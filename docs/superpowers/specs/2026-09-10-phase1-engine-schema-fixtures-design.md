@@ -236,11 +236,14 @@ interface EffectHandler<E extends Effect> {
 effects resolve to a handler implementing the identical interface, looked up by handler id in
 `custom/registry.ts` — one dispatch mechanism, two lookup tables.
 
-### 1. `resolveStats(champion, level, build) → StatSheet`
+### 1. `resolveStats(champion, level, build, catalog) → StatSheet`
 
 **Spec fix.** Original signature was `resolveStats(champion, level, build, runes, inputs)`, but
-`Build` already carries `runes` and `inputs` — the extra parameters were redundant with the type.
-Collapsed to three arguments.
+`Build` already carries `runes` and `inputs` — those two parameters were redundant with the type.
+However `Build.items`/`Build.runes` are id strings, not embedded objects, so a lookup is still
+needed: `catalog: { items: Map<string, Item>, runes: Map<string, Rune> }`, mirroring
+`validateItemCost`'s `allItems: Map<string, Item>` in `validate/item.ts`. See
+`docs/decisions/2026-09-10-resolve-stats-item-rune-catalog.md`.
 
 Returns base / bonus / total per stat and a breakdown: `{ stat, source, layer, amount }[]`, where
 `source` is `{ kind: 'champion' | 'item' | 'rune' | 'effect', id, name }` (names are fine in
