@@ -267,4 +267,26 @@ describe('resolveStats', () => {
       source: { kind: 'champion', id: 'nunu-willump', name: 'Nunu & Willump' },
     })
   })
+
+  it('clamps level below 1 up to 1', () => {
+    const sheet = resolveStats(validChampion(), 0, emptyBuild(), { items: new Map(), runes: new Map() })
+    const level1Sheet = resolveStats(validChampion(), 1, emptyBuild(), { items: new Map(), runes: new Map() })
+    expect(sheet.base.hp).toBe(level1Sheet.base.hp)
+  })
+
+  it('clamps level above MAX_CHAMPION_LEVEL down to MAX_CHAMPION_LEVEL', () => {
+    const sheet = resolveStats(
+      validChampion(), MAX_CHAMPION_LEVEL + 50, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const maxLevelSheet = resolveStats(
+      validChampion(), MAX_CHAMPION_LEVEL, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    expect(sheet.base.hp).toBe(maxLevelSheet.base.hp)
+  })
+
+  it('rounds a non-integer level', () => {
+    const sheet = resolveStats(validChampion(), 7.4, emptyBuild(), { items: new Map(), runes: new Map() })
+    const level7Sheet = resolveStats(validChampion(), 7, emptyBuild(), { items: new Map(), runes: new Map() })
+    expect(sheet.base.hp).toBe(level7Sheet.base.hp)
+  })
 })
