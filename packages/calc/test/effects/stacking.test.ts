@@ -34,4 +34,9 @@ describe('stackingHandler', () => {
     )
     expect(contribution.dataWarning).toBe('Test Stacks: perStack is unverified (null)')
   })
+
+  it('clamps negative stack counts to zero', () => {
+    const [contribution] = stackingHandler.contributeStats!(effect, ctx({ inputs: { stacks: -5 } }))
+    expect(contribution.amount).toBe(0)
+  })
 })

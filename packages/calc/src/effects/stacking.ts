@@ -7,7 +7,7 @@ export const stackingHandler: EffectHandler<StackingEffect> = {
   stage: 'flat',
   contributeStats(effect, ctx) {
     const rawStacks = ctx.inputs[effect.stackInputId]
-    const stacks = typeof rawStacks === 'number' ? Math.min(rawStacks, effect.maxStacks) : 0
+    const stacks = typeof rawStacks === 'number' ? Math.max(0, Math.min(rawStacks, effect.maxStacks)) : 0
     const resolved = resolveScalar(effect.perStack, ctx.level)
     return [{
       stat: effect.stat,
