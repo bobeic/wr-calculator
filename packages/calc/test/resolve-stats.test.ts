@@ -234,6 +234,29 @@ describe('resolveStats', () => {
     expect(sheet.unverifiedRules).toContain('levelRangeInterpolation')
   })
 
+  it('breakdown entries sum to the base/bonus totals for every stat', () => {
+    const item = itemWithStats('multi-stat-item', 25)
+    item.effects = [{
+      id: 'mult', name: 'Test Multiplier', description: '', support: 'full',
+      kind: 'statMultiplier', stat: 'ad', layer: 'bonus', amount: 0.2,
+    }]
+    const items = new Map([['multi-stat-item', item]])
+    const build = emptyBuild({ items: ['multi-stat-item'] })
+    const sheet = resolveStats(validChampion(), 5, build, { items, runes: new Map() })
+
+    const statsInBreakdown = new Set(sheet.breakdown.map((entry) => entry.stat))
+    for (const stat of statsInBreakdown) {
+      const baseSum = sheet.breakdown
+        .filter((entry) => entry.stat === stat && entry.layer === 'base')
+        .reduce((acc, entry) => acc + entry.amount, 0)
+      const bonusSum = sheet.breakdown
+        .filter((entry) => entry.stat === stat && entry.layer === 'bonus')
+        .reduce((acc, entry) => acc + entry.amount, 0)
+      expect(sheet.base[stat] ?? 0).toBeCloseTo(baseSum, 10)
+      expect(sheet.bonus[stat] ?? 0).toBeCloseTo(bonusSum, 10)
+    }
+  })
+
   it('includes a breakdown entry for every contribution with its source', () => {
     const sheet = resolveStats(
       validChampion(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
