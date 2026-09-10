@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { NullableScalarSchema } from './scalar'
 
 export const DamageTypeSchema = z.enum(['physical', 'magic', 'true'])
+export type DamageType = z.infer<typeof DamageTypeSchema>
 
 export const DamageRatioStatSchema = z.enum([
   'totalAd', 'bonusAd', 'ap', 'maxHp', 'bonusHp',
