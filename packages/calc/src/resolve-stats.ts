@@ -2,6 +2,7 @@ import type { Champion, Build, Item, Rune, Effect, StatKey, NullableScalar } fro
 import { STAT_KEYS } from '@wr-calc/schema'
 import {
   MAX_CHAMPION_LEVEL, ATTACK_SPEED_CAP, STAT_RESOLUTION_ORDER, statAtLevel, attackSpeedAtLevel,
+  totalAttackSpeed,
 } from './rules'
 import type { UnverifiedRuleId } from './rules'
 import { resolveScalar, scalarWarning } from './resolve-scalar'
@@ -122,10 +123,12 @@ export function resolveStats(
     }
   }
 
-  const uncappedAttackSpeed = (base.attackSpeed ?? 0) + (bonus.attackSpeed ?? 0)
+  const uncappedAttackSpeed = totalAttackSpeed(base.attackSpeed ?? 0, bonus.attackSpeed ?? 0)
   if (uncappedAttackSpeed > ATTACK_SPEED_CAP) {
+    const baseAs = base.attackSpeed ?? 0
+    const cappedBonusFraction = baseAs > 0 ? (ATTACK_SPEED_CAP / baseAs) - 1 : 0
     record({
-      stat: 'attackSpeed', layer: 'bonus', amount: ATTACK_SPEED_CAP - uncappedAttackSpeed,
+      stat: 'attackSpeed', layer: 'bonus', amount: cappedBonusFraction - (bonus.attackSpeed ?? 0),
       source: championSource, usedLevelRangeInterpolation: false,
     })
   }
@@ -134,7 +137,9 @@ export function resolveStats(
   for (const stat of STAT_KEYS) {
     const baseValue = base[stat] ?? 0
     const bonusValue = bonus[stat] ?? 0
-    if (baseValue !== 0 || bonusValue !== 0) total[stat] = baseValue + bonusValue
+    if (baseValue !== 0 || bonusValue !== 0) {
+      total[stat] = stat === 'attackSpeed' ? totalAttackSpeed(baseValue, bonusValue) : baseValue + bonusValue
+    }
   }
 
   return {

@@ -61,6 +61,15 @@ export function attackSpeedAtLevel(base: number, ratio: number, level: number): 
   return base * (1 + ratio * n * factor)
 }
 
+// TODO-VERIFY(attackSpeedStacking): confirm bonus attack speed (item/rune fractions) combines
+// multiplicatively with base attack speed — total = base * (1 + bonusFraction) — rather than
+// additively, by comparing a champion's displayed attack speed at 0% and at a known X% bonus AS
+// in the practice tool and checking which formula the displayed result matches.
+/** Combines a champion's base attack speed with a fractional bonus (e.g. from items) multiplicatively. */
+export function totalAttackSpeed(base: number, bonusFraction: number): number {
+  return base * (1 + bonusFraction)
+}
+
 // TODO-VERIFY(statResolutionOrder): confirm stat resolution applies in this order — champion
 // base+growth, then flat contributions (item stats, `stat`/`stacking` effects), then
 // `statMultiplier` effects, then `statConversion` effects, then caps — by equipping items that
@@ -98,5 +107,6 @@ export const UNVERIFIED_RULE_IDS = [
   'itemSlots',
   'attackSpeedRatioGrowth',
   'statResolutionOrder',
+  'attackSpeedStacking',
 ] as const
 export type UnverifiedRuleId = (typeof UNVERIFIED_RULE_IDS)[number]

@@ -205,6 +205,16 @@ describe('resolveStats', () => {
     expect(sheet.total.attackSpeed).toBe(ATTACK_SPEED_CAP)
   })
 
+  it('combines bonus attack speed with base multiplicatively, not additively', () => {
+    const item = itemWithStats('as-fraction-item', 0)
+    item.stats = { attackSpeed: 0.25 }
+    const items = new Map([['as-fraction-item', item]])
+    const build = emptyBuild({ items: ['as-fraction-item'] })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.total.attackSpeed).toBeCloseTo(0.625 * 1.25, 10)
+    expect(sheet.total.attackSpeed).not.toBeCloseTo(0.625 + 0.25, 10)
+  })
+
   it('always reports the core unverified rules used by every call', () => {
     const sheet = resolveStats(
       validChampion(), 1, emptyBuild(), { items: new Map(), runes: new Map() }

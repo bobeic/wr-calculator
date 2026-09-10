@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   MAX_CHAMPION_LEVEL, statAtLevel, interpolateLevelRange, resolveAdaptiveDamageType,
-  attackSpeedAtLevel, STAT_RESOLUTION_ORDER, UNVERIFIED_RULE_IDS,
+  attackSpeedAtLevel, totalAttackSpeed, STAT_RESOLUTION_ORDER, UNVERIFIED_RULE_IDS,
 } from '../src/rules'
 
 describe('statAtLevel', () => {
@@ -70,6 +70,16 @@ describe('attackSpeedAtLevel', () => {
     const late = attackSpeedAtLevel(0.625, 0.025, MAX_CHAMPION_LEVEL)
       - attackSpeedAtLevel(0.625, 0.025, MAX_CHAMPION_LEVEL - 1)
     expect(late).toBeGreaterThan(early)
+  })
+})
+
+describe('totalAttackSpeed', () => {
+  it('combines base and a fractional bonus multiplicatively', () => {
+    expect(totalAttackSpeed(0.625, 0.25)).toBeCloseTo(0.78125, 10)
+  })
+
+  it('returns base unchanged when the bonus fraction is 0', () => {
+    expect(totalAttackSpeed(0.625, 0)).toBe(0.625)
   })
 })
 
