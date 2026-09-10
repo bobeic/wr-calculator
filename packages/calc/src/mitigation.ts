@@ -8,14 +8,16 @@ export interface ResistModifiers {
   flatPen: number
 }
 
-export const ZERO_RESIST_MODIFIERS: ResistModifiers = {
+export const ZERO_RESIST_MODIFIERS: ResistModifiers = Object.freeze({
   flatReduction: 0, pctReduction: 0, pctPen: 0, flatPen: 0,
-}
+})
 
 /**
  * Applies resist modifiers to a raw resist value in RESIST_MODIFICATION_ORDER, each step reading
  * the running value left by the previous one. Reduction (flat/percent) can drive resist negative;
- * penetration (flat/percent) cannot take it below 0.
+ * penetration (flat/percent) cannot take it below 0 and is a no-op once resist is already <= 0
+ * (it never pulls a negative resist back toward zero, which would reduce the attacker's
+ * negative-resist damage-amplification bonus instead of only ever helping or doing nothing).
  */
 export function effectiveResist(
   rawResist: number, modifiers: ResistModifiers = ZERO_RESIST_MODIFIERS
@@ -38,7 +40,9 @@ export function mitigationMultiplier(resist: number): number {
   return resist >= 0 ? 100 / (100 + resist) : 2 - 100 / (100 - resist)
 }
 
-/** Mitigates raw damage of a given type by a raw resist value and its modifiers. True damage passes through unaffected. */
+/**
+ * Mitigates raw damage of a given type by a raw resist value and its modifiers. True damage passes through unaffected.
+ */
 export function mitigateDamage(
   rawDamage: number, damageType: DamageType, rawResist: number,
   modifiers: ResistModifiers = ZERO_RESIST_MODIFIERS
