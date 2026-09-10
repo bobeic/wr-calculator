@@ -25,12 +25,9 @@ export function effectiveResist(
     if (step === 'flatReduction') resist -= modifiers.flatReduction
     else if (step === 'pctReduction') resist -= resist * modifiers.pctReduction
     else if (step === 'pctPen') {
-      const reduction = resist * modifiers.pctPen
-      if (reduction > 0) resist = Math.max(0, resist - reduction)
-      else resist -= reduction
+      if (resist > 0) resist = Math.max(0, resist - resist * modifiers.pctPen)
     } else {
-      if (modifiers.flatPen > 0) resist = Math.max(0, resist - modifiers.flatPen)
-      else resist -= modifiers.flatPen
+      if (resist > 0) resist = Math.max(0, resist - modifiers.flatPen)
     }
   }
   return resist

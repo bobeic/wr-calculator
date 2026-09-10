@@ -56,6 +56,20 @@ describe('effectiveResist', () => {
       flatReduction: 20, pctReduction: 0, pctPen: 0.5, flatPen: 0,
     })).toBe(40)
   })
+
+  it('percent penetration is no-op when resist is already negative', () => {
+    // 100 -> flatReduction 150 -> -50 -> pctReduction 0 -> -50 -> pctPen 0.5 (no-op since resist < 0) -> -50
+    expect(effectiveResist(100, {
+      flatReduction: 150, pctReduction: 0, pctPen: 0.5, flatPen: 0,
+    })).toBe(-50)
+  })
+
+  it('flat penetration is no-op when resist is already negative', () => {
+    // 100 -> flatReduction 150 -> -50 -> pctReduction 0 -> -50 -> pctPen 0 -> -50 -> flatPen 30 (no-op since resist < 0) -> -50
+    expect(effectiveResist(100, {
+      flatReduction: 150, pctReduction: 0, pctPen: 0, flatPen: 30,
+    })).toBe(-50)
+  })
 })
 
 describe('mitigateDamage', () => {
