@@ -21,6 +21,9 @@ export function resolveScalar(scalar: NullableScalar, level: number): ResolvedSc
     return { value, wasNull: false, usedLevelRangeInterpolation: true, wasByRank: false }
   }
   if ('byLevel' in scalar) {
+    if (scalar.byLevel.length === 0) {
+      return { value: 0, wasNull: true, usedLevelRangeInterpolation: false, wasByRank: false }
+    }
     const index = Math.min(Math.max(Math.round(level), 1), scalar.byLevel.length) - 1
     return {
       value: scalar.byLevel[index], wasNull: false, usedLevelRangeInterpolation: false,

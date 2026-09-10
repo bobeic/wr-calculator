@@ -36,6 +36,13 @@ describe('resolveScalar', () => {
     expect(result.value).toBe(0)
     expect(result.wasByRank).toBe(true)
   })
+
+  it('resolves an empty byLevel array to 0 and flags wasNull', () => {
+    const result = resolveScalar({ byLevel: [] }, 5)
+    expect(result).toEqual({
+      value: 0, wasNull: true, usedLevelRangeInterpolation: false, wasByRank: false,
+    })
+  })
 })
 
 describe('scalarWarning', () => {
@@ -56,5 +63,12 @@ describe('scalarWarning', () => {
   it('returns undefined when nothing is wrong', () => {
     const resolved = resolveScalar(10, 5)
     expect(scalarWarning('Test Effect', 'amount', resolved)).toBeUndefined()
+  })
+
+  it('returns a null-style warning for empty byLevel array', () => {
+    const resolved = resolveScalar({ byLevel: [] }, 5)
+    expect(scalarWarning('Test Effect', 'amount', resolved)).toBe(
+      'Test Effect: amount is unverified (null)'
+    )
   })
 })
