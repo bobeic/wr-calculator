@@ -76,7 +76,12 @@ export function resolveStats(
     return (base[stat] ?? 0) + (bonus[stat] ?? 0)
   }
 
-  const items = build.items.map((id) => {
+  const itemIds = [
+    ...build.items,
+    ...(build.boots ? [build.boots] : []),
+    ...(build.enchant ? [build.enchant] : []),
+  ]
+  const items = itemIds.map((id) => {
     const item = catalog.items.get(id)
     if (!item) throw new Error(`resolveStats: unknown item id '${id}' in build`)
     return item

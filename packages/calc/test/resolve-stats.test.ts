@@ -71,6 +71,28 @@ describe('resolveStats', () => {
     )).toThrow(/unknown rune id/)
   })
 
+  it('includes boots and enchant stats in the bonus layer, not just build.items', () => {
+    const boots = itemWithStats('boots-of-swiftness', 0)
+    boots.stats = { moveSpeed: 45 }
+    const enchant = itemWithStats('stasis-enchant', 0)
+    enchant.stats = { ad: 15 }
+    const items = new Map([
+      ['boots-of-swiftness', boots],
+      ['stasis-enchant', enchant],
+    ])
+    const build = emptyBuild({ boots: 'boots-of-swiftness', enchant: 'stasis-enchant' })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.bonus.moveSpeed).toBe(45)
+    expect(sheet.bonus.ad).toBe(15)
+  })
+
+  it('throws when a build references an unknown boots id', () => {
+    const build = emptyBuild({ boots: 'does-not-exist' })
+    expect(() => resolveStats(
+      validChampion(), 1, build, { items: new Map(), runes: new Map() }
+    )).toThrow(/unknown item id/)
+  })
+
   it('records a data warning for a null item stat', () => {
     const item = itemWithStats('rabadons', 0)
     item.stats = { ap: null }
