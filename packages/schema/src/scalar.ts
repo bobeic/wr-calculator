@@ -5,9 +5,9 @@ import { z } from 'zod'
  */
 export const ScalarSchema = z.union([
   z.number(),
-  z.object({ byLevel: z.array(z.number()) }),
-  z.object({ levelRange: z.object({ min: z.number(), max: z.number() }) }),
-  z.object({ byRank: z.array(z.number()) }),
+  z.object({ byLevel: z.array(z.number()) }).strict(),
+  z.object({ levelRange: z.object({ min: z.number(), max: z.number() }).strict() }).strict(),
+  z.object({ byRank: z.array(z.number()) }).strict(),
 ])
 export type Scalar = z.infer<typeof ScalarSchema>
 

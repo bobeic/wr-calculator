@@ -38,6 +38,11 @@ describe('ItemSchema', () => {
     expect(() => ItemSchema.parse(item)).toThrow()
   })
 
+  it('rejects an unknown top-level field', () => {
+    const item = { ...validItem(), madeUpField: true }
+    expect(() => ItemSchema.parse(item)).toThrow()
+  })
+
   it('parses an item carrying effects', () => {
     const item = {
       ...validItem(),

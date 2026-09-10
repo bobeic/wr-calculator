@@ -33,6 +33,30 @@ describe('on-hit-family effect kinds', () => {
     expect(result.kind).toBe('spellblade')
   })
 
+  it('rejects an unknown field inside a spellblade ratio entry', () => {
+    expect(() =>
+      EffectSchema.parse({
+        ...base,
+        kind: 'spellblade',
+        damageType: 'physical',
+        bonusDamage: null,
+        ratios: [{ stat: 'ad', value: 1, madeUpField: true }],
+        internalCooldownSeconds: 1.5,
+      })
+    ).toThrow()
+  })
+
+  it('rejects an unknown field inside onHit.pctOwnStat', () => {
+    expect(() =>
+      EffectSchema.parse({
+        ...base,
+        kind: 'onHit',
+        damageType: 'physical',
+        pctOwnStat: { stat: 'ad', ratio: 0.5, madeUpField: true },
+      })
+    ).toThrow()
+  })
+
   it('parses a procEveryN effect', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'procEveryN', n: 3, damageType: 'magic', damage: 40,

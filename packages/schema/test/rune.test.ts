@@ -8,4 +8,13 @@ describe('RuneSchema', () => {
     })
     expect(result.id).toBe('conqueror')
   })
+
+  it('rejects an unknown field', () => {
+    expect(() =>
+      RuneSchema.parse({
+        id: 'conqueror', name: 'Conqueror', path: 'precision', slot: 'keystone', effects: [],
+        madeUpField: true,
+      })
+    ).toThrow()
+  })
 })

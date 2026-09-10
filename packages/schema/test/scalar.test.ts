@@ -28,6 +28,16 @@ describe('ScalarSchema', () => {
   it('rejects null on the non-nullable schema', () => {
     expect(() => ScalarSchema.parse(null)).toThrow()
   })
+
+  it('rejects an unknown field inside byLevel', () => {
+    expect(() => ScalarSchema.parse({ byLevel: [1, 2, 3], madeUpField: true })).toThrow()
+  })
+
+  it('rejects an unknown field inside levelRange', () => {
+    expect(() =>
+      ScalarSchema.parse({ levelRange: { min: 10, max: 50, madeUpField: true } })
+    ).toThrow()
+  })
 })
 
 describe('NullableScalarSchema', () => {

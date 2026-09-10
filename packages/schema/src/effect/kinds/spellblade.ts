@@ -7,7 +7,8 @@ export const SpellbladeEffectSchema = EffectBaseSchema.extend({
   kind: z.literal('spellblade'),
   damageType: z.enum(['physical', 'magic', 'true']),
   bonusDamage: NullableScalarSchema,
-  ratios: z.array(z.object({ stat: StatKeySchema, value: NullableScalarSchema })).default([]),
+  ratios: z.array(z.object({ stat: StatKeySchema, value: NullableScalarSchema }).strict())
+    .default([]),
   internalCooldownSeconds: NullableScalarSchema,
 })
 export type SpellbladeEffect = z.infer<typeof SpellbladeEffectSchema>

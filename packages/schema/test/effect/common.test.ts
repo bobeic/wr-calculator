@@ -48,4 +48,8 @@ describe('EffectBaseSchema', () => {
     const { description, ...rest } = valid
     expect(() => EffectBaseSchema.parse(rest)).toThrow()
   })
+
+  it('rejects an unknown field', () => {
+    expect(() => EffectBaseSchema.parse({ ...valid, madeUpField: true })).toThrow()
+  })
 })

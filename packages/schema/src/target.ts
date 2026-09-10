@@ -7,7 +7,7 @@ export const TargetChampionSchema = z.object({
   champion: z.string(),
   level: z.number(),
   build: BuildSchema,
-})
+}).strict()
 
 export const TargetDummySchema = z.object({
   kind: z.literal('dummy'),
@@ -15,7 +15,7 @@ export const TargetDummySchema = z.object({
   armor: z.number(),
   mr: z.number(),
   effects: z.array(EffectSchema).optional(),
-})
+}).strict()
 
 export const TargetSchema = z.discriminatedUnion('kind', [TargetChampionSchema, TargetDummySchema])
 export type Target = z.infer<typeof TargetSchema>

@@ -47,4 +47,10 @@ describe('simple effect kinds', () => {
   it('rejects an unknown kind', () => {
     expect(() => EffectSchema.parse({ ...base, kind: 'madeUpKind' })).toThrow()
   })
+
+  it('rejects an unknown field on a stat effect (EffectBaseSchema.strict() cascades via extend)', () => {
+    expect(() =>
+      EffectSchema.parse({ ...base, kind: 'stat', stat: 'ad', amount: 10, madeUpField: true })
+    ).toThrow()
+  })
 })

@@ -10,7 +10,7 @@ export const OnHitEffectSchema = EffectBaseSchema.extend({
   pctTargetCurrentHp: NullableScalarSchema.optional(),
   pctTargetMaxHp: NullableScalarSchema.optional(),
   pctTargetMissingHp: NullableScalarSchema.optional(),
-  pctOwnStat: z.object({ stat: StatKeySchema, ratio: NullableScalarSchema }).optional(),
+  pctOwnStat: z.object({ stat: StatKeySchema, ratio: NullableScalarSchema }).strict().optional(),
   minDamage: NullableScalarSchema.optional(),
   maxDamage: NullableScalarSchema.optional(),
   monsterCap: NullableScalarSchema.optional(),

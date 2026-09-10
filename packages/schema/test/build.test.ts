@@ -16,4 +16,15 @@ describe('BuildSchema', () => {
     const result = BuildSchema.parse({ items: [], runes: [], inputs: {} })
     expect(result.boots).toBeUndefined()
   })
+
+  it('allows arbitrary keys inside inputs (user-defined input ids)', () => {
+    const result = BuildSchema.parse({ items: [], runes: [], inputs: { anyKeyAtAll: 3 } })
+    expect(result.inputs.anyKeyAtAll).toBe(3)
+  })
+
+  it('rejects an unknown top-level field', () => {
+    expect(() =>
+      BuildSchema.parse({ items: [], runes: [], inputs: {}, madeUpField: true })
+    ).toThrow()
+  })
 })
