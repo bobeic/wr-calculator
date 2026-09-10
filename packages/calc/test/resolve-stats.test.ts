@@ -221,7 +221,7 @@ describe('resolveStats', () => {
     )
     expect(sheet.unverifiedRules).toEqual(expect.arrayContaining([
       'maxChampionLevel', 'statGrowthCurve', 'statResolutionOrder', 'attackSpeedRatioGrowth',
-      'attackSpeedCap',
+      'attackSpeedCap', 'attackSpeedStacking',
     ]))
   })
 
