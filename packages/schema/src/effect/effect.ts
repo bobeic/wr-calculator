@@ -12,8 +12,11 @@ import { PenetrationEffectSchema } from './kinds/penetration'
 import { DamageAmpEffectSchema } from './kinds/damage-amp'
 import { CooldownRefundEffectSchema } from './kinds/cooldown-refund'
 import { DamageReductionEffectSchema } from './kinds/damage-reduction'
+import { ShieldEffectSchema } from './kinds/shield'
+import { HealEffectSchema } from './kinds/heal'
+import { ActiveEffectSchema } from './kinds/active'
+import { CustomEffectSchema } from './kinds/custom'
 
-// Task 7 appends its kinds' schemas to this array.
 export const EffectSchema = z.discriminatedUnion('kind', [
   StatEffectSchema,
   StatMultiplierEffectSchema,
@@ -28,6 +31,30 @@ export const EffectSchema = z.discriminatedUnion('kind', [
   DamageAmpEffectSchema,
   CooldownRefundEffectSchema,
   DamageReductionEffectSchema,
+  ShieldEffectSchema,
+  HealEffectSchema,
+  ActiveEffectSchema,
+  CustomEffectSchema,
 ])
 export type Effect = z.infer<typeof EffectSchema>
 export type EffectKind = Effect['kind']
+
+export * from './kinds/stat'
+export * from './kinds/stat-multiplier'
+export * from './kinds/stat-conversion'
+export * from './kinds/stacking'
+export * from './kinds/on-hit'
+export * from './kinds/spellblade'
+export * from './kinds/proc-every-n'
+export * from './kinds/dot'
+export * from './kinds/resist-shred'
+export * from './kinds/penetration'
+export * from './kinds/damage-amp'
+export * from './kinds/cooldown-refund'
+export * from './kinds/damage-reduction'
+export * from './kinds/shield'
+export * from './kinds/heal'
+export * from './kinds/active'
+export * from './kinds/custom'
+export * from './condition'
+export * from './kinds/common'
