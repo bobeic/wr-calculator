@@ -11,10 +11,12 @@ export const DamageRatioStatSchema = z.enum([
 export const DamageComponentSchema = z.object({
   type: DamageTypeSchema,
   base: NullableScalarSchema,
-  ratios: z.array(z.object({ stat: DamageRatioStatSchema, value: NullableScalarSchema })),
+  ratios: z.array(
+    z.object({ stat: DamageRatioStatSchema, value: NullableScalarSchema }).strict()
+  ),
   hits: z.number().optional(),
   tags: z.array(z.string()),
-})
+}).strict()
 export type DamageComponent = z.infer<typeof DamageComponentSchema>
 
 export const AbilitySchema = z.object({
@@ -29,8 +31,8 @@ export const AbilitySchema = z.object({
     appliesOnHit: z.boolean().optional(),
     triggersSpellblade: z.boolean().optional(),
     resetsBasicAttack: z.boolean().optional(),
-  }),
+  }).strict(),
   /** Handler id for kits that don't fit the declarative damage model, e.g. Nunu's Q throw. */
   custom: z.string().optional(),
-})
+}).strict()
 export type Ability = z.infer<typeof AbilitySchema>

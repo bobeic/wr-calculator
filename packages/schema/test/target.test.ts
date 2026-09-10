@@ -20,4 +20,10 @@ describe('TargetSchema', () => {
   it('rejects a dummy target missing hp', () => {
     expect(() => TargetSchema.parse({ kind: 'dummy', armor: 60, mr: 40 })).toThrow()
   })
+
+  it('rejects a dummy target with an unknown field', () => {
+    expect(() =>
+      TargetSchema.parse({ kind: 'dummy', hp: 2000, armor: 60, mr: 40, madeUpField: true })
+    ).toThrow()
+  })
 })

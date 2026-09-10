@@ -9,5 +9,5 @@ export const RuneSchema = z.object({
   path: z.string(),
   slot: z.string(),
   effects: z.array(EffectSchema),
-})
+}).strict()
 export type Rune = z.infer<typeof RuneSchema>

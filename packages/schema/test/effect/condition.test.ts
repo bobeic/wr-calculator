@@ -24,4 +24,10 @@ describe('ConditionSchema', () => {
   it('rejects targetHpBelow missing threshold', () => {
     expect(() => ConditionSchema.parse({ type: 'targetHpBelow' })).toThrow()
   })
+
+  it('rejects an unknown field', () => {
+    expect(() =>
+      ConditionSchema.parse({ type: 'targetHpBelow', threshold: 0.3, madeUpField: true })
+    ).toThrow()
+  })
 })

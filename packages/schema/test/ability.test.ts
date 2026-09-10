@@ -39,4 +39,14 @@ describe('AbilitySchema', () => {
     const result = AbilitySchema.parse({ ...validAbility, custom: 'nunuSnowball' })
     expect(result.custom).toBe('nunuSnowball')
   })
+
+  it('rejects an unknown field', () => {
+    expect(() => AbilitySchema.parse({ ...validAbility, madeUpField: true })).toThrow()
+  })
+
+  it('rejects an unknown field in flags', () => {
+    expect(() =>
+      AbilitySchema.parse({ ...validAbility, flags: { madeUpFlag: true } })
+    ).toThrow()
+  })
 })

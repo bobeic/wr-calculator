@@ -5,5 +5,5 @@ export const ProvenanceSchema = z.object({
   patch: z.string(),
   verifiedInGame: z.boolean(),
   verifiedAt: z.string().optional(),
-})
+}).strict()
 export type Provenance = z.infer<typeof ProvenanceSchema>

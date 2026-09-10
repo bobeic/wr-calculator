@@ -48,4 +48,30 @@ describe('ChampionSchema', () => {
     }
     expect(() => ChampionSchema.parse(champion)).toThrow()
   })
+
+  it('rejects attackSpeed inside baseStats since base AS has its own dedicated field', () => {
+    const champion = {
+      id: 'x', name: 'X', resource: 'mana' as const,
+      baseStats: { attackSpeed: { base: 0.625, perLevel: 0.005 } },
+      attackSpeed: { base: 0.625 },
+      abilities: {
+        passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
+        e: validAbility('e'), r: validAbility('r'),
+      },
+    }
+    expect(() => ChampionSchema.parse(champion)).toThrow()
+  })
+
+  it('rejects an unknown top-level field', () => {
+    const champion = {
+      id: 'x', name: 'X', resource: 'mana' as const, baseStats: {},
+      attackSpeed: { base: 0.6 },
+      abilities: {
+        passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
+        e: validAbility('e'), r: validAbility('r'),
+      },
+      madeUpField: true,
+    }
+    expect(() => ChampionSchema.parse(champion)).toThrow()
+  })
 })

@@ -12,11 +12,11 @@ export const ItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   tier: ItemTierSchema,
-  cost: z.object({ total: z.number(), combine: z.number() }),
+  cost: z.object({ total: z.number(), combine: z.number() }).strict(),
   recipe: z.array(z.string()),
-  stats: statKeyRecord(NullableScalarSchema).strict(),
+  stats: statKeyRecord(NullableScalarSchema),
   effects: z.array(EffectSchema),
   tags: z.array(z.string()),
   provenance: ProvenanceSchema,
-})
+}).strict()
 export type Item = z.infer<typeof ItemSchema>
