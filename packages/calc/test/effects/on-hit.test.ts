@@ -83,4 +83,18 @@ describe('onHitHandler.onBasicAttack', () => {
     onHitHandler.hooks!.onBasicAttack!({ ...baseEffect, flat: null }, c)
     expect(c.addDataWarning).toHaveBeenCalledWith('Test On-Hit: flat is unverified (null)')
   })
+
+  it('clamps to 0 and records a data warning when minDamage is null', () => {
+    const c = ctx()
+    onHitHandler.hooks!.onBasicAttack!({ ...baseEffect, flat: -5, minDamage: null }, c)
+    expect(c.addDataWarning).toHaveBeenCalledWith('Test On-Hit: minDamage is unverified (null)')
+    expect(c.dealDamage).toHaveBeenCalledWith(expect.objectContaining({ amount: 0 }))
+  })
+
+  it('clamps to 0 and records a data warning when maxDamage is null', () => {
+    const c = ctx()
+    onHitHandler.hooks!.onBasicAttack!({ ...baseEffect, flat: 15, maxDamage: null }, c)
+    expect(c.addDataWarning).toHaveBeenCalledWith('Test On-Hit: maxDamage is unverified (null)')
+    expect(c.dealDamage).toHaveBeenCalledWith(expect.objectContaining({ amount: 0 }))
+  })
 })

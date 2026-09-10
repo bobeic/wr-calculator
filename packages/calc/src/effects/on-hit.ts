@@ -24,8 +24,12 @@ export const onHitHandler: EffectHandler<OnHitEffect> = {
         const statValue = ctx.selfSheet.total[effect.pctOwnStat.stat] ?? 0
         amount += part(effect.pctOwnStat.ratio, 'pctOwnStat.ratio') * statValue
       }
-      if (effect.minDamage != null) amount = Math.max(amount, part(effect.minDamage, 'minDamage'))
-      if (effect.maxDamage != null) amount = Math.min(amount, part(effect.maxDamage, 'maxDamage'))
+      if (effect.minDamage !== undefined) {
+        amount = Math.max(amount, part(effect.minDamage, 'minDamage'))
+      }
+      if (effect.maxDamage !== undefined) {
+        amount = Math.min(amount, part(effect.maxDamage, 'maxDamage'))
+      }
 
       ctx.dealDamage({
         type: effect.damageType, amount,
