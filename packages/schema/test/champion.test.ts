@@ -35,4 +35,17 @@ describe('ChampionSchema', () => {
     }
     expect(() => ChampionSchema.parse(champion)).toThrow()
   })
+
+  it('rejects an unknown stat key in baseStats', () => {
+    const champion = {
+      id: 'x', name: 'X', resource: 'mana' as const,
+      baseStats: { madeUpStat: { base: 10, perLevel: 1 } },
+      attackSpeed: { base: 0.6 },
+      abilities: {
+        passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
+        e: validAbility('e'), r: validAbility('r'),
+      },
+    }
+    expect(() => ChampionSchema.parse(champion)).toThrow()
+  })
 })

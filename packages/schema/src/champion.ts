@@ -4,7 +4,7 @@ import { AbilitySchema } from './ability'
 
 export const ChampionBaseStatsSchema = statKeyRecord(
   z.object({ base: z.number(), perLevel: z.number() })
-)
+).strict()
 
 export const ChampionSchema = z.object({
   id: z.string(),

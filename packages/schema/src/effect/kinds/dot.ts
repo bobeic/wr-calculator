@@ -6,7 +6,7 @@ export const DotEffectSchema = EffectBaseSchema.extend({
   kind: z.literal('dot'),
   damageType: z.enum(['physical', 'magic', 'true']),
   tickAmount: NullableScalarSchema,
-  tickIntervalSeconds: z.number(),
+  tickIntervalSeconds: z.number().positive(),
   durationSeconds: NullableScalarSchema,
   refresh: z.enum(['refresh', 'stack', 'ignore']),
 })
