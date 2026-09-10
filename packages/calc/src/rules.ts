@@ -49,6 +49,25 @@ export function resolveAdaptiveDamageType(bonusAd: number, ap: number): 'physica
   return bonusAd >= ap ? 'physical' : 'magic'
 }
 
+// TODO-VERIFY(attackSpeedRatioGrowth): confirm champion base attack speed scales with level as
+// base * (1 + ratio * growthFactor(level)), using the same non-linear growth curve as other
+// stats, by recording a champion's displayed base attack speed at level 1 and at
+// MAX_CHAMPION_LEVEL in the practice tool and checking it fits this formula.
+/** Resolves a champion's base attack speed at a given level from its base value and AS ratio. */
+export function attackSpeedAtLevel(base: number, ratio: number, level: number): number {
+  if (level <= 1) return base
+  const n = level - 1
+  const factor = GROWTH_CURVE_A + GROWTH_CURVE_B * n
+  return base * (1 + ratio * n * factor)
+}
+
+// TODO-VERIFY(statResolutionOrder): confirm stat resolution applies in this order — champion
+// base+growth, then flat contributions (item stats, `stat`/`stacking` effects), then
+// `statMultiplier` effects, then `statConversion` effects, then caps — by equipping items that
+// cover multiple stages together and checking the displayed total against each possible
+// ordering.
+export const STAT_RESOLUTION_ORDER = ['flat', 'multiplier', 'conversion'] as const
+
 // TODO-VERIFY(resistModificationOrder): confirm resist modification order by applying a flat
 // reduction, a % reduction, and armor pen together on a known-armor dummy and checking the
 // resulting mitigation matches this order rather than a different one.
@@ -77,5 +96,7 @@ export const UNVERIFIED_RULE_IDS = [
   'resistModificationOrder',
   'uniqueEffectResolution',
   'itemSlots',
+  'attackSpeedRatioGrowth',
+  'statResolutionOrder',
 ] as const
 export type UnverifiedRuleId = (typeof UNVERIFIED_RULE_IDS)[number]
