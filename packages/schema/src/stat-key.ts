@@ -17,5 +17,5 @@ export function statKeyRecord<T extends z.ZodTypeAny>(valueSchema: T) {
   const shape = Object.fromEntries(
     STAT_KEYS.map((key) => [key, valueSchema.optional()])
   ) as Record<StatKey, z.ZodOptional<T>>
-  return z.object(shape).strict()
+  return z.object(shape)
 }

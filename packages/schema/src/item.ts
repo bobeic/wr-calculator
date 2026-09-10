@@ -14,7 +14,7 @@ export const ItemSchema = z.object({
   tier: ItemTierSchema,
   cost: z.object({ total: z.number(), combine: z.number() }),
   recipe: z.array(z.string()),
-  stats: statKeyRecord(NullableScalarSchema),
+  stats: statKeyRecord(NullableScalarSchema).strict(),
   effects: z.array(EffectSchema),
   tags: z.array(z.string()),
   provenance: ProvenanceSchema,
