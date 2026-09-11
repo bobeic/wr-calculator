@@ -18,7 +18,7 @@ export const resistShredHandler: EffectHandler<ResistShredEffect> = {
         : 1
 
       let expiresAt: number | undefined
-      if (effect.durationSeconds != null) {
+      if (effect.durationSeconds !== undefined) {
         const resolved = resolveScalar(effect.durationSeconds, ctx.level)
         const warning = scalarWarning(effect.name, 'durationSeconds', resolved)
         if (warning) ctx.addDataWarning(warning)
@@ -32,6 +32,7 @@ export const resistShredHandler: EffectHandler<ResistShredEffect> = {
       (effect.resist === 'armor' && damageType === 'physical')
       || (effect.resist === 'mr' && damageType === 'magic')
     if (!targetsThisDamageType) return {}
+    if (effect.condition && !ctx.conditionMet(effect, effect.condition, { damageType })) return {}
 
     const buff = ctx.opponent.buffs[buffKey(effect)]
     if (!buff || (buff.expiresAt !== undefined && buff.expiresAt < ctx.time)) return {}

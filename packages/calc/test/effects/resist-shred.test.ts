@@ -45,6 +45,21 @@ describe('resistShredHandler.onDamageDealt', () => {
     resistShredHandler.hooks!.onDamageDealt!(stacking, c, {} as never)
     expect(c.opponent.buffs['resistShred:e1'].stacks).toBe(3)
   })
+
+  it('flags a data warning when durationSeconds is null', () => {
+    const warnings: string[] = []
+    const c = ctx({ addDataWarning: (message) => warnings.push(message) })
+    const effect = { ...nonStacking, durationSeconds: null }
+    resistShredHandler.hooks!.onDamageDealt!(effect, c, {} as never)
+    expect(warnings).toEqual(['Test Shred: durationSeconds is unverified (null)'])
+  })
+
+  it('sets expiresAt to the current time (not undefined) when durationSeconds is null', () => {
+    const c = ctx({ time: 7 })
+    const effect = { ...nonStacking, durationSeconds: null }
+    resistShredHandler.hooks!.onDamageDealt!(effect, c, {} as never)
+    expect(c.opponent.buffs['resistShred:e1'].expiresAt).toBe(7)
+  })
 })
 
 describe('resistShredHandler.modifyResist', () => {
@@ -73,5 +88,20 @@ describe('resistShredHandler.modifyResist', () => {
     const percentEffect = { ...nonStacking, mode: 'percent' as const, amount: 0.1 }
     const c = ctx({ opponent: runtime({ buffs: { 'resistShred:e1': { stacks: 1 } } }) })
     expect(resistShredHandler.modifyResist!(percentEffect, c, 'physical')).toEqual({ pctReduction: 0.1 })
+  })
+
+  it('applies normally when its condition is met', () => {
+    const effect = { ...nonStacking, condition: { type: 'targetHpBelow' as const, threshold: 0.3 } }
+    const c = ctx({ opponent: runtime({ buffs: { 'resistShred:e1': { stacks: 1 } } }) })
+    expect(resistShredHandler.modifyResist!(effect, c, 'physical')).toEqual({ flatReduction: 5 })
+  })
+
+  it('returns nothing when its condition is not met, even with an active buff', () => {
+    const effect = { ...nonStacking, condition: { type: 'targetHpBelow' as const, threshold: 0.3 } }
+    const c = ctx({
+      conditionMet: () => false,
+      opponent: runtime({ buffs: { 'resistShred:e1': { stacks: 1 } } }),
+    })
+    expect(resistShredHandler.modifyResist!(effect, c, 'physical')).toEqual({})
   })
 })
