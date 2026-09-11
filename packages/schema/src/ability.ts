@@ -8,6 +8,7 @@ export const DamageRatioStatSchema = z.enum([
   'totalAd', 'bonusAd', 'ap', 'maxHp', 'bonusHp',
   'targetMaxHp', 'targetCurrentHp', 'targetMissingHp',
 ])
+export type DamageRatioStat = z.infer<typeof DamageRatioStatSchema>
 
 export const DamageComponentSchema = z.object({
   type: DamageTypeSchema,
