@@ -84,6 +84,15 @@ export function critMultiplier(
   return 1 + clampedChance * (fullCritMultiplier - 1)
 }
 
+// TODO-VERIFY(abilityHasteFormula): confirm ability haste reduces cooldowns via the standard LoL
+// formula (cooldown / (1 + haste/100)) rather than a different Wild Rift-specific curve, by
+// comparing a champion's displayed ability cooldown at 0 and at a known ability haste value in
+// the practice tool.
+/** Reduces a base cooldown by a flat ability haste value using the standard LoL haste formula. */
+export function cooldownWithHaste(baseCooldownSeconds: number, abilityHaste: number): number {
+  return baseCooldownSeconds / (1 + abilityHaste / 100)
+}
+
 // TODO-VERIFY(statResolutionOrder): confirm stat resolution applies in this order — champion
 // base+growth, then flat contributions (item stats, `stat`/`stacking` effects), then
 // `statMultiplier` effects, then `statConversion` effects, then caps — by equipping items that
@@ -126,5 +135,6 @@ export const UNVERIFIED_RULE_IDS = [
   'statResolutionOrder',
   'attackSpeedStacking',
   'damageAmpTiming',
+  'abilityHasteFormula',
 ] as const
 export type UnverifiedRuleId = (typeof UNVERIFIED_RULE_IDS)[number]
