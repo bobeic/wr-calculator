@@ -1911,7 +1911,7 @@ import { resolveScalar, scalarWarning } from '../resolve-scalar'
 export const activeHandler: EffectHandler<ActiveEffect> = {
   kind: 'active',
   activate(effect, ctx) {
-    if (effect.damage == null || effect.damageType == null) return
+    if (effect.damage === undefined || effect.damageType === undefined) return
     const resolved = resolveScalar(effect.damage, ctx.level)
     const warning = scalarWarning(effect.name, 'damage', resolved)
     if (warning) ctx.addDataWarning(warning)
