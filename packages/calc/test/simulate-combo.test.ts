@@ -326,6 +326,20 @@ describe('simulateCombo', () => {
     expect(() => simulateCombo(attacker, target, ['AA'], { critMode: 'never' })).not.toThrow()
   })
 
+  it('does not run away when three or more procEveryN effects mutually chain', () => {
+    const items = new Map(['a', 'b', 'c'].map((letter) => [
+      `test-proc-${letter}`,
+      baseItem(`test-proc-${letter}`, {
+        id: `test-proc-${letter}-passive`, name: `Test Proc ${letter.toUpperCase()}`, description: '',
+        support: 'full', kind: 'procEveryN', n: 1, damageType: 'magic', damage: 5, resetsOnMiss: false,
+      }),
+    ]))
+    const build = emptyBuild({ items: ['test-proc-a', 'test-proc-b', 'test-proc-c'] })
+    const attacker = combatantFromChampion(championWithAbility(), 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy())
+    expect(() => simulateCombo(attacker, target, ['AA'], { critMode: 'never' })).not.toThrow()
+  })
+
   it('surfaces a custom effect with no registered handler as unsupported', () => {
     const item = baseItem('test-custom-item', {
       id: 'test-custom-passive', name: 'Test Custom', description: '',

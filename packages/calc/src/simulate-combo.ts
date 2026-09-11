@@ -126,6 +126,7 @@ export function simulateCombo(
   let timeToKill: number | undefined
   let overkill: number | undefined
   let damageDepth = 0
+  let chainAborted = false
 
   const trackSupport = (effect: Effect) => {
     if (effect.support !== 'full' && !unsupportedByEffectId.has(effect.id)) {
@@ -183,10 +184,21 @@ export function simulateCombo(
 
   function performDamage(input: RawDamageInstanceInput): DamageInstance {
     damageDepth++
+    // Once the cap has tripped anywhere in this chain, every remaining nested call bails too.
+    // Capping depth alone still lets three or more mutually-proccing effects explore an
+    // exponential call tree; this keeps the aborted chain's remaining work roughly linear.
+    if (chainAborted) {
+      damageDepth--
+      return {
+        time, source: input.source, type: input.type, raw: 0, mitigated: 0,
+        targetHpAfter: targetRuntime.currentHp,
+      }
+    }
     // An effect that deals damage from an onDamageDealt hook can feed another effect that does the
     // same; two n:1 procEveryN items count each other's procs and would recurse until the stack
     // blows. Cap the chain and report it rather than crashing the whole simulation.
     if (damageDepth > MAX_DAMAGE_CHAIN_DEPTH) {
+      chainAborted = true
       damageDepth--
       dataWarnings.push(
         `Damage chain exceeded ${MAX_DAMAGE_CHAIN_DEPTH} nested instances (likely a cycle between `
@@ -277,6 +289,8 @@ export function simulateCombo(
       return instance
     } finally {
       damageDepth--
+      // The chain has fully unwound, so the next top-level action starts clean.
+      if (damageDepth === 0) chainAborted = false
     }
   }
 
