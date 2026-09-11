@@ -36,6 +36,7 @@ export interface EffectHandler<E extends Effect = Effect> {
   modifyResist?(effect: E, ctx: HookContext, damageType: DamageType): Partial<ResistModifiers>
   damageMultiplier?(effect: E, ctx: HookContext, input: RawDamageInstanceInput): number
   damageReductionFraction?(effect: E, ctx: HookContext, damageType: DamageType): number
+  activate?(effect: E, ctx: HookContext): void
 }
 
 export type SourceKind = 'basicAttack' | 'ability' | 'item' | 'other'
