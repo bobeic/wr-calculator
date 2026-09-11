@@ -62,7 +62,15 @@ describe('activeHandler.activate', () => {
       kind: 'active' as const, cooldownSeconds: 60, damageType: 'true' as const, damage: null,
     }
     let warned: string | undefined
-    activeHandler.activate!(effect, ctx({ addDataWarning: (m) => { warned = m } }))
+    let dealtAmount: number | undefined
+    activeHandler.activate!(effect, ctx({
+      addDataWarning: (m) => { warned = m },
+      dealDamage: (input) => {
+        dealtAmount = input.amount
+        return { time: 0, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
+      },
+    }))
     expect(warned).toBe('Test Active: damage is unverified (null)')
+    expect(dealtAmount).toBe(0)
   })
 })
