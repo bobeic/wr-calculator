@@ -11,7 +11,7 @@ import { critMultiplier, cooldownWithHaste } from './rules'
 import { mitigateDamage, applyDamageReductionFractions, ZERO_RESIST_MODIFIERS } from './mitigation'
 import { resolveEffectHandler } from './effects/registry'
 import { resolveDamageComponent } from './damage-component'
-import { resolveScalar } from './resolve-scalar'
+import { resolveScalar, scalarWarning } from './resolve-scalar'
 
 export type ComboAction = 'AA' | 'Q' | 'W' | 'E' | 'R' | `item:${string}` | `wait:${number}`
 
@@ -311,9 +311,8 @@ export function simulateCombo(
       }
 
       const cooldownResolved = resolveScalar(ability.cooldown, attacker.level)
-      if (cooldownResolved.wasNull) {
-        dataWarnings.push(`${ability.name}: cooldown is unverified (null)`)
-      }
+      const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
+      if (cooldownWarning) dataWarnings.push(cooldownWarning)
       const hastedCooldown = cooldownWithHaste(
         cooldownResolved.value, attacker.sheet.total.abilityHaste ?? 0
       )
@@ -332,14 +331,16 @@ export function simulateCombo(
       if (!ignoreCooldowns && time < availableAt) continue
 
       const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
+      // A blocked active isn't "involved" in the action at all — matching the hook-dispatch sites,
+      // a failed condition skips the whole action, so it never fires and never goes on cooldown.
+      if (!conditionAllows(activeEffect, ctx)) continue
       const handler = resolveEffectHandler(activeEffect, customHandlers)
       handler?.activate?.(activeEffect, ctx)
       trackSupport(activeEffect)
 
       const cooldownResolved = resolveScalar(activeEffect.cooldownSeconds, attacker.level)
-      if (cooldownResolved.wasNull) {
-        dataWarnings.push(`${activeEffect.name}: cooldownSeconds is unverified (null)`)
-      }
+      const cooldownWarning = scalarWarning(activeEffect.name, 'cooldownSeconds', cooldownResolved)
+      if (cooldownWarning) dataWarnings.push(cooldownWarning)
       attackerRuntime.cooldowns[cooldownKey] = time + cooldownResolved.value
     } else if (action.startsWith('wait:')) {
       time += Number(action.slice(5))

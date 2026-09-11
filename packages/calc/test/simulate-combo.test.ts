@@ -188,6 +188,71 @@ describe('simulateCombo', () => {
     expect(result.instances[0].mitigated).toBe(100)
   })
 
+  it('warns when an ability cooldown uses a byRank scalar it cannot resolve', () => {
+    const champion = championWithAbility()
+    champion.abilities.q.cooldown = { byRank: [8, 9, 10] }
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const target = combatantFromDummy(dummy())
+    const result = simulateCombo(attacker, target, ['Q'], { critMode: 'never' })
+    expect(result.dataWarnings).toContain(
+      'Q: cooldown uses a byRank scalar outside an ability-rank context; treated as 0'
+    )
+  })
+
+  it('blocks a hook-based effect when its condition is not met', () => {
+    const item = baseItem('test-conditional-onhit', {
+      id: 'test-conditional-onhit-passive', name: 'Test Conditional On-Hit', description: '',
+      support: 'full', kind: 'onHit', damageType: 'magic', flat: 20,
+      condition: { type: 'targetHpBelow', threshold: 0.5 },
+    })
+    const items = new Map([['test-conditional-onhit', item]])
+    const build = emptyBuild({ items: ['test-conditional-onhit'] })
+    const attacker = combatantFromChampion(championWithAbility(), 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy({ hp: 1000 })) // starts at full hp, so targetHpBelow(0.5) is false
+    const result = simulateCombo(attacker, target, ['AA'], { critMode: 'never' })
+    expect(result.totalsByType.magic).toBeUndefined()
+  })
+
+  it('allows a hook-based effect when its condition is met', () => {
+    const item = baseItem('test-conditional-onhit', {
+      id: 'test-conditional-onhit-passive', name: 'Test Conditional On-Hit', description: '',
+      support: 'full', kind: 'onHit', damageType: 'magic', flat: 20,
+      condition: { type: 'targetHpAbove', threshold: 0.5 },
+    })
+    const items = new Map([['test-conditional-onhit', item]])
+    const build = emptyBuild({ items: ['test-conditional-onhit'] })
+    const attacker = combatantFromChampion(championWithAbility(), 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy({ hp: 1000 })) // starts at full hp, so targetHpAbove(0.5) is true
+    const result = simulateCombo(attacker, target, ['AA'], { critMode: 'never' })
+    expect(result.totalsByType.magic).toBe(20)
+  })
+
+  it('gates an item active on its condition without consuming its cooldown when blocked', () => {
+    const item = baseItem('test-conditional-active', {
+      id: 'test-conditional-active-passive', name: 'Test Conditional Active', description: '',
+      support: 'full', kind: 'active', cooldownSeconds: 60, damageType: 'magic', damage: 100,
+      condition: { type: 'targetHpBelow', threshold: 0.5 },
+    })
+    const items = new Map([['test-conditional-active', item]])
+    const build = emptyBuild({ items: ['test-conditional-active'] })
+    const champion = championWithAbility({
+      baseStats: { hp: { base: 1000, perLevel: 0 }, ad: { base: 600, perLevel: 0 } },
+    })
+    const attacker = combatantFromChampion(champion, 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy({ hp: 1000 }))
+    // The first activation is blocked (target at full hp); the AA drops it to 40%, so the second
+    // one fires — which it only can if the blocked attempt never put the active on cooldown.
+    const result = simulateCombo(
+      attacker, target, ['item:test-conditional-active', 'AA', 'item:test-conditional-active'],
+      { critMode: 'never' }
+    )
+    const activeInstances = result.instances.filter((i) => i.source.id === 'test-conditional-active-passive')
+    expect(activeInstances.map((i) => i.time)).toEqual([1])
+    expect(result.totalsByType.magic).toBe(100)
+  })
+
   it('ticks a dot applied on ability hit while a later wait advances through it', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
