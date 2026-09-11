@@ -4,6 +4,7 @@ import { statHandler } from './stat'
 import { stackingHandler } from './stacking'
 import { statMultiplierHandler } from './stat-multiplier'
 import { statConversionHandler } from './stat-conversion'
+import { CUSTOM_HANDLERS } from '../custom/registry'
 
 /**
  * Handlers for the effect kinds resolveStats needs. The remaining combat-only kinds (onHit,
@@ -25,4 +26,18 @@ export function contributeStats(effect: Effect, ctx: StatContext): StatContribut
 /** The stat-resolution stage a given effect's kind belongs to, if it contributes stats at all. */
 export function stageOf(effect: Effect): EffectStage | undefined {
   return EFFECT_HANDLERS[effect.kind]?.stage
+}
+
+/**
+ * Resolves the handler for any effect, including `kind: 'custom'`'s second-level dispatch by
+ * `effect.handler` id. `customHandlers` lets a caller (mainly tests) override or extend the
+ * built-in `CUSTOM_HANDLERS` registry without any hidden mutable registration step.
+ */
+export function resolveEffectHandler(
+  effect: Effect, customHandlers: Record<string, EffectHandler<any>> = {}
+): EffectHandler<any> | undefined {
+  if (effect.kind === 'custom') {
+    return customHandlers[effect.handler] ?? CUSTOM_HANDLERS[effect.handler]
+  }
+  return EFFECT_HANDLERS[effect.kind]
 }
