@@ -1,0 +1,98 @@
+# ADR: `simulateCombo` known Phase 1 gaps
+
+**Status:** Accepted
+
+## Context
+
+Step 4's plan (`docs/superpowers/plans/2026-09-10-phase1-step4-simulate-combo.md`, Task 16) carried
+an inline "Known Phase 1 gaps" note listing what the engine deliberately accepts-but-doesn't-model
+in its first version. The plan's final whole-branch review (2026-09-11) surfaced several more —
+some fixed in the same review's fix round, some left as documented, accepted gaps. This ADR is the
+durable record of the accepted gaps, since the plan document itself will not be revisited once
+Phase 1 moves on to Steps 5+.
+
+Two related bugs the same review found (`damageAmp` never honoring a `sourceKind` condition, and
+`dot`'s `refresh` field being inert) were fixed directly, not deferred — they aren't gaps, they're
+correctness bugs, and are not listed here.
+
+## Decision — the following are accepted Phase 1 gaps
+
+1. **`timeToKill` is measured from the moment a basic attack lands, not from combo start.** The
+   `AA` sequence action advances `time` by the attack interval *before* dealing damage, so the
+   first AA of a combo lands at `t = 1/attackSpeed`, not `t ≈ 0`. A pure-AA kill's reported
+   `timeToKill` is therefore inflated by roughly one attack interval relative to "time since the
+   player pressed attack." This is a real, if small, bias in any DPS figure derived as `total /
+   timeToKill`, and it is largest for fast-attack-speed builds — exactly where it would most affect
+   a build comparison. Accepted for Phase 1 because fixing it changes the semantics of every
+   existing `time`/`timeToKill` value the tests already pin, and deserves its own considered pass
+   rather than a rushed change in a final review's fix round. **Must be resolved, or at minimum
+   re-confirmed as intentional, before Step 5's `compareBuilds` plots `ttk` on a crossover chart** —
+   a systematic bias in a headline metric is a visible wrong answer in the product this is being
+   built for.
+
+2. **`penetration` and `damageReduction` cannot express a `sourceKind`-based `condition`.**
+   `modifyResist(effect, ctx, damageType)` and `damageReductionFraction(effect, ctx, damageType)`
+   only receive the damage type, never the `RawDamageInstanceInput.source.kind` that
+   `damageMultiplier` (and, after this ADR's companion fix round, `conditionMet`'s `damageAmp`
+   caller) already thread through. Since `PenetrationEffectSchema` makes `condition` a *required*
+   field — unconditional penetration is deliberately expressed as a plain `stat` effect instead
+   (see `packages/schema/src/effect/kinds/penetration.ts`) — this silently disables 1 of that
+   kind's 8 possible condition types for the one kind whose entire purpose is conditionality (e.g.
+   "20% armor penetration on basic attacks" cannot be expressed today). The fix is a signature
+   change — widen both reader capabilities to receive the full `RawDamageInstanceInput` instead of
+   a bare `DamageType`, mirroring `damageMultiplier`'s existing shape — touching
+   `effects/types.ts`, `penetration.ts`, `damage-reduction.ts`, `resist-shred.ts`'s `modifyResist`,
+   and the three call sites in `simulate-combo.ts`. Deferred rather than rushed into a final
+   review's fix round; pick up when real item data first needs a `sourceKind`-conditioned pen or
+   reduction effect.
+
+3. **Shield and heal effects mutate combatant runtime state that never surfaces in `ComboResult`.**
+   `shieldHandler`/`healHandler` correctly write to `ctx.self.shieldHp`/`currentHp` on
+   `onAbilityCast`, and shield absorption is correctly applied when the attacker is later
+   *targeted* by damage — but Phase 1's asymmetric combat model means the attacker is never
+   targeted (only the target ever takes damage), so the attacker's own `shieldHp`/healed
+   `currentHp` are write-only: nothing in `ComboResult` reports them. The code path is correct, not
+   buggy — it will become observable the moment a symmetric (two-attacker) combat mode exists —
+   but today it's effectively dead from the caller's perspective. `ShieldEffect.durationSeconds` is
+   resolved (and its data warning surfaced) but the shield itself never expires mid-combo, for the
+   same underlying reason: nothing currently reads the shield expiry.
+
+4. **`DamageComponent.hits > 1` collapses into a single `DamageInstance`** whose `amount` already
+   has `hits` multiplied in, rather than emitting `hits` separate instances. This is
+   mitigation-equivalent to the correct behavior (resist math is linear), but is NOT equivalent the
+   moment a per-instance mechanic is in play — a `procEveryN` counter, a `% current HP` ratio that
+   should re-read HP between hits, or a shield that partially absorbs one hit and not the next.
+   No multi-hit ability exists in the fixture data yet to exercise this; revisit when one does.
+
+5. **Item actives (`item:'<id>'` sequence actions) consume zero simulated time.** Multiple
+   activations in the same sequence entry, or interleaved with `ignoreCooldowns: true`, can all
+   land at the same instant. Real active items presumably have some cast/animation delay; Phase 1
+   doesn't model one.
+
+6. **`ignoreCooldowns: true` also bypasses item-passive internal cooldowns** (e.g. `spellblade`'s
+   ICD, `resistShred`'s implicit per-hit accumulation timing), not just ability and item-active
+   cooldowns. This is defensible for a "pure burst, ignore all timing gates" mode, but the option's
+   name doesn't make that scope explicit — a caller might reasonably expect it to only bypass
+   *ability* cooldowns. Document the actual scope wherever this option is surfaced in a future UI.
+
+7. **A handful of schema fields are accepted but read by nothing:** `OnHitEffect.monsterCap`,
+   `ProcEveryNEffect.resetsOnMiss`, `ProcEveryNEffect.debuffId`. `resetsOnMiss` is arguably moot
+   until Phase 1 has any concept of a basic attack "missing." `monsterCap` is a real, common WR
+   item mechanic (on-hit damage capped against monsters) and should be picked up alongside whatever
+   step first models jungle monsters as targets.
+
+8. **Percent armor/magic penetration and percent resist reduction from multiple sources stack
+   additively**, not multiplicatively — two 40% penetration sources currently sum to 80% rather
+   than compounding to `1 - 0.6*0.6 = 64%`. `RESIST_MODIFICATION_ORDER`'s *order* is already
+   TODO-VERIFY-tagged (`resistModificationOrder` in `packages/calc/src/rules.ts`), but the
+   *stacking rule* among multiple same-step sources is a separate, currently-undocumented
+   assumption. Should get its own `TODO-VERIFY` rule id once picked up.
+
+## Consequences
+
+- None of the above block Phase 1 from running end-to-end; each is either inert today (no data
+  exercises it) or a known, bounded bias rather than a crash or a silently-wrong headline number.
+- Item 1 (`timeToKill` bias) is the one with a stated deadline: it must be resolved or explicitly
+  re-affirmed before Step 5 builds `compareBuilds`'s crossover charts on top of it.
+- This ADR supersedes the plan's inline "Known Phase 1 gaps" note as the durable reference —
+  future steps should update this file, not the (by then historical) Step 4 plan document.
