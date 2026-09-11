@@ -88,6 +88,36 @@ correctness bugs, and are not listed here.
    *stacking rule* among multiple same-step sources is a separate, currently-undocumented
    assumption. Should get its own `TODO-VERIFY` rule id once picked up.
 
+9. **A `custom` effect declaring `support: 'full'` with no registered handler still vanishes
+   silently.** The fix that surfaces unresolved `custom` effects (`resolve()` in
+   `simulate-combo.ts`) routes through the existing `trackSupport`, which only records an entry
+   when `support !== 'full'` — matching every other effect kind's convention, where `'full'` means
+   "this is correctly modeled." An unresolved handler on a `'full'`-labeled `custom` effect is a
+   data-authoring error (the data claims full support that doesn't exist yet), not a normal Phase-1
+   state, so it's accepted as a gap rather than special-cased. Also: surfacing an unresolved
+   `custom` effect only happens when the sequence actually dispatches through it (an `AA`, ability
+   cast, or damage instance) — a sequence that never triggers any dispatch (e.g. `['wait:1']`
+   alone) won't surface it even if one is equipped. Both are edge cases within an already-inert
+   Phase-1 feature (`CUSTOM_HANDLERS` is empty for all of Phase 1).
+
+10. **The "pending scheduled ticks" warning (added when a sequence ends with unresolved DoT ticks)
+    gives misleading advice when the sequence ended because the target died**, rather than because
+    the caller forgot a trailing `wait:`. The warning text suggests adding a `wait:<seconds>`
+    action, which isn't the right fix for a kill — there's nothing left to wait for. Wording-only;
+    the warning is still factually correct that ticks were dropped.
+
+11. **The damage-chain recursion guard (`MAX_DAMAGE_CHAIN_DEPTH`, `simulate-combo.ts`) changes the
+    exact `DamageInstance` count for a chain that already hits the cap**, compared to a
+    depth-only (non-sticky) version of the same guard: once the cap trips anywhere in a chain, the
+    `chainAborted` flag suppresses *all* remaining nested calls in that chain, not just the branch
+    that tripped it — so two independent proc subtrees spawned from the same top-level action (e.g.
+    two `procEveryN` effects on one `AA`) both get cut short rather than only the second. This is
+    inherent to the fix (the same mechanism that keeps 3+ mutually-proccing effects from an
+    exponential blowup) and only affects inputs that were already hitting the cap and being
+    reported via the `dataWarning` — i.e. already-broken/degenerate data, not a normal case. Noted
+    here so a future reader doesn't mistake a changed instance count on a cap-tripping fixture for
+    a regression.
+
 ## Consequences
 
 - None of the above block Phase 1 from running end-to-end; each is either inert today (no data
