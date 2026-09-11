@@ -70,6 +70,20 @@ export function totalAttackSpeed(base: number, bonusFraction: number): number {
   return base * (1 + bonusFraction)
 }
 
+// TODO-VERIFY(critDamageMultiplier): reuses the constant above; the "expected value, no rolling"
+// approach itself needs no separate verification (it's a modeling choice, not a game mechanic) but
+// the underlying crit chance/damage stacking it's built on does — see BASE_CRIT_DAMAGE_MULTIPLIER.
+/** Resolves the crit multiplier for a basic attack under a given crit mode; 'expected' is a deterministic expected value, never a random roll. */
+export function critMultiplier(
+  critChance: number, bonusCritDamage: number, mode: 'expected' | 'always' | 'never'
+): number {
+  const fullCritMultiplier = BASE_CRIT_DAMAGE_MULTIPLIER + bonusCritDamage
+  if (mode === 'never') return 1
+  if (mode === 'always') return fullCritMultiplier
+  const clampedChance = Math.min(Math.max(critChance, 0), 1)
+  return 1 + clampedChance * (fullCritMultiplier - 1)
+}
+
 // TODO-VERIFY(statResolutionOrder): confirm stat resolution applies in this order — champion
 // base+growth, then flat contributions (item stats, `stat`/`stacking` effects), then
 // `statMultiplier` effects, then `statConversion` effects, then caps — by equipping items that
@@ -95,6 +109,9 @@ export const ITEM_SLOTS = 6
 export const HAS_SEPARATE_BOOTS_SLOT = true
 export const HAS_SEPARATE_ENCHANT_SLOT = true
 
+// TODO-VERIFY(damageAmpTiming): confirm damageAmp effects multiply raw damage before resist
+// mitigation (not after) — compare a known damageAmp source's effect on a hit against a
+// known-armor dummy to the pre- vs post-mitigation prediction.
 export const UNVERIFIED_RULE_IDS = [
   'maxChampionLevel',
   'critDamageMultiplier',
@@ -108,5 +125,6 @@ export const UNVERIFIED_RULE_IDS = [
   'attackSpeedRatioGrowth',
   'statResolutionOrder',
   'attackSpeedStacking',
+  'damageAmpTiming',
 ] as const
 export type UnverifiedRuleId = (typeof UNVERIFIED_RULE_IDS)[number]

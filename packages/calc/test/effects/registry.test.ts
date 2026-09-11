@@ -7,10 +7,12 @@ function ctx(): StatContext {
 }
 
 describe('EFFECT_HANDLERS', () => {
-  it('registers exactly the four stat-contributing kinds', () => {
-    expect(Object.keys(EFFECT_HANDLERS).sort()).toEqual(
-      ['stacking', 'stat', 'statConversion', 'statMultiplier'].sort()
-    )
+  it('registers every effect kind except custom', () => {
+    expect(Object.keys(EFFECT_HANDLERS).sort()).toEqual([
+      'active', 'cooldownRefund', 'damageAmp', 'damageReduction', 'dot', 'heal', 'onHit',
+      'penetration', 'procEveryN', 'resistShred', 'shield', 'spellblade', 'stacking', 'stat',
+      'statConversion', 'statMultiplier',
+    ])
   })
 })
 
@@ -25,17 +27,17 @@ describe('contributeStats', () => {
     expect(result[0].amount).toBe(10)
   })
 
-  it('returns an empty array for a kind with no registered handler', () => {
+  it('returns an empty array for custom, the one kind never registered by kind', () => {
     const effect = {
       id: 'e1', name: 'Test', description: '', support: 'full' as const,
-      kind: 'shield' as const, amount: 10, durationSeconds: 5,
+      kind: 'custom' as const, handler: 'does-not-exist',
     }
     expect(contributeStats(effect, ctx())).toEqual([])
   })
 })
 
 describe('stageOf', () => {
-  it('returns the stage for a registered kind', () => {
+  it('returns the stage for a registered stat-contributing kind', () => {
     const effect = {
       id: 'e1', name: 'Test', description: '', support: 'full' as const,
       kind: 'statMultiplier' as const, stat: 'ad' as const, layer: 'bonus' as const, amount: 0.1,
@@ -43,10 +45,18 @@ describe('stageOf', () => {
     expect(stageOf(effect)).toBe('multiplier')
   })
 
-  it('returns undefined for a kind with no registered handler', () => {
+  it('returns undefined for a registered combat-only kind (it has no stage)', () => {
     const effect = {
       id: 'e1', name: 'Test', description: '', support: 'full' as const,
       kind: 'shield' as const, amount: 10, durationSeconds: 5,
+    }
+    expect(stageOf(effect)).toBeUndefined()
+  })
+
+  it('returns undefined for custom', () => {
+    const effect = {
+      id: 'e1', name: 'Test', description: '', support: 'full' as const,
+      kind: 'custom' as const, handler: 'does-not-exist',
     }
     expect(stageOf(effect)).toBeUndefined()
   })

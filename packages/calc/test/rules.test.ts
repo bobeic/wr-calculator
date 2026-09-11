@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   MAX_CHAMPION_LEVEL, statAtLevel, interpolateLevelRange, resolveAdaptiveDamageType,
-  attackSpeedAtLevel, totalAttackSpeed, STAT_RESOLUTION_ORDER, UNVERIFIED_RULE_IDS,
+  attackSpeedAtLevel, totalAttackSpeed, STAT_RESOLUTION_ORDER, UNVERIFIED_RULE_IDS, critMultiplier,
 } from '../src/rules'
 
 describe('statAtLevel', () => {
@@ -93,5 +93,25 @@ describe('UNVERIFIED_RULE_IDS', () => {
   it('is non-empty and has no duplicates', () => {
     expect(UNVERIFIED_RULE_IDS.length).toBeGreaterThan(0)
     expect(new Set(UNVERIFIED_RULE_IDS).size).toBe(UNVERIFIED_RULE_IDS.length)
+  })
+})
+
+describe('critMultiplier', () => {
+  it('is 1 in "never" mode', () => {
+    expect(critMultiplier(0.5, 0.2, 'never')).toBe(1)
+  })
+
+  it('is the full crit multiplier in "always" mode', () => {
+    expect(critMultiplier(0.5, 0.2, 'always')).toBeCloseTo(1.95)
+  })
+
+  it('is an expected value between 1 and the full multiplier in "expected" mode', () => {
+    const result = critMultiplier(0.5, 0, 'expected')
+    expect(result).toBeCloseTo(1 + 0.5 * 0.75)
+  })
+
+  it('clamps crit chance to [0, 1] in "expected" mode', () => {
+    expect(critMultiplier(2, 0, 'expected')).toBe(critMultiplier(1, 0, 'expected'))
+    expect(critMultiplier(-1, 0, 'expected')).toBe(1)
   })
 })

@@ -4,18 +4,40 @@ import { statHandler } from './stat'
 import { stackingHandler } from './stacking'
 import { statMultiplierHandler } from './stat-multiplier'
 import { statConversionHandler } from './stat-conversion'
+import { onHitHandler } from './on-hit'
+import { damageAmpHandler } from './damage-amp'
+import { penetrationHandler } from './penetration'
+import { damageReductionHandler } from './damage-reduction'
+import { resistShredHandler } from './resist-shred'
+import { spellbladeHandler } from './spellblade'
+import { procEveryNHandler } from './proc-every-n'
+import { dotHandler } from './dot'
+import { cooldownRefundHandler } from './cooldown-refund'
+import { shieldHandler, healHandler } from './shield-heal'
+import { activeHandler } from './active'
 import { CUSTOM_HANDLERS } from '../custom/registry'
 
 /**
- * Handlers for the effect kinds resolveStats needs. The remaining combat-only kinds (onHit,
- * spellblade, dot, ...) get their handlers in Step 4 alongside simulateCombo, which is what
- * actually dispatches on them; resolveStats never needs them, so they aren't registered here.
+ * Handlers for every effect kind except `custom`, which dispatches a second time by
+ * `effect.handler` id (see `resolveEffectHandler` below) rather than by kind.
  */
 export const EFFECT_HANDLERS: Partial<Record<EffectKind, EffectHandler<any>>> = {
   stat: statHandler,
   stacking: stackingHandler,
   statMultiplier: statMultiplierHandler,
   statConversion: statConversionHandler,
+  onHit: onHitHandler,
+  damageAmp: damageAmpHandler,
+  penetration: penetrationHandler,
+  damageReduction: damageReductionHandler,
+  resistShred: resistShredHandler,
+  spellblade: spellbladeHandler,
+  procEveryN: procEveryNHandler,
+  dot: dotHandler,
+  cooldownRefund: cooldownRefundHandler,
+  shield: shieldHandler,
+  heal: healHandler,
+  active: activeHandler,
 }
 
 /** Looks up and calls the registered handler's contributeStats for an effect, if any. */
