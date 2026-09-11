@@ -37,7 +37,7 @@ describe('cooldownRefundHandler.onAbilityHit', () => {
       kind: 'cooldownRefund' as const, mode: 'flat' as const, amount: 3, excludesUltimate: true,
     }
     cooldownRefundHandler.hooks!.onAbilityHit!(effect, c, 'q', [])
-    expect(self.cooldowns).toEqual({ q: 15, w: 9, r: 100 })
+    expect(self.cooldowns).toEqual({ q: 15, w: 10, r: 100 })
   })
 
   it('clamps a flat refund at the current time', () => {

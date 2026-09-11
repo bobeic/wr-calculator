@@ -15,9 +15,7 @@ export const cooldownRefundHandler: EffectHandler<CooldownRefundEffect> = {
         const availableAt = ctx.self.cooldowns[key]
         if (availableAt === undefined || availableAt <= ctx.time) continue
         if (effect.mode === 'flat') {
-          const remaining = availableAt - ctx.time
-          const newTime = availableAt - resolved.value
-          ctx.self.cooldowns[key] = remaining <= 1 ? Math.max(ctx.time, newTime) : newTime
+          ctx.self.cooldowns[key] = Math.max(ctx.time, availableAt - resolved.value)
         } else {
           const remaining = availableAt - ctx.time
           ctx.self.cooldowns[key] = ctx.time + remaining * (1 - resolved.value)
