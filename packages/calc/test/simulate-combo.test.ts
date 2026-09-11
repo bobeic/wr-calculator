@@ -270,4 +270,102 @@ describe('simulateCombo', () => {
     expect(dotInstances).toHaveLength(3)
     expect(dotInstances.map((i) => i.mitigated)).toEqual([10, 10, 10])
   })
+
+  it('applies a damageAmp effect only when its sourceKind condition matches', () => {
+    const item = baseItem('test-amp-item', {
+      id: 'test-amp-passive', name: 'Test Amp', description: '', support: 'full',
+      kind: 'damageAmp', amount: 1, condition: { type: 'sourceKind', value: 'ability' },
+    })
+    const items = new Map([['test-amp-item', item]])
+    const build = emptyBuild({ items: ['test-amp-item'] })
+    const champion = championWithAbility()
+    champion.abilities.q.damage = [{ type: 'magic', base: 100, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(champion, 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy())
+
+    const abilityResult = simulateCombo(attacker, target, ['Q'], { critMode: 'never' })
+    expect(abilityResult.instances[0].mitigated).toBe(200)
+
+    const aaResult = simulateCombo(attacker, target, ['AA'], { critMode: 'never' })
+    expect(aaResult.instances[0].mitigated).toBe(60)
+  })
+
+  it('resets DoT ticks on refresh instead of stacking a second tick train', () => {
+    const item = baseItem('test-dot-item', {
+      id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
+      kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
+      durationSeconds: 3, refresh: 'refresh',
+    })
+    const items = new Map([['test-dot-item', item]])
+    const build = emptyBuild({ items: ['test-dot-item'] })
+    const champion = championWithAbility()
+    champion.abilities.q.damage = []
+    const attacker = combatantFromChampion(champion, 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy())
+    const result = simulateCombo(
+      attacker, target, ['Q', 'Q', 'wait:3'], { critMode: 'never', ignoreCooldowns: true }
+    )
+    const dotInstances = result.instances.filter((i) => i.source.id === 'test-dot-passive')
+    expect(dotInstances).toHaveLength(3)
+    expect(result.totalsByType.magic).toBe(30)
+  })
+
+  it('does not crash when two n:1 procEveryN effects would otherwise recurse into each other', () => {
+    const itemA = baseItem('test-proc-a', {
+      id: 'test-proc-a-passive', name: 'Test Proc A', description: '', support: 'full',
+      kind: 'procEveryN', n: 1, damageType: 'magic', damage: 5, resetsOnMiss: false,
+    })
+    const itemB = baseItem('test-proc-b', {
+      id: 'test-proc-b-passive', name: 'Test Proc B', description: '', support: 'full',
+      kind: 'procEveryN', n: 1, damageType: 'magic', damage: 5, resetsOnMiss: false,
+    })
+    const items = new Map([['test-proc-a', itemA], ['test-proc-b', itemB]])
+    const build = emptyBuild({ items: ['test-proc-a', 'test-proc-b'] })
+    const attacker = combatantFromChampion(championWithAbility(), 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy())
+    expect(() => simulateCombo(attacker, target, ['AA'], { critMode: 'never' })).not.toThrow()
+  })
+
+  it('surfaces a custom effect with no registered handler as unsupported', () => {
+    const item = baseItem('test-custom-item', {
+      id: 'test-custom-passive', name: 'Test Custom', description: '',
+      support: 'none', supportNotes: 'unmodeled', kind: 'custom', handler: 'does-not-exist',
+    })
+    const items = new Map([['test-custom-item', item]])
+    const build = emptyBuild({ items: ['test-custom-item'] })
+    const attacker = combatantFromChampion(championWithAbility(), 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy())
+    const result = simulateCombo(attacker, target, ['AA'], { critMode: 'never' })
+    expect(result.unsupportedEffects).toContainEqual({
+      id: 'test-custom-passive', support: 'none', supportNotes: 'unmodeled',
+    })
+  })
+
+  it('warns when scheduled ticks are still pending at the end of the sequence', () => {
+    const item = baseItem('test-dot-item', {
+      id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
+      kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
+      durationSeconds: 3, refresh: 'refresh',
+    })
+    const items = new Map([['test-dot-item', item]])
+    const build = emptyBuild({ items: ['test-dot-item'] })
+    const champion = championWithAbility()
+    champion.abilities.q.damage = []
+    const attacker = combatantFromChampion(champion, 1, build, { items, runes: new Map() })
+    const target = combatantFromDummy(dummy())
+    const result = simulateCombo(attacker, target, ['Q'], { critMode: 'never' })
+    expect(result.dataWarnings.some((w) => w.includes('still pending'))).toBe(true)
+  })
+
+  it('warns and ignores an invalid wait duration instead of corrupting the timeline', () => {
+    const attacker = combatantFromChampion(
+      championWithAbility(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const target = combatantFromDummy(dummy())
+    const result = simulateCombo(
+      attacker, target, ['AA', 'wait:not-a-number' as any, 'AA'], { critMode: 'never' }
+    )
+    expect(result.instances.every((i) => Number.isFinite(i.time))).toBe(true)
+    expect(result.dataWarnings.some((w) => w.includes('Invalid wait duration'))).toBe(true)
+  })
 })

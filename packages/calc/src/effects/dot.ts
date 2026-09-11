@@ -11,7 +11,9 @@ export const dotHandler: EffectHandler<DotEffect> = {
   hooks: {
     onAbilityHit(effect, ctx) {
       const key = buffKey(effect)
-      if (ctx.opponent.buffs[key] && effect.refresh === 'ignore') return
+      const alreadyActive = ctx.opponent.buffs[key] !== undefined
+      if (alreadyActive && effect.refresh === 'ignore') return
+      if (alreadyActive && effect.refresh === 'refresh') ctx.cancelScheduled?.(key)
 
       const amountResolved = resolveScalar(effect.tickAmount, ctx.level)
       const amountWarning = scalarWarning(effect.name, 'tickAmount', amountResolved)
@@ -31,7 +33,7 @@ export const dotHandler: EffectHandler<DotEffect> = {
             type: effect.damageType, amount: amountResolved.value,
             source: { kind: 'item', id: effect.id, name: effect.name },
           })
-        })
+        }, key)
       }
     },
   },

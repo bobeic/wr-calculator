@@ -13,6 +13,13 @@ import { resolveEffectHandler } from './effects/registry'
 import { resolveDamageComponent } from './damage-component'
 import { resolveScalar, scalarWarning } from './resolve-scalar'
 
+/**
+ * How deep one damage instance may chain through effects that deal damage from a damage hook
+ * before the engine assumes a cycle. Not a game mechanic — a safety limit, so it lives here rather
+ * than in rules.ts.
+ */
+const MAX_DAMAGE_CHAIN_DEPTH = 64
+
 export type ComboAction = 'AA' | 'Q' | 'W' | 'E' | 'R' | `item:${string}` | `wait:${number}`
 
 export interface SimulateComboOptions {
@@ -113,11 +120,12 @@ export function simulateCombo(
   const dataWarnings: string[] = []
   const unverifiedRuleIds = new Set<UnverifiedRuleId>()
   const unsupportedByEffectId = new Map<string, UnsupportedEffectEntry>()
-  const scheduled: { time: number; run: (ctx: HookContext) => void }[] = []
+  const scheduled: { time: number; run: (ctx: HookContext) => void; key?: string }[] = []
   let time = 0
   let killed = false
   let timeToKill: number | undefined
   let overkill: number | undefined
+  let damageDepth = 0
 
   const trackSupport = (effect: Effect) => {
     if (effect.support !== 'full' && !unsupportedByEffectId.has(effect.id)) {
@@ -125,6 +133,16 @@ export function simulateCombo(
         id: effect.id, support: effect.support, supportNotes: effect.supportNotes,
       })
     }
+  }
+
+  /**
+   * Resolves an effect's handler, reporting any `custom` effect whose handler id isn't registered
+   * so an unmodelled effect surfaces in the envelope instead of vanishing at every `continue`.
+   */
+  function resolve(effect: Effect): EffectHandler<any> | undefined {
+    const handler = resolveEffectHandler(effect, customHandlers)
+    if (!handler && effect.kind === 'custom') trackSupport(effect)
+    return handler
   }
 
   function buildCtx(
@@ -142,9 +160,14 @@ export function simulateCombo(
       addUnverifiedRule: (id) => unverifiedRuleIds.add(id),
       conditionMet: (effect, condition, extra) =>
         evaluateCondition(effect, condition, self, opponent, opponentRuntime, extra),
-      scheduleEvent: (atTime, run) => {
-        scheduled.push({ time: atTime, run })
+      scheduleEvent: (atTime, run, key) => {
+        scheduled.push({ time: atTime, run, key })
         scheduled.sort((a, b) => a.time - b.time)
+      },
+      cancelScheduled: (key) => {
+        for (let i = scheduled.length - 1; i >= 0; i--) {
+          if (scheduled[i].key === key) scheduled.splice(i, 1)
+        }
       },
     }
   }
@@ -159,87 +182,108 @@ export function simulateCombo(
   }
 
   function performDamage(input: RawDamageInstanceInput): DamageInstance {
-    const attackerCtx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
-
-    let raw = input.amount
-    for (const effect of attackerEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
-      if (!handler?.damageMultiplier) continue
-      const multiplier = handler.damageMultiplier(effect, attackerCtx, input)
-      if (multiplier === 1) continue
-      raw *= multiplier
-      unverifiedRuleIds.add('damageAmpTiming')
-      trackSupport(effect)
+    damageDepth++
+    // An effect that deals damage from an onDamageDealt hook can feed another effect that does the
+    // same; two n:1 procEveryN items count each other's procs and would recurse until the stack
+    // blows. Cap the chain and report it rather than crashing the whole simulation.
+    if (damageDepth > MAX_DAMAGE_CHAIN_DEPTH) {
+      damageDepth--
+      dataWarnings.push(
+        `Damage chain exceeded ${MAX_DAMAGE_CHAIN_DEPTH} nested instances (likely a cycle between `
+        + 'two effects, e.g. two procEveryN items counting each other); further chained damage was '
+        + 'suppressed.'
+      )
+      return {
+        time, source: input.source, type: input.type, raw: 0, mitigated: 0,
+        targetHpAfter: targetRuntime.currentHp,
+      }
     }
 
-    const resistBase = input.type === 'physical' ? target.sheet.total.armor ?? 0
-      : input.type === 'magic' ? target.sheet.total.mr ?? 0 : 0
-    const modifiers: ResistModifiers = { ...ZERO_RESIST_MODIFIERS }
-    if (input.type === 'physical') {
-      modifiers.flatPen += attacker.sheet.total.flatArmorPen ?? 0
-      modifiers.pctPen += attacker.sheet.total.pctArmorPen ?? 0
-    } else if (input.type === 'magic') {
-      modifiers.flatPen += attacker.sheet.total.flatMagicPen ?? 0
-      modifiers.pctPen += attacker.sheet.total.pctMagicPen ?? 0
+    try {
+      const attackerCtx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
+
+      let raw = input.amount
+      for (const effect of attackerEffectsList) {
+        const handler = resolve(effect)
+        if (!handler?.damageMultiplier) continue
+        const multiplier = handler.damageMultiplier(effect, attackerCtx, input)
+        if (multiplier === 1) continue
+        raw *= multiplier
+        unverifiedRuleIds.add('damageAmpTiming')
+        trackSupport(effect)
+      }
+
+      const resistBase = input.type === 'physical' ? target.sheet.total.armor ?? 0
+        : input.type === 'magic' ? target.sheet.total.mr ?? 0 : 0
+      const modifiers: ResistModifiers = { ...ZERO_RESIST_MODIFIERS }
+      if (input.type === 'physical') {
+        modifiers.flatPen += attacker.sheet.total.flatArmorPen ?? 0
+        modifiers.pctPen += attacker.sheet.total.pctArmorPen ?? 0
+      } else if (input.type === 'magic') {
+        modifiers.flatPen += attacker.sheet.total.flatMagicPen ?? 0
+        modifiers.pctPen += attacker.sheet.total.pctMagicPen ?? 0
+      }
+      for (const effect of attackerEffectsList) {
+        const handler = resolve(effect)
+        if (!handler?.modifyResist) continue
+        const partial = handler.modifyResist(effect, attackerCtx, input.type)
+        if (Object.keys(partial).length === 0) continue
+        modifiers.flatReduction += partial.flatReduction ?? 0
+        modifiers.pctReduction += partial.pctReduction ?? 0
+        modifiers.pctPen += partial.pctPen ?? 0
+        modifiers.flatPen += partial.flatPen ?? 0
+        trackSupport(effect)
+      }
+
+      let mitigated = mitigateDamage(raw, input.type, resistBase, modifiers)
+      if (input.type !== 'true') unverifiedRuleIds.add('resistModificationOrder')
+
+      const targetCtx = buildCtx(target, targetRuntime, attacker, attackerRuntime)
+      const fractions: number[] = []
+      for (const effect of targetEffectsList) {
+        const handler = resolve(effect)
+        if (!handler?.damageReductionFraction) continue
+        const fraction = handler.damageReductionFraction(effect, targetCtx, input.type)
+        if (fraction === 0) continue
+        fractions.push(fraction)
+        trackSupport(effect)
+      }
+      mitigated = applyDamageReductionFractions(mitigated, fractions)
+
+      const absorbed = Math.min(targetRuntime.shieldHp, mitigated)
+      targetRuntime.shieldHp -= absorbed
+      targetRuntime.currentHp -= (mitigated - absorbed)
+
+      const instance: DamageInstance = {
+        time, source: input.source, type: input.type, raw, mitigated,
+        targetHpAfter: targetRuntime.currentHp,
+      }
+      instances.push(instance)
+
+      if (!killed && targetRuntime.currentHp <= 0) {
+        killed = true
+        timeToKill = time
+        overkill = -targetRuntime.currentHp
+      }
+
+      for (const effect of attackerEffectsList) {
+        const handler = resolve(effect)
+        if (!handler?.hooks?.onDamageDealt) continue
+        if (!conditionAllows(effect, attackerCtx, { damageType: instance.type, sourceKind: instance.source.kind })) continue
+        handler.hooks.onDamageDealt(effect, attackerCtx, instance)
+        trackSupport(effect)
+      }
+
+      return instance
+    } finally {
+      damageDepth--
     }
-    for (const effect of attackerEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
-      if (!handler?.modifyResist) continue
-      const partial = handler.modifyResist(effect, attackerCtx, input.type)
-      if (Object.keys(partial).length === 0) continue
-      modifiers.flatReduction += partial.flatReduction ?? 0
-      modifiers.pctReduction += partial.pctReduction ?? 0
-      modifiers.pctPen += partial.pctPen ?? 0
-      modifiers.flatPen += partial.flatPen ?? 0
-      trackSupport(effect)
-    }
-
-    let mitigated = mitigateDamage(raw, input.type, resistBase, modifiers)
-    if (input.type !== 'true') unverifiedRuleIds.add('resistModificationOrder')
-
-    const targetCtx = buildCtx(target, targetRuntime, attacker, attackerRuntime)
-    const fractions: number[] = []
-    for (const effect of targetEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
-      if (!handler?.damageReductionFraction) continue
-      const fraction = handler.damageReductionFraction(effect, targetCtx, input.type)
-      if (fraction === 0) continue
-      fractions.push(fraction)
-      trackSupport(effect)
-    }
-    mitigated = applyDamageReductionFractions(mitigated, fractions)
-
-    const absorbed = Math.min(targetRuntime.shieldHp, mitigated)
-    targetRuntime.shieldHp -= absorbed
-    targetRuntime.currentHp -= (mitigated - absorbed)
-
-    const instance: DamageInstance = {
-      time, source: input.source, type: input.type, raw, mitigated,
-      targetHpAfter: targetRuntime.currentHp,
-    }
-    instances.push(instance)
-
-    if (!killed && targetRuntime.currentHp <= 0) {
-      killed = true
-      timeToKill = time
-      overkill = -targetRuntime.currentHp
-    }
-
-    for (const effect of attackerEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
-      if (!handler?.hooks?.onDamageDealt) continue
-      if (!conditionAllows(effect, attackerCtx, { damageType: instance.type, sourceKind: instance.source.kind })) continue
-      handler.hooks.onDamageDealt(effect, attackerCtx, instance)
-      trackSupport(effect)
-    }
-
-    return instance
   }
 
   function dispatchOnBasicAttack() {
     const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
     for (const effect of attackerEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
+      const handler = resolve(effect)
       if (!handler?.hooks?.onBasicAttack) continue
       if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onBasicAttack(effect, ctx)
@@ -250,7 +294,7 @@ export function simulateCombo(
   function dispatchOnAbilityCast(abilityKey: AbilityKey) {
     const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
     for (const effect of attackerEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
+      const handler = resolve(effect)
       if (!handler?.hooks?.onAbilityCast) continue
       if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onAbilityCast(effect, ctx, abilityKey)
@@ -261,7 +305,7 @@ export function simulateCombo(
   function dispatchOnAbilityHit(abilityKey: AbilityKey, hitInstances: DamageInstance[]) {
     const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
     for (const effect of attackerEffectsList) {
-      const handler = resolveEffectHandler(effect, customHandlers)
+      const handler = resolve(effect)
       if (!handler?.hooks?.onAbilityHit) continue
       if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onAbilityHit(effect, ctx, abilityKey, hitInstances)
@@ -334,7 +378,7 @@ export function simulateCombo(
       // A blocked active isn't "involved" in the action at all — matching the hook-dispatch sites,
       // a failed condition skips the whole action, so it never fires and never goes on cooldown.
       if (!conditionAllows(activeEffect, ctx)) continue
-      const handler = resolveEffectHandler(activeEffect, customHandlers)
+      const handler = resolve(activeEffect)
       handler?.activate?.(activeEffect, ctx)
       trackSupport(activeEffect)
 
@@ -343,9 +387,22 @@ export function simulateCombo(
       if (cooldownWarning) dataWarnings.push(cooldownWarning)
       attackerRuntime.cooldowns[cooldownKey] = time + cooldownResolved.value
     } else if (action.startsWith('wait:')) {
-      time += Number(action.slice(5))
+      const seconds = Number(action.slice(5))
+      if (!Number.isFinite(seconds)) {
+        dataWarnings.push(`Invalid wait duration in sequence: "${action}" — ignored.`)
+        continue
+      }
+      time += seconds
       flushScheduledEvents(time)
     }
+  }
+
+  if (scheduled.length > 0) {
+    dataWarnings.push(
+      `${scheduled.length} scheduled effect tick(s) (e.g. a DoT) were still pending when the `
+      + 'sequence ended and were not applied — add a trailing wait:<seconds> action to let them '
+      + 'resolve.'
+    )
   }
 
   const totalsByType: Partial<Record<DamageType, number>> = {}
@@ -365,7 +422,9 @@ export function simulateCombo(
   return {
     instances, totalsByType, totalsBySource, killed, timeToKill, overkill,
     unsupportedEffects: [...mergedUnsupported.values()],
-    dataWarnings: [...attacker.sheet.dataWarnings, ...target.sheet.dataWarnings, ...dataWarnings],
+    dataWarnings: [...new Set([
+      ...attacker.sheet.dataWarnings, ...target.sheet.dataWarnings, ...dataWarnings,
+    ])],
     unverifiedRules: [...new Set([
       ...attacker.sheet.unverifiedRules, ...target.sheet.unverifiedRules, ...unverifiedRuleIds,
     ])],

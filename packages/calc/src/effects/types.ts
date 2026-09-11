@@ -105,5 +105,6 @@ export interface HookContext {
     effect: Effect, condition: Condition,
     extra?: { damageType?: DamageType; sourceKind?: SourceKind }
   ): boolean
-  scheduleEvent?(atTime: number, run: (ctx: HookContext) => void): void
+  scheduleEvent?(atTime: number, run: (ctx: HookContext) => void, key?: string): void
+  cancelScheduled?(key: string): void
 }
