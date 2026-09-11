@@ -113,6 +113,18 @@ further sign-off needed, but every task builds on the same model)
     before falling back to `packages/calc/src/custom/registry.ts`'s `CUSTOM_HANDLERS` (empty in
     Phase 1 — no real champion kits are implemented until Step 6+). This keeps the dispatch pure and
     testable without any hidden mutable registration step.
+12. **`effect.condition` is gated generically by the engine for every hook dispatch, not by each
+    hook-based handler individually.** Task 16's `simulateCombo` defines a `conditionAllows(effect,
+    ctx, extra?)` helper (`!effect.condition || ctx.conditionMet(...)`) and checks it in all four
+    hook-dispatch sites (`dispatchOnBasicAttack`, `dispatchOnAbilityCast`, `dispatchOnAbilityHit`,
+    and `performDamage`'s `onDamageDealt` loop) before ever calling into a handler's hook. This was
+    added after Task 5's review caught `resistShredHandler.modifyResist` missing a condition check
+    its sibling `penetrationHandler` had — rather than risk the same omission recurring across
+    Tasks 6-12's hook-based handlers, the check moved to the one place it can't be forgotten. The
+    three *reader* capabilities (`modifyResist`/`damageMultiplier`/`damageReductionFraction`) are
+    NOT covered by this — `performDamage` calls those directly outside the hook-dispatch loops, so
+    each of those handlers still self-checks its own `condition` (as `penetration`/`damageAmp`/
+    `resistShred.modifyResist`/`damageReduction` already correctly do).
 
 ---
 
@@ -3039,6 +3051,23 @@ function evaluateCondition(
 }
 
 /**
+ * Gates any hook dispatch on the effect's own optional `condition` — this is what lets a
+ * conditional effect skip a hook-triggered mechanic (onHit, spellblade, dot, procEveryN,
+ * cooldownRefund, shield, heal, active) without every individual handler needing its own
+ * condition check. Reader capabilities (`modifyResist`/`damageMultiplier`/`damageReductionFraction`)
+ * are NOT covered by this — they're called directly by performDamage's modifier-gathering phase,
+ * not through a hook-dispatch loop, so each of those handlers still self-checks its own condition
+ * (see `penetrationHandler`/`damageAmpHandler`/`resistShredHandler.modifyResist`/
+ * `damageReductionHandler`).
+ */
+function conditionAllows(
+  effect: Effect, ctx: HookContext,
+  extra?: { damageType?: DamageType; sourceKind?: SourceKind }
+): boolean {
+  return !effect.condition || ctx.conditionMet(effect, effect.condition, extra)
+}
+
+/**
  * Runs an event-driven combat timeline for `attacker` acting through `sequence` against `target`.
  * Phase 1 is asymmetric: only the attacker acts (basic attacks, ability casts, item actives) — the
  * target never initiates damage, so every DamageInstance flows attacker -> target. See this task's
@@ -3180,6 +3209,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolveEffectHandler(effect, customHandlers)
       if (!handler?.hooks?.onDamageDealt) continue
+      if (!conditionAllows(effect, attackerCtx, { damageType: instance.type, sourceKind: instance.source.kind })) continue
       handler.hooks.onDamageDealt(effect, attackerCtx, instance)
       trackSupport(effect)
     }
@@ -3192,6 +3222,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolveEffectHandler(effect, customHandlers)
       if (!handler?.hooks?.onBasicAttack) continue
+      if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onBasicAttack(effect, ctx)
       trackSupport(effect)
     }
@@ -3202,6 +3233,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolveEffectHandler(effect, customHandlers)
       if (!handler?.hooks?.onAbilityCast) continue
+      if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onAbilityCast(effect, ctx, abilityKey)
       trackSupport(effect)
     }
@@ -3212,6 +3244,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolveEffectHandler(effect, customHandlers)
       if (!handler?.hooks?.onAbilityHit) continue
+      if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onAbilityHit(effect, ctx, abilityKey, hitInstances)
       trackSupport(effect)
     }
