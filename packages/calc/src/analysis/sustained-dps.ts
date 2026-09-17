@@ -9,8 +9,9 @@ const ABILITY_ACTION: Record<AbilityKey, ComboAction> = { q: 'Q', w: 'W', e: 'E'
  * Estimated damage per second over `seconds`, casting abilities off cooldown in `priority` order
  * (each attempt is a free no-op in simulateCombo if still on cooldown) and filling with basic
  * attacks. Only counts damage landing strictly before `seconds` so the result matches the
- * attack-speed-implied rate exactly for a pure-AA rotation; the rate reflects the achieved kill
- * time when the target dies inside the window, and the full window otherwise.
+ * attack-speed-implied rate exactly for a pure-AA rotation; the rate divides by `seconds` unless
+ * the target dies strictly inside `[0, seconds]`, in which case it divides by the achieved kill
+ * time instead (a kill landing at or after `seconds` is capped back to `seconds`).
  *
  * @throws RangeError if `seconds` is not greater than 0.
  */
@@ -38,6 +39,11 @@ export function sustainedDps(
   // how much faster one build killed than another. Divide by the window actually achieved instead.
   // A kill on the very first instance (timeToKill === 0) has no window to divide by, so it falls
   // back to `seconds` rather than returning Infinity.
-  const achievedWindow = killed && timeToKill !== undefined && timeToKill > 0 ? timeToKill : seconds
+  // `blocks` above deliberately over-provisions the sequence past `seconds`, so the target can also
+  // die in that out-of-window tail (timeToKill > seconds). The numerator already stops at `seconds`
+  // there, so the achieved window is capped at `seconds` — dividing a window-bounded total by a
+  // larger, out-of-window kill time would understate dps.
+  const achievedWindow = killed && timeToKill !== undefined && timeToKill > 0
+    ? Math.min(timeToKill, seconds) : seconds
   return total / achievedWindow
 }

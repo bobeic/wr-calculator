@@ -67,6 +67,19 @@ describe('sustainedDps', () => {
     expect(sustainedDps(attacker, target, 10, [])).toBeCloseTo(120, 5)
   })
 
+  it('caps the divisor at the window when the padded sequence kills after `seconds`', () => {
+    const attacker = combatantFromChampion(
+      championWithAbility(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const target = combatantFromDummy(dummy({ hp: 200 }))
+    // sustainedDps over-provisions the sequence on purpose: blocks = ceil(2.5/1) + 0 + 1 = 4 AAs,
+    // landing at t=0,1,2,3 — so the rotation runs a full second past the 2.5s window. At 60 per AA
+    // the 200hp dummy is on 20hp after t=2 and only dies on the t=3 swing, giving timeToKill=3,
+    // which is outside the window. The numerator already stops at the window (t=0,1,2 -> 180), so
+    // the divisor must be the 2.5s window, not the 3s kill: 180/2.5 = 72, not 180/3 = 60.
+    expect(sustainedDps(attacker, target, 2.5, [])).toBeCloseTo(72, 5)
+  })
+
   it('throws on a non-positive window instead of returning NaN or Infinity', () => {
     const attacker = combatantFromChampion(
       championWithAbility(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
