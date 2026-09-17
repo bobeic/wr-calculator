@@ -331,8 +331,8 @@ export function simulateCombo(
     if (killed) break
 
     if (action === 'AA') {
-      const interval = 1 / Math.max(attacker.sheet.total.attackSpeed ?? 1, 0.01)
-      time += interval
+      // The attack lands at the current time (an idle attacker's first swing is ~instant); the
+      // interval only delays how soon the *next* swing can land, so it's added after, not before.
       flushScheduledEvents(time)
 
       const critChance = attacker.sheet.total.critChance ?? 0
@@ -345,6 +345,9 @@ export function simulateCombo(
         source: { kind: 'basicAttack', id: 'AA', name: 'Basic Attack' },
       })
       dispatchOnBasicAttack()
+
+      const interval = 1 / Math.max(attacker.sheet.total.attackSpeed ?? 1, 0.01)
+      time += interval
     } else if (action === 'Q' || action === 'W' || action === 'E' || action === 'R') {
       if (!attacker.abilities) continue
       const abilityKey = action.toLowerCase() as AbilityKey

@@ -17,18 +17,18 @@ correctness bugs, and are not listed here.
 
 ## Decision — the following are accepted Phase 1 gaps
 
-1. **`timeToKill` is measured from the moment a basic attack lands, not from combo start.** The
-   `AA` sequence action advances `time` by the attack interval *before* dealing damage, so the
-   first AA of a combo lands at `t = 1/attackSpeed`, not `t ≈ 0`. A pure-AA kill's reported
-   `timeToKill` is therefore inflated by roughly one attack interval relative to "time since the
-   player pressed attack." This is a real, if small, bias in any DPS figure derived as `total /
-   timeToKill`, and it is largest for fast-attack-speed builds — exactly where it would most affect
-   a build comparison. Accepted for Phase 1 because fixing it changes the semantics of every
-   existing `time`/`timeToKill` value the tests already pin, and deserves its own considered pass
-   rather than a rushed change in a final review's fix round. **Must be resolved, or at minimum
-   re-confirmed as intentional, before Step 5's `compareBuilds` plots `ttk` on a crossover chart** —
-   a systematic bias in a headline metric is a visible wrong answer in the product this is being
-   built for.
+1. **RESOLVED (2026-09-17).** `timeToKill` was measured from the moment a basic attack landed, not
+   from combo start: the `AA` sequence action advanced `time` by the attack interval *before*
+   dealing damage, so the first AA of a combo landed at `t = 1/attackSpeed`, not `t ≈ 0`. Fixed by
+   reordering the `AA` branch in `simulate-combo.ts` to flush scheduled events, deal damage, and
+   dispatch `onBasicAttack` at the current `time`, then advance `time += interval` afterward — the
+   interval now represents recovery until the *next* swing rather than a windup before this one.
+   `Q`/`W`/`E`/`R` and `wait:` were untouched; their `time += duration` genuinely is a pre-effect
+   delay (cast time, an explicit wait). Every AA-derived `time`/`timeToKill` value shifts back by
+   exactly one interval; pinned test assertions in `simulate-combo.test.ts` were updated to match
+   (verified failing against the old code before the fix, per TDD). No other file in the repo
+   referenced `timeToKill` or `'AA'` timing, so the change was self-contained. Step 5's
+   `compareBuilds` can now plot `ttk` without this systematic bias.
 
 2. **`penetration` and `damageReduction` cannot express a `sourceKind`-based `condition`.**
    `modifyResist(effect, ctx, damageType)` and `damageReductionFraction(effect, ctx, damageType)`
@@ -122,7 +122,7 @@ correctness bugs, and are not listed here.
 
 - None of the above block Phase 1 from running end-to-end; each is either inert today (no data
   exercises it) or a known, bounded bias rather than a crash or a silently-wrong headline number.
-- Item 1 (`timeToKill` bias) is the one with a stated deadline: it must be resolved or explicitly
-  re-affirmed before Step 5 builds `compareBuilds`'s crossover charts on top of it.
+- Item 1 (`timeToKill` bias) was the one with a stated deadline; it is now resolved (see above), so
+  Step 5's `compareBuilds` crossover charts can build on an unbiased `timeToKill`.
 - This ADR supersedes the plan's inline "Known Phase 1 gaps" note as the durable reference —
   future steps should update this file, not the (by then historical) Step 4 plan document.
