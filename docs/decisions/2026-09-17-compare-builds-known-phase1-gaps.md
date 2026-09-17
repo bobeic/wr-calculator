@@ -22,7 +22,12 @@ the durable reference — same pattern as
    like `build.items`. Their cost is added once, at the first breakpoint. This means the very first
    plotted breakpoint's `gold` already includes boots/enchant cost even though, narratively, a
    player might buy their first component before boots. Acceptable for a first pass; revisit if the
-   crossover chart needs to model purchase order across item types.
+   crossover chart needs to model purchase order across item types. A corollary of the same
+   design: because the breakpoint loop runs over `build.items` only, a build with zero `items` but
+   `boots`/`enchant` set produces no breakpoints at all — so that build's boots/enchant gold is
+   never counted anywhere and its side of the envelope stays empty. Accepted for the same reason:
+   the crossover chart is a series over completed legendary items, and a boots-only build has no
+   series to plot. Revisit together with staged boots/enchant purchases.
 4. **`compareBuilds` does not surface `sustainedDps`'s own `simulateCombo` call's envelope
    entries** (`dataWarnings`/`unsupportedEffects`/`unverifiedRules`) — only the `burst` call's
    envelope is unioned in per breakpoint. In practice this rarely loses information: `dps` and
@@ -34,6 +39,11 @@ the durable reference — same pattern as
    would eventually kill.** A build that only kills through sustained cooldown-respecting play (not
    within the fixed burst sequence) reports `ttk: undefined` for that breakpoint. Callers (a future
    debug page or UI) should treat `undefined` as "not modeled by this scenario," not "unkillable."
+   The same applies to the figures that *are* reported: `burst` and `ttk` come from
+   `simulateCombo(..., { ignoreCooldowns: true })`, so a returned `ttk` is an idealized best case in
+   which every ability in `scenario.burstSequence` is off cooldown, not a cooldown-respecting
+   timeline. Treat it as "how fast could this build kill with everything available," and read `dps`
+   (which does respect cooldowns) for the sustained picture.
 
 ## Consequences
 
