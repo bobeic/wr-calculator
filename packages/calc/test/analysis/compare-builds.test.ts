@@ -1,5 +1,5 @@
 // packages/calc/test/analysis/compare-builds.test.ts
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { compareBuilds } from '../../src/analysis/compare-builds'
 import type { CompareBuildsScenario } from '../../src/analysis/compare-builds'
 import { combatantFromDummy } from '../../src/combatant'
@@ -64,5 +64,24 @@ describe('compareBuilds', () => {
     expect(result.a[1].dps).toBeGreaterThan(result.a[0].dps)
     expect(result.a[0].ttk).toBeUndefined() // single AA never kills a 100000hp dummy
     expect(result.a[0].ehp).toEqual({ physical: 1000, magic: 1000 })
+  })
+
+  it('reuses a cached combatant when both sides resolve the same breakpoint', async () => {
+    const combatantModule = await import('../../src/combatant')
+    const items = new Map([['item-shared', adItem('item-shared', 10, 1000)]])
+    const champion = championWithAbility()
+    const build = emptyBuild({ items: ['item-shared'] })
+    const target = combatantFromDummy(dummy())
+    const scenario: CompareBuildsScenario = { durationSeconds: 1, priority: [], burstSequence: ['AA'] }
+    const spy = vi.spyOn(combatantModule, 'combatantFromChampion')
+
+    compareBuilds(
+      { champion, level: 1, build, catalog: { items, runes: new Map() } },
+      { champion, level: 1, build, catalog: { items, runes: new Map() } },
+      target, scenario
+    )
+
+    expect(spy).toHaveBeenCalledTimes(1)
+    spy.mockRestore()
   })
 })

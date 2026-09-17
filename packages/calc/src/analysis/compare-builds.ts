@@ -56,8 +56,17 @@ function mergeEnvelope(envelope: Envelope, source: {
   source.unverifiedRules.forEach((id) => envelope.unverifiedRuleIds.add(id))
 }
 
+function cacheKey(
+  championId: string, level: number, itemIds: string[], runeIds: string[],
+  inputs: Record<string, number | boolean>
+): string {
+  const inputsKey = Object.keys(inputs).sort().map((key) => `${key}=${inputs[key]}`).join('&')
+  return `${championId}|${level}|${itemIds.join(',')}|${runeIds.join(',')}|${inputsKey}`
+}
+
 function breakpointsForSide(
-  side: CompareBuildsSide, target: Combatant, scenario: CompareBuildsScenario, envelope: Envelope
+  side: CompareBuildsSide, target: Combatant, scenario: CompareBuildsScenario, envelope: Envelope,
+  combatantCache: Map<string, Combatant>
 ): BuildBreakpoint[] {
   const breakpoints: BuildBreakpoint[] = []
   let gold = 0
@@ -65,7 +74,18 @@ function breakpointsForSide(
   for (let itemCount = 1; itemCount <= side.build.items.length; itemCount++) {
     const itemIds = side.build.items.slice(0, itemCount)
     const build: Build = { ...side.build, items: itemIds }
-    const combatant = combatantFromChampion(side.champion, side.level, build, side.catalog)
+    // The key must cover every id combatantFromChampion actually resolves against (build.items
+    // plus boots/enchant), not just the staged generic items — otherwise two sides sharing the
+    // same generic items but different boots/enchant would wrongly collide in the cache.
+    const fullItemIds = [
+      ...itemIds, ...(build.boots ? [build.boots] : []), ...(build.enchant ? [build.enchant] : []),
+    ]
+    const key = cacheKey(side.champion.id, side.level, fullItemIds, build.runes, build.inputs)
+    let combatant = combatantCache.get(key)
+    if (!combatant) {
+      combatant = combatantFromChampion(side.champion, side.level, build, side.catalog)
+      combatantCache.set(key, combatant)
+    }
     mergeEnvelope(envelope, combatant.sheet)
 
     // combatantFromChampion above already validated every id in build.items/boots/enchant via
@@ -98,8 +118,9 @@ export function compareBuilds(
   const envelope: Envelope = {
     unsupportedByEffectId: new Map(), dataWarnings: [], unverifiedRuleIds: new Set(),
   }
-  const aBreakpoints = breakpointsForSide(a, target, scenario, envelope)
-  const bBreakpoints = breakpointsForSide(b, target, scenario, envelope)
+  const combatantCache = new Map<string, Combatant>()
+  const aBreakpoints = breakpointsForSide(a, target, scenario, envelope, combatantCache)
+  const bBreakpoints = breakpointsForSide(b, target, scenario, envelope, combatantCache)
 
   return {
     a: aBreakpoints, b: bBreakpoints,
