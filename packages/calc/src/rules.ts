@@ -112,11 +112,13 @@ export const RESIST_MODIFICATION_ORDER = [
 // passive is shown as active.
 export const UNIQUE_EFFECT_RESOLUTION: 'strongest' | 'first' = 'strongest'
 
-// TODO-VERIFY(itemSlots): confirm the inventory holds 6 item slots plus a separate boots slot
-// and a separate enchant slot (i.e. boots/enchant don't consume one of the 6), in a custom game.
+// TODO-VERIFY(itemSlots): confirm the inventory holds 6 item slots plus a separate boots slot,
+// in a custom game.
+// Confirmed 2026-09-17 (user, in-game): Wild Rift removed the boot-enchant mechanic — enchants
+// are standalone items now, not a separate attach-to-boots slot.
 export const ITEM_SLOTS = 6
 export const HAS_SEPARATE_BOOTS_SLOT = true
-export const HAS_SEPARATE_ENCHANT_SLOT = true
+export const HAS_SEPARATE_ENCHANT_SLOT = false
 
 // TODO-VERIFY(damageAmpTiming): confirm damageAmp effects multiply raw damage before resist
 // mitigation (not after) — compare a known damageAmp source's effect on a hit against a

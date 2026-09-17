@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { statKeyRecord } from './stat-key'
 import { AbilitySchema } from './ability'
+import { ProvenanceSchema } from './provenance'
 
 /**
  * 'attackSpeed' is excluded here: a champion's base AS lives only in the dedicated
@@ -25,5 +26,6 @@ export const ChampionSchema = z.object({
     e: AbilitySchema,
     r: AbilitySchema,
   }).strict(),
+  provenance: ProvenanceSchema,
 }).strict()
 export type Champion = z.infer<typeof ChampionSchema>

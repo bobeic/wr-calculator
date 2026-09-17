@@ -8,6 +8,7 @@ function validChampion(overrides: Partial<Champion> = {}): Champion {
     id: 'nunu-willump', name: 'Nunu & Willump', resource: 'mana',
     baseStats: { hp: { base: 610, perLevel: 90 }, ad: { base: 60, perLevel: 3 } },
     attackSpeed: { base: 0.625, ratio: 0.025 },
+    provenance: { source: 'manual', patch: 'test', verifiedInGame: false },
     abilities: {
       passive: { id: 'passive', name: 'P', maxRank: 1, cooldown: 0, castTime: 0, damage: [], flags: {} },
       q: { id: 'q', name: 'Q', maxRank: 5, cooldown: 8, castTime: 0.25, damage: [], flags: {} },

@@ -5,6 +5,8 @@ function validAbility(id: string) {
   return { id, name: id, maxRank: 5, cooldown: 8, castTime: 0.25, damage: [], flags: {} }
 }
 
+const testProvenance = { source: 'manual' as const, patch: 'test', verifiedInGame: false }
+
 describe('ChampionSchema', () => {
   it('parses a minimal valid champion', () => {
     const champion = {
@@ -20,6 +22,7 @@ describe('ChampionSchema', () => {
         e: validAbility('e'),
         r: validAbility('r'),
       },
+      provenance: testProvenance,
     }
     const result = ChampionSchema.parse(champion)
     expect(result.id).toBe('nunu-willump')
@@ -32,6 +35,7 @@ describe('ChampionSchema', () => {
         passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
         e: validAbility('e'), r: validAbility('r'),
       },
+      provenance: testProvenance,
     }
     expect(() => ChampionSchema.parse(champion)).toThrow()
   })
@@ -45,6 +49,7 @@ describe('ChampionSchema', () => {
         passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
         e: validAbility('e'), r: validAbility('r'),
       },
+      provenance: testProvenance,
     }
     expect(() => ChampionSchema.parse(champion)).toThrow()
   })
@@ -58,6 +63,7 @@ describe('ChampionSchema', () => {
         passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
         e: validAbility('e'), r: validAbility('r'),
       },
+      provenance: testProvenance,
     }
     expect(() => ChampionSchema.parse(champion)).toThrow()
   })
@@ -70,6 +76,7 @@ describe('ChampionSchema', () => {
         passive: validAbility('passive'), q: validAbility('q'), w: validAbility('w'),
         e: validAbility('e'), r: validAbility('r'),
       },
+      provenance: testProvenance,
       madeUpField: true,
     }
     expect(() => ChampionSchema.parse(champion)).toThrow()

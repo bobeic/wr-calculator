@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   MAX_CHAMPION_LEVEL, statAtLevel, interpolateLevelRange, resolveAdaptiveDamageType,
   attackSpeedAtLevel, totalAttackSpeed, STAT_RESOLUTION_ORDER, UNVERIFIED_RULE_IDS, critMultiplier,
+  HAS_SEPARATE_ENCHANT_SLOT,
 } from '../src/rules'
 
 describe('statAtLevel', () => {
@@ -113,5 +114,11 @@ describe('critMultiplier', () => {
   it('clamps crit chance to [0, 1] in "expected" mode', () => {
     expect(critMultiplier(2, 0, 'expected')).toBe(critMultiplier(1, 0, 'expected'))
     expect(critMultiplier(-1, 0, 'expected')).toBe(1)
+  })
+})
+
+describe('HAS_SEPARATE_ENCHANT_SLOT', () => {
+  it('is false: Wild Rift removed the boot-enchant mechanic, enchants are standalone items now', () => {
+    expect(HAS_SEPARATE_ENCHANT_SLOT).toBe(false)
   })
 })

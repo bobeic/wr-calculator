@@ -9,6 +9,7 @@ function championWithAbility(overrides: Partial<Champion> = {}): Champion {
     id: 'test-champ', name: 'Test Champion', resource: 'mana',
     baseStats: { hp: { base: 1000, perLevel: 0 }, ad: { base: 60, perLevel: 0 } },
     attackSpeed: { base: 1, ratio: 0 },
+    provenance: { source: 'manual', patch: 'test', verifiedInGame: false },
     abilities: {
       passive: { id: 'passive', name: 'P', maxRank: 1, cooldown: 0, castTime: 0, damage: [], flags: {} },
       q: {
