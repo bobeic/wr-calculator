@@ -54,4 +54,26 @@ describe('sustainedDps', () => {
     // counts (the recast at t=8 falls on the excluded boundary), adding exactly 50/8 dps.
     expect(withQ).toBeCloseTo(pureAa + 50 / 8, 5)
   })
+
+  it('divides by the achieved kill time when the target dies inside the window', () => {
+    const attacker = combatantFromChampion(
+      championWithAbility(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const target = combatantFromDummy(dummy({ hp: 120 }))
+    // attackSpeed 1 and 0 armor -> exactly 60 mitigated per AA, landing at t=0 and t=1. The second
+    // hit takes the 120hp dummy to exactly 0, so simulateCombo sets killed/timeToKill=1 and stops.
+    // Both instances are inside the 10s window, so total=120 over an achieved window of 1s = 120 —
+    // not 120/10=12, which is what dividing by the full (never-reached) window would report.
+    expect(sustainedDps(attacker, target, 10, [])).toBeCloseTo(120, 5)
+  })
+
+  it('throws on a non-positive window instead of returning NaN or Infinity', () => {
+    const attacker = combatantFromChampion(
+      championWithAbility(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const target = combatantFromDummy(dummy())
+    expect(() => sustainedDps(attacker, target, 0, [])).toThrow(RangeError)
+    expect(() => sustainedDps(attacker, target, -1, [])).toThrow(/seconds must be > 0/)
+    expect(() => sustainedDps(attacker, target, Number.NaN, [])).toThrow(RangeError)
+  })
 })
