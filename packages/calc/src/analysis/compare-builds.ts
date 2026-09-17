@@ -60,7 +60,7 @@ function cacheKey(
   championId: string, level: number, itemIds: string[], runeIds: string[],
   inputs: Record<string, number | boolean>
 ): string {
-  const inputsKey = Object.keys(inputs).sort().map((key) => `${key}=${inputs[key]}`).join('&')
+  const inputsKey = JSON.stringify(Object.keys(inputs).sort().map((key) => [key, inputs[key]]))
   return `${championId}|${level}|${itemIds.join(',')}|${runeIds.join(',')}|${inputsKey}`
 }
 
