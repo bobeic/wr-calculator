@@ -71,17 +71,42 @@ describe('compareBuilds', () => {
     const items = new Map([['item-shared', adItem('item-shared', 10, 1000)]])
     const champion = championWithAbility()
     const build = emptyBuild({ items: ['item-shared'] })
+    // One catalog object for both sides: cross-side cache sharing is keyed on catalog identity,
+    // which is the common case (comparing two builds for the same champion off one data set).
+    const catalog = { items, runes: new Map() }
     const target = combatantFromDummy(dummy())
     const scenario: CompareBuildsScenario = { durationSeconds: 1, priority: [], burstSequence: ['AA'] }
     const spy = vi.spyOn(combatantModule, 'combatantFromChampion')
 
     compareBuilds(
-      { champion, level: 1, build, catalog: { items, runes: new Map() } },
-      { champion, level: 1, build, catalog: { items, runes: new Map() } },
+      { champion, level: 1, build, catalog },
+      { champion, level: 1, build, catalog },
       target, scenario
     )
 
     expect(spy).toHaveBeenCalledTimes(1)
     spy.mockRestore()
+  })
+
+  it('does not share cached combatants between sides that pass different catalogs', () => {
+    // Same item id, different item behind it in each side's catalog: an id-only cache key would
+    // let side b reuse side a's Combatant and report side a's gold and damage.
+    const catalogA = { items: new Map([['item-x', adItem('item-x', 10, 1000)]]), runes: new Map() }
+    const catalogB = { items: new Map([['item-x', adItem('item-x', 40, 3000)]]), runes: new Map() }
+    const champion = championWithAbility()
+    const build = emptyBuild({ items: ['item-x'] })
+    const target = combatantFromDummy(dummy())
+    const scenario: CompareBuildsScenario = { durationSeconds: 1, priority: [], burstSequence: ['AA'] }
+
+    const result = compareBuilds(
+      { champion, level: 1, build, catalog: catalogA },
+      { champion, level: 1, build, catalog: catalogB },
+      target, scenario
+    )
+
+    expect(result.a[0].gold).toBe(1000)
+    expect(result.b[0].gold).toBe(3000)
+    expect(result.a[0].burst).toBeCloseTo(70) // 60 base AD + 10 from catalogA's item-x
+    expect(result.b[0].burst).toBeCloseTo(100) // 60 base AD + 40 from catalogB's item-x
   })
 })

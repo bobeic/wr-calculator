@@ -56,12 +56,35 @@ function mergeEnvelope(envelope: Envelope, source: {
   source.unverifiedRules.forEach((id) => envelope.unverifiedRuleIds.add(id))
 }
 
+// Read-only identity bookkeeping, not shared combat state: it hands each distinct StatCatalog
+// object a stable small integer purely so cache keys built from two different catalogs can never
+// collide. The combatant cache itself is created fresh per compareBuilds call and keys are only
+// ever compared within one call, so the absolute ids never reach a computed value and the engine
+// stays deterministic.
+const catalogIdentities = new WeakMap<StatCatalog, number>()
+let nextCatalogIdentity = 0
+
+function catalogIdentity(catalog: StatCatalog): number {
+  const existing = catalogIdentities.get(catalog)
+  if (existing !== undefined) return existing
+  const assigned = nextCatalogIdentity++
+  catalogIdentities.set(catalog, assigned)
+  return assigned
+}
+
+/**
+ * A collision-safe cache key for one resolved Combatant. Every segment goes through a single
+ * JSON.stringify of a structured array rather than being concatenated with a delimiter, so no id
+ * containing a separator character can make two structurally different builds share a key.
+ */
 function cacheKey(
-  championId: string, level: number, itemIds: string[], runeIds: string[],
+  catalog: StatCatalog, championId: string, level: number, itemIds: string[], runeIds: string[],
   inputs: Record<string, number | boolean>
 ): string {
-  const inputsKey = JSON.stringify(Object.keys(inputs).sort().map((key) => [key, inputs[key]]))
-  return `${championId}|${level}|${itemIds.join(',')}|${runeIds.join(',')}|${inputsKey}`
+  return JSON.stringify([
+    catalogIdentity(catalog), championId, level, itemIds, runeIds,
+    Object.keys(inputs).sort().map((key) => [key, inputs[key]]),
+  ])
 }
 
 function breakpointsForSide(
@@ -76,11 +99,15 @@ function breakpointsForSide(
     const build: Build = { ...side.build, items: itemIds }
     // The key must cover every id combatantFromChampion actually resolves against (build.items
     // plus boots/enchant), not just the staged generic items — otherwise two sides sharing the
-    // same generic items but different boots/enchant would wrongly collide in the cache.
+    // same generic items but different boots/enchant would wrongly collide in the cache. It must
+    // also cover the catalog the ids resolve *through*: the two sides carry independent catalogs,
+    // so an id-only key would let side b reuse a Combatant resolved from side a's catalog.
     const fullItemIds = [
       ...itemIds, ...(build.boots ? [build.boots] : []), ...(build.enchant ? [build.enchant] : []),
     ]
-    const key = cacheKey(side.champion.id, side.level, fullItemIds, build.runes, build.inputs)
+    const key = cacheKey(
+      side.catalog, side.champion.id, side.level, fullItemIds, build.runes, build.inputs
+    )
     let combatant = combatantCache.get(key)
     if (!combatant) {
       combatant = combatantFromChampion(side.champion, side.level, build, side.catalog)
@@ -88,8 +115,11 @@ function breakpointsForSide(
     }
     mergeEnvelope(envelope, combatant.sheet)
 
-    // combatantFromChampion above already validated every id in build.items/boots/enchant via
-    // resolveStats, so the catalog lookups below are safe — same trust boundary combatant.ts uses.
+    // combatantFromChampion validated every id in build.items/boots/enchant against this exact
+    // catalog via resolveStats when the cache entry was created, so the lookups below are safe —
+    // same trust boundary combatant.ts uses. On a cache hit that validation happened on an earlier
+    // breakpoint rather than on this call, which is equally sound because the key pins the catalog
+    // identity: a hit can only come from an entry resolved against this same catalog object.
     if (itemCount === 1) {
       if (side.build.boots) gold += side.catalog.items.get(side.build.boots)!.cost.total
       if (side.build.enchant) gold += side.catalog.items.get(side.build.enchant)!.cost.total
