@@ -109,4 +109,41 @@ describe('compareBuilds', () => {
     expect(result.a[0].burst).toBeCloseTo(70) // 60 base AD + 10 from catalogA's item-x
     expect(result.b[0].burst).toBeCloseTo(100) // 60 base AD + 40 from catalogB's item-x
   })
+
+  it('unions envelope entries across breakpoints without duplicating them', () => {
+    const partialItem = adItem('item-partial', 10, 1000)
+    // A null stat scalar is what resolveStats turns into a dataWarning, and a stat effect with
+    // support !== 'full' is what it records as an unsupported-effect entry. Both are re-reported by
+    // every breakpoint's stat sheet and by every burst simulateCombo call, so a union that didn't
+    // dedupe would repeat each of them once per breakpoint per side.
+    partialItem.stats = { ad: null }
+    partialItem.effects = [{
+      id: 'iffy', name: 'Iffy Passive', description: '', support: 'partial',
+      supportNotes: 'exact scaling unconfirmed', kind: 'stat', stat: 'ad', amount: 5,
+    }]
+    const items = new Map([
+      ['item-partial', partialItem],
+      ['item-plain', adItem('item-plain', 20, 2000)],
+    ])
+    const champion = championWithAbility()
+    const catalog = { items, runes: new Map() }
+    const build = emptyBuild({ items: ['item-partial', 'item-plain'] })
+    const target = combatantFromDummy(dummy())
+    const scenario: CompareBuildsScenario = { durationSeconds: 3, priority: [], burstSequence: ['AA'] }
+
+    const result = compareBuilds(
+      { champion, level: 1, build, catalog },
+      { champion, level: 1, build, catalog },
+      target, scenario
+    )
+
+    expect(result.a).toHaveLength(2)
+    expect(result.b).toHaveLength(2)
+    expect(result.unsupportedEffects).toEqual([
+      { id: 'iffy', support: 'partial', supportNotes: 'exact scaling unconfirmed' },
+    ])
+    expect(result.dataWarnings).toEqual(['item-partial: stats.ad is unverified (null)'])
+    expect(result.unverifiedRules.length).toBeGreaterThan(0)
+    expect(new Set(result.unverifiedRules).size).toBe(result.unverifiedRules.length)
+  })
 })
