@@ -23,6 +23,9 @@ importers:
 
   packages/data:
     dependencies:
+      '@wr-calc/calc':
+        specifier: workspace:*
+        version: link:../calc
       '@wr-calc/schema':
         specifier: workspace:*
         version: link:../schema
