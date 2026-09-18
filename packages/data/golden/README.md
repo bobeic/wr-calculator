@@ -38,3 +38,12 @@ Each case is a `*.json` file matching `GoldenCaseSchema` (`packages/data/src/gol
 To add a case: play the scenario in the Wild Rift practice tool, record the real numbers, and
 drop a new `*.json` file in this directory. No code changes needed — `golden.test.ts` picks it up
 automatically.
+
+Before you record a case, check the items involved. Many items in
+`packages/data/src/patches/7.3/items.ts` are still skeletons — their stat and effect magnitudes
+are `null`, which the engine resolves to `0`. If `scenario.build.items` includes one of these,
+the engine will under-count damage compared to what you measured in the practice tool. Fill in
+that item's real values first, then record the case — otherwise the case will fail (or pass for
+the wrong reason).
+
+Run just this package's tests with `pnpm --filter @wr-calc/data test`.

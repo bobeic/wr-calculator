@@ -38,13 +38,18 @@ export function runGoldenCase(
   if (!champion) {
     return { passed: false, failures: [`unknown championId '${goldenCase.scenario.championId}'`] }
   }
-  const attacker = combatantFromChampion(
-    champion, goldenCase.scenario.level, goldenCase.scenario.build, catalog
-  )
-  const target = combatantFromDummy({ kind: 'dummy', ...goldenCase.scenario.target })
-  const result = simulateCombo(
-    attacker, target, goldenCase.scenario.combo as ComboAction[], { critMode: 'expected' }
-  )
+  let result: ReturnType<typeof simulateCombo>
+  try {
+    const attacker = combatantFromChampion(
+      champion, goldenCase.scenario.level, goldenCase.scenario.build, catalog
+    )
+    const target = combatantFromDummy({ kind: 'dummy', ...goldenCase.scenario.target })
+    result = simulateCombo(
+      attacker, target, goldenCase.scenario.combo as ComboAction[], { critMode: 'expected' }
+    )
+  } catch (error) {
+    return { passed: false, failures: [error instanceof Error ? error.message : String(error)] }
+  }
 
   const failures: string[] = []
   const check = (label: string, actual: number | undefined, expected: number | undefined): void => {

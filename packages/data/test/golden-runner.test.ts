@@ -59,6 +59,16 @@ describe('runGoldenCase', () => {
     expect(result.passed).toBe(false)
     expect(result.failures[0]).toContain('does-not-exist')
   })
+
+  it('fails with a clear message for an unknown item id in the build', () => {
+    const goldenCase: GoldenCase = {
+      scenario: { ...scenario, build: { ...scenario.build, items: ['does-not-exist'] } },
+      expected: {}, tolerance: 0.01, patch: '7.3', source: 'practice-tool',
+    }
+    const result = runGoldenCase(goldenCase, champions, PATCH_7_3_CATALOG)
+    expect(result.passed).toBe(false)
+    expect(result.failures[0]).toContain('does-not-exist')
+  })
 })
 
 describe('loadGoldenCases', () => {
