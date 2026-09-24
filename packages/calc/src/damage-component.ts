@@ -23,20 +23,20 @@ function resolveRatioStat(
   }
 }
 
-/** Resolves one Ability DamageComponent's damage amount for a given attacker/target/level/live target HP. */
+/** Resolves one Ability DamageComponent's damage amount for a given attacker/target/level/ability rank/live target HP. */
 export function resolveDamageComponent(
   component: DamageComponent, attacker: Combatant, target: Combatant,
-  targetCurrentHp: number, level: number, ownerName: string
+  targetCurrentHp: number, level: number, ownerName: string, rank?: number
 ): ResolvedDamageComponent {
   const dataWarnings: string[] = []
-  const baseResolved = resolveScalar(component.base, level)
+  const baseResolved = resolveScalar(component.base, level, rank)
   const baseWarning = scalarWarning(ownerName, 'base', baseResolved)
   if (baseWarning) dataWarnings.push(baseWarning)
 
   let amount = baseResolved.value
   for (const ratio of component.ratios) {
     const statValue = resolveRatioStat(ratio.stat, attacker, target, targetCurrentHp)
-    const ratioResolved = resolveScalar(ratio.value, level)
+    const ratioResolved = resolveScalar(ratio.value, level, rank)
     const ratioWarning = scalarWarning(ownerName, `ratios.${ratio.stat}`, ratioResolved)
     if (ratioWarning) dataWarnings.push(ratioWarning)
     amount += statValue * ratioResolved.value

@@ -359,10 +359,13 @@ export function simulateCombo(
       flushScheduledEvents(time)
       dispatchOnAbilityCast(abilityKey)
 
+      // No per-ability rank input yet: every ability is assumed fully ranked (see
+      // docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md).
+      const rank = ability.maxRank
       const hitInstances: DamageInstance[] = []
       for (const component of ability.damage) {
         const resolved = resolveDamageComponent(
-          component, attacker, target, targetRuntime.currentHp, attacker.level, ability.name
+          component, attacker, target, targetRuntime.currentHp, attacker.level, ability.name, rank
         )
         resolved.dataWarnings.forEach((warning) => dataWarnings.push(warning))
         hitInstances.push(performDamage({
@@ -371,7 +374,7 @@ export function simulateCombo(
         }))
       }
 
-      const cooldownResolved = resolveScalar(ability.cooldown, attacker.level)
+      const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
       const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
       if (cooldownWarning) dataWarnings.push(cooldownWarning)
       const hastedCooldown = cooldownWithHaste(
