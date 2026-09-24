@@ -6,7 +6,7 @@ A pnpm/TypeScript monorepo for a League of Legends build damage calculator. Curr
 
 - `packages/schema`: Zod schemas defining the data contract for game entities (champions, items, effects)
 - `packages/calc`: Calculation engine, currently includes game-mechanics constants and rules in `rules.ts`
-- `packages/data`: Scaffolded for future data storage and management
+- `packages/data`: patch 7.3 data (all champions and items generated from wrpocket.app via `pnpm --filter @wr-calc/data import:wrpocket`, plus hand-modeled starter items; everything unverified until checked in-game), `buildCatalog`, and the golden test runner (Node-only loader at `@wr-calc/data/golden-loader`)
 
 ## Getting Started
 

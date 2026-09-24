@@ -177,7 +177,7 @@ export function buildChampionMap(champions: Champion[]): Map<string, Champion> {
 }
 ```
 
-`packages/data/src/patches/7.3/index.ts`: add `export * from './targets'` after `export * from './champions'`.
+`packages/data/src/patches/7.3/index.ts`: add `export * from './targets'` after `export * from './provenance'`.
 
 `packages/data/src/index.ts`: add `export * from './champion-map'` after `export * from './catalog'`.
 
@@ -319,7 +319,7 @@ The root `vitest.workspace.ts` already globs `apps/*`, so it needs no edit.
 Root `package.json`: change the `typecheck` script to
 
 ```json
-"typecheck": "tsc -b && pnpm --filter @wr-calc/web typecheck",
+"typecheck": "tsc -b && tsc -p packages/data/tsconfig.scripts.json && pnpm --filter @wr-calc/web typecheck",
 ```
 
 Root `.gitignore`: append
@@ -373,7 +373,7 @@ import { PATCH_7_3_DATASET } from '../src/lib/dataset'
 describe('defaultState', () => {
   it('uses the first champion at max level, empty builds and the first preset', () => {
     expect(defaultState(PATCH_7_3_DATASET)).toEqual({
-      championId: 'nunu-willump',
+      championId: 'aatrox',
       level: 15,
       buildA: { items: [], runes: [], inputs: {} },
       buildB: { items: [], runes: [], inputs: {} },
@@ -786,7 +786,7 @@ describe('decodeState: malformed params', () => {
 describe('decodeState: unknown ids', () => {
   it('resets an unknown champion and reports it', () => {
     const { state, issues } = decode('champ=zed')
-    expect(state.championId).toBe('nunu-willump')
+    expect(state.championId).toBe('aatrox')
     expect(issues).toEqual(["unknown champion 'zed', reset to default"])
   })
 
@@ -1026,7 +1026,7 @@ git commit -m "feat: encode and decode debug-page state in the URL"
   - `function collectInputs(build: DebugBuild, catalog: StatCatalog): EffectInput[]`: purchase order (items, then boots, then runes), deduped by input `id` (first one wins). Unknown ids are skipped.
   - `function inputValue(input: EffectInput, values: Record<string, number | boolean>): number | boolean`
   - `function resolveInputs(build: DebugBuild, catalog: StatCatalog): Record<string, number | boolean>`: every collected input's `default`, overridden by `build.inputs`.
-- Real data facts used by the tests: `heartsteel` declares `{ type: 'stackCount', id: 'heartsteel-stacks', min: 0, max: 20, default: 0 }`. `seraphs-embrace` declares `{ type: 'boolean', id: 'seraphs-embrace-shield-used', default: false }`. `long-sword` and `trinity-force` declare no inputs.
+- Real data facts used by the tests: `heartsteel` declares `{ type: 'stackCount', id: 'heartsteel-stacks', min: 0, max: 3000, default: 0 }` then `{ type: 'boolean', id: 'heartsteel-charge-ready', default: false }`. `seraphs-embrace` declares `{ type: 'boolean', id: 'seraphs-embrace-shield-used', default: false }`. `long-sword` and `trinity-force` declare no inputs.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1054,12 +1054,14 @@ describe('collectInputs', () => {
 
   it('keeps purchase order', () => {
     expect(ids(build({ items: ['seraphs-embrace', 'heartsteel'] }))).toEqual([
-      'seraphs-embrace-shield-used', 'heartsteel-stacks',
+      'seraphs-embrace-shield-used', 'heartsteel-stacks', 'heartsteel-charge-ready',
     ])
   })
 
   it('dedupes an input declared by the same item bought twice', () => {
-    expect(ids(build({ items: ['heartsteel', 'heartsteel'] }))).toEqual(['heartsteel-stacks'])
+    expect(ids(build({ items: ['heartsteel', 'heartsteel'] }))).toEqual([
+      'heartsteel-stacks', 'heartsteel-charge-ready',
+    ])
   })
 
   it('skips unknown ids', () => {
@@ -1082,7 +1084,7 @@ describe('collectInputs', () => {
       build({ items: ['seraphs-embrace'], boots: 'heartsteel', runes: ['test-rune'] }), withRune,
     )
     expect(result.map((input) => input.id)).toEqual([
-      'seraphs-embrace-shield-used', 'heartsteel-stacks', 'test-rune-toggle',
+      'seraphs-embrace-shield-used', 'heartsteel-stacks', 'heartsteel-charge-ready', 'test-rune-toggle',
     ])
   })
 })
@@ -1103,7 +1105,9 @@ describe('resolveInputs', () => {
   it('fills every declared default, overridden by set values', () => {
     expect(resolveInputs(build({
       items: ['heartsteel', 'seraphs-embrace'], inputs: { 'heartsteel-stacks': 7 },
-    }), catalog)).toEqual({ 'heartsteel-stacks': 7, 'seraphs-embrace-shield-used': false })
+    }), catalog)).toEqual({
+      'heartsteel-stacks': 7, 'heartsteel-charge-ready': false, 'seraphs-embrace-shield-used': false,
+    })
   })
 
   it('returns an empty record for a build with no inputs', () => {
@@ -1228,11 +1232,9 @@ describe('nullReport', () => {
   })
 
   it('reports real patch 7.3 item nulls', () => {
-    const botrk = PATCH_7_3_CATALOG.items.get('blade-of-the-ruined-king')!
-    const paths = nullReport([{ label: 'item blade-of-the-ruined-king', value: botrk }])
-      .map((entry) => entry.path)
-    expect(paths).toContain('item blade-of-the-ruined-king › stats.ad')
-    expect(paths).toContain('item blade-of-the-ruined-king › effects[0].pctTargetCurrentHp')
+    const seraph = PATCH_7_3_CATALOG.items.get('seraphs-embrace')!
+    const paths = nullReport([{ label: 'item seraphs-embrace', value: seraph }]).map((entry) => entry.path)
+    expect(paths).toContain('item seraphs-embrace › effects[1].amount')
   })
 })
 ```
@@ -1365,7 +1367,7 @@ describe('runDebug with the real 7.3 dataset', () => {
     const result = runDebug(state(), dataset)
     expect(ok(result.sheetA).total.hp).toBeGreaterThan(0)
     expect(ok(result.sheetB).total.ad).toBeGreaterThan(0)
-    // Base AD is real data, so basic attacks deal damage even while item magnitudes are null.
+    // Base AD and item AD are real data, so basic attacks deal damage.
     expect(ok(result.comboA).totalsBySource.AA).toBeGreaterThan(0)
     expect(ok(result.comboB).instances.length).toBeGreaterThan(0)
     const compare = ok(result.compare)
@@ -1428,35 +1430,34 @@ describe('runDebug envelope and nulls', () => {
     const result = runDebug(state({ buildB: { items: ['liandrys-torment'], runes: [], inputs: {} } }), dataset)
     const liandrys = result.envelope.unsupportedEffects.filter((entry) => entry.id === 'liandrys-torment-dot')
     expect(liandrys).toHaveLength(1)
-    expect(result.envelope.dataWarnings.length).toBeGreaterThan(0)
     expect(result.envelope.dataWarnings.length).toBe(new Set(result.envelope.dataWarnings).size)
     expect(result.envelope.unverifiedRules.length).toBe(new Set(result.envelope.unverifiedRules).size)
   })
 
   it('reports each null once even when both builds share an item', () => {
-    const result = runDebug(state({
-      buildB: { items: ['blade-of-the-ruined-king'], runes: [], inputs: {} },
-    }), dataset)
+    const buildA = { items: ['seraphs-embrace'], runes: [], inputs: {} }
+    const buildB = { items: ['seraphs-embrace'], runes: [], inputs: {} }
+    const result = runDebug(state({ buildA, buildB }), dataset)
     const paths = result.nulls.map((entry) => entry.path)
-    expect(paths.filter((path) => path === 'item blade-of-the-ruined-king › stats.ad')).toHaveLength(1)
+    expect(paths.filter((path) => path === 'item seraphs-embrace › effects[1].amount')).toHaveLength(1)
     expect(paths.some((path) => path.startsWith('champion jinx › '))).toBe(true)
   })
 
   it('includes a champion target and its items in the null report', () => {
     const target: DebugTarget = {
       kind: 'champion', championId: 'annie', level: 9,
-      build: { items: ['blasting-wand'], runes: [], inputs: {} },
+      build: { items: ['seraphs-embrace'], runes: [], inputs: {} },
     }
     const paths = runDebug(state({ target }), dataset).nulls.map((entry) => entry.path)
     expect(paths.some((path) => path.startsWith('champion annie › '))).toBe(true)
-    expect(paths).toContain('item blasting-wand › stats.ap')
+    expect(paths).toContain('item seraphs-embrace › effects[1].amount')
   })
 })
 
 describe('toBuild', () => {
   it('fills declared input defaults so the engine never sees a missing input', () => {
     expect(toBuild({ items: ['heartsteel'], runes: [], inputs: {} }, dataset)).toEqual({
-      items: ['heartsteel'], runes: [], inputs: { 'heartsteel-stacks': 0 },
+      items: ['heartsteel'], runes: [], inputs: { 'heartsteel-stacks': 0, 'heartsteel-charge-ready': false },
     })
   })
 
@@ -2265,7 +2266,7 @@ real patch data, and a bare debug page for exercising the engine end to end.
 
 - `packages/schema`: Zod schemas defining the data contract (champions, items, runes, effects, builds, targets)
 - `packages/calc`: the calculation engine: `resolveStats`, `simulateCombo`, `compareBuilds`, sustained DPS, effective HP, and game rules in `rules.ts`
-- `packages/data`: patch 7.3 champion/item skeletons (magnitudes still `null` pending in-game data entry), target presets, `buildCatalog`/`buildChampionMap`, and the golden test runner (Node-only loader at `@wr-calc/data/golden-loader`)
+- `packages/data`: patch 7.3 data (all champions and items generated from wrpocket.app via `pnpm --filter @wr-calc/data import:wrpocket`, plus hand-modeled starter items; everything unverified until checked in-game), `buildCatalog`, and the golden test runner (Node-only loader at `@wr-calc/data/golden-loader`)
 - `apps/web`: Next.js debug page (static export) that runs the engine in the browser
 ```
 

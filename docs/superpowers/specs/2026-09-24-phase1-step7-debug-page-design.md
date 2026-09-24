@@ -9,11 +9,11 @@ Prerequisite, already done (`866b671`, ADR `docs/decisions/2026-09-24-data-golde
 
 ## 1. Purpose
 
-**The page is a companion for entering real data.** Every stat and effect magnitude in the patch
-7.3 data is still `null` (only item `cost` is real), so every real build currently reads as 0. The
-page's first job is to exercise the full engine end to end against the real 7.3 data, and to show
-prominently which values are still missing. As the user fills in the data, the numbers on the page
-become real. No demo or fake dataset is shipped.
+**The page is a companion for verifying data.** The 7.3 data is imported from wrpocket.app and
+marked unverified (see `docs/superpowers/specs/2026-09-24-wrpocket-import-design.md`); only a few
+values are still `null` (e.g. Seraph's shield, ability passives' cooldowns). The page exercises the
+full engine end to end against that data and lists every remaining `null`, so in-game checks can
+focus on what matters. No demo or fake dataset is shipped.
 
 The page is unstyled, with no design work. The real UI gets its own design pass later.
 
