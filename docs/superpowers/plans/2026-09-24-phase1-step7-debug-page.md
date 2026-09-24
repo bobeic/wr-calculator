@@ -2231,7 +2231,7 @@ kill %1
 
 Expected: prints `wr-calc debug`. Then report to the controller that the in-browser manual check (below) is still needed. The controller or user does it with `pnpm --filter @wr-calc/web dev` → http://localhost:3000:
 1. The page loads with Aatrox, the squishy target and combo `AA`, and shows a non-zero AA total.
-2. Adding Heartsteel to Build A shows a "Heartsteel stacks" number input, and the URL updates.
+2. Adding Heartsteel to Build A shows a "Heartsteel bonus Health gained" number input and a "Heartsteel charged strike ready" checkbox, and the URL updates.
 3. Typing `Q XX` in the combo field shows an inline error and "Error: combo text failed…" in the Combo and compareBuilds panels, while the stat sheets still render.
 4. Reloading the page restores the same state from the URL.
 5. Opening `?champ=zed` shows a "URL issues" section.
