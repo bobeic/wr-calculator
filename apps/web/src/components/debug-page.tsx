@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
 import { PATCH_7_3_DATASET } from '../lib/dataset'
-import { CRIT_MODES } from '../lib/debug-state'
+import { CRIT_MODES, MAX_DURATION_SECONDS } from '../lib/debug-state'
 import type { DebugState } from '../lib/debug-state'
 import { decodeState, encodeState } from '../lib/url-state'
-import { parseCombo, parsePriority } from '../lib/parse-combo'
+import { findMissingComboItems, parseCombo, parsePriority } from '../lib/parse-combo'
 import { runDebug } from '../lib/run-debug'
 import { BuildEditor } from './build-editor'
 import { TargetEditor } from './target-editor'
@@ -29,16 +29,26 @@ export function DebugPage() {
   const result = useMemo(() => runDebug(state, dataset), [state])
   const comboParse = parseCombo(state.combo)
   const priorityParse = parsePriority(state.priority)
+  const missingComboItems = findMissingComboItems(
+    comboParse.ok ? comboParse.actions : [], state.buildA, state.buildB,
+  )
   const update = (patch: Partial<DebugState>) => setState((current) => ({ ...current, ...patch }))
 
   return (
     <main>
       <h1>wr-calc debug (patch 7.3)</h1>
+      <p>
+        Ability damage and cooldowns resolved from per-rank data currently collapse to 0 (see{' '}
+        docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md), so combo and compareBuilds
+        ability numbers are not trustworthy yet.
+      </p>
       <NullsPanel nulls={result.nulls} />
       {initial.issues.length > 0 && (
         <section>
-          <h2>URL issues</h2>
-          <ul>{initial.issues.map((issue) => <li key={issue}>{issue}</li>)}</ul>
+          <h2>URL issues (on load)</h2>
+          <ul>
+            {initial.issues.map((issue, index) => <li key={`${index}-${issue}`}>{issue}</li>)}
+          </ul>
         </section>
       )}
       <section>
@@ -64,6 +74,13 @@ export function DebugPage() {
         <p>
           <label>Combo <input value={state.combo} onChange={(event) => update({ combo: event.target.value })} /></label>
           {!comboParse.ok && <span role="alert"> {comboParse.error}</span>}
+          {missingComboItems.length > 0 && (
+            <ul>
+              {missingComboItems.map((warning, index) => (
+                <li key={`${index}-${warning}`} role="alert">{warning}</li>
+              ))}
+            </ul>
+          )}
         </p>
         <p>
           <label>Priority <input value={state.priority} onChange={(event) => update({ priority: event.target.value })} /></label>
@@ -71,11 +88,17 @@ export function DebugPage() {
         </p>
         <p>
           <label>
-            Duration (s){' '}
-            <input type="number" min={0.5} step={0.5} value={state.durationSeconds} onChange={(event) => {
-              const durationSeconds = Number(event.target.value)
-              if (Number.isFinite(durationSeconds) && durationSeconds > 0) update({ durationSeconds })
-            }} />
+            Duration (s, max {MAX_DURATION_SECONDS}){' '}
+            <input
+              type="number" min={0.5} max={MAX_DURATION_SECONDS} step={0.5} value={state.durationSeconds}
+              onChange={(event) => {
+                const durationSeconds = Number(event.target.value)
+                if (
+                  Number.isFinite(durationSeconds) && durationSeconds > 0
+                  && durationSeconds <= MAX_DURATION_SECONDS
+                ) update({ durationSeconds })
+              }}
+            />
           </label>{' '}
           <label>
             Crit mode{' '}
@@ -84,7 +107,8 @@ export function DebugPage() {
               if (critMode) update({ critMode })
             }}>
               {CRIT_MODES.map((mode) => <option key={mode} value={mode}>{mode}</option>)}
-            </select>
+            </select>{' '}
+            <small>(combo panel only; compareBuilds uses expected crits)</small>
           </label>
         </p>
       </section>
