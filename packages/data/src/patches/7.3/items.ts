@@ -95,7 +95,10 @@ export const STARTER_ITEMS: Item[] = [
       kind: 'resistShred', id: 'black-cleaver-carve', name: 'Sunder',
       description: "Dealing physical damage to a champion reduces their Armor by 6% for 6 seconds, "
         + 'stacking up to 5 times (30%).',
-      support: 'full', supportNotes: 'Rage move speed is not modeled.',
+      support: 'partial',
+      supportNotes: '"To a champion" isn\'t enforced (it also stacks on monster hits), and Rage '
+        + 'move speed is not modeled.',
+      condition: { type: 'damageType', value: 'physical' },
       resist: 'armor', mode: 'percent', amount: 0.06, stacking: true, maxStacks: 5,
       durationSeconds: 6,
     }],
@@ -201,8 +204,32 @@ export const STARTER_ITEMS: Item[] = [
   {
     id: 'force-of-nature', name: 'Force of Nature', tier: 'legendary',
     cost: { total: 2800, combine: 500 }, recipe: ['ruby-crystal', 'negatron-cloak', 'winged-moonplate'],
-    stats: { hp: 400, mr: 60, moveSpeedPct: 0.04 }, effects: [],
-    tags: ['magic-resist'],
+    stats: { hp: 400, mr: 60, moveSpeedPct: 0.04 }, tags: ['magic-resist'],
+    effects: [
+      {
+        kind: 'stacking', id: 'force-of-nature-steadfast-mr', name: 'Steadfast (Magic Resist)',
+        description: 'Taking magic damage from enemy champions grants a stack of Steadfast, up to '
+          + '4, for 7 seconds. At max stacks, gain 70 bonus Magic Resist.',
+        support: 'partial',
+        supportNotes: 'The stack count is a manual toggle (0 or max) here, not accumulated from '
+          + 'taking magic damage; also declares the shared "at max stacks" input.',
+        stat: 'mr', perStack: 70, maxStacks: 1, stackInputId: 'force-of-nature-max-stacks',
+        inputs: [{
+          type: 'stackCount', id: 'force-of-nature-max-stacks', label: 'Force of Nature at max stacks',
+          min: 0, max: 1, default: 0,
+        }],
+      },
+      {
+        kind: 'stacking', id: 'force-of-nature-steadfast-ms', name: 'Steadfast (Move Speed)',
+        description: 'Taking magic damage from enemy champions grants a stack of Steadfast, up to '
+          + '4, for 7 seconds. At max stacks, gain 6% Move Speed.',
+        support: 'partial',
+        supportNotes: 'Shares the "Force of Nature at max stacks" input declared by '
+          + 'force-of-nature-steadfast-mr; the stack count is a manual toggle (0 or max) here, not '
+          + 'accumulated from taking magic damage.',
+        stat: 'moveSpeedPct', perStack: 0.06, maxStacks: 1, stackInputId: 'force-of-nature-max-stacks',
+      },
+    ],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
 ]

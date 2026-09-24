@@ -49,6 +49,28 @@ describe('STARTER_ITEMS', () => {
       expect(item.provenance, item.id).toEqual({ source: 'wiki', patch: '7.3', verifiedInGame: false })
     }
   })
+
+  it("gates Black Cleaver's Sunder to physical damage, since the engine's onDamageDealt hook fires for every damage type", () => {
+    const blackCleaver = STARTER_ITEMS.find((item) => item.id === 'black-cleaver')!
+    const sunder = blackCleaver.effects.find((effect) => effect.id === 'black-cleaver-carve')!
+    expect(sunder.condition).toEqual({ type: 'damageType', value: 'physical' })
+    expect(sunder.support).toBe('partial')
+  })
+
+  it('declares the Force of Nature max-stacks input once, shared by both Steadfast effects', () => {
+    const forceOfNature = STARTER_ITEMS.find((item) => item.id === 'force-of-nature')!
+    const stackingEffects = forceOfNature.effects.filter(
+      (effect): effect is Extract<typeof effect, { kind: 'stacking' }> => effect.kind === 'stacking'
+    )
+    expect(stackingEffects).toHaveLength(2)
+    for (const effect of stackingEffects) {
+      expect(effect.stackInputId, effect.id).toBe('force-of-nature-max-stacks')
+    }
+    const declaringEffects = stackingEffects.filter(
+      (effect) => effect.inputs?.some((input) => input.id === 'force-of-nature-max-stacks')
+    )
+    expect(declaringEffects).toHaveLength(1)
+  })
 })
 
 describe('PATCH_7_3_ITEMS', () => {
