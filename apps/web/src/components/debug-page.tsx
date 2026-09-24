@@ -23,9 +23,12 @@ export function DebugPage() {
 
   // Native replaceState, not router.replace: Next keys the page segment by its search params, so a
   // router navigation remounts DebugPage and re-decodes the already-cleaned URL, losing `initial.issues`.
+  // Skipped until the first edit: this child effect runs before Next's router patches replaceState on
+  // mount, and an unpatched call wipes the router's history state and wedges it.
   useEffect(() => {
+    if (state === initial.state) return
     window.history.replaceState(null, '', `?${encodeState(state)}`)
-  }, [state])
+  }, [initial.state, state])
 
   const result = useMemo(() => runDebug(state, dataset), [state])
   const comboParse = parseCombo(state.combo)
