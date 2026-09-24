@@ -62,13 +62,21 @@ describe('parseRatios', () => {
     })
     expect(parseRatios('+0.5 AP')).toEqual({ ratios: [], unparsed: ['0.5 AP'] })
   })
+
+  it('collapses internal whitespace and tolerates no space between % and the label', () => {
+    expect(parseRatios('+80%bonus  AD')).toEqual({ ratios: [{ stat: 'bonusAd', value: 0.8 }], unparsed: [] })
+    expect(parseRatios('+80% bonus  AD')).toEqual({ ratios: [{ stat: 'bonusAd', value: 0.8 }], unparsed: [] })
+  })
 })
 
 describe('findTextDamage', () => {
   it('reads per-rank base damage, ratios and type', () => {
     expect(findTextDamage(
       'Hurls a fireball, dealing 80 / 130 / 180 / 230 (+85% AP) magic damage.',
-    )).toEqual({ base: [80, 130, 180, 230], ratioGroup: '+85% AP', type: 'magic', isRangeUpperBound: false })
+    )).toEqual({
+      base: [80, 130, 180, 230], ratioGroup: '+85% AP', type: 'magic', isRangeUpperBound: false,
+      formulaSnippet: null, perHitSnippet: null,
+    })
   })
 
   it('reads "bonus <type> damage" phrases', () => {
@@ -80,11 +88,48 @@ describe('findTextDamage', () => {
   it('flags the upper end of a damage range', () => {
     expect(findTextDamage(
       'dealing 25 (+12% bonus AD)–250 (+120% bonus AD) physical damage plus more',
-    )).toEqual({ base: [250], ratioGroup: '+120% bonus AD', type: 'physical', isRangeUpperBound: true })
+    )).toEqual({
+      base: [250], ratioGroup: '+120% bonus AD', type: 'physical', isRangeUpperBound: true,
+      formulaSnippet: null, perHitSnippet: null,
+    })
   })
 
   it('returns null when there is no damage phrase', () => {
     expect(findTextDamage('Gains 32 (based on level) Move Speed while out of combat.')).toBeNull()
+  })
+
+  it('flags a formula-shaped base value ("N + Level x M" or "N + M") with a reconstructed snippet', () => {
+    expect(findTextDamage(
+      "Illumination empowers Lux's next attack against that target, dealing 18 + Level x 7.5 (+25% AP) magic damage.",
+    )).toMatchObject({ base: [7.5], formulaSnippet: '18 + Level x 7.5' })
+    expect(findTextDamage(
+      'plus 13 + 2 (+20% AP) magic damage over 1.5 seconds.',
+    )).toMatchObject({ base: [2], formulaSnippet: '13 + 2' })
+  })
+
+  it('does not flag an ordinary base value as a formula', () => {
+    expect(findTextDamage('Hurls a fireball, dealing 80 (+85% AP) magic damage.')).toMatchObject({
+      formulaSnippet: null,
+    })
+  })
+
+  it('flags per-hit/per-second ticking text right after the damage phrase, with a short snippet', () => {
+    expect(findTextDamage('Fires 5 arrows, dealing 70 (+100% bonus AD) physical damage per arrow.'))
+      .toMatchObject({ perHitSnippet: 'per arrow' })
+    expect(findTextDamage('The trail burns for 60 (+60% bonus AD) magic damage per second, dealing up to 150.'))
+      .toMatchObject({ perHitSnippet: 'per second' })
+    expect(findTextDamage('Curses an area, dealing 7 (+7% AP) magic damage every 0.5 seconds to enemies within, and more.'))
+      .toMatchObject({ perHitSnippet: 'every 0.5 seconds to enemies within' })
+    expect(findTextDamage('Slashes twice, damaging enemies for 20 (+50% bonus AD) physical damage each and more.'))
+      .toMatchObject({ perHitSnippet: 'each and more' })
+  })
+
+  it('does not flag ordinary trailing text as per-hit', () => {
+    expect(findTextDamage('Hurls a fireball, dealing 80 (+85% AP) magic damage.')).toMatchObject({
+      perHitSnippet: null,
+    })
+    expect(findTextDamage('dealing 25 (+12% bonus AD)–250 (+120% bonus AD) physical damage plus more'))
+      .toMatchObject({ perHitSnippet: null })
   })
 })
 

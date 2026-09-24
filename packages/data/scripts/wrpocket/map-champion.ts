@@ -1,4 +1,6 @@
-import type { Ability, Champion, DamageComponent, Provenance } from '@wr-calc/schema'
+import type {
+  Ability, Champion, DamageComponent, NullableScalar, Provenance,
+} from '@wr-calc/schema'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
 import type { RawAbility, RawChampion } from './raw-schemas'
 import { normalizeId } from './ids'
@@ -77,6 +79,12 @@ function mapDamage(slot: AbilitySlot, raw: RawAbility, notes: string[]): DamageC
     if (damageTypesIn(text).length > 1) {
       notes.push(`${slot}: text names several damage types; only the first damage phrase is modeled`)
     }
+    if (found.formulaSnippet) {
+      notes.push(`${slot}: damage looks like a formula ('${found.formulaSnippet}'); base may be wrong`)
+    }
+    if (found.perHitSnippet) {
+      notes.push(`${slot}: damage is per second/hit ('${found.perHitSnippet}'); modeled as one hit`)
+    }
     const ratios = parseRatios(found.ratioGroup)
     ratios.unparsed.forEach((part) => notes.push(`${slot}: unparsed ratio '${part}'`))
     return [{ type: found.type, base: toScalar(base), ratios: ratios.ratios, tags: [] }]
@@ -93,23 +101,41 @@ function mapDamage(slot: AbilitySlot, raw: RawAbility, notes: string[]): DamageC
   return []
 }
 
+/** Notes when a byRank scalar's array length doesn't match the ability's maxRank. */
+function noteRankMismatch(
+  slot: AbilitySlot, field: string, scalar: NullableScalar | undefined, maxRank: number, notes: string[],
+): void {
+  if (scalar && typeof scalar === 'object' && 'byRank' in scalar && scalar.byRank.length !== maxRank) {
+    notes.push(`${slot}: ${field} has ${scalar.byRank.length} ranks but maxRank is ${maxRank}`)
+  }
+}
+
 function mapAbility(championId: string, slot: AbilitySlot, raw: RawAbility, notes: string[]): Ability {
   const cooldown = scaling(raw, 'cd')
   const defaultRanks = slot === 'passive' ? 1 : slot === 'r' ? 3 : 4
   const maxRank = slot === 'passive' ? 1 : cooldown && cooldown.length > 1 ? cooldown.length : defaultRanks
+  const damage = mapDamage(slot, raw, notes)
   const ability: Ability = {
     id: `${championId}-${slot}`,
     name: raw.name.en,
     maxRank,
     cooldown: cooldown ? toScalar(cooldown) : null,
     castTime: 0,
-    damage: mapDamage(slot, raw, notes),
+    damage,
     flags: {},
   }
   if (slot !== 'passive') {
     const cost = scaling(raw, 'MP')
     ability.cost = cost ? toScalar(cost) : null
     if (!cooldown) notes.push(`${slot}: no cooldown in the table`)
+  }
+  noteRankMismatch(slot, 'cooldown', ability.cooldown, maxRank, notes)
+  noteRankMismatch(slot, 'cost', ability.cost, maxRank, notes)
+  for (const component of damage) {
+    noteRankMismatch(slot, 'base', component.base, maxRank, notes)
+    for (const ratio of component.ratios) {
+      noteRankMismatch(slot, `ratios.${ratio.stat}`, ratio.value, maxRank, notes)
+    }
   }
   return ability
 }

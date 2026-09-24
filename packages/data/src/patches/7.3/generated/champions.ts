@@ -6669,7 +6669,12 @@ export const GENERATED_CHAMPIONS: Champion[] = [
                 130
               ]
             },
-            "ratios": [],
+            "ratios": [
+              {
+                "stat": "bonusAd",
+                "value": 0.8
+              }
+            ],
             "tags": []
           }
         ],

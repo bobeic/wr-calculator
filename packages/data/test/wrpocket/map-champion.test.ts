@@ -171,4 +171,49 @@ describe('mapChampion: abilities', () => {
     raw.abilities['スキル2'] = ability('Attacks deal 12 (+10% Armor) bonus magic damage.', [['cd', '7']])
     expect(mapChampion(raw, PROVENANCE).notes).toContain("w: unparsed ratio '10% Armor'")
   })
+
+  it('notes a formula-shaped base value on the passive', () => {
+    const raw = rawChampion()
+    raw.abilities['パッシブ'] = ability(
+      "Illumination empowers Lux's next attack against that target, dealing 18 + Level x 7.5 (+25% AP) magic damage.",
+    )
+    expect(mapChampion(raw, PROVENANCE).notes).toContain(
+      "passive: damage looks like a formula ('18 + Level x 7.5'); base may be wrong",
+    )
+  })
+
+  it('notes per-hit/per-second ticking text on an ability', () => {
+    const raw = rawChampion()
+    raw.abilities['スキル2'] = ability(
+      'Fires 5 arrows in a cone, dealing 70 (+100% bonus AD) physical damage per arrow.', [['cd', '7']],
+    )
+    expect(mapChampion(raw, PROVENANCE).notes).toContain(
+      "w: damage is per second/hit ('per arrow'); modeled as one hit",
+    )
+  })
+
+  it('notes a byRank field whose length differs from maxRank', () => {
+    const raw = rawChampion()
+    // cd has one value, so w keeps the default maxRank of 4; the base table has 5 ranks.
+    raw.abilities['スキル2'] = ability('Deals 160 (+55% AP) magic damage.', [
+      ['cd', '10'], ['基础伤害', '160/230/300/370/440'],
+    ])
+    // cd has 3 values (maxRank 3), but MP has 4.
+    raw.abilities['アルティメット'] = ability('Deals 70 (+65% bonus AD) physical damage.', [
+      ['cd', '80/70/60'], ['MP', '80/80/80/80'], ['基础伤害', '60/110/160'],
+    ])
+    const { notes } = mapChampion(raw, PROVENANCE)
+    expect(notes).toContain('w: base has 5 ranks but maxRank is 4')
+    expect(notes).toContain('r: cost has 4 ranks but maxRank is 3')
+  })
+
+  it('notes a byRank base and ratio on a maxRank-1 passive', () => {
+    const raw = rawChampion()
+    raw.abilities['パッシブ'] = ability(
+      'Attacks fire rounds, dealing 20/24/28/32/36 (+102%/104%/106%/108%/110% AD) physical damage to the first enemy hit.',
+    )
+    const { notes } = mapChampion(raw, PROVENANCE)
+    expect(notes).toContain('passive: base has 5 ranks but maxRank is 1')
+    expect(notes).toContain('passive: ratios.totalAd has 5 ranks but maxRank is 1')
+  })
 })
