@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { parseCombo, parsePriority } from '../src/lib/parse-combo'
+import { findMissingComboItems, parseCombo, parsePriority } from '../src/lib/parse-combo'
+import type { DebugBuild } from '../src/lib/debug-state'
 
 describe('parseCombo', () => {
   it('parses every action form', () => {
@@ -35,6 +36,45 @@ describe('parseCombo', () => {
     expect(parseCombo('Q AA XX R')).toEqual({
       ok: false, error: "unknown combo token 'XX'", tokenIndex: 2,
     })
+  })
+})
+
+describe('findMissingComboItems', () => {
+  const buildA: DebugBuild = { items: ['trinity-force'], boots: 'plated-steelcaps', runes: [], inputs: {} }
+  const buildB: DebugBuild = { items: ['long-sword'], runes: [], inputs: {} }
+
+  it('returns no warnings when every item: token is in both builds', () => {
+    expect(findMissingComboItems(['item:trinity-force'], buildA, buildA)).toEqual([])
+  })
+
+  it('warns for the one build missing the item', () => {
+    expect(findMissingComboItems(['item:trinity-force'], buildA, buildB)).toEqual([
+      "combo: item 'trinity-force' is not in build B",
+    ])
+  })
+
+  it('warns for both builds when the item is a mistyped/unknown id', () => {
+    expect(findMissingComboItems(['item:mystery'], buildA, buildB)).toEqual([
+      "combo: item 'mystery' is not in build A",
+      "combo: item 'mystery' is not in build B",
+    ])
+  })
+
+  it('matches an item id equipped as boots', () => {
+    expect(findMissingComboItems(['item:plated-steelcaps'], buildA, buildB)).toEqual([
+      "combo: item 'plated-steelcaps' is not in build B",
+    ])
+  })
+
+  it('ignores non-item actions and de-dupes a repeated item token', () => {
+    expect(findMissingComboItems(['AA', 'item:mystery', 'wait:1', 'item:mystery'], buildA, buildB)).toEqual([
+      "combo: item 'mystery' is not in build A",
+      "combo: item 'mystery' is not in build B",
+    ])
+  })
+
+  it('returns no warnings for an empty combo', () => {
+    expect(findMissingComboItems([], buildA, buildB)).toEqual([])
   })
 })
 

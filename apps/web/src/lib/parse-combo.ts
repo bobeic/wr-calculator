@@ -1,4 +1,5 @@
 import type { AbilityKey, ComboAction } from '@wr-calc/calc'
+import type { DebugBuild } from './debug-state'
 
 export type ParseError = { ok: false; error: string; tokenIndex: number }
 export type ComboParse = { ok: true; actions: ComboAction[] } | ParseError
@@ -39,6 +40,25 @@ export function parseCombo(text: string): ComboParse {
     return { ok: false, error: `unknown combo token '${token}'`, tokenIndex }
   }
   return { ok: true, actions }
+}
+
+/**
+ * Lists `item:` tokens in a parsed combo that aren't in build A's or build B's items/boots —
+ * simulateCombo silently skips such a token instead of erroring, so this surfaces it up front.
+ */
+export function findMissingComboItems(
+  actions: ComboAction[], buildA: DebugBuild, buildB: DebugBuild,
+): string[] {
+  const has = (build: DebugBuild, id: string) => build.items.includes(id) || build.boots === id
+  const ids = [...new Set(
+    actions.flatMap((action) => (action.startsWith('item:') ? [action.slice('item:'.length)] : [])),
+  )]
+  const warnings: string[] = []
+  for (const id of ids) {
+    if (!has(buildA, id)) warnings.push(`combo: item '${id}' is not in build A`)
+    if (!has(buildB, id)) warnings.push(`combo: item '${id}' is not in build B`)
+  }
+  return warnings
 }
 
 /** Parses ability-priority text like "Q E W R" into lowercase ability keys for compareBuilds. */
