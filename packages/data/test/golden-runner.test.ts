@@ -4,8 +4,7 @@ import type { ComboAction } from '@wr-calc/calc'
 import { runGoldenCase } from '../src/golden-runner'
 import { loadGoldenCases } from '../src/golden-loader'
 import type { GoldenCase } from '../src/golden-types'
-import { PATCH_7_3_CHAMPIONS } from '../src/patches/7.3/champions'
-import { PATCH_7_3_CATALOG } from '../src/patches/7.3'
+import { PATCH_7_3_CHAMPIONS, PATCH_7_3_CATALOG } from '../src/patches/7.3'
 
 const champions = new Map(PATCH_7_3_CHAMPIONS.map((champion) => [champion.id, champion]))
 const nunu = champions.get('nunu-willump')!

@@ -1,36 +1,81 @@
 import { describe, it, expect } from 'vitest'
 import { ItemSchema } from '@wr-calc/schema'
-import { PATCH_7_3_ITEMS } from '../src/patches/7.3/items'
+import { PATCH_7_3_ITEMS, STARTER_ITEMS } from '../src/patches/7.3'
+import { GENERATED_ITEMS } from '../src/patches/7.3/generated/items'
 
-const EXPECTED_IDS = [
+const STARTER_IDS = [
   'long-sword', 'bf-sword', 'blasting-wand', 'rabadons-deathcap', 'blade-of-the-ruined-king',
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
 ].sort()
+// Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
+const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
+
+function nullPaths(value: unknown, path: string, out: string[]): void {
+  if (value === null) out.push(path)
+  else if (Array.isArray(value)) value.forEach((element, index) => nullPaths(element, `${path}[${index}]`, out))
+  else if (typeof value === 'object') {
+    for (const [key, child] of Object.entries(value)) nullPaths(child, `${path}.${key}`, out)
+  }
+}
+
+describe('STARTER_ITEMS', () => {
+  it('has exactly the 15 starter items', () => {
+    expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
+  })
+
+  it('has no null values except the documented Seraph shield', () => {
+    const found: string[] = []
+    for (const item of STARTER_ITEMS) {
+      const paths: string[] = []
+      nullPaths(item, '', paths)
+      found.push(...paths.map((path) => `${item.id} ›${path.replace(/^\./, ' ')}`))
+    }
+    expect(found).toEqual(ALLOWED_STARTER_NULLS)
+  })
+
+  it('matches its generated counterpart on cost, recipe and every generated stat', () => {
+    for (const starter of STARTER_ITEMS) {
+      const generated = GENERATED_ITEMS.find((item) => item.id === starter.id)
+      if (!generated) continue // seraphs-embrace only
+      expect(starter.cost, starter.id).toEqual(generated.cost)
+      expect(starter.recipe, starter.id).toEqual(generated.recipe)
+      expect(starter.stats, starter.id).toMatchObject(generated.stats)
+    }
+  })
+
+  it('is marked as unverified wiki data', () => {
+    for (const item of STARTER_ITEMS) {
+      expect(item.provenance, item.id).toEqual({ source: 'wiki', patch: '7.3', verifiedInGame: false })
+    }
+  })
+})
 
 describe('PATCH_7_3_ITEMS', () => {
-  it('has exactly the 15 starter items', () => {
-    expect(PATCH_7_3_ITEMS.map((item) => item.id).sort()).toEqual(EXPECTED_IDS)
+  it('is every generated item plus seraphs-embrace, with unique ids', () => {
+    const ids = PATCH_7_3_ITEMS.map((item) => item.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids).toHaveLength(GENERATED_ITEMS.length + 1)
+    expect(ids).toContain('seraphs-embrace')
+  })
+
+  it('uses the starter item wherever one exists', () => {
+    for (const starter of STARTER_ITEMS) {
+      expect(PATCH_7_3_ITEMS.find((item) => item.id === starter.id), starter.id).toBe(starter)
+    }
   })
 
   it('every item parses against ItemSchema', () => {
-    for (const item of PATCH_7_3_ITEMS) {
-      expect(() => ItemSchema.parse(item), item.id).not.toThrow()
-    }
+    for (const item of PATCH_7_3_ITEMS) expect(() => ItemSchema.parse(item), item.id).not.toThrow()
   })
 
-  it('every item cost is internally consistent (recipe: [], so combine === total)', () => {
+  it('every recipe resolves and combine + component totals equals the item total', () => {
+    const byId = new Map(PATCH_7_3_ITEMS.map((item) => [item.id, item]))
     for (const item of PATCH_7_3_ITEMS) {
-      expect(item.recipe, item.id).toEqual([])
-      expect(item.cost.combine, item.id).toBe(item.cost.total)
-    }
-  })
-
-  it('every item is marked unverified for patch 7.3', () => {
-    for (const item of PATCH_7_3_ITEMS) {
-      expect(item.provenance, item.id).toEqual({
-        source: 'manual', patch: '7.3', verifiedInGame: false,
-      })
+      const components = item.recipe.map((id) => byId.get(id))
+      expect(components.every((component) => component !== undefined), item.id).toBe(true)
+      const componentTotal = components.reduce((sum, component) => sum + (component?.cost.total ?? 0), 0)
+      expect(item.cost.combine + componentTotal, item.id).toBe(item.cost.total)
     }
   })
 })

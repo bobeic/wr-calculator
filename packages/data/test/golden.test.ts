@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { runGoldenCase } from '../src/golden-runner'
 import { loadGoldenCases } from '../src/golden-loader'
-import { PATCH_7_3_CHAMPIONS } from '../src/patches/7.3/champions'
-import { PATCH_7_3_CATALOG } from '../src/patches/7.3'
+import { PATCH_7_3_CHAMPIONS, PATCH_7_3_CATALOG } from '../src/patches/7.3'
 
 const GOLDEN_DIR = new URL('../golden', import.meta.url).pathname
 const champions = new Map(PATCH_7_3_CHAMPIONS.map((champion) => [champion.id, champion]))

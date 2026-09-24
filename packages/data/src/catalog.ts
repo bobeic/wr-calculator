@@ -8,3 +8,13 @@ export function buildCatalog(items: Item[], runes: Rune[] = []): StatCatalog {
     runes: new Map(runes.map((rune) => [rune.id, rune])),
   }
 }
+
+/** Merges overrides into base by id: base order kept, same ids replaced, new ids appended. */
+export function mergeById<T extends { id: string }>(base: T[], overrides: T[]): T[] {
+  const overrideById = new Map(overrides.map((entry) => [entry.id, entry]))
+  const baseIds = new Set(base.map((entry) => entry.id))
+  return [
+    ...base.map((entry) => overrideById.get(entry.id) ?? entry),
+    ...overrides.filter((entry) => !baseIds.has(entry.id)),
+  ]
+}

@@ -1,158 +1,179 @@
 import type { Item } from '@wr-calc/schema'
-import { PATCH_7_3_PROVENANCE } from './provenance'
+import { WRPOCKET_7_3_PROVENANCE } from './provenance'
 
-export const PATCH_7_3_ITEMS: Item[] = [
+// Hand-modeled starter items: stats/cost/recipe from wrpocket (English text), plus effects modeled
+// with this repo's effect kinds. These replace the generated entries with the same id.
+export const STARTER_ITEMS: Item[] = [
   {
     id: 'long-sword', name: 'Long Sword', tier: 'basic',
-    cost: { total: 350, combine: 350 }, recipe: [],
-    stats: { ad: null }, effects: [], tags: ['physical'],
-    provenance: PATCH_7_3_PROVENANCE,
+    cost: { total: 500, combine: 500 }, recipe: [],
+    stats: { ad: 12 }, effects: [], tags: ['physical'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
-    id: 'bf-sword', name: 'B.F. Sword', tier: 'basic',
-    cost: { total: 1300, combine: 1300 }, recipe: [],
-    stats: { ad: null }, effects: [], tags: ['physical'],
-    provenance: PATCH_7_3_PROVENANCE,
+    id: 'bf-sword', name: 'B. F. Sword', tier: 'epic',
+    cost: { total: 1500, combine: 500 }, recipe: ['long-sword', 'long-sword'],
+    stats: { ad: 40 }, effects: [], tags: ['physical'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
-    id: 'blasting-wand', name: 'Blasting Wand', tier: 'basic',
-    cost: { total: 850, combine: 850 }, recipe: [],
-    stats: { ap: null }, effects: [], tags: ['magic'],
-    provenance: PATCH_7_3_PROVENANCE,
+    id: 'blasting-wand', name: 'Blasting Wand', tier: 'epic',
+    cost: { total: 800, combine: 300 }, recipe: ['amplifying-tome'],
+    stats: { ap: 40 }, effects: [], tags: ['magic'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'rabadons-deathcap', name: "Rabadon's Deathcap", tier: 'legendary',
-    cost: { total: 2950, combine: 2950 }, recipe: [],
-    stats: { ap: null }, tags: ['magic'],
+    cost: { total: 3400, combine: 600 }, recipe: ['needlessly-large-rod', 'needlessly-large-rod'],
+    stats: { ap: 130 }, tags: ['magic'],
     effects: [{
-      kind: 'statMultiplier', id: 'rabadons-deathcap-magic-opus', name: 'Magic Opus',
-      description: 'Increases total ability power.', support: 'full',
-      stat: 'ap', layer: 'total', amount: null,
+      kind: 'statMultiplier', id: 'rabadons-deathcap-magic-opus', name: 'Overkill',
+      description: 'Increases ability power by 30%.', support: 'full',
+      stat: 'ap', layer: 'total', amount: 0.3,
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'blade-of-the-ruined-king', name: 'Blade of the Ruined King', tier: 'legendary',
-    cost: { total: 3200, combine: 3200 }, recipe: [],
-    stats: { ad: null, attackSpeed: null, lifesteal: null }, tags: ['physical', 'on-hit'],
+    cost: { total: 3100, combine: 200 }, recipe: ['recurve-bow', 'vampiric-scepter', 'pickaxe'],
+    stats: { ad: 40, attackSpeed: 0.3, lifesteal: 0.12 }, tags: ['physical', 'on-hit'],
     effects: [{
-      kind: 'onHit', id: 'botrk-mists-edge', name: "Mist's Edge",
-      description: 'On-hit: deals physical damage equal to a percent of the target\'s current HP.',
-      support: 'full',
-      damageType: 'physical', pctTargetCurrentHp: null,
+      kind: 'onHit', id: 'botrk-mists-edge', name: 'Ruined Strike',
+      description: "Basic attacks deal bonus physical damage equal to 7% of the target's current Health "
+        + '(8.5% for melee), minimum 15, maximum 100 against monsters.',
+      support: 'partial',
+      supportNotes: 'Uses the ranged value (7%); melee champions get 8.5%. The Drain slow is not modeled.',
+      damageType: 'physical', pctTargetCurrentHp: 0.07, minDamage: 15, monsterCap: 100,
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'trinity-force', name: 'Trinity Force', tier: 'legendary',
-    cost: { total: 3333, combine: 3333 }, recipe: [],
-    stats: { ad: null, attackSpeed: null, abilityHaste: null, hp: null }, tags: ['physical'],
+    cost: { total: 3333, combine: 333 }, recipe: ['sheen', 'hearthbound-axe', 'phage'],
+    stats: { ad: 36, hp: 333, attackSpeed: 0.3, abilityHaste: 15 }, tags: ['physical'],
     effects: [{
       kind: 'spellblade', id: 'trinity-force-spellblade', name: 'Spellblade',
-      description: 'After using an ability, the next basic attack deals bonus physical damage.',
-      support: 'full',
-      damageType: 'physical', bonusDamage: null,
-      ratios: [{ stat: 'ad', value: null }], internalCooldownSeconds: null,
+      description: 'After using an ability, the next basic attack within 10 seconds deals 200% base '
+        + 'Attack Damage as bonus physical damage (1.5 second cooldown).',
+      support: 'partial',
+      supportNotes: 'The real bonus is 200% of *base* AD; the spellblade ratio can only reference total '
+        + 'AD, so this overstates damage once you have bonus AD. Valor move speed is not modeled.',
+      damageType: 'physical', bonusDamage: 0,
+      ratios: [{ stat: 'ad', value: 2 }], internalCooldownSeconds: 1.5,
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'liandrys-torment', name: "Liandry's Torment", tier: 'legendary',
-    cost: { total: 2900, combine: 2900 }, recipe: [],
-    stats: { ap: null, hp: null, abilityHaste: null }, tags: ['magic'],
+    cost: { total: 3000, combine: 800 }, recipe: ['haunting-guise', 'fated-ashes'],
+    stats: { ap: 70, hp: 300 }, tags: ['magic'],
     effects: [{
       kind: 'dot', id: 'liandrys-torment-dot', name: 'Torment',
-      description: 'Ability damage burns the target over time.',
-      support: 'partial',
-      supportNotes: 'Modeled as a flat/AP-ratio DoT only; the real %-max-health burn component '
-        + 'and multi-target stacking are not modeled.',
-      damageType: 'magic', tickAmount: null, tickIntervalSeconds: 1, durationSeconds: null,
+      description: 'Damaging abilities burn the enemy for 3 seconds, dealing magic damage equal to 2% of '
+        + 'their maximum Health per second.',
+      support: 'none',
+      supportNotes: 'The burn is % of target max Health; the dot kind only models flat ticks, so this deals '
+        + '0 until a %-max-Health dot exists. Madness (up to +6% damage) is not modeled.',
+      damageType: 'magic', tickAmount: 0, tickIntervalSeconds: 1, durationSeconds: 3,
       refresh: 'refresh',
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'void-staff', name: 'Void Staff', tier: 'legendary',
-    cost: { total: 2650, combine: 2650 }, recipe: [],
+    cost: { total: 3000, combine: 600 }, recipe: ['needlessly-large-rod', 'void-amethyst'],
     // Unconditional magic pen is a plain stat, not a `penetration`-kind effect (that kind is
     // reserved for conditional pen — see packages/schema/src/effect/kinds/penetration.ts).
-    stats: { ap: null, pctMagicPen: null }, effects: [], tags: ['magic'],
-    provenance: PATCH_7_3_PROVENANCE,
+    stats: { ap: 95, pctMagicPen: 0.4 }, effects: [], tags: ['magic'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'black-cleaver', name: 'Black Cleaver', tier: 'legendary',
-    cost: { total: 3000, combine: 3000 }, recipe: [],
-    stats: { ad: null, hp: null, abilityHaste: null }, tags: ['physical'],
+    cost: { total: 3000, combine: 500 }, recipe: ['long-sword', 'phage', 'kindlegem'],
+    stats: { ad: 40, hp: 400, abilityHaste: 20 }, tags: ['physical'],
     effects: [{
-      kind: 'resistShred', id: 'black-cleaver-carve', name: 'Carve',
-      description: 'On-hit: reduces the target\'s armor for a few seconds, stacking.',
-      support: 'full',
-      resist: 'armor', mode: 'percent', amount: null, stacking: true, maxStacks: 6,
-      durationSeconds: null,
+      kind: 'resistShred', id: 'black-cleaver-carve', name: 'Sunder',
+      description: "Dealing physical damage to a champion reduces their Armor by 6% for 6 seconds, "
+        + 'stacking up to 5 times (30%).',
+      support: 'full', supportNotes: 'Rage move speed is not modeled.',
+      resist: 'armor', mode: 'percent', amount: 0.06, stacking: true, maxStacks: 5,
+      durationSeconds: 6,
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'infinity-edge', name: 'Infinity Edge', tier: 'legendary',
-    cost: { total: 3400, combine: 3400 }, recipe: [],
-    stats: { ad: null, critChance: null, critDamage: null }, effects: [], tags: ['physical', 'crit'],
-    provenance: PATCH_7_3_PROVENANCE,
+    cost: { total: 3400, combine: 600 }, recipe: ['brawlers-gloves', 'bf-sword', 'pickaxe'],
+    // critDamage 0.3: "Critical strike damage increased from 200% to 230%."
+    stats: { ad: 75, critChance: 0.25, critDamage: 0.3 }, effects: [], tags: ['physical', 'crit'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'navori-quickblades', name: 'Navori Quickblades', tier: 'legendary',
-    cost: { total: 3400, combine: 3400 }, recipe: [],
-    stats: { ad: null, critChance: null, attackSpeed: null }, tags: ['physical', 'crit'],
+    cost: { total: 2650, combine: 450 }, recipe: ['dagger', 'dagger', 'zeal'],
+    stats: { attackSpeed: 0.4, critChance: 0.25, moveSpeedPct: 0.04 }, tags: ['physical', 'crit'],
     effects: [{
-      kind: 'cooldownRefund', id: 'navori-untold-determination', name: 'Untold Determination',
-      description: 'Critical strikes refund a percent of ability cooldowns, including the ultimate.',
-      support: 'full',
-      mode: 'percent', amount: null, excludesUltimate: false,
+      kind: 'cooldownRefund', id: 'navori-untold-determination', name: 'Deft Strikes',
+      description: 'Attacks reduce the remaining cooldowns of your basic abilities by 15%.',
+      support: 'partial',
+      supportNotes: 'The real passive triggers on basic attacks; the cooldownRefund kind only triggers '
+        + 'on ability hits.',
+      mode: 'percent', amount: 0.15, excludesUltimate: true,
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'heartsteel', name: 'Heartsteel', tier: 'legendary',
-    cost: { total: 3000, combine: 3000 }, recipe: [],
-    stats: { hp: null }, tags: ['tank', 'on-hit'],
+    cost: { total: 2800, combine: 300 }, recipe: ['ruby-crystal', 'kindlegem', 'giants-belt'],
+    // wrpocket also lists healthRegen 150 (% of base regen), which has no flat-stat equivalent here.
+    stats: { hp: 700, abilityHaste: 20 }, tags: ['tank', 'on-hit'],
     effects: [
       {
-        kind: 'stacking', id: 'heartsteel-vigor', name: 'Vigor',
-        description: 'Gains stacking bonus health from takedowns and objectives.',
+        kind: 'stacking', id: 'heartsteel-vigor', name: 'Colossal Consumption (bonus Health gained)',
+        description: "Charged strikes grant maximum Health equal to 15% of the damage dealt.",
         support: 'partial',
-        supportNotes: 'Stack count is a manual input here, not auto-accumulated from '
-          + 'takedowns/objectives as in-game.',
-        stat: 'hp', perStack: null, maxStacks: 20, stackInputId: 'heartsteel-stacks',
+        supportNotes: 'The Health already gained is a manual input (1 stack = 1 Health); it is not '
+          + 'accumulated from strikes automatically.',
+        stat: 'hp', perStack: 1, maxStacks: 3000, stackInputId: 'heartsteel-stacks',
         inputs: [{
-          type: 'stackCount', id: 'heartsteel-stacks', label: 'Heartsteel stacks',
-          min: 0, max: 20, default: 0,
+          type: 'stackCount', id: 'heartsteel-stacks', label: 'Heartsteel bonus Health gained',
+          min: 0, max: 3000, default: 0,
         }],
       },
       {
-        kind: 'onHit', id: 'heartsteel-repurpose', name: 'Repurpose',
-        description: 'On-hit: deals bonus physical damage scaling with bonus health.',
-        support: 'full',
-        damageType: 'physical', pctOwnStat: { stat: 'hp', ratio: null },
+        kind: 'onHit', id: 'heartsteel-repurpose', name: 'Colossal Consumption (charged strike)',
+        description: 'A charged attack deals bonus physical damage equal to 140 + 3.5% of maximum Health.',
+        support: 'partial',
+        supportNotes: 'Applies to every basic attack while the toggle is on; in-game it charges for 2.5 '
+          + 'seconds near an enemy champion and has a 20-second cooldown per target.',
+        damageType: 'physical', flat: 140, pctOwnStat: { stat: 'hp', ratio: 0.035 },
+        condition: { type: 'toggle', inputId: 'heartsteel-charge-ready' },
+        inputs: [{
+          type: 'boolean', id: 'heartsteel-charge-ready', label: 'Heartsteel charged strike ready',
+          default: false,
+        }],
       },
     ],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'seraphs-embrace', name: "Seraph's Embrace", tier: 'legendary',
-    cost: { total: 3000, combine: 3000 }, recipe: [],
-    stats: { ap: null, mana: null }, tags: ['magic'],
+    // Not on wrpocket: it's Archangel's Staff after Mana Charge reaches 700 bonus Mana. Stats are
+    // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana; no extra gold to "buy" it.
+    cost: { total: 3000, combine: 0 }, recipe: ['archangels-staff'],
+    stats: { ap: 60, mana: 1200, abilityHaste: 25 }, tags: ['magic'],
     effects: [
       {
-        kind: 'statConversion', id: 'seraphs-embrace-focused-will', name: 'Focused Will',
-        description: 'Grants ability power equal to a percent of maximum mana.',
+        kind: 'statConversion', id: 'seraphs-embrace-focused-will', name: 'Awe',
+        description: 'Gain Ability Power equal to 1% of your maximum Mana.',
         support: 'full',
-        fromStat: 'mana', toStat: 'ap', ratio: null,
+        fromStat: 'mana', toStat: 'ap', ratio: 0.01,
       },
       {
-        kind: 'shield', id: 'seraphs-embrace-bottomless-well', name: 'Bottomless Well',
-        description: 'Active: grants a shield scaling with maximum mana.',
+        kind: 'shield', id: 'seraphs-embrace-bottomless-well', name: 'Lifeline',
+        description: "Seraph's upgraded shield. Values aren't on wrpocket; verify in-game.",
         support: 'partial',
-        supportNotes: 'Modeled as a manually toggled shield; the real active\'s cast time and '
-          + 'cooldown interaction are not modeled.',
+        supportNotes: 'Modeled as a manually toggled shield; trigger and cooldown are not modeled.',
         amount: null, durationSeconds: null,
         condition: { type: 'toggle', inputId: 'seraphs-embrace-shield-used' },
         inputs: [{
@@ -161,27 +182,27 @@ export const PATCH_7_3_ITEMS: Item[] = [
         }],
       },
     ],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'plated-steelcaps', name: 'Plated Steelcaps', tier: 'boots',
-    cost: { total: 1100, combine: 1100 }, recipe: [],
-    stats: { armor: null, moveSpeed: null }, tags: ['boots', 'defense'],
+    cost: { total: 1200, combine: 300 }, recipe: ['ruby-crystal', 'boots-of-speed'],
+    stats: { hp: 150, armor: 25, moveSpeed: 45 }, tags: ['boots', 'defense'],
     effects: [{
-      kind: 'damageReduction', id: 'plated-steelcaps-reinforced-armor', name: 'Reinforced Armor',
-      description: 'Reduces incoming damage from basic attacks.',
+      kind: 'damageReduction', id: 'plated-steelcaps-reinforced-armor', name: 'Block',
+      description: 'Reduces damage taken from champion basic attacks by 10%.',
       support: 'partial',
       supportNotes: 'Modeled as reducing all physical damage; the real passive only reduces '
         + 'basic-attack damage specifically.',
-      damageType: 'physical', amount: null,
+      damageType: 'physical', amount: 0.1,
     }],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'force-of-nature', name: 'Force of Nature', tier: 'legendary',
-    cost: { total: 2800, combine: 2800 }, recipe: [],
-    stats: { mr: null, moveSpeedPct: null, hpRegen: null }, effects: [],
+    cost: { total: 2800, combine: 500 }, recipe: ['ruby-crystal', 'negatron-cloak', 'winged-moonplate'],
+    stats: { hp: 400, mr: 60, moveSpeedPct: 0.04 }, effects: [],
     tags: ['magic-resist'],
-    provenance: PATCH_7_3_PROVENANCE,
+    provenance: WRPOCKET_7_3_PROVENANCE,
   },
 ]
