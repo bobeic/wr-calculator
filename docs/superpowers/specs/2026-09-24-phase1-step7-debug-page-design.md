@@ -16,9 +16,9 @@ full engine end to end against that data and lists every remaining `null`, so in
 focus on what matters. No demo or fake dataset is shipped.
 
 The page's ability-driven numbers (per-ability damage, any combo/sustained-DPS figure that casts
-`Q`/`W`/`E`/`R`) are not yet trustworthy: the engine has no ability-rank context for `byRank`
-scalars, so imported per-rank base damage and cooldowns resolve to 0 — see
-`docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md` for the gap and candidate fixes.
+`Q`/`W`/`E`/`R`) assume every ability is at max rank: `simulateCombo` resolves `byRank` scalars at
+`ability.maxRank`, and there is no per-ability rank input yet — see
+`docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md`.
 
 The page is unstyled, with no design work. The real UI gets its own design pass later.
 

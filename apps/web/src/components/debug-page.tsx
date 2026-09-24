@@ -42,9 +42,9 @@ export function DebugPage() {
     <main>
       <h1>wr-calc debug (patch 7.3)</h1>
       <p>
-        Ability damage and cooldowns resolved from per-rank data currently collapse to 0 (see{' '}
-        docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md), so combo and compareBuilds
-        ability numbers are not trustworthy yet.
+        Ability values assume every ability is at max rank (see{' '}
+        docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md); there is no per-ability rank
+        input yet.
       </p>
       <NullsPanel nulls={result.nulls} />
       {initial.issues.length > 0 && (

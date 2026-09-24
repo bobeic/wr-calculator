@@ -1,6 +1,6 @@
 # ADR: The engine has no ability-rank context for `byRank` scalars
 
-**Status:** Accepted
+**Status:** Accepted (option 1 implemented 2026-09-24; see the update at the end)
 
 ## Context
 
@@ -66,3 +66,23 @@ are identified but left open for the user to pick from before any engine change 
   only supplied the first real data that exercises it.
 - The Step 7 spec (`docs/superpowers/specs/2026-09-24-phase1-step7-debug-page-design.md`, §1) now
   points at this ADR so a reader of the debug page's ability numbers is warned before trusting them.
+
+## Update 2026-09-24: option 1 implemented
+
+The user chose option 1 now, with a per-ability rank input (a slice of option 2) as a later
+follow-up. Implementation:
+
+- `resolveScalar(scalar, level, rank?)` takes an optional ability rank. A `byRank` scalar with a
+  rank resolves to entry `min(max(rank, 1), length)`; without one it still resolves to 0 with the
+  "outside an ability-rank context" warning, so item/rune effects are unchanged (no item or rune
+  data uses `byRank`).
+- `resolveDamageComponent` takes the rank too, and `simulateCombo`'s `Q`/`W`/`E`/`R` branch passes
+  `ability.maxRank` for both damage components and the cooldown. Ability `cost` is still never
+  resolved (no resource model).
+- `scalarWarning` warns when a `byRank` array's length differs from the rank it was resolved at.
+  In the 7.3 import that flags 5 of 1,383 arrays: Jayce W base (5 values, maxRank 4), Nilah R cost
+  (4 values, maxRank 3, unused), and the Twitch and Zeri passive damage arrays (5 values, maxRank 1;
+  really per-stack/per-level, and passives aren't cast by `simulateCombo`).
+- The debug page's notice now says ability values assume max rank.
+
+This accepts option 1's stated downside: a low-level scenario still shows max-rank ability numbers.
