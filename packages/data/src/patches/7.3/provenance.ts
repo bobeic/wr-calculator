@@ -4,3 +4,8 @@ import type { Provenance } from '@wr-calc/schema'
 export const PATCH_7_3_PROVENANCE: Provenance = {
   source: 'manual', patch: '7.3', verifiedInGame: false,
 }
+
+/** Every value imported from (or hand-filled from) wrpocket.app for patch 7.3; unverified until checked in-game. */
+export const WRPOCKET_7_3_PROVENANCE: Provenance = {
+  source: 'wiki', patch: '7.3', verifiedInGame: false,
+}
