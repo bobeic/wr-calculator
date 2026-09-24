@@ -105,7 +105,9 @@ interface DebugState {
     default and adds an issue.
   - Ids not in the dataset (champion, item, rune, preset) are dropped and each adds an issue.
 - `decodeState(encodeState(s))` must equal `s` for any valid `s`.
-- The page writes state with `router.replace` (no history entry per keystroke).
+- The page writes state with `window.history.replaceState` (no history entry per keystroke).
+  Not `router.replace`: Next keys the page segment by its search params, so a router navigation
+  remounts the page and discards the on-load URL issues.
 
 ## 5. Logic modules
 

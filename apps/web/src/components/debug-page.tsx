@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
 import { PATCH_7_3_DATASET } from '../lib/dataset'
 import { CRIT_MODES, MAX_DURATION_SECONDS } from '../lib/debug-state'
@@ -18,13 +18,14 @@ const dataset = PATCH_7_3_DATASET
 /** The debug page: state is decoded from the URL once, mirrored back on every change, and re-run through the engine. */
 export function DebugPage() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const [initial] = useState(() => decodeState(searchParams, dataset))
   const [state, setState] = useState<DebugState>(initial.state)
 
+  // Native replaceState, not router.replace: Next keys the page segment by its search params, so a
+  // router navigation remounts DebugPage and re-decodes the already-cleaned URL, losing `initial.issues`.
   useEffect(() => {
-    router.replace(`?${encodeState(state)}`, { scroll: false })
-  }, [router, state])
+    window.history.replaceState(null, '', `?${encodeState(state)}`)
+  }, [state])
 
   const result = useMemo(() => runDebug(state, dataset), [state])
   const comboParse = parseCombo(state.combo)
