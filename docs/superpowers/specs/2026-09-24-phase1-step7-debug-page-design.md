@@ -123,12 +123,20 @@ The page renders a `stackCount` input as a number field clamped to `[min, max]` 
 input as a checkbox, with values stored in `build.inputs`. An input's value falls back to its
 declared `default` when it's missing from `build.inputs`.
 
+`resolveInputs(build, catalog)` returns every collected input's declared `default`, overridden by
+whatever is in `build.inputs`. **This is required, not cosmetic:** the engine reads a missing input
+as `0`/`false` (e.g. `stacking.ts` treats a non-number as 0 stacks), not as the declared default.
+`run-debug` therefore always passes `resolveInputs(...)` as `Build.inputs`.
+
 ### `null-report.ts`
 
-`nullReport(champion, items, targetPreset?): { path: string }[]` walks the selected data and
+`nullReport(sources: { label: string; value: unknown }[]): { path: string }[]` walks each source
+(assembled by `run-debug` from the selected champion, the deduped items of both builds, and a
+champion target's champion and items) and
 reports every `null` value found where a magnitude or stat can be (including inside nested
 `Scalar`s such as `byLevel` arrays). Paths are human-readable, e.g.
-`item botrk › effects[0] (on-hit) › magnitude`. Fields that are legitimately optional and absent
+`item blade-of-the-ruined-king › effects[0].pctTargetCurrentHp`. Target presets are not walked:
+`TargetDummySchema` doesn't allow `null`, so the page labels presets unverified instead. Fields that are legitimately optional and absent
 (`undefined`) are not reported.
 
 ### `run-debug.ts`
