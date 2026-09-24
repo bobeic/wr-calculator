@@ -69,8 +69,8 @@ describe('simulateCombo', () => {
     const expected = simulateCombo(attacker, target, ['AA'], { critMode: 'expected' })
 
     expect(never.instances[0].mitigated).toBe(100)
-    expect(always.instances[0].mitigated).toBe(175)
-    expect(expected.instances[0].mitigated).toBeCloseTo(100 * (1 + 0.5 * 0.75))
+    expect(always.instances[0].mitigated).toBe(200)
+    expect(expected.instances[0].mitigated).toBeCloseTo(100 * (1 + 0.5 * 1))
   })
 
   it('applies an onHit item effect on every basic attack', () => {

@@ -16,10 +16,14 @@ describe('statAtLevel', () => {
     )
   })
 
-  it('grows non-linearly: late-level increments exceed early-level increments', () => {
-    const early = statAtLevel(100, 10, 2) - statAtLevel(100, 10, 1)
-    const late = statAtLevel(100, 10, MAX_CHAMPION_LEVEL) - statAtLevel(100, 10, MAX_CHAMPION_LEVEL - 1)
-    expect(late).toBeGreaterThan(early)
+  it('grows linearly: every level adds exactly perLevel', () => {
+    for (let level = 2; level <= MAX_CHAMPION_LEVEL; level++) {
+      expect(statAtLevel(100, 10, level) - statAtLevel(100, 10, level - 1)).toBeCloseTo(10, 10)
+    }
+  })
+
+  it('resolves a mid level to base + perLevel * (level - 1)', () => {
+    expect(statAtLevel(100, 10, 8)).toBeCloseTo(170, 10)
   })
 })
 
@@ -103,12 +107,17 @@ describe('critMultiplier', () => {
   })
 
   it('is the full crit multiplier in "always" mode', () => {
-    expect(critMultiplier(0.5, 0.2, 'always')).toBeCloseTo(1.95)
+    expect(critMultiplier(0.5, 0.2, 'always')).toBeCloseTo(2.2)
+  })
+
+  it('has a 200% base, so Infinity Edge (+30%) crits for 230%', () => {
+    expect(critMultiplier(1, 0, 'always')).toBeCloseTo(2)
+    expect(critMultiplier(1, 0.3, 'always')).toBeCloseTo(2.3)
   })
 
   it('is an expected value between 1 and the full multiplier in "expected" mode', () => {
     const result = critMultiplier(0.5, 0, 'expected')
-    expect(result).toBeCloseTo(1 + 0.5 * 0.75)
+    expect(result).toBeCloseTo(1 + 0.5 * 1)
   })
 
   it('clamps crit chance to [0, 1] in "expected" mode', () => {
