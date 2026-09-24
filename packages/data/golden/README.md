@@ -2,7 +2,7 @@
 
 Real, in-game-verified combat scenarios that `packages/data/test/golden.test.ts` checks the
 engine against. Empty today (see `docs/superpowers/specs/2026-09-17-phase1-step6-real-data-golden-runner-design.md`)
-— `loadGoldenCases` returns `[]` for an empty directory, so the runner test file runs zero
+— `loadGoldenCases` (Node-only, imported from `@wr-calc/data/golden-loader`, not the root entry) returns `[]` for an empty directory, so the runner test file runs zero
 dynamic tests until the first real `*.json` case is added here. That's expected, not broken.
 
 ## Format

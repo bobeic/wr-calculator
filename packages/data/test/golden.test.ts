@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { loadGoldenCases, runGoldenCase } from '../src/golden-runner'
+import { runGoldenCase } from '../src/golden-runner'
+import { loadGoldenCases } from '../src/golden-loader'
 import { PATCH_7_3_CHAMPIONS } from '../src/patches/7.3/champions'
 import { PATCH_7_3_CATALOG } from '../src/patches/7.3'
 

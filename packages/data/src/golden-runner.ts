@@ -1,29 +1,7 @@
-import { readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import type { Champion } from '@wr-calc/schema'
 import type { StatCatalog, ComboAction } from '@wr-calc/calc'
 import { combatantFromChampion, combatantFromDummy, simulateCombo } from '@wr-calc/calc'
-import { GoldenCaseSchema } from './golden-types'
 import type { GoldenCase } from './golden-types'
-
-export interface LoadedGoldenCase {
-  file: string
-  case: GoldenCase
-}
-
-/** Reads and validates every *.json golden case in a directory. Missing/empty dir -> []. */
-export function loadGoldenCases(dir: string): LoadedGoldenCase[] {
-  let files: string[]
-  try {
-    files = readdirSync(dir).filter((name) => name.endsWith('.json'))
-  } catch {
-    return []
-  }
-  return files.map((file) => {
-    const raw: unknown = JSON.parse(readFileSync(join(dir, file), 'utf-8'))
-    return { file, case: GoldenCaseSchema.parse(raw) }
-  })
-}
 
 export interface GoldenRunResult {
   passed: boolean
