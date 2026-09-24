@@ -3,10 +3,11 @@ import { combatantFromChampion, combatantFromDummy, simulateCombo } from '@wr-ca
 import type { ComboAction } from '@wr-calc/calc'
 import { runGoldenCase } from '../src/golden-runner'
 import { loadGoldenCases } from '../src/golden-loader'
+import { buildChampionMap } from '../src/champion-map'
 import type { GoldenCase } from '../src/golden-types'
 import { PATCH_7_3_CHAMPIONS, PATCH_7_3_CATALOG } from '../src/patches/7.3'
 
-const champions = new Map(PATCH_7_3_CHAMPIONS.map((champion) => [champion.id, champion]))
+const champions = buildChampionMap(PATCH_7_3_CHAMPIONS)
 const nunu = champions.get('nunu-willump')!
 const scenario: GoldenCase['scenario'] = {
   championId: 'nunu-willump', level: 1,
