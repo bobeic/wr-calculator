@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { decodeState, encodeState } from '../src/lib/url-state'
-import { defaultState, emptyBuild } from '../src/lib/debug-state'
+import { MAX_DURATION_SECONDS, defaultState, emptyBuild } from '../src/lib/debug-state'
 import type { DebugState, DebugTarget } from '../src/lib/debug-state'
 import { PATCH_7_3_DATASET } from '../src/lib/dataset'
 
@@ -53,6 +53,18 @@ describe('decodeState: malformed params', () => {
   it('resets an empty or non-numeric duration and reports it', () => {
     expect(decode('dur=').issues).toEqual(["duration: invalid value '', reset to default"])
     expect(decode('dur=abc').state.durationSeconds).toBe(10)
+  })
+
+  it('accepts a duration at the MAX_DURATION_SECONDS ceiling', () => {
+    const { state, issues } = decode(`dur=${MAX_DURATION_SECONDS}`)
+    expect(state.durationSeconds).toBe(MAX_DURATION_SECONDS)
+    expect(issues).toEqual([])
+  })
+
+  it('resets a duration above MAX_DURATION_SECONDS and reports it', () => {
+    const { state, issues } = decode(`dur=${MAX_DURATION_SECONDS + 1}`)
+    expect(state.durationSeconds).toBe(10)
+    expect(issues).toEqual([`duration: invalid value '${MAX_DURATION_SECONDS + 1}', reset to default`])
   })
 
   it('resets a malformed build to empty and reports it', () => {

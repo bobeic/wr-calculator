@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
 import type { DebugBuild, DebugDataset, DebugState, DebugTarget } from './debug-state'
-import { CRIT_MODES, defaultState, emptyBuild } from './debug-state'
+import { CRIT_MODES, MAX_DURATION_SECONDS, defaultState, emptyBuild } from './debug-state'
 
 /** Read-only view of query params; URLSearchParams and Next's ReadonlyURLSearchParams both fit. */
 export interface QueryParams {
@@ -139,7 +139,8 @@ export function decodeState(
   const buildB = decodeBuild(params.get('b'), 'build B', dataset, issues)
   const target = decodeTarget(params.get('t'), defaults.target, dataset, issues)
   const durationSeconds = decodeNumber(
-    params.get('dur'), 'duration', defaults.durationSeconds, (value) => value > 0, issues,
+    params.get('dur'), 'duration', defaults.durationSeconds,
+    (value) => value > 0 && value <= MAX_DURATION_SECONDS, issues,
   )
 
   let critMode = defaults.critMode

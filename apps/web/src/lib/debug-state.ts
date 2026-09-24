@@ -18,6 +18,9 @@ export type DebugTarget =
 export type CritMode = 'expected' | 'always' | 'never'
 export const CRIT_MODES: readonly CritMode[] = ['expected', 'always', 'never']
 
+/** Upper bound on combo/sustainedDps duration: simulation cost grows linearly with it. */
+export const MAX_DURATION_SECONDS = 120
+
 export interface DebugState {
   championId: string
   level: number
