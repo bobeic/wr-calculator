@@ -27,7 +27,7 @@ are CC BY-NC 4.0. Everything imported is marked unverified.
   Chinese; the import uses the English values.
 - **Ability base damage:** the English text is used when it gives every rank. When the text shows only
   the rank-1 value and the table's rank 1 matches, the table's full per-rank values are used (135
-  such abilities). When both give full ranks and disagree (28 abilities, e.g. Annie Q text
+  such abilities). When both give full ranks and disagree (35 abilities, e.g. Annie Q text
   `80/130/180/230` vs table `80/125/170/215`), the English text is used and the conflict is logged.
 - **Cooldown and mana cost** come only from the table; the text rarely has them.
 
