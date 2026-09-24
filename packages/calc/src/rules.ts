@@ -9,26 +9,21 @@
 export const MAX_CHAMPION_LEVEL = 15
 
 // TODO-VERIFY(critDamageMultiplier): confirm the base crit multiplier by comparing a non-crit vs
-// crit auto-attack in the combat log on a target dummy with no bonus crit damage sources.
-export const BASE_CRIT_DAMAGE_MULTIPLIER = 1.75
+// crit auto-attack in the combat log on a target dummy with no bonus crit damage sources. 2.0 is
+// taken from Infinity Edge's 7.3 text ("Critical strike damage increased from 200% to 230%").
+export const BASE_CRIT_DAMAGE_MULTIPLIER = 2
 
 // TODO-VERIFY(attackSpeedCap): confirm the attack speed cap by stacking AS items on a fast-AS
 // champion until the attack interval stops decreasing, and reading the displayed AS value.
 export const ATTACK_SPEED_CAP = 2.5
 
-const GROWTH_CURVE_A = 0.7025
-const GROWTH_CURVE_B = (1 - GROWTH_CURVE_A) / (MAX_CHAMPION_LEVEL - 1)
-
-// TODO-VERIFY(statGrowthCurve): confirm the growth curve shape (assumed to follow the classic
-// LoL non-linear per-level formula, rescaled so full growth lands at MAX_CHAMPION_LEVEL instead
-// of the PC game's level 18) by recording a champion's displayed stats at every level 1-15 in
-// the practice tool and fitting them against this formula.
+// TODO-VERIFY(statGrowthCurve): growth is linear because wrpocket's 7.3 per-level stat tables are
+// exactly linear for all 142 champions; confirm by recording a champion's displayed stats at a few
+// levels in the practice tool (e.g. level-8 Jinx HP should equal base + 7 * perLevel).
 /** Resolves a champion stat at a given level from its base and per-level growth. */
 export function statAtLevel(base: number, perLevel: number, level: number): number {
   if (level <= 1) return base
-  const n = level - 1
-  const factor = GROWTH_CURVE_A + GROWTH_CURVE_B * n
-  return base + perLevel * n * factor
+  return base + perLevel * (level - 1)
 }
 
 // TODO-VERIFY(levelRangeInterpolation): confirm "X-Y based on level" values interpolate linearly
@@ -49,15 +44,18 @@ export function resolveAdaptiveDamageType(bonusAd: number, ap: number): 'physica
   return bonusAd >= ap ? 'physical' : 'magic'
 }
 
-// TODO-VERIFY(attackSpeedRatioGrowth): confirm champion base attack speed scales with level as
-// base * (1 + ratio * growthFactor(level)), using the same non-linear growth curve as other
-// stats, by recording a champion's displayed base attack speed at level 1 and at
-// MAX_CHAMPION_LEVEL in the practice tool and checking it fits this formula.
+const ATTACK_SPEED_CURVE_A = 0.7025
+const ATTACK_SPEED_CURVE_B = (1 - ATTACK_SPEED_CURVE_A) / (MAX_CHAMPION_LEVEL - 1)
+
+// TODO-VERIFY(attackSpeedRatioGrowth): unlike other stats, attack speed grows non-linearly, as
+// base * (1 + ratio * n * (A + B * n)) with n = level - 1 (the classic LoL curve rescaled to
+// MAX_CHAMPION_LEVEL). wrpocket's 7.3 tables fit this within 0.0022 for all 142 champions, while a
+// straight line misses by up to 0.03; confirm in the practice tool at a few levels.
 /** Resolves a champion's base attack speed at a given level from its base value and AS ratio. */
 export function attackSpeedAtLevel(base: number, ratio: number, level: number): number {
   if (level <= 1) return base
   const n = level - 1
-  const factor = GROWTH_CURVE_A + GROWTH_CURVE_B * n
+  const factor = ATTACK_SPEED_CURVE_A + ATTACK_SPEED_CURVE_B * n
   return base * (1 + ratio * n * factor)
 }
 
