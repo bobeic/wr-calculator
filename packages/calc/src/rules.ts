@@ -17,13 +17,22 @@ export const BASE_CRIT_DAMAGE_MULTIPLIER = 2
 // champion until the attack interval stops decreasing, and reading the displayed AS value.
 export const ATTACK_SPEED_CAP = 2.5
 
-// TODO-VERIFY(statGrowthCurve): growth is linear because wrpocket's 7.3 per-level stat tables are
-// exactly linear for all 142 champions; confirm by recording a champion's displayed stats at a few
-// levels in the practice tool (e.g. level-8 Jinx HP should equal base + 7 * perLevel).
+const GROWTH_CURVE_A = 0.72
+const GROWTH_CURVE_B = (1 - GROWTH_CURVE_A) / (MAX_CHAMPION_LEVEL - 1)
+
+// Fitted to Annie's HP and mana at every level 1-15 in the 7.3 practice tool: all 30 values equal
+// the ceiling of this curve (the stat screen rounds up). Full growth lands exactly at
+// MAX_CHAMPION_LEVEL, so perLevel is (level-15 value - level-1 value) / 14.
+/** How many levels' worth of perLevel growth a champion has at a given level (0 at level 1, 14 at level 15). */
+function growthLevels(level: number): number {
+  if (level <= 1) return 0
+  const n = level - 1
+  return n * (GROWTH_CURVE_A + GROWTH_CURVE_B * n)
+}
+
 /** Resolves a champion stat at a given level from its base and per-level growth. */
 export function statAtLevel(base: number, perLevel: number, level: number): number {
-  if (level <= 1) return base
-  return base + perLevel * (level - 1)
+  return base + perLevel * growthLevels(level)
 }
 
 // TODO-VERIFY(levelRangeInterpolation): confirm "X-Y based on level" values interpolate linearly
@@ -44,19 +53,12 @@ export function resolveAdaptiveDamageType(bonusAd: number, ap: number): 'physica
   return bonusAd >= ap ? 'physical' : 'magic'
 }
 
-const ATTACK_SPEED_CURVE_A = 0.7025
-const ATTACK_SPEED_CURVE_B = (1 - ATTACK_SPEED_CURVE_A) / (MAX_CHAMPION_LEVEL - 1)
-
-// TODO-VERIFY(attackSpeedRatioGrowth): unlike other stats, attack speed grows non-linearly, as
-// base * (1 + ratio * n * (A + B * n)) with n = level - 1 (the classic LoL curve rescaled to
-// MAX_CHAMPION_LEVEL). wrpocket's 7.3 tables fit this within 0.0022 for all 142 champions, while a
-// straight line misses by up to 0.03; confirm in the practice tool at a few levels.
+// TODO-VERIFY(attackSpeedRatioGrowth): assumes attack speed follows the same curve as other stats
+// (wrpocket's 7.3 attack-speed tables fit it within 0.0009 for all 142 champions); confirm by
+// reading a champion's attack speed at a few mid levels in the practice tool.
 /** Resolves a champion's base attack speed at a given level from its base value and AS ratio. */
 export function attackSpeedAtLevel(base: number, ratio: number, level: number): number {
-  if (level <= 1) return base
-  const n = level - 1
-  const factor = ATTACK_SPEED_CURVE_A + ATTACK_SPEED_CURVE_B * n
-  return base * (1 + ratio * n * factor)
+  return base * (1 + ratio * growthLevels(level))
 }
 
 // TODO-VERIFY(attackSpeedStacking): confirm bonus attack speed (item/rune fractions) combines
@@ -125,7 +127,6 @@ export const UNVERIFIED_RULE_IDS = [
   'maxChampionLevel',
   'critDamageMultiplier',
   'attackSpeedCap',
-  'statGrowthCurve',
   'levelRangeInterpolation',
   'adaptiveDamageType',
   'resistModificationOrder',

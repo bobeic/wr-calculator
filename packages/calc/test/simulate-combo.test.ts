@@ -189,17 +189,31 @@ describe('simulateCombo', () => {
     expect(result.instances[0].mitigated).toBe(100)
   })
 
-  it('warns when an ability cooldown uses a byRank scalar it cannot resolve', () => {
+  it('resolves a byRank ability cooldown at the ability\'s maxRank', () => {
     const champion = championWithAbility()
-    champion.abilities.q.cooldown = { byRank: [8, 9, 10] }
+    champion.abilities.q.cooldown = { byRank: [12, 11, 10, 9, 8] }
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    const target = combatantFromDummy(dummy())
+    const blocked = simulateCombo(attacker, target, ['Q', 'wait:7.9', 'Q'], { critMode: 'never' })
+    expect(blocked.instances).toHaveLength(1)
+    const recast = simulateCombo(attacker, target, ['Q', 'wait:8', 'Q'], { critMode: 'never' })
+    expect(recast.instances).toHaveLength(2)
+    expect(recast.dataWarnings.filter((warning) => warning.includes('byRank'))).toEqual([])
+  })
+
+  it('resolves byRank ability damage at the ability\'s maxRank', () => {
+    const champion = championWithAbility()
+    champion.abilities.q.damage = [
+      { type: 'true', base: { byRank: [50, 100, 150, 200, 250] }, ratios: [], tags: [] },
+    ]
     const attacker = combatantFromChampion(
       champion, 1, emptyBuild(), { items: new Map(), runes: new Map() }
     )
     const target = combatantFromDummy(dummy())
     const result = simulateCombo(attacker, target, ['Q'], { critMode: 'never' })
-    expect(result.dataWarnings).toContain(
-      'Q: cooldown uses a byRank scalar outside an ability-rank context; treated as 0'
-    )
+    expect(result.instances[0].mitigated).toBe(250)
   })
 
   it('blocks a hook-based effect when its condition is not met', () => {

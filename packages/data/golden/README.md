@@ -1,9 +1,15 @@
 # Golden test cases
 
 Real, in-game-verified combat scenarios that `packages/data/test/golden.test.ts` checks the
-engine against. Empty today (see `docs/superpowers/specs/2026-09-17-phase1-step6-real-data-golden-runner-design.md`)
-— `loadGoldenCases` (Node-only, imported from `@wr-calc/data/golden-loader`, not the root entry) returns `[]` for an empty directory, so the runner test file runs zero
-dynamic tests until the first real `*.json` case is added here. That's expected, not broken.
+engine against. `loadGoldenCases` (Node-only, imported from `@wr-calc/data/golden-loader`, not the
+root entry) loads every `*.json` file here.
+
+Current cases (7.3 practice tool, 2026-09-25): Annie at level 15, one ability per case, against the
+practice dummy (100 armor / 100 MR; its HP is unknown, so `hp` is a placeholder and no
+`timeToKill` is recorded). "clean build" is Spellslinger's Shoes + Rabadon's Deathcap + Void Staff +
+Zhonya's Hourglass, which have no on-hit damage passives. "full build" adds Luden's Echo and
+Infinity Orb; those hits were recorded with Luden's passive on cooldown and the dummy above
+Infinity Orb's low-HP threshold, so neither passive applies.
 
 ## Format
 

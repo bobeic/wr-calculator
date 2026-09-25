@@ -221,9 +221,16 @@ describe('resolveStats', () => {
       validChampion(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
     )
     expect(sheet.unverifiedRules).toEqual(expect.arrayContaining([
-      'maxChampionLevel', 'statGrowthCurve', 'statResolutionOrder', 'attackSpeedRatioGrowth',
+      'maxChampionLevel', 'statResolutionOrder', 'attackSpeedRatioGrowth',
       'attackSpeedCap', 'attackSpeedStacking',
     ]))
+  })
+
+  it('no longer reports statGrowthCurve: it was verified in the practice tool', () => {
+    const sheet = resolveStats(
+      validChampion(), 1, emptyBuild(), { items: new Map(), runes: new Map() }
+    )
+    expect(sheet.unverifiedRules).not.toContain('statGrowthCurve')
   })
 
   it('tags levelRangeInterpolation only when a levelRange scalar is actually used', () => {

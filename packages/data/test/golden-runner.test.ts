@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { combatantFromChampion, combatantFromDummy, simulateCombo } from '@wr-calc/calc'
 import type { ComboAction } from '@wr-calc/calc'
+import { mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { runGoldenCase } from '../src/golden-runner'
 import { loadGoldenCases } from '../src/golden-loader'
 import { buildChampionMap } from '../src/champion-map'
@@ -74,9 +77,13 @@ describe('runGoldenCase', () => {
 
 describe('loadGoldenCases', () => {
   it('returns an empty array when the directory has no *.json case files', () => {
-    // packages/data/golden/ has no committed cases yet (see golden/README.md) — this locks in
-    // "no real cases yet" as a supported, non-error state, per the Step 6 design doc.
-    expect(loadGoldenCases(new URL('../golden', import.meta.url).pathname)).toEqual([])
+    // "No real cases yet" is a supported, non-error state, per the Step 6 design doc.
+    const emptyDir = mkdtempSync(join(tmpdir(), 'golden-empty-'))
+    try {
+      expect(loadGoldenCases(emptyDir)).toEqual([])
+    } finally {
+      rmSync(emptyDir, { recursive: true })
+    }
   })
 
   it('returns an empty array when the directory does not exist', () => {

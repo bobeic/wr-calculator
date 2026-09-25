@@ -42,6 +42,18 @@ describe('resolveDamageComponent', () => {
     expect(result.amount).toBe(50)
   })
 
+  it('resolves byRank base and ratio values at the given ability rank', () => {
+    const attacker = combatant({ sheet: sheet({ total: { ap: 100 } }) })
+    const target = combatant()
+    const component = {
+      type: 'magic' as const, base: { byRank: [80, 120, 160] },
+      ratios: [{ stat: 'ap' as const, value: { byRank: [0.4, 0.5, 0.6] } }], tags: [],
+    }
+    const result = resolveDamageComponent(component, attacker, target, 1000, 5, 'Test Q', 3)
+    expect(result.amount).toBeCloseTo(160 + 100 * 0.6)
+    expect(result.dataWarnings).toEqual([])
+  })
+
   it('multiplies by hits when present', () => {
     const attacker = combatant()
     const target = combatant()
