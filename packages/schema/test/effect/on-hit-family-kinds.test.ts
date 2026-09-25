@@ -21,6 +21,26 @@ describe('on-hit-family effect kinds', () => {
     expect(result.kind).toBe('onHit')
   })
 
+  it('parses an abilityHitProc effect with ratios and a start-on-cooldown input', () => {
+    const result = EffectSchema.parse({
+      ...base,
+      kind: 'abilityHitProc',
+      damageType: 'magic',
+      damage: 175,
+      ratios: [{ stat: 'ap', value: 0.14 }],
+      cooldownSeconds: 9,
+      startOnCooldownInputId: 'test-on-cooldown',
+    })
+    expect(result.kind).toBe('abilityHitProc')
+  })
+
+  it('defaults abilityHitProc ratios to an empty list', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'abilityHitProc', damageType: 'magic', damage: 50, cooldownSeconds: 5,
+    })
+    expect(result.kind === 'abilityHitProc' && result.ratios).toEqual([])
+  })
+
   it('parses a spellblade effect', () => {
     const result = EffectSchema.parse({
       ...base,

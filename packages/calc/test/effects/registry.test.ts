@@ -9,7 +9,7 @@ function ctx(): StatContext {
 describe('EFFECT_HANDLERS', () => {
   it('registers every effect kind except custom', () => {
     expect(Object.keys(EFFECT_HANDLERS).sort()).toEqual([
-      'active', 'cooldownRefund', 'damageAmp', 'damageReduction', 'dot', 'heal', 'onHit',
+      'abilityHitProc', 'active', 'cooldownRefund', 'damageAmp', 'damageReduction', 'dot', 'heal', 'onHit',
       'penetration', 'procEveryN', 'resistShred', 'shield', 'spellblade', 'stacking', 'stat',
       'statConversion', 'statMultiplier',
     ])

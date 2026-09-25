@@ -15,6 +15,7 @@ import { dotHandler } from './dot'
 import { cooldownRefundHandler } from './cooldown-refund'
 import { shieldHandler, healHandler } from './shield-heal'
 import { activeHandler } from './active'
+import { abilityHitProcHandler } from './ability-hit-proc'
 import { CUSTOM_HANDLERS } from '../custom/registry'
 
 /**
@@ -38,6 +39,7 @@ export const EFFECT_HANDLERS: Partial<Record<EffectKind, EffectHandler<any>>> = 
   shield: shieldHandler,
   heal: healHandler,
   active: activeHandler,
+  abilityHitProc: abilityHitProcHandler,
 }
 
 /** Looks up and calls the registered handler's contributeStats for an effect, if any. */
