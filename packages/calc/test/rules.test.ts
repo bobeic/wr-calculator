@@ -16,14 +16,23 @@ describe('statAtLevel', () => {
     )
   })
 
-  it('grows linearly: every level adds exactly perLevel', () => {
-    for (let level = 2; level <= MAX_CHAMPION_LEVEL; level++) {
-      expect(statAtLevel(100, 10, level) - statAtLevel(100, 10, level - 1)).toBeCloseTo(10, 10)
-    }
+  // Annie's HP and mana at every level, read off the 7.3 practice-tool stat screen (2026-09-25). The
+  // stat screen rounds up, so each value is the ceiling of the unrounded engine value.
+  const ANNIE_HP = [600, 689, 783, 881, 984, 1092, 1205, 1323, 1445, 1572, 1704, 1841, 1983, 2129, 2280]
+  const ANNIE_MANA = [435, 478, 522, 569, 618, 669, 723, 779, 837, 897, 960, 1025, 1092, 1162, 1233]
+
+  it('matches Annie\'s in-game HP at every level (rounded up)', () => {
+    ANNIE_HP.forEach((hp, index) => expect(Math.ceil(statAtLevel(600, 120, index + 1))).toBe(hp))
   })
 
-  it('resolves a mid level to base + perLevel * (level - 1)', () => {
-    expect(statAtLevel(100, 10, 8)).toBeCloseTo(170, 10)
+  it('matches Annie\'s in-game mana at every level (rounded up)', () => {
+    ANNIE_MANA.forEach((mana, index) => expect(Math.ceil(statAtLevel(435, 57, index + 1))).toBe(mana))
+  })
+
+  it('grows non-linearly: late-level increments exceed early-level increments', () => {
+    const early = statAtLevel(100, 10, 2) - statAtLevel(100, 10, 1)
+    const late = statAtLevel(100, 10, MAX_CHAMPION_LEVEL) - statAtLevel(100, 10, MAX_CHAMPION_LEVEL - 1)
+    expect(late).toBeGreaterThan(early)
   })
 })
 
@@ -68,6 +77,14 @@ describe('attackSpeedAtLevel', () => {
     const level1 = attackSpeedAtLevel(0.625, 0.025, 1)
     const maxLevel = attackSpeedAtLevel(0.625, 0.025, MAX_CHAMPION_LEVEL)
     expect(maxLevel).toBeGreaterThan(level1)
+  })
+
+  it('uses the same growth curve as other stats', () => {
+    for (let level = 1; level <= MAX_CHAMPION_LEVEL; level++) {
+      expect(attackSpeedAtLevel(0.625, 0.025, level)).toBeCloseTo(
+        0.625 * (1 + 0.025 * (statAtLevel(0, 1, level))), 10
+      )
+    }
   })
 
   it('grows non-linearly: late-level increments exceed early-level increments', () => {

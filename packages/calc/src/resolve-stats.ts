@@ -37,7 +37,7 @@ export function resolveStats(
   const dataWarnings: string[] = []
   const unsupportedEffects: UnsupportedEffectEntry[] = []
   const unverifiedRules = new Set<UnverifiedRuleId>([
-    'maxChampionLevel', 'statGrowthCurve', 'statResolutionOrder', 'attackSpeedRatioGrowth',
+    'maxChampionLevel', 'statResolutionOrder', 'attackSpeedRatioGrowth',
     'attackSpeedCap', 'attackSpeedStacking',
   ])
 
