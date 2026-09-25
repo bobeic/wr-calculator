@@ -12,7 +12,9 @@
       ],
       "boots": "spellslingers-shoes",
       "runes": [],
-      "inputs": {}
+      "inputs": {
+        "ludens-echo-on-cooldown": true
+      }
     },
     "target": {
       "hp": 10000,
