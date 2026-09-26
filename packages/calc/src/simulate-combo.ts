@@ -73,6 +73,10 @@ function evaluateCondition(
       return opponent.kind === 'champion'
     case 'targetIsMonster':
       return opponent.kind === 'monster'
+    case 'allOf':
+      return condition.conditions.every(
+        (leaf) => evaluateCondition(effect, leaf, self, opponent, opponentRuntime, extra)
+      )
   }
 }
 

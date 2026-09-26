@@ -305,6 +305,34 @@ describe('simulateCombo', () => {
     expect(aaResult.instances[0].mitigated).toBe(60)
   })
 
+  it('applies an allOf-conditioned damageAmp only when every condition holds', () => {
+    const item = baseItem('test-amp-item', {
+      id: 'test-amp-passive', name: 'Test Amp', description: '', support: 'full',
+      kind: 'damageAmp', amount: 1,
+      condition: {
+        type: 'allOf',
+        conditions: [{ type: 'targetHpBelow', threshold: 0.5 }, { type: 'sourceKind', value: 'ability' }],
+      },
+    })
+    const items = new Map([['test-amp-item', item]])
+    const build = emptyBuild({ items: ['test-amp-item'] })
+    const champion = championWithAbility({
+      baseStats: { hp: { base: 1000, perLevel: 0 }, ad: { base: 600, perLevel: 0 } },
+    })
+    champion.abilities.q.damage = [{ type: 'magic', base: 100, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(champion, 1, build, { items, runes: new Map() })
+
+    // Full hp: the ability is not amplified.
+    const fullHp = simulateCombo(attacker, combatantFromDummy(dummy({ hp: 2000 })), ['Q'], { critMode: 'never' })
+    expect(fullHp.instances[0].mitigated).toBe(100)
+
+    // Two AAs drop it to 40%; the third AA lands below 50% but is not an ability, the Q is.
+    const lowHp = simulateCombo(
+      attacker, combatantFromDummy(dummy({ hp: 2000 })), ['AA', 'AA', 'AA', 'Q'], { critMode: 'never' }
+    )
+    expect(lowHp.instances.map((i) => i.mitigated)).toEqual([600, 600, 600, 200])
+  })
+
   it('resets DoT ticks on refresh instead of stacking a second tick train', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
