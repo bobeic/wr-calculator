@@ -12,6 +12,14 @@ Infinity Orb; those hits were recorded with Luden's passive on cooldown (the
 `ludens-echo-on-cooldown` build input) and the dummy above Infinity Orb's low-HP threshold, so
 neither passive applies.
 
+Infinity Orb cases (2026-09-26): "orb build" is the clean build plus Infinity Orb. The `low-hp`
+cases were hit with the dummy below 40% HP (`startHpFraction: 0.3`), so Inevitable Demise applies:
+Q, W and R each dealt 1.2x, while Luden's Echo on the full-build Q was not amplified.
+
+The practice tool appears to round damage up rather than to the nearest whole number, so a
+recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
+tolerance covers this.
+
 ## Format
 
 Each case is a `*.json` file matching `GoldenCaseSchema` (`packages/data/src/golden-types.ts`):
@@ -35,6 +43,8 @@ Each case is a `*.json` file matching `GoldenCaseSchema` (`packages/data/src/gol
 - `scenario`: enough to build a `Combatant` (via `combatantFromChampion`) and a dummy target,
   then run `simulateCombo`. `combo` uses the same `ComboAction` strings as `simulateCombo` itself
   (`'AA' | 'Q' | 'W' | 'E' | 'R' | 'item:<id>' | 'wait:<seconds>'`).
+- `scenario.target.startHpFraction` (optional): the fraction of max HP the dummy starts at, for
+  effects gated on low target HP. Defaults to 1 (full HP).
 - `expected`: only include the fields you actually measured in the practice tool —
   `runGoldenCase` skips any field left out. Currently supported: `totalDamage`, `timeToKill`.
 - `tolerance`: fraction, e.g. `0.02` = allow ±2%.

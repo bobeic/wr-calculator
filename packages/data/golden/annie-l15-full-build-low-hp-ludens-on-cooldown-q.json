@@ -1,0 +1,35 @@
+{
+  "scenario": {
+    "championId": "annie",
+    "level": 15,
+    "build": {
+      "items": [
+        "ludens-echo",
+        "rabadons-deathcap",
+        "void-staff",
+        "infinity-orb",
+        "zhonyas-hourglass"
+      ],
+      "boots": "spellslingers-shoes",
+      "runes": [],
+      "inputs": {
+        "ludens-echo-on-cooldown": true
+      }
+    },
+    "target": {
+      "hp": 10000,
+      "armor": 100,
+      "mr": 100,
+      "startHpFraction": 0.3
+    },
+    "combo": [
+      "Q"
+    ]
+  },
+  "expected": {
+    "totalDamage": 879
+  },
+  "tolerance": 0.01,
+  "patch": "7.3",
+  "source": "practice-tool"
+}
