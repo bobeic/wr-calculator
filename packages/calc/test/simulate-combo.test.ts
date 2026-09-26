@@ -295,7 +295,7 @@ describe('simulateCombo', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh',
+      durationSeconds: 3, refresh: 'refresh', ratios: [],
     })
     const items = new Map([['test-dot-item', item]])
     const build = emptyBuild({ items: ['test-dot-item'] })
@@ -367,7 +367,7 @@ describe('simulateCombo', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh', condition: { type: 'abilitySlot', value: 'r' },
+      durationSeconds: 3, refresh: 'refresh', ratios: [], condition: { type: 'abilitySlot', value: 'r' },
     })
     const items = new Map([['test-dot-item', item]])
     const champion = championWithAbility()
@@ -386,7 +386,7 @@ describe('simulateCombo', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh',
+      durationSeconds: 3, refresh: 'refresh', ratios: [],
     })
     const items = new Map([['test-dot-item', item]])
     const build = emptyBuild({ items: ['test-dot-item'] })
@@ -451,7 +451,7 @@ describe('simulateCombo', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh',
+      durationSeconds: 3, refresh: 'refresh', ratios: [],
     })
     const items = new Map([['test-dot-item', item]])
     const build = emptyBuild({ items: ['test-dot-item'] })

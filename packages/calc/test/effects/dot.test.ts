@@ -31,7 +31,7 @@ function ctx(overrides: Partial<HookContext> = {}): HookContext {
 const effect = {
   id: 'e1', name: 'Test DoT', description: '', support: 'full' as const,
   kind: 'dot' as const, damageType: 'magic' as const, tickAmount: 5, tickIntervalSeconds: 2,
-  durationSeconds: 6, refresh: 'refresh' as const,
+  durationSeconds: 6, refresh: 'refresh' as const, ratios: [],
 }
 
 describe('dotHandler.onAbilityHit', () => {
@@ -70,5 +70,44 @@ describe('dotHandler.onAbilityHit', () => {
     const c = ctx({ opponent, scheduleEvent: (atTime) => { scheduled.push(atTime) } })
     dotHandler.hooks!.onAbilityHit!(ignoreEffect, c, 'q', [])
     expect(scheduled).toEqual([])
+  })
+})
+
+describe('dotHandler tick ratios', () => {
+  it('adds each ratio times the attacker\'s stat to every tick', () => {
+    const apSheet = { ...sheet(), total: { ap: 600 } }
+    let dealt = 0
+    const c = ctx({
+      selfSheet: apSheet,
+      scheduleEvent: (_atTime, run) => run(ctx({
+        dealDamage: (input) => {
+          dealt = input.amount
+          return { time: 0, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
+        },
+      })),
+    })
+    dotHandler.hooks!.onAbilityHit!({ ...effect, ratios: [{ stat: 'ap', value: 0.05 }] }, c, 'r', [])
+    expect(dealt).toBe(35)
+  })
+})
+
+describe('dotHandler.modifyResist', () => {
+  const shredding = { ...effect, shredWhileActive: { resist: 'mr' as const, amount: 10 } }
+
+  it('reduces the matching resist by a flat amount while the dot is active, up to its expiry', () => {
+    const opponent = runtime({ buffs: { 'dot:e1': { expiresAt: 6 } } })
+    expect(dotHandler.modifyResist!(shredding, ctx({ opponent, time: 6 }), 'magic')).toEqual({ flatReduction: 10 })
+  })
+
+  it('does nothing once the dot has expired, before it is applied, or for other damage types', () => {
+    const active = runtime({ buffs: { 'dot:e1': { expiresAt: 6 } } })
+    expect(dotHandler.modifyResist!(shredding, ctx({ opponent: active, time: 6.1 }), 'magic')).toEqual({})
+    expect(dotHandler.modifyResist!(shredding, ctx(), 'magic')).toEqual({})
+    expect(dotHandler.modifyResist!(shredding, ctx({ opponent: active }), 'physical')).toEqual({})
+  })
+
+  it('does nothing for a dot without shredWhileActive', () => {
+    const opponent = runtime({ buffs: { 'dot:e1': { expiresAt: 6 } } })
+    expect(dotHandler.modifyResist!(effect, ctx({ opponent }), 'magic')).toEqual({})
   })
 })

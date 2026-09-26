@@ -75,7 +75,7 @@ export const STARTER_ITEMS: Item[] = [
       supportNotes: 'The burn is % of target max Health; the dot kind only models flat ticks, so this deals '
         + '0 until a %-max-Health dot exists. Madness (up to +6% damage) is not modeled.',
       damageType: 'magic', tickAmount: 0, tickIntervalSeconds: 1, durationSeconds: 3,
-      refresh: 'refresh',
+      refresh: 'refresh', ratios: [],
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },

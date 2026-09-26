@@ -97,6 +97,25 @@ describe('on-hit-family effect kinds', () => {
     expect(result.kind).toBe('dot')
   })
 
+  it('parses a dot effect with stat ratios and a flat shred while it is active', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'dot', damageType: 'magic', tickAmount: 60, tickIntervalSeconds: 1,
+      durationSeconds: 3, refresh: 'refresh', ratios: [{ stat: 'ap', value: 0.05 }],
+      shredWhileActive: { resist: 'mr', amount: 10 },
+    })
+    expect(result).toMatchObject({
+      ratios: [{ stat: 'ap', value: 0.05 }], shredWhileActive: { resist: 'mr', amount: 10 },
+    })
+  })
+
+  it('defaults a dot effect to no ratios', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
+      durationSeconds: 4, refresh: 'refresh',
+    })
+    expect(result).toMatchObject({ ratios: [] })
+  })
+
   it('rejects a dot effect with an invalid refresh rule', () => {
     expect(() =>
       EffectSchema.parse({
