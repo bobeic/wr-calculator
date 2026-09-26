@@ -71,10 +71,15 @@ export function resolveStats(
     source: championSource, usedLevelRangeInterpolation: false,
   })
 
+  // While the multiplier stage runs, every multiplier reads the stats as they were before that
+  // stage, so % bonuses on one stat add together rather than compound (verified in game
+  // 2026-09-26: Rabadon's +30% and Blackfire's +4% gave 450 AP x 1.34).
+  let frozen: { base: typeof base; bonus: typeof bonus } | undefined
   const statSoFar = (stat: StatKey, layer: StatLayer | 'total'): number => {
-    if (layer === 'base') return base[stat] ?? 0
-    if (layer === 'bonus') return bonus[stat] ?? 0
-    return (base[stat] ?? 0) + (bonus[stat] ?? 0)
+    const source = frozen ?? { base, bonus }
+    if (layer === 'base') return source.base[stat] ?? 0
+    if (layer === 'bonus') return source.bonus[stat] ?? 0
+    return (source.base[stat] ?? 0) + (source.bonus[stat] ?? 0)
   }
 
   const itemIds = [
@@ -111,6 +116,7 @@ export function resolveStats(
   ]
   const ctx: StatContext = { level: clampedLevel, inputs: build.inputs, statSoFar }
   for (const stage of STAT_RESOLUTION_ORDER) {
+    frozen = stage === 'multiplier' ? { base: { ...base }, bonus: { ...bonus } } : undefined
     for (const effect of effects) {
       if (stageOf(effect) !== stage) continue
       const contributions = contributeStats(effect, ctx)

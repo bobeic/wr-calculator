@@ -128,6 +128,27 @@ describe('resolveStats', () => {
     expect(sheet.bonus.ad).toBe(110)
   })
 
+  it('adds statMultipliers on the same stat together instead of compounding them', () => {
+    // Measured 2026-09-26: 450 AP with Rabadon's (+30%) and Blackfire (+4%) showed 603 in game,
+    // i.e. 450 x 1.34, not 450 x 1.3 x 1.04 = 608.4.
+    const item = itemWithStats('ap-item', 0)
+    item.stats = { ap: 450 }
+    item.effects = [
+      {
+        id: 'mult-a', name: 'Multiplier A', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.3,
+      },
+      {
+        id: 'mult-b', name: 'Multiplier B', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.04,
+      },
+    ]
+    const items = new Map([['ap-item', item]])
+    const build = emptyBuild({ items: ['ap-item'] })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.total.ap).toBeCloseTo(603, 6)
+  })
+
   it('applies statConversion using the post-multiplier total of the source stat', () => {
     const item = itemWithStats('conversion-item', 0)
     item.stats = { ap: 100 }
