@@ -135,6 +135,29 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'horizon-focus', name: 'Horizon Focus', tier: 'legendary',
+    cost: { total: 2700, combine: 400 }, recipe: ['amplifying-tome', 'fiendish-codex', 'fiendish-codex'],
+    stats: { ap: 80, abilityHaste: 25 }, tags: ['magic'],
+    effects: [{
+      kind: 'damageAmp', id: 'horizon-focus-hypershot', name: 'Hypershot',
+      description: 'Damaging an enemy champion with an ability from at least 600 units away reveals '
+        + 'them for 8 seconds and increases the damage you deal to them by 10%.',
+      support: 'partial',
+      // Measured in the 7.3 practice tool (2026-09-26): the dummy counts as a champion, and both the
+      // max-range Q that triggers Hypershot and the W/R that follow it dealt 1.1x.
+      supportNotes: 'Range is not modeled: the toggle says whether Hypershot is active, and when on it '
+        + 'amplifies every hit in the combo, including the one that triggers it. Its 8-second duration '
+        + 'and the Focus reveal are not modeled.',
+      amount: 0.1,
+      condition: { type: 'toggle', inputId: 'horizon-focus-hypershot' },
+      inputs: [{
+        type: 'boolean', id: 'horizon-focus-hypershot', label: 'Horizon Focus Hypershot active',
+        default: false,
+      }],
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'black-cleaver', name: 'Black Cleaver', tier: 'legendary',
     cost: { total: 3000, combine: 500 }, recipe: ['long-sword', 'phage', 'kindlegem'],
     stats: { ad: 40, hp: 400, abilityHaste: 20 }, tags: ['physical'],
