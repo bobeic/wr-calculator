@@ -21,6 +21,10 @@ describe('ConditionSchema', () => {
     expect(ConditionSchema.parse({ type: 'abilitySlot', value: 'r' }).type).toBe('abilitySlot')
   })
 
+  it('accepts a targetHasDot condition with no extra fields', () => {
+    expect(ConditionSchema.parse({ type: 'targetHasDot' }).type).toBe('targetHasDot')
+  })
+
   it('rejects an abilitySlot outside q/w/e/r', () => {
     expect(() => ConditionSchema.parse({ type: 'abilitySlot', value: 'passive' })).toThrow()
   })

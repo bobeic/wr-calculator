@@ -149,6 +149,30 @@ describe('resolveStats', () => {
     expect(sheet.total.ap).toBeCloseTo(603, 6)
   })
 
+  it('defers a statMultiplier gated on targetHasDot to combat, sized from the pre-multiplier stat', () => {
+    const item = itemWithStats('ap-item', 0)
+    item.stats = { ap: 450 }
+    item.effects = [
+      {
+        id: 'mult-a', name: 'Multiplier A', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.3,
+      },
+      {
+        id: 'burn-mult', name: 'Burning Multiplier', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.04,
+        condition: { type: 'targetHasDot' },
+      },
+    ]
+    const items = new Map([['ap-item', item]])
+    const build = emptyBuild({ items: ['ap-item'] })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.total.ap).toBeCloseTo(585, 6)
+    expect(sheet.combatContributions).toHaveLength(1)
+    expect(sheet.combatContributions![0].effect.id).toBe('burn-mult')
+    expect(sheet.combatContributions![0].contributions[0]).toMatchObject({ stat: 'ap', layer: 'bonus' })
+    expect(sheet.combatContributions![0].contributions[0].amount).toBeCloseTo(18, 6)
+  })
+
   it('applies statConversion using the post-multiplier total of the source stat', () => {
     const item = itemWithStats('conversion-item', 0)
     item.stats = { ap: 100 }

@@ -1,4 +1,4 @@
-import type { Champion, Build, Item, Rune, Effect, StatKey, NullableScalar } from '@wr-calc/schema'
+import type { Champion, Build, Item, Rune, Effect, StatKey, NullableScalar, Condition } from '@wr-calc/schema'
 import { STAT_KEYS } from '@wr-calc/schema'
 import {
   MAX_CHAMPION_LEVEL, ATTACK_SPEED_CAP, STAT_RESOLUTION_ORDER, statAtLevel, attackSpeedAtLevel,
@@ -18,6 +18,23 @@ export interface StatSheet {
   unsupportedEffects: UnsupportedEffectEntry[]
   dataWarnings: string[]
   unverifiedRules: UnverifiedRuleId[]
+  /**
+   * Stat contributions from effects whose condition is only known in combat (e.g. targetHasDot).
+   * They are sized here, at their stage, but applied by the combat simulation while it holds.
+   */
+  combatContributions?: CombatContribution[]
+}
+
+export interface CombatContribution {
+  effect: Effect
+  contributions: StatContribution[]
+}
+
+/** Whether a condition can only be evaluated during combat, not at stat resolution. */
+export function isCombatOnlyCondition(condition: Condition | undefined): boolean {
+  if (!condition) return false
+  if (condition.type === 'allOf') return condition.conditions.some((leaf) => leaf.type === 'targetHasDot')
+  return condition.type === 'targetHasDot'
 }
 
 export interface StatCatalog {
@@ -115,11 +132,16 @@ export function resolveStats(
     ...runes.flatMap((rune) => rune.effects),
   ]
   const ctx: StatContext = { level: clampedLevel, inputs: build.inputs, statSoFar }
+  const combatContributions: CombatContribution[] = []
   for (const stage of STAT_RESOLUTION_ORDER) {
     frozen = stage === 'multiplier' ? { base: { ...base }, bonus: { ...bonus } } : undefined
     for (const effect of effects) {
       if (stageOf(effect) !== stage) continue
       const contributions = contributeStats(effect, ctx)
+      if (isCombatOnlyCondition(effect.condition)) {
+        if (contributions.length > 0) combatContributions.push({ effect, contributions })
+        continue
+      }
       for (const contribution of contributions) record(contribution)
       if (contributions.length > 0 && effect.support !== 'full') {
         unsupportedEffects.push({
@@ -151,5 +173,6 @@ export function resolveStats(
   return {
     base, bonus, total, breakdown, unsupportedEffects, dataWarnings,
     unverifiedRules: [...unverifiedRules],
+    ...(combatContributions.length > 0 ? { combatContributions } : {}),
   }
 }
