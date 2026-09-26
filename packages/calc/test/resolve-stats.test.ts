@@ -65,6 +65,15 @@ describe('resolveStats', () => {
     )).toThrow(/unknown item id/)
   })
 
+  it('throws when a build holds two items from the same exclusiveGroup', () => {
+    const first = { ...itemWithStats('pen-a', 0), exclusiveGroup: 'percent-magic-pen' }
+    const second = { ...itemWithStats('pen-b', 0), exclusiveGroup: 'percent-magic-pen' }
+    const items = new Map([['pen-a', first], ['pen-b', second]])
+    const build = emptyBuild({ items: ['pen-a', 'pen-b'] })
+    expect(() => resolveStats(validChampion(), 1, build, { items, runes: new Map() }))
+      .toThrow(/pen-a.*pen-b.*percent-magic-pen/)
+  })
+
   it('throws when a build references an unknown rune id', () => {
     const build = emptyBuild({ runes: ['does-not-exist'] })
     expect(() => resolveStats(

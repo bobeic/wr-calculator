@@ -109,6 +109,18 @@ export function resolveStats(
     if (!item) throw new Error(`resolveStats: unknown item id '${id}' in build`)
     return item
   })
+  const holderByGroup = new Map<string, string>()
+  for (const item of items) {
+    if (!item.exclusiveGroup) continue
+    const holder = holderByGroup.get(item.exclusiveGroup)
+    if (holder) {
+      throw new Error(
+        `resolveStats: items '${holder}' and '${item.id}' can't be held together `
+        + `(both in exclusive group '${item.exclusiveGroup}')`
+      )
+    }
+    holderByGroup.set(item.exclusiveGroup, item.id)
+  }
   const runes = build.runes.map((id) => {
     const rune = catalog.runes.get(id)
     if (!rune) throw new Error(`resolveStats: unknown rune id '${id}' in build`)

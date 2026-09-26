@@ -17,6 +17,8 @@ export const ItemSchema = z.object({
   stats: statKeyRecord(NullableScalarSchema),
   effects: z.array(EffectSchema),
   tags: z.array(z.string()),
+  /** A build may hold at most one item from each exclusive group (a shop restriction). */
+  exclusiveGroup: z.string().optional(),
   provenance: ProvenanceSchema,
 }).strict()
 export type Item = z.infer<typeof ItemSchema>
