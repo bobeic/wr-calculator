@@ -18,6 +18,13 @@ export const dotHandler: EffectHandler<DotEffect> = {
       const amountResolved = resolveScalar(effect.tickAmount, ctx.level)
       const amountWarning = scalarWarning(effect.name, 'tickAmount', amountResolved)
       if (amountWarning) ctx.addDataWarning(amountWarning)
+      let tickAmount = amountResolved.value
+      for (const ratio of effect.ratios) {
+        const ratioResolved = resolveScalar(ratio.value, ctx.level)
+        const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
+        if (ratioWarning) ctx.addDataWarning(ratioWarning)
+        tickAmount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
+      }
 
       const durationResolved = resolveScalar(effect.durationSeconds, ctx.level)
       const durationWarning = scalarWarning(effect.name, 'durationSeconds', durationResolved)
@@ -30,11 +37,28 @@ export const dotHandler: EffectHandler<DotEffect> = {
         const tickTime = ctx.time + i * effect.tickIntervalSeconds
         ctx.scheduleEvent?.(tickTime, (laterCtx) => {
           laterCtx.dealDamage({
-            type: effect.damageType, amount: amountResolved.value,
+            type: effect.damageType, amount: tickAmount,
             source: { kind: 'item', id: effect.id, name: effect.name },
           })
         }, key)
       }
     },
+  },
+  // No condition check here: the dot's condition gates applying it (e.g. an abilitySlot that a
+  // damage instance can't match), so an active dot already passed it.
+  modifyResist(effect, ctx, damageType) {
+    const shred = effect.shredWhileActive
+    if (!shred) return {}
+    const matches = (shred.resist === 'armor' && damageType === 'physical')
+      || (shred.resist === 'mr' && damageType === 'magic')
+    if (!matches) return {}
+
+    const buff = ctx.opponent.buffs[buffKey(effect)]
+    if (!buff || buff.expiresAt === undefined || buff.expiresAt < ctx.time) return {}
+
+    const resolved = resolveScalar(shred.amount, ctx.level)
+    const warning = scalarWarning(effect.name, 'shredWhileActive.amount', resolved)
+    if (warning) ctx.addDataWarning(warning)
+    return { flatReduction: resolved.value }
   },
 }

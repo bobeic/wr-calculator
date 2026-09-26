@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { simulateCombo } from '../src/simulate-combo'
+import type { ComboAction } from '../src/simulate-combo'
 import { combatantFromChampion, combatantFromDummy } from '../src/combatant'
 import type { Champion, Item, Build, Target } from '@wr-calc/schema'
 
@@ -203,6 +204,28 @@ describe('simulateCombo', () => {
     expect(recast.dataWarnings.filter((warning) => warning.includes('byRank'))).toEqual([])
   })
 
+  it('adds ultimateHaste to ability haste for the ultimate\'s cooldown only', () => {
+    const item: Item = {
+      ...baseItem('test-haste-item', {
+        id: 'test-haste-noop', name: 'No-op', description: '', support: 'full',
+        kind: 'damageAmp', amount: 0, condition: { type: 'targetIsMonster' },
+      }),
+      stats: { abilityHaste: 15, ultimateHaste: 20 },
+    }
+    const catalog = { items: new Map([['test-haste-item', item]]), runes: new Map() }
+    const champion = championWithAbility()
+    champion.abilities.r.damage = [{ type: 'true', base: 10, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(champion, 1, emptyBuild({ items: ['test-haste-item'] }), catalog)
+    const target = combatantFromDummy(dummy())
+
+    // R: 100 / (1 + 35/100) = 74.07s.
+    expect(simulateCombo(attacker, target, ['R', 'wait:74', 'R'], { critMode: 'never' }).instances).toHaveLength(1)
+    expect(simulateCombo(attacker, target, ['R', 'wait:74.1', 'R'], { critMode: 'never' }).instances).toHaveLength(2)
+    // Q uses only the 15 ability haste: 8 / 1.15 = 6.96s (6.5 would pass if ultimateHaste applied).
+    expect(simulateCombo(attacker, target, ['Q', 'wait:6.5', 'Q'], { critMode: 'never' }).instances).toHaveLength(1)
+    expect(simulateCombo(attacker, target, ['Q', 'wait:7', 'Q'], { critMode: 'never' }).instances).toHaveLength(2)
+  })
+
   it('resolves byRank ability damage at the ability\'s maxRank', () => {
     const champion = championWithAbility()
     champion.abilities.q.damage = [
@@ -272,7 +295,7 @@ describe('simulateCombo', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh',
+      durationSeconds: 3, refresh: 'refresh', ratios: [],
     })
     const items = new Map([['test-dot-item', item]])
     const build = emptyBuild({ items: ['test-dot-item'] })
@@ -340,11 +363,47 @@ describe('simulateCombo', () => {
     expect(lowHp.instances.map((i) => i.mitigated)).toEqual([600, 600, 600, 200])
   })
 
+  it('triggers an abilitySlot-conditioned dot only from that ability', () => {
+    const item = baseItem('test-dot-item', {
+      id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
+      kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
+      durationSeconds: 3, refresh: 'refresh', ratios: [], condition: { type: 'abilitySlot', value: 'r' },
+    })
+    const items = new Map([['test-dot-item', item]])
+    const champion = championWithAbility()
+    champion.abilities.r.damage = [{ type: 'magic', base: 100, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild({ items: ['test-dot-item'] }), { items, runes: new Map() }
+    )
+    const dotTicks = (combo: ComboAction[]) => simulateCombo(
+      attacker, combatantFromDummy(dummy()), combo, { critMode: 'never' }
+    ).instances.filter((i) => i.source.id === 'test-dot-passive')
+    expect(dotTicks(['Q', 'wait:3'])).toHaveLength(0)
+    expect(dotTicks(['R', 'wait:3'])).toHaveLength(3)
+  })
+
+  it('fires a damageWindowProc\'s delayed hit once combo damage crosses the threshold', () => {
+    const item = baseItem('test-window-item', {
+      id: 'test-window-passive', name: 'Test Window', description: '', support: 'full',
+      kind: 'damageWindowProc', targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2,
+      damageType: 'true', damage: 40, ratios: [], cooldownSeconds: 25,
+    })
+    const items = new Map([['test-window-item', item]])
+    const champion = championWithAbility()
+    champion.abilities.q.damage = [{ type: 'true', base: 300, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild({ items: ['test-window-item'] }), { items, runes: new Map() }
+    )
+    const result = simulateCombo(attacker, combatantFromDummy(dummy({ hp: 1000 })), ['Q', 'wait:2'], { critMode: 'never' })
+    const procs = result.instances.filter((i) => i.source.id === 'test-window-passive')
+    expect(procs.map((i) => [i.time, i.mitigated])).toEqual([[2, 40]])
+  })
+
   it('resets DoT ticks on refresh instead of stacking a second tick train', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh',
+      durationSeconds: 3, refresh: 'refresh', ratios: [],
     })
     const items = new Map([['test-dot-item', item]])
     const build = emptyBuild({ items: ['test-dot-item'] })
@@ -409,7 +468,7 @@ describe('simulateCombo', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
       kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
-      durationSeconds: 3, refresh: 'refresh',
+      durationSeconds: 3, refresh: 'refresh', ratios: [],
     })
     const items = new Map([['test-dot-item', item]])
     const build = emptyBuild({ items: ['test-dot-item'] })

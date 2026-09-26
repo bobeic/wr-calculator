@@ -77,6 +77,13 @@ export interface CombatantRuntime {
 
 export type AbilityKey = 'q' | 'w' | 'e' | 'r'
 
+/** Facts about the triggering event that some conditions check. */
+export interface ConditionExtra {
+  damageType?: DamageType
+  sourceKind?: SourceKind
+  abilityKey?: AbilityKey
+}
+
 export interface HookHandlers<E extends Effect> {
   onBasicAttack?(effect: E, ctx: HookContext): void
   onAbilityCast?(effect: E, ctx: HookContext, abilityKey: AbilityKey): void
@@ -103,7 +110,7 @@ export interface HookContext {
   addUnverifiedRule(id: UnverifiedRuleId): void
   conditionMet(
     effect: Effect, condition: Condition,
-    extra?: { damageType?: DamageType; sourceKind?: SourceKind }
+    extra?: ConditionExtra
   ): boolean
   scheduleEvent?(atTime: number, run: (ctx: HookContext) => void, key?: string): void
   cancelScheduled?(key: string): void

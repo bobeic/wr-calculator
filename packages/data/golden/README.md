@@ -5,8 +5,7 @@ engine against. `loadGoldenCases` (Node-only, imported from `@wr-calc/data/golde
 root entry) loads every `*.json` file here.
 
 Current cases (7.3 practice tool, 2026-09-25): Annie at level 15, one ability per case, against the
-practice dummy (100 armor / 100 MR; its HP is unknown, so `hp` is a placeholder and no
-`timeToKill` is recorded). "clean build" is Spellslinger's Shoes + Rabadon's Deathcap + Void Staff +
+practice dummy (100 armor / 100 MR / 10,000 HP; no `timeToKill` is recorded). "clean build" is Spellslinger's Shoes + Rabadon's Deathcap + Void Staff +
 Zhonya's Hourglass, which have no on-hit damage passives. "full build" adds Luden's Echo and
 Infinity Orb; those hits were recorded with Luden's passive on cooldown (the
 `ludens-echo-on-cooldown` build input) and the dummy above Infinity Orb's low-HP threshold, so
@@ -15,6 +14,15 @@ neither passive applies.
 Infinity Orb cases (2026-09-26): "orb build" is the clean build plus Infinity Orb. The `low-hp`
 cases were hit with the dummy below 40% HP (`startHpFraction: 0.3`), so Inevitable Demise applies:
 Q, W and R each dealt 1.2x, while Luden's Echo on the full-build Q was not amplified.
+
+Horizon Focus cases (2026-09-26): "horizon build" is the clean build plus Horizon Focus. The
+`hypershot` cases set the `horizon-focus-hypershot` input; in game, Q was cast from max range to
+trigger Hypershot, and both that Q and the W/R after it dealt 1.1x.
+
+Malignance cases (2026-09-26): "malignance build" is the clean build plus Malignance. The
+`r-with-burn` case is R followed by the 3-second burn: 515 + 3 ticks of 70 (the burn's 10 MR
+reduction applies to its own ticks). `q-during-burn` is R then Q while the ground burns: 515 + 574
+(551 without the reduction), so the reduction applies to all magic damage during the burn.
 
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%

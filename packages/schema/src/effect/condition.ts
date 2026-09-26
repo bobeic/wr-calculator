@@ -12,6 +12,9 @@ const LEAF_CONDITIONS = [
     type: z.literal('sourceKind'),
     value: z.enum(['basicAttack', 'ability', 'item', 'other']),
   }).strict(),
+  // Known only to ability cast/hit hooks (e.g. a burn applied when the ultimate hits), not to
+  // per-damage-instance checks like damageAmp.
+  z.object({ type: z.literal('abilitySlot'), value: z.enum(['q', 'w', 'e', 'r']) }).strict(),
   z.object({ type: z.literal('targetIsChampion') }).strict(),
   z.object({ type: z.literal('targetIsMonster') }).strict(),
 ] as const

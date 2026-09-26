@@ -1,8 +1,8 @@
 import type { Effect, DamageType, Condition } from '@wr-calc/schema'
 import type { Combatant } from './combatant'
 import type {
-  AbilityKey, CombatantRuntime, DamageInstance, EffectHandler, HookContext,
-  RawDamageInstanceInput, SourceKind,
+  AbilityKey, CombatantRuntime, ConditionExtra, DamageInstance, EffectHandler, HookContext,
+  RawDamageInstanceInput,
 } from './effects/types'
 import type { UnverifiedRuleId } from './rules'
 import type { ResistModifiers } from './mitigation'
@@ -46,7 +46,7 @@ function combatantEffects(combatant: Combatant): Effect[] {
 
 function evaluateCondition(
   effect: Effect, condition: Condition, self: Combatant, opponent: Combatant,
-  opponentRuntime: CombatantRuntime, extra?: { damageType?: DamageType; sourceKind?: SourceKind }
+  opponentRuntime: CombatantRuntime, extra?: ConditionExtra
 ): boolean {
   switch (condition.type) {
     case 'targetHpBelow': {
@@ -69,6 +69,8 @@ function evaluateCondition(
       return extra?.damageType === condition.value
     case 'sourceKind':
       return extra?.sourceKind === condition.value
+    case 'abilitySlot':
+      return extra?.abilityKey === condition.value
     case 'targetIsChampion':
       return opponent.kind === 'champion'
     case 'targetIsMonster':
@@ -92,7 +94,7 @@ function evaluateCondition(
  */
 function conditionAllows(
   effect: Effect, ctx: HookContext,
-  extra?: { damageType?: DamageType; sourceKind?: SourceKind }
+  extra?: ConditionExtra
 ): boolean {
   return !effect.condition || ctx.conditionMet(effect, effect.condition, extra)
 }
@@ -314,7 +316,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolve(effect)
       if (!handler?.hooks?.onAbilityCast) continue
-      if (!conditionAllows(effect, ctx)) continue
+      if (!conditionAllows(effect, ctx, { abilityKey })) continue
       handler.hooks.onAbilityCast(effect, ctx, abilityKey)
       trackSupport(effect)
     }
@@ -325,7 +327,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolve(effect)
       if (!handler?.hooks?.onAbilityHit) continue
-      if (!conditionAllows(effect, ctx)) continue
+      if (!conditionAllows(effect, ctx, { abilityKey })) continue
       handler.hooks.onAbilityHit(effect, ctx, abilityKey, hitInstances)
       trackSupport(effect)
     }
@@ -381,8 +383,9 @@ export function simulateCombo(
       const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
       const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
       if (cooldownWarning) dataWarnings.push(cooldownWarning)
+      const ultimateHaste = abilityKey === 'r' ? attacker.sheet.total.ultimateHaste ?? 0 : 0
       const hastedCooldown = cooldownWithHaste(
-        cooldownResolved.value, attacker.sheet.total.abilityHaste ?? 0
+        cooldownResolved.value, (attacker.sheet.total.abilityHaste ?? 0) + ultimateHaste
       )
       unverifiedRuleIds.add('abilityHasteFormula')
       attackerRuntime.cooldowns[abilityKey] = time + hastedCooldown

@@ -75,7 +75,7 @@ export const STARTER_ITEMS: Item[] = [
       supportNotes: 'The burn is % of target max Health; the dot kind only models flat ticks, so this deals '
         + '0 until a %-max-Health dot exists. Madness (up to +6% damage) is not modeled.',
       damageType: 'magic', tickAmount: 0, tickIntervalSeconds: 1, durationSeconds: 3,
-      refresh: 'refresh',
+      refresh: 'refresh', ratios: [],
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
@@ -131,6 +131,72 @@ export const STARTER_ITEMS: Item[] = [
         type: 'allOf',
         conditions: [{ type: 'targetHpBelow', threshold: 0.4 }, { type: 'sourceKind', value: 'ability' }],
       },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'horizon-focus', name: 'Horizon Focus', tier: 'legendary',
+    cost: { total: 2700, combine: 400 }, recipe: ['amplifying-tome', 'fiendish-codex', 'fiendish-codex'],
+    stats: { ap: 80, abilityHaste: 25 }, tags: ['magic'],
+    effects: [{
+      kind: 'damageAmp', id: 'horizon-focus-hypershot', name: 'Hypershot',
+      description: 'Damaging an enemy champion with an ability from at least 600 units away reveals '
+        + 'them for 8 seconds and increases the damage you deal to them by 10%.',
+      support: 'partial',
+      // Measured in the 7.3 practice tool (2026-09-26): the dummy counts as a champion, and both the
+      // max-range Q that triggers Hypershot and the W/R that follow it dealt 1.1x.
+      supportNotes: 'Range is not modeled: the toggle says whether Hypershot is active, and when on it '
+        + 'amplifies every hit in the combo, including the one that triggers it. Its 8-second duration '
+        + 'and the Focus reveal are not modeled.',
+      amount: 0.1,
+      condition: { type: 'toggle', inputId: 'horizon-focus-hypershot' },
+      inputs: [{
+        type: 'boolean', id: 'horizon-focus-hypershot', label: 'Horizon Focus Hypershot active',
+        default: false,
+      }],
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'malignance', name: 'Malignance', tier: 'legendary',
+    cost: { total: 2700, combine: 700 }, recipe: ['blasting-wand', 'lost-chapter'],
+    // ultimateHaste 20: "Your ultimate abilities gain 20 Ability Haste" (Scorn).
+    stats: { ap: 90, mana: 500, abilityHaste: 15, ultimateHaste: 20 }, tags: ['magic'],
+    effects: [{
+      kind: 'dot', id: 'malignance-hatefog', name: 'Hatefog',
+      description: 'Damaging a champion with your ultimate burns the ground beneath them for 3s, '
+        + 'dealing magic damage equal to 60 plus 5% Ability Power per second and reducing their '
+        + 'Magic Resist by 10.',
+      support: 'partial',
+      // Measured in the 7.3 practice tool (2026-09-26): each tick dealt 70 against the 100 MR dummy,
+      // so the 10 MR reduction applies to the burn's own ticks (67 without it); Annie's R cooldown
+      // showed 44.4s (60 / 1.35), confirming the ultimate haste.
+      supportNotes: 'The target is assumed to stay in the burn for all 3 seconds. The burn radius '
+        + 'is not modeled.',
+      damageType: 'magic', tickAmount: 60, ratios: [{ stat: 'ap', value: 0.05 }],
+      tickIntervalSeconds: 1, durationSeconds: 3, refresh: 'refresh',
+      condition: { type: 'abilitySlot', value: 'r' },
+      shredWhileActive: { resist: 'mr', amount: 10 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'stormsurge', name: 'Stormsurge', tier: 'legendary',
+    cost: { total: 2800, combine: 750 }, recipe: ['aether-wisp', 'hextech-alternator'],
+    stats: { ap: 90, moveSpeedPct: 0.06, flatMagicPen: 15 }, tags: ['magic'],
+    effects: [{
+      kind: 'damageWindowProc', id: 'stormsurge-squall', name: 'Stormraider / Squall',
+      description: "When you deal damage equal to 25% of a champion's max Health within 2.5 seconds, "
+        + 'inflict Squall on them and gain 25% Movement Speed for 2.5 seconds (25-second cooldown). '
+        + 'Squall: after 2 seconds, deal 125 + 10% Ability Power magic damage.',
+      support: 'partial',
+      // Not verifiable in the 7.3 practice tool (2026-09-26): Squall never triggered on the
+      // dummy, even with a 6-item build dealing over 2,500 in 2.5s, so the dummy seems not to count
+      // as a champion for Stormsurge (unlike Horizon Focus and Malignance, which did trigger).
+      supportNotes: 'Unverified in game. Counts damage after resists. The movement speed and the '
+        + '"target dies first" splash are not modeled.',
+      targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2, damageType: 'magic',
+      damage: 125, ratios: [{ stat: 'ap', value: 0.1 }], cooldownSeconds: 25,
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },

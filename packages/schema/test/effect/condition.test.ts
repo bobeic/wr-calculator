@@ -17,6 +17,14 @@ describe('ConditionSchema', () => {
     expect(result.type).toBe('targetIsMonster')
   })
 
+  it('accepts an abilitySlot condition', () => {
+    expect(ConditionSchema.parse({ type: 'abilitySlot', value: 'r' }).type).toBe('abilitySlot')
+  })
+
+  it('rejects an abilitySlot outside q/w/e/r', () => {
+    expect(() => ConditionSchema.parse({ type: 'abilitySlot', value: 'passive' })).toThrow()
+  })
+
   it('rejects an unknown condition type', () => {
     expect(() => ConditionSchema.parse({ type: 'madeUp' })).toThrow()
   })
