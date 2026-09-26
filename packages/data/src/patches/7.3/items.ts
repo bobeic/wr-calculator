@@ -190,9 +190,11 @@ export const STARTER_ITEMS: Item[] = [
         + 'inflict Squall on them and gain 25% Movement Speed for 2.5 seconds (25-second cooldown). '
         + 'Squall: after 2 seconds, deal 125 + 10% Ability Power magic damage.',
       support: 'partial',
-      supportNotes: 'Not yet triggered in game (Q+W+R on the 10,000 HP dummy fell short of 2,500). '
-        + 'Counts damage after resists. The movement speed and the "target dies first" splash '
-        + 'are not modeled.',
+      // Not verifiable in the 7.3 practice tool (2026-09-26): Squall never triggered on the
+      // dummy, even with a 6-item build dealing over 2,500 in 2.5s, so the dummy seems not to count
+      // as a champion for Stormsurge (unlike Horizon Focus and Malignance, which did trigger).
+      supportNotes: 'Unverified in game. Counts damage after resists. The movement speed and the '
+        + '"target dies first" splash are not modeled.',
       targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2, damageType: 'magic',
       damage: 125, ratios: [{ stat: 'ap', value: 0.1 }], cooldownSeconds: 25,
     }],
