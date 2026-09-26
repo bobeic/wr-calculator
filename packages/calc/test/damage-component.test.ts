@@ -13,7 +13,7 @@ function sheet(overrides: Partial<StatSheet> = {}): StatSheet {
 function combatant(overrides: Partial<Combatant> = {}): Combatant {
   return {
     id: 'c1', name: 'Test', kind: 'champion', level: 5, sheet: sheet(), items: [],
-    runeEffects: [], inputs: {}, ...overrides,
+    runeEffects: [], inputs: {}, startHpFraction: 1, ...overrides,
   }
 }
 

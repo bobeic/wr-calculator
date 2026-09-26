@@ -12,6 +12,8 @@ export interface Combatant {
   items: Item[]
   runeEffects: Effect[]
   inputs: Record<string, number | boolean>
+  /** Fraction of max HP this combatant starts a combo at. */
+  startHpFraction: number
   abilities?: Champion['abilities']
 }
 
@@ -30,7 +32,7 @@ export function combatantFromChampion(
   const runeEffects = build.runes.flatMap((id) => catalog.runes.get(id)!.effects)
   return {
     id: champion.id, name: champion.name, kind: 'champion', level, sheet, items, runeEffects,
-    inputs: build.inputs, abilities: champion.abilities,
+    inputs: build.inputs, startHpFraction: 1, abilities: champion.abilities,
   }
 }
 
@@ -47,5 +49,6 @@ export function combatantFromDummy(dummy: TargetDummy): Combatant {
     // for any byLevel/levelRange scalar a synthetic test effect attached to it might use.
     id: 'dummy', name: 'Training Dummy', kind: 'dummy', level: MAX_CHAMPION_LEVEL, sheet,
     items: [], runeEffects: dummy.effects ?? [], inputs: {},
+    startHpFraction: dummy.startHpFraction ?? 1,
   }
 }

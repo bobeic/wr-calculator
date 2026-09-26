@@ -87,6 +87,13 @@ describe('combatantFromDummy', () => {
     expect(combatant.abilities).toBeUndefined()
   })
 
+  it('starts at full hp unless the dummy sets startHpFraction', () => {
+    expect(combatantFromDummy({ kind: 'dummy', hp: 1000, armor: 0, mr: 0 }).startHpFraction).toBe(1)
+    expect(
+      combatantFromDummy({ kind: 'dummy', hp: 1000, armor: 0, mr: 0, startHpFraction: 0.3 }).startHpFraction
+    ).toBe(0.3)
+  })
+
   it('carries the dummy\'s own effects, if any', () => {
     const dummy: Extract<Target, { kind: 'dummy' }> = {
       kind: 'dummy', hp: 1000, armor: 0, mr: 0,

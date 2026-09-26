@@ -305,6 +305,13 @@ describe('simulateCombo', () => {
     expect(aaResult.instances[0].mitigated).toBe(60)
   })
 
+  it('starts the target at its startHpFraction of max hp', () => {
+    const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild(), { items: new Map(), runes: new Map() })
+    const target = combatantFromDummy(dummy({ hp: 1000, startHpFraction: 0.3 }))
+    const result = simulateCombo(attacker, target, ['AA'], { critMode: 'never' })
+    expect(result.instances[0].targetHpAfter).toBe(240)
+  })
+
   it('applies an allOf-conditioned damageAmp only when every condition holds', () => {
     const item = baseItem('test-amp-item', {
       id: 'test-amp-passive', name: 'Test Amp', description: '', support: 'full',
