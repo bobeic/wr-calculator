@@ -65,6 +65,15 @@ describe('resolveStats', () => {
     )).toThrow(/unknown item id/)
   })
 
+  it('throws when a build holds two items from the same exclusiveGroup', () => {
+    const first = { ...itemWithStats('pen-a', 0), exclusiveGroup: 'percent-magic-pen' }
+    const second = { ...itemWithStats('pen-b', 0), exclusiveGroup: 'percent-magic-pen' }
+    const items = new Map([['pen-a', first], ['pen-b', second]])
+    const build = emptyBuild({ items: ['pen-a', 'pen-b'] })
+    expect(() => resolveStats(validChampion(), 1, build, { items, runes: new Map() }))
+      .toThrow(/pen-a.*pen-b.*percent-magic-pen/)
+  })
+
   it('throws when a build references an unknown rune id', () => {
     const build = emptyBuild({ runes: ['does-not-exist'] })
     expect(() => resolveStats(
@@ -126,6 +135,51 @@ describe('resolveStats', () => {
     const build = emptyBuild({ items: ['flat-item'] })
     const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
     expect(sheet.bonus.ad).toBe(110)
+  })
+
+  it('adds statMultipliers on the same stat together instead of compounding them', () => {
+    // Measured 2026-09-26: 450 AP with Rabadon's (+30%) and Blackfire (+4%) showed 603 in game,
+    // i.e. 450 x 1.34, not 450 x 1.3 x 1.04 = 608.4.
+    const item = itemWithStats('ap-item', 0)
+    item.stats = { ap: 450 }
+    item.effects = [
+      {
+        id: 'mult-a', name: 'Multiplier A', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.3,
+      },
+      {
+        id: 'mult-b', name: 'Multiplier B', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.04,
+      },
+    ]
+    const items = new Map([['ap-item', item]])
+    const build = emptyBuild({ items: ['ap-item'] })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.total.ap).toBeCloseTo(603, 6)
+  })
+
+  it('defers a statMultiplier gated on targetHasDot to combat, sized from the pre-multiplier stat', () => {
+    const item = itemWithStats('ap-item', 0)
+    item.stats = { ap: 450 }
+    item.effects = [
+      {
+        id: 'mult-a', name: 'Multiplier A', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.3,
+      },
+      {
+        id: 'burn-mult', name: 'Burning Multiplier', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.04,
+        condition: { type: 'targetHasDot' },
+      },
+    ]
+    const items = new Map([['ap-item', item]])
+    const build = emptyBuild({ items: ['ap-item'] })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.total.ap).toBeCloseTo(585, 6)
+    expect(sheet.combatContributions).toHaveLength(1)
+    expect(sheet.combatContributions![0].effect.id).toBe('burn-mult')
+    expect(sheet.combatContributions![0].contributions[0]).toMatchObject({ stat: 'ap', layer: 'bonus' })
+    expect(sheet.combatContributions![0].contributions[0].amount).toBeCloseTo(18, 6)
   })
 
   it('applies statConversion using the post-multiplier total of the source stat', () => {

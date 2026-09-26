@@ -67,16 +67,29 @@ export const STARTER_ITEMS: Item[] = [
     id: 'liandrys-torment', name: "Liandry's Torment", tier: 'legendary',
     cost: { total: 3000, combine: 800 }, recipe: ['haunting-guise', 'fated-ashes'],
     stats: { ap: 70, hp: 300 }, tags: ['magic'],
-    effects: [{
-      kind: 'dot', id: 'liandrys-torment-dot', name: 'Torment',
-      description: 'Damaging abilities burn the enemy for 3 seconds, dealing magic damage equal to 2% of '
-        + 'their maximum Health per second.',
-      support: 'none',
-      supportNotes: 'The burn is % of target max Health; the dot kind only models flat ticks, so this deals '
-        + '0 until a %-max-Health dot exists. Madness (up to +6% damage) is not modeled.',
-      damageType: 'magic', tickAmount: 0, tickIntervalSeconds: 1, durationSeconds: 3,
-      refresh: 'refresh', ratios: [],
-    }],
+    effects: [
+      {
+        kind: 'dot', id: 'liandrys-torment-dot', name: 'Torment',
+        description: "Damaging abilities or empowered attacks deal 2% of the target's max Health as "
+          + 'bonus magic damage each second, over 3 seconds.',
+        support: 'partial',
+        // Measured in the 7.3 practice tool (2026-09-26): the burn ticks every 0.5s (6 ticks of ~75
+        // against the 100 MR, 10,000 HP dummy), i.e. 1% max HP per tick.
+        supportNotes: 'Only abilities apply the burn; empowered attacks are not modeled.',
+        damageType: 'magic', tickAmount: 0, targetMaxHpRatio: 0.01, tickIntervalSeconds: 0.5,
+        durationSeconds: 3, refresh: 'refresh', ratios: [],
+      },
+      {
+        kind: 'combatRampAmp', id: 'liandrys-torment-madness', name: 'Madness',
+        description: 'While fighting enemy champions, deal 2% additional damage each second, up to 6% '
+          + 'after 3 seconds.',
+        support: 'partial',
+        // Measured 2026-09-26: the opening Q wasn't amplified; its burn ticks read 76, 78, 78, 79, 79,
+        // 79 (+2%, +4%, +4%, +6%, +6%, +6% on 74.6), and a Q 4s later hit for 567 (+6%).
+        supportNotes: 'Combat starts at your first hit and never ends within a combo.',
+        amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 3,
+      },
+    ],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
@@ -85,6 +98,46 @@ export const STARTER_ITEMS: Item[] = [
     // Unconditional magic pen is a plain stat, not a `penetration`-kind effect (that kind is
     // reserved for conditional pen — see packages/schema/src/effect/kinds/penetration.ts).
     stats: { ap: 95, pctMagicPen: 0.4 }, effects: [], tags: ['magic'],
+    // The shop won't sell Void Staff and Cryptbloom together (in-game, 2026-09-26).
+    exclusiveGroup: 'percent-magic-pen',
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'cryptbloom', name: 'Cryptbloom', tier: 'legendary',
+    cost: { total: 3000, combine: 600 }, recipe: ['amplifying-tome', 'fiendish-codex', 'void-amethyst'],
+    // Life from Death only heals allies after a kill, so it has no 1v1 damage effect to model.
+    stats: { ap: 75, pctMagicPen: 0.3, abilityHaste: 20 }, effects: [], tags: ['magic'],
+    exclusiveGroup: 'percent-magic-pen',
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'blackfire-torch', name: 'Blackfire Torch', tier: 'legendary',
+    cost: { total: 2800, combine: 700 }, recipe: ['lost-chapter', 'fated-ashes'],
+    stats: { ap: 80, mana: 500, abilityHaste: 20 }, tags: ['magic'],
+    effects: [
+      {
+        kind: 'dot', id: 'blackfire-torch-baleful-blaze', name: 'Baleful Blaze',
+        description: 'Damaging abilities burn enemies, dealing an additional 20 + 2% Ability Power '
+          + 'magic damage per second for 3 seconds. Against monsters, they deal 40 + 2% Ability Power '
+          + 'magic damage per second.',
+        support: 'partial',
+        // Measured in the 7.3 practice tool (2026-09-26): the burn ticks every 0.5s, 6 ticks of 12
+        // against the 100 MR dummy, so each tick is half the per-second value.
+        supportNotes: 'Uses the champion value; the higher damage against monsters is not modeled.',
+        damageType: 'magic', tickAmount: 10, ratios: [{ stat: 'ap', value: 0.01 }],
+        tickIntervalSeconds: 0.5, durationSeconds: 3, refresh: 'refresh',
+      },
+      {
+        kind: 'statMultiplier', id: 'blackfire-torch-blackfire', name: 'Blackfire',
+        description: 'Each enemy champion or monster affected by your Baleful Blaze grants you 4% '
+          + 'Ability Power.',
+        support: 'full',
+        // Measured 2026-09-26: W then Q showed 603 AP (450 x 1.34, adding to Rabadon's 30%) and Q
+        // hit for 555. One target only, so at most one 4% stack.
+        stat: 'ap', layer: 'total', amount: 0.04,
+        condition: { type: 'targetHasDot', effectId: 'blackfire-torch-baleful-blaze' },
+      },
+    ],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {

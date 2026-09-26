@@ -25,6 +25,12 @@ export const dotHandler: EffectHandler<DotEffect> = {
         if (ratioWarning) ctx.addDataWarning(ratioWarning)
         tickAmount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
       }
+      if (effect.targetMaxHpRatio !== undefined) {
+        const hpRatioResolved = resolveScalar(effect.targetMaxHpRatio, ctx.level)
+        const hpRatioWarning = scalarWarning(effect.name, 'targetMaxHpRatio', hpRatioResolved)
+        if (hpRatioWarning) ctx.addDataWarning(hpRatioWarning)
+        tickAmount += (ctx.opponentSheet.total.hp ?? 0) * hpRatioResolved.value
+      }
 
       const durationResolved = resolveScalar(effect.durationSeconds, ctx.level)
       const durationWarning = scalarWarning(effect.name, 'durationSeconds', durationResolved)

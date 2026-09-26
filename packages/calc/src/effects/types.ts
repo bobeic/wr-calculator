@@ -73,6 +73,8 @@ export interface CombatantRuntime {
   shieldHp: number
   cooldowns: Record<string, number>
   buffs: Record<string, RuntimeBuff>
+  /** When this combatant first dealt damage in the combo; unset until then. */
+  combatStartedAt?: number
 }
 
 export type AbilityKey = 'q' | 'w' | 'e' | 'r'

@@ -6,8 +6,9 @@ import type {
 } from './effects/types'
 import type { UnverifiedRuleId } from './rules'
 import type { ResistModifiers } from './mitigation'
+import type { StatSheet } from './resolve-stats'
 import type { UnsupportedEffectEntry } from './result-envelope'
-import { critMultiplier, cooldownWithHaste } from './rules'
+import { critMultiplier, cooldownWithHaste, totalAttackSpeed } from './rules'
 import { mitigateDamage, applyDamageReductionFractions, ZERO_RESIST_MODIFIERS } from './mitigation'
 import { resolveEffectHandler } from './effects/registry'
 import { resolveDamageComponent } from './damage-component'
@@ -46,7 +47,7 @@ function combatantEffects(combatant: Combatant): Effect[] {
 
 function evaluateCondition(
   effect: Effect, condition: Condition, self: Combatant, opponent: Combatant,
-  opponentRuntime: CombatantRuntime, extra?: ConditionExtra
+  opponentRuntime: CombatantRuntime, time: number, extra?: ConditionExtra
 ): boolean {
   switch (condition.type) {
     case 'targetHpBelow': {
@@ -71,13 +72,19 @@ function evaluateCondition(
       return extra?.sourceKind === condition.value
     case 'abilitySlot':
       return extra?.abilityKey === condition.value
+    case 'targetHasDot':
+      // Phase 1 only lets the attacker apply dots, so any active dot buff on the target is ours.
+      return Object.entries(opponentRuntime.buffs).some(([key, buff]) =>
+        (condition.effectId === undefined ? key.startsWith('dot:') : key === `dot:${condition.effectId}`)
+        && buff.expiresAt !== undefined && buff.expiresAt >= time
+      )
     case 'targetIsChampion':
       return opponent.kind === 'champion'
     case 'targetIsMonster':
       return opponent.kind === 'monster'
     case 'allOf':
       return condition.conditions.every(
-        (leaf) => evaluateCondition(effect, leaf, self, opponent, opponentRuntime, extra)
+        (leaf) => evaluateCondition(effect, leaf, self, opponent, opponentRuntime, time, extra)
       )
   }
 }
@@ -152,13 +159,41 @@ export function simulateCombo(
     return handler
   }
 
+  /**
+   * The attacker's sheet at the current moment: its resolved stats plus any combat-only stat
+   * contributions (e.g. Blackfire's AP while the target burns) whose condition holds right now.
+   */
+  function attackerSheetNow(): StatSheet {
+    const deferred = attacker.sheet.combatContributions
+    if (!deferred) return attacker.sheet
+    const base = { ...attacker.sheet.base }
+    const bonus = { ...attacker.sheet.bonus }
+    const total = { ...attacker.sheet.total }
+    for (const { effect, contributions } of deferred) {
+      if (!evaluateCondition(effect, effect.condition!, attacker, target, targetRuntime, time)) continue
+      trackSupport(effect)
+      for (const { stat, layer, amount } of contributions) {
+        const layerValues = layer === 'base' ? base : bonus
+        layerValues[stat] = (layerValues[stat] ?? 0) + amount
+        total[stat] = stat === 'attackSpeed'
+          ? totalAttackSpeed(base.attackSpeed ?? 0, bonus.attackSpeed ?? 0)
+          : (base[stat] ?? 0) + (bonus[stat] ?? 0)
+      }
+    }
+    return { ...attacker.sheet, base, bonus, total }
+  }
+
+  function sheetNow(combatant: Combatant): StatSheet {
+    return combatant === attacker ? attackerSheetNow() : combatant.sheet
+  }
+
   function buildCtx(
     self: Combatant, selfRuntime: CombatantRuntime, opponent: Combatant,
     opponentRuntime: CombatantRuntime
   ): HookContext {
     return {
       time, level: self.level, self: selfRuntime, opponent: opponentRuntime,
-      selfSheet: self.sheet, opponentSheet: opponent.sheet,
+      selfSheet: sheetNow(self), opponentSheet: sheetNow(opponent),
       selfKind: self.kind, opponentKind: opponent.kind, inputs: self.inputs, ignoreCooldowns,
       // Phase 1 has no target-initiated damage, so dealDamage always applies attacker -> target,
       // regardless of which side's ctx it was called from.
@@ -166,7 +201,7 @@ export function simulateCombo(
       addDataWarning: (message) => dataWarnings.push(message),
       addUnverifiedRule: (id) => unverifiedRuleIds.add(id),
       conditionMet: (effect, condition, extra) =>
-        evaluateCondition(effect, condition, self, opponent, opponentRuntime, extra),
+        evaluateCondition(effect, condition, self, opponent, opponentRuntime, time, extra),
       scheduleEvent: (atTime, run, key) => {
         scheduled.push({ time: atTime, run, key })
         scheduled.sort((a, b) => a.time - b.time)
@@ -234,12 +269,13 @@ export function simulateCombo(
       const resistBase = input.type === 'physical' ? target.sheet.total.armor ?? 0
         : input.type === 'magic' ? target.sheet.total.mr ?? 0 : 0
       const modifiers: ResistModifiers = { ...ZERO_RESIST_MODIFIERS }
+      const attackerTotal = attackerCtx.selfSheet.total
       if (input.type === 'physical') {
-        modifiers.flatPen += attacker.sheet.total.flatArmorPen ?? 0
-        modifiers.pctPen += attacker.sheet.total.pctArmorPen ?? 0
+        modifiers.flatPen += attackerTotal.flatArmorPen ?? 0
+        modifiers.pctPen += attackerTotal.pctArmorPen ?? 0
       } else if (input.type === 'magic') {
-        modifiers.flatPen += attacker.sheet.total.flatMagicPen ?? 0
-        modifiers.pctPen += attacker.sheet.total.pctMagicPen ?? 0
+        modifiers.flatPen += attackerTotal.flatMagicPen ?? 0
+        modifiers.pctPen += attackerTotal.pctMagicPen ?? 0
       }
       for (const effect of attackerEffectsList) {
         const handler = resolve(effect)
@@ -277,6 +313,8 @@ export function simulateCombo(
         targetHpAfter: targetRuntime.currentHp,
       }
       instances.push(instance)
+      // Set after the hit, so the hit that starts combat isn't itself amplified by combat ramps.
+      if (attackerRuntime.combatStartedAt === undefined) attackerRuntime.combatStartedAt = time
 
       if (!killed && targetRuntime.currentHp <= 0) {
         killed = true
@@ -341,18 +379,19 @@ export function simulateCombo(
       // interval only delays how soon the *next* swing can land, so it's added after, not before.
       flushScheduledEvents(time)
 
-      const critChance = attacker.sheet.total.critChance ?? 0
-      const bonusCritDamage = attacker.sheet.total.critDamage ?? 0
+      const attackerTotal = attackerSheetNow().total
+      const critChance = attackerTotal.critChance ?? 0
+      const bonusCritDamage = attackerTotal.critDamage ?? 0
       const critMult = critMultiplier(critChance, bonusCritDamage, critMode)
       unverifiedRuleIds.add('critDamageMultiplier')
 
       performDamage({
-        type: 'physical', amount: (attacker.sheet.total.ad ?? 0) * critMult,
+        type: 'physical', amount: (attackerTotal.ad ?? 0) * critMult,
         source: { kind: 'basicAttack', id: 'AA', name: 'Basic Attack' },
       })
       dispatchOnBasicAttack()
 
-      const interval = 1 / Math.max(attacker.sheet.total.attackSpeed ?? 1, 0.01)
+      const interval = 1 / Math.max(attackerSheetNow().total.attackSpeed ?? 1, 0.01)
       time += interval
     } else if (action === 'Q' || action === 'W' || action === 'E' || action === 'R') {
       if (!attacker.abilities) continue
@@ -371,7 +410,8 @@ export function simulateCombo(
       const hitInstances: DamageInstance[] = []
       for (const component of ability.damage) {
         const resolved = resolveDamageComponent(
-          component, attacker, target, targetRuntime.currentHp, attacker.level, ability.name, rank
+          component, { ...attacker, sheet: attackerSheetNow() }, target, targetRuntime.currentHp,
+          attacker.level, ability.name, rank
         )
         resolved.dataWarnings.forEach((warning) => dataWarnings.push(warning))
         hitInstances.push(performDamage({
@@ -383,9 +423,10 @@ export function simulateCombo(
       const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
       const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
       if (cooldownWarning) dataWarnings.push(cooldownWarning)
-      const ultimateHaste = abilityKey === 'r' ? attacker.sheet.total.ultimateHaste ?? 0 : 0
+      const attackerTotal = attackerSheetNow().total
+      const ultimateHaste = abilityKey === 'r' ? attackerTotal.ultimateHaste ?? 0 : 0
       const hastedCooldown = cooldownWithHaste(
-        cooldownResolved.value, (attacker.sheet.total.abilityHaste ?? 0) + ultimateHaste
+        cooldownResolved.value, (attackerTotal.abilityHaste ?? 0) + ultimateHaste
       )
       unverifiedRuleIds.add('abilityHasteFormula')
       attackerRuntime.cooldowns[abilityKey] = time + hastedCooldown

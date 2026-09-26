@@ -108,6 +108,14 @@ describe('on-hit-family effect kinds', () => {
     })
   })
 
+  it('accepts a dot tick based on the target\'s max HP', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'dot', damageType: 'magic', tickAmount: 0, tickIntervalSeconds: 0.5,
+      durationSeconds: 3, refresh: 'refresh', targetMaxHpRatio: 0.01,
+    })
+    expect(result).toMatchObject({ targetMaxHpRatio: 0.01 })
+  })
+
   it('defaults a dot effect to no ratios', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
@@ -129,6 +137,19 @@ describe('on-hit-family effect kinds', () => {
     expect(() => EffectSchema.parse({
       ...base, kind: 'damageWindowProc', targetMaxHpFraction: 0.25, windowSeconds: 0,
       delaySeconds: 2, damageType: 'magic', damage: 125, cooldownSeconds: 25,
+    })).toThrow()
+  })
+
+  it('parses a combatRampAmp effect', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 3,
+    })
+    expect(result.kind).toBe('combatRampAmp')
+  })
+
+  it('rejects a combatRampAmp with a non-positive stack interval', () => {
+    expect(() => EffectSchema.parse({
+      ...base, kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 0, maxStacks: 3,
     })).toThrow()
   })
 

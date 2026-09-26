@@ -21,6 +21,11 @@ describe('ItemSchema', () => {
     expect(result.id).toBe('long-sword')
   })
 
+  it('accepts an optional exclusiveGroup', () => {
+    const result = ItemSchema.parse({ ...validItem(), exclusiveGroup: 'percent-magic-pen' })
+    expect(result.exclusiveGroup).toBe('percent-magic-pen')
+  })
+
   it('allows null stat values for unverified data', () => {
     const item = validItem()
     item.stats = { ad: null } as unknown as typeof item.stats

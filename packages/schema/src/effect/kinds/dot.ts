@@ -13,6 +13,8 @@ export const DotEffectSchema = EffectBaseSchema.extend({
   /** Added to each tick: the attacker's stat times the ratio, read when the dot is applied. */
   ratios: z.array(z.object({ stat: StatKeySchema, value: NullableScalarSchema }).strict())
     .default([]),
+  /** Added to each tick: the target's max HP times this, read when the dot is applied. */
+  targetMaxHpRatio: NullableScalarSchema.optional(),
   /** A flat resist reduction on the target for as long as the dot is active. */
   shredWhileActive: z.object({
     resist: z.enum(['armor', 'mr']), amount: NullableScalarSchema,

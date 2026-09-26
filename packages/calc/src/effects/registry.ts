@@ -17,6 +17,7 @@ import { shieldHandler, healHandler } from './shield-heal'
 import { activeHandler } from './active'
 import { abilityHitProcHandler } from './ability-hit-proc'
 import { damageWindowProcHandler } from './damage-window-proc'
+import { combatRampAmpHandler } from './combat-ramp-amp'
 import { CUSTOM_HANDLERS } from '../custom/registry'
 
 /**
@@ -42,6 +43,7 @@ export const EFFECT_HANDLERS: Partial<Record<EffectKind, EffectHandler<any>>> = 
   active: activeHandler,
   abilityHitProc: abilityHitProcHandler,
   damageWindowProc: damageWindowProcHandler,
+  combatRampAmp: combatRampAmpHandler,
 }
 
 /** Looks up and calls the registered handler's contributeStats for an effect, if any. */

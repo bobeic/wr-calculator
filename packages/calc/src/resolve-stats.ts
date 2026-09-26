@@ -1,4 +1,4 @@
-import type { Champion, Build, Item, Rune, Effect, StatKey, NullableScalar } from '@wr-calc/schema'
+import type { Champion, Build, Item, Rune, Effect, StatKey, NullableScalar, Condition } from '@wr-calc/schema'
 import { STAT_KEYS } from '@wr-calc/schema'
 import {
   MAX_CHAMPION_LEVEL, ATTACK_SPEED_CAP, STAT_RESOLUTION_ORDER, statAtLevel, attackSpeedAtLevel,
@@ -18,6 +18,23 @@ export interface StatSheet {
   unsupportedEffects: UnsupportedEffectEntry[]
   dataWarnings: string[]
   unverifiedRules: UnverifiedRuleId[]
+  /**
+   * Stat contributions from effects whose condition is only known in combat (e.g. targetHasDot).
+   * They are sized here, at their stage, but applied by the combat simulation while it holds.
+   */
+  combatContributions?: CombatContribution[]
+}
+
+export interface CombatContribution {
+  effect: Effect
+  contributions: StatContribution[]
+}
+
+/** Whether a condition can only be evaluated during combat, not at stat resolution. */
+export function isCombatOnlyCondition(condition: Condition | undefined): boolean {
+  if (!condition) return false
+  if (condition.type === 'allOf') return condition.conditions.some((leaf) => leaf.type === 'targetHasDot')
+  return condition.type === 'targetHasDot'
 }
 
 export interface StatCatalog {
@@ -71,10 +88,15 @@ export function resolveStats(
     source: championSource, usedLevelRangeInterpolation: false,
   })
 
+  // While the multiplier stage runs, every multiplier reads the stats as they were before that
+  // stage, so % bonuses on one stat add together rather than compound (verified in game
+  // 2026-09-26: Rabadon's +30% and Blackfire's +4% gave 450 AP x 1.34).
+  let frozen: { base: typeof base; bonus: typeof bonus } | undefined
   const statSoFar = (stat: StatKey, layer: StatLayer | 'total'): number => {
-    if (layer === 'base') return base[stat] ?? 0
-    if (layer === 'bonus') return bonus[stat] ?? 0
-    return (base[stat] ?? 0) + (bonus[stat] ?? 0)
+    const source = frozen ?? { base, bonus }
+    if (layer === 'base') return source.base[stat] ?? 0
+    if (layer === 'bonus') return source.bonus[stat] ?? 0
+    return (source.base[stat] ?? 0) + (source.bonus[stat] ?? 0)
   }
 
   const itemIds = [
@@ -87,6 +109,18 @@ export function resolveStats(
     if (!item) throw new Error(`resolveStats: unknown item id '${id}' in build`)
     return item
   })
+  const holderByGroup = new Map<string, string>()
+  for (const item of items) {
+    if (!item.exclusiveGroup) continue
+    const holder = holderByGroup.get(item.exclusiveGroup)
+    if (holder) {
+      throw new Error(
+        `resolveStats: items '${holder}' and '${item.id}' can't be held together `
+        + `(both in exclusive group '${item.exclusiveGroup}')`
+      )
+    }
+    holderByGroup.set(item.exclusiveGroup, item.id)
+  }
   const runes = build.runes.map((id) => {
     const rune = catalog.runes.get(id)
     if (!rune) throw new Error(`resolveStats: unknown rune id '${id}' in build`)
@@ -110,10 +144,16 @@ export function resolveStats(
     ...runes.flatMap((rune) => rune.effects),
   ]
   const ctx: StatContext = { level: clampedLevel, inputs: build.inputs, statSoFar }
+  const combatContributions: CombatContribution[] = []
   for (const stage of STAT_RESOLUTION_ORDER) {
+    frozen = stage === 'multiplier' ? { base: { ...base }, bonus: { ...bonus } } : undefined
     for (const effect of effects) {
       if (stageOf(effect) !== stage) continue
       const contributions = contributeStats(effect, ctx)
+      if (isCombatOnlyCondition(effect.condition)) {
+        if (contributions.length > 0) combatContributions.push({ effect, contributions })
+        continue
+      }
       for (const contribution of contributions) record(contribution)
       if (contributions.length > 0 && effect.support !== 'full') {
         unsupportedEffects.push({
@@ -145,5 +185,6 @@ export function resolveStats(
   return {
     base, bonus, total, breakdown, unsupportedEffects, dataWarnings,
     unverifiedRules: [...unverifiedRules],
+    ...(combatContributions.length > 0 ? { combatContributions } : {}),
   }
 }

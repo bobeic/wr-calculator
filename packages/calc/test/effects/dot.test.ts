@@ -91,6 +91,23 @@ describe('dotHandler tick ratios', () => {
   })
 })
 
+describe('dotHandler target max HP ticks', () => {
+  it('adds targetMaxHpRatio times the target\'s max HP to every tick', () => {
+    let dealt = 0
+    const c = ctx({
+      opponentSheet: { ...sheet(), total: { hp: 10000 } },
+      scheduleEvent: (_atTime, run) => run(ctx({
+        dealDamage: (input) => {
+          dealt = input.amount
+          return { time: 0, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
+        },
+      })),
+    })
+    dotHandler.hooks!.onAbilityHit!({ ...effect, tickAmount: 0, targetMaxHpRatio: 0.01 }, c, 'q', [])
+    expect(dealt).toBe(100)
+  })
+})
+
 describe('dotHandler.modifyResist', () => {
   const shredding = { ...effect, shredWhileActive: { resist: 'mr' as const, amount: 10 } }
 
