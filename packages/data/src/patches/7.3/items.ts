@@ -158,6 +158,29 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'malignance', name: 'Malignance', tier: 'legendary',
+    cost: { total: 2700, combine: 700 }, recipe: ['blasting-wand', 'lost-chapter'],
+    // ultimateHaste 20: "Your ultimate abilities gain 20 Ability Haste" (Scorn).
+    stats: { ap: 90, mana: 500, abilityHaste: 15, ultimateHaste: 20 }, tags: ['magic'],
+    effects: [{
+      kind: 'dot', id: 'malignance-hatefog', name: 'Hatefog',
+      description: 'Damaging a champion with your ultimate burns the ground beneath them for 3s, '
+        + 'dealing magic damage equal to 60 plus 5% Ability Power per second and reducing their '
+        + 'Magic Resist by 10.',
+      support: 'partial',
+      // Measured in the 7.3 practice tool (2026-09-26): each tick dealt 70 against the 100 MR dummy,
+      // so the 10 MR reduction applies to the burn's own ticks (67 without it); Annie's R cooldown
+      // showed 44.4s (60 / 1.35), confirming the ultimate haste.
+      supportNotes: 'The target is assumed to stay in the burn for all 3 seconds. The burn radius '
+        + 'is not modeled.',
+      damageType: 'magic', tickAmount: 60, ratios: [{ stat: 'ap', value: 0.05 }],
+      tickIntervalSeconds: 1, durationSeconds: 3, refresh: 'refresh',
+      condition: { type: 'abilitySlot', value: 'r' },
+      shredWhileActive: { resist: 'mr', amount: 10 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'black-cleaver', name: 'Black Cleaver', tier: 'legendary',
     cost: { total: 3000, combine: 500 }, recipe: ['long-sword', 'phage', 'kindlegem'],
     stats: { ad: 40, hp: 400, abilityHaste: 20 }, tags: ['physical'],

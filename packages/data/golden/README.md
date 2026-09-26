@@ -19,6 +19,10 @@ Horizon Focus cases (2026-09-26): "horizon build" is the clean build plus Horizo
 `hypershot` cases set the `horizon-focus-hypershot` input; in game, Q was cast from max range to
 trigger Hypershot, and both that Q and the W/R after it dealt 1.1x.
 
+Malignance cases (2026-09-26): "malignance build" is the clean build plus Malignance. The
+`r-with-burn` case is R followed by the 3-second burn: 515 + 3 ticks of 70 (the burn's 10 MR
+reduction applies to its own ticks).
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.
