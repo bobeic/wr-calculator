@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const STAT_KEYS = [
   'hp', 'hpRegen', 'mana', 'manaRegen', 'ad', 'ap', 'armor', 'mr',
-  'attackSpeed', 'critChance', 'critDamage', 'abilityHaste',
+  'attackSpeed', 'critChance', 'critDamage', 'abilityHaste', 'ultimateHaste',
   'moveSpeed', 'moveSpeedPct', 'flatArmorPen', 'pctArmorPen',
   'flatMagicPen', 'pctMagicPen', 'lifesteal', 'physicalVamp',
   'omnivamp', 'healShieldPower', 'tenacity',

@@ -381,8 +381,9 @@ export function simulateCombo(
       const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
       const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
       if (cooldownWarning) dataWarnings.push(cooldownWarning)
+      const ultimateHaste = abilityKey === 'r' ? attacker.sheet.total.ultimateHaste ?? 0 : 0
       const hastedCooldown = cooldownWithHaste(
-        cooldownResolved.value, attacker.sheet.total.abilityHaste ?? 0
+        cooldownResolved.value, (attacker.sheet.total.abilityHaste ?? 0) + ultimateHaste
       )
       unverifiedRuleIds.add('abilityHasteFormula')
       attackerRuntime.cooldowns[abilityKey] = time + hastedCooldown

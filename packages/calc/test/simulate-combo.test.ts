@@ -203,6 +203,28 @@ describe('simulateCombo', () => {
     expect(recast.dataWarnings.filter((warning) => warning.includes('byRank'))).toEqual([])
   })
 
+  it('adds ultimateHaste to ability haste for the ultimate\'s cooldown only', () => {
+    const item: Item = {
+      ...baseItem('test-haste-item', {
+        id: 'test-haste-noop', name: 'No-op', description: '', support: 'full',
+        kind: 'damageAmp', amount: 0, condition: { type: 'targetIsMonster' },
+      }),
+      stats: { abilityHaste: 15, ultimateHaste: 20 },
+    }
+    const catalog = { items: new Map([['test-haste-item', item]]), runes: new Map() }
+    const champion = championWithAbility()
+    champion.abilities.r.damage = [{ type: 'true', base: 10, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(champion, 1, emptyBuild({ items: ['test-haste-item'] }), catalog)
+    const target = combatantFromDummy(dummy())
+
+    // R: 100 / (1 + 35/100) = 74.07s.
+    expect(simulateCombo(attacker, target, ['R', 'wait:74', 'R'], { critMode: 'never' }).instances).toHaveLength(1)
+    expect(simulateCombo(attacker, target, ['R', 'wait:74.1', 'R'], { critMode: 'never' }).instances).toHaveLength(2)
+    // Q uses only the 15 ability haste: 8 / 1.15 = 6.96s (6.5 would pass if ultimateHaste applied).
+    expect(simulateCombo(attacker, target, ['Q', 'wait:6.5', 'Q'], { critMode: 'never' }).instances).toHaveLength(1)
+    expect(simulateCombo(attacker, target, ['Q', 'wait:7', 'Q'], { critMode: 'never' }).instances).toHaveLength(2)
+  })
+
   it('resolves byRank ability damage at the ability\'s maxRank', () => {
     const champion = championWithAbility()
     champion.abilities.q.damage = [
