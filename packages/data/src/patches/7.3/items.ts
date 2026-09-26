@@ -181,6 +181,24 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'stormsurge', name: 'Stormsurge', tier: 'legendary',
+    cost: { total: 2800, combine: 750 }, recipe: ['aether-wisp', 'hextech-alternator'],
+    stats: { ap: 90, moveSpeedPct: 0.06, flatMagicPen: 15 }, tags: ['magic'],
+    effects: [{
+      kind: 'damageWindowProc', id: 'stormsurge-squall', name: 'Stormraider / Squall',
+      description: "When you deal damage equal to 25% of a champion's max Health within 2.5 seconds, "
+        + 'inflict Squall on them and gain 25% Movement Speed for 2.5 seconds (25-second cooldown). '
+        + 'Squall: after 2 seconds, deal 125 + 10% Ability Power magic damage.',
+      support: 'partial',
+      supportNotes: 'Not yet triggered in game (Q+W+R on the 10,000 HP dummy fell short of 2,500). '
+        + 'Counts damage after resists. The movement speed and the "target dies first" splash '
+        + 'are not modeled.',
+      targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2, damageType: 'magic',
+      damage: 125, ratios: [{ stat: 'ap', value: 0.1 }], cooldownSeconds: 25,
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'black-cleaver', name: 'Black Cleaver', tier: 'legendary',
     cost: { total: 3000, combine: 500 }, recipe: ['long-sword', 'phage', 'kindlegem'],
     stats: { ad: 40, hp: 400, abilityHaste: 20 }, tags: ['physical'],

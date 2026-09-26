@@ -8,6 +8,7 @@ const STARTER_IDS = [
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
+  'stormsurge',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -21,7 +22,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 19 starter items', () => {
+  it('has exactly the 20 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -107,6 +108,17 @@ describe('STARTER_ITEMS', () => {
       kind: 'dot', damageType: 'magic', tickAmount: 60, ratios: [{ stat: 'ap', value: 0.05 }],
       tickIntervalSeconds: 1, durationSeconds: 3, condition: { type: 'abilitySlot', value: 'r' },
       shredWhileActive: { resist: 'mr', amount: 10 }, support: 'partial',
+    })
+  })
+
+  it("models Stormsurge's Squall as a damage-window proc", () => {
+    const stormsurge = STARTER_ITEMS.find((item) => item.id === 'stormsurge')!
+    expect(stormsurge.stats).toEqual({ ap: 90, moveSpeedPct: 0.06, flatMagicPen: 15 })
+    expect(stormsurge.effects).toHaveLength(1)
+    expect(stormsurge.effects[0]).toMatchObject({
+      kind: 'damageWindowProc', targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2,
+      damageType: 'magic', damage: 125, ratios: [{ stat: 'ap', value: 0.1 }], cooldownSeconds: 25,
+      support: 'partial',
     })
   })
 
