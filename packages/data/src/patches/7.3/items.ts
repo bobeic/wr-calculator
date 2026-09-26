@@ -98,10 +98,13 @@ export const STARTER_ITEMS: Item[] = [
         + 'by Echo, the primary target takes an additional 20 + 1.2% Ability Power magic damage. '
         + '(9 second cooldown)',
       support: 'partial',
-      supportNotes: 'Single target only: modeled as the primary target with 5 fewer targets hit '
-        + '(75 + 5 × 20 = 175, 8% + 5 × 1.2% = 14% AP). Empowered basic attacks do not trigger it. '
-        + 'The 9-second cooldown is assumed not to be reduced by ability haste.',
-      damageType: 'magic', damage: 175, ratios: [{ stat: 'ap', value: 0.14 }], cooldownSeconds: 9,
+      // Measured in the 7.3 practice tool (2026-09-26): Echo counts "fewer targets" out of 5 total
+      // (main target + up to 4 others), not the 5 nearby the text implies; 1, 2 and 3 dummies gave
+      // 4, 3 and 2 bonus instances on the main target.
+      supportNotes: 'Single target only: modeled as the main target with 4 fewer targets hit '
+        + '(75 + 4 × 20 = 155, 8% + 4 × 1.2% = 12.8% AP). Empowered basic attacks do not trigger '
+        + 'it. The 9-second cooldown is assumed not to be reduced by ability haste.',
+      damageType: 'magic', damage: 155, ratios: [{ stat: 'ap', value: 0.128 }], cooldownSeconds: 9,
       startOnCooldownInputId: 'ludens-echo-on-cooldown',
       inputs: [{
         type: 'boolean', id: 'ludens-echo-on-cooldown',

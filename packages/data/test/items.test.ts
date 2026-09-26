@@ -63,8 +63,8 @@ describe('STARTER_ITEMS', () => {
     expect(ludens.effects).toHaveLength(1)
     const echo = ludens.effects[0]
     expect(echo).toMatchObject({
-      kind: 'abilityHitProc', damageType: 'magic', damage: 175,
-      ratios: [{ stat: 'ap', value: 0.14 }], cooldownSeconds: 9,
+      kind: 'abilityHitProc', damageType: 'magic', damage: 155,
+      ratios: [{ stat: 'ap', value: 0.128 }], cooldownSeconds: 9,
       startOnCooldownInputId: 'ludens-echo-on-cooldown', support: 'partial',
     })
     expect(echo.inputs).toEqual([{
