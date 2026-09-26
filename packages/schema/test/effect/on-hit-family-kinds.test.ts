@@ -108,6 +108,14 @@ describe('on-hit-family effect kinds', () => {
     })
   })
 
+  it('accepts a dot tick based on the target\'s max HP', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'dot', damageType: 'magic', tickAmount: 0, tickIntervalSeconds: 0.5,
+      durationSeconds: 3, refresh: 'refresh', targetMaxHpRatio: 0.01,
+    })
+    expect(result).toMatchObject({ targetMaxHpRatio: 0.01 })
+  })
+
   it('defaults a dot effect to no ratios', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
