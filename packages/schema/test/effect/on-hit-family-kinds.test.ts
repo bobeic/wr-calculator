@@ -140,6 +140,19 @@ describe('on-hit-family effect kinds', () => {
     })).toThrow()
   })
 
+  it('parses a combatRampAmp effect', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 3,
+    })
+    expect(result.kind).toBe('combatRampAmp')
+  })
+
+  it('rejects a combatRampAmp with a non-positive stack interval', () => {
+    expect(() => EffectSchema.parse({
+      ...base, kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 0, maxStacks: 3,
+    })).toThrow()
+  })
+
   it('rejects a dot effect with an invalid refresh rule', () => {
     expect(() =>
       EffectSchema.parse({

@@ -277,6 +277,8 @@ export function simulateCombo(
         targetHpAfter: targetRuntime.currentHp,
       }
       instances.push(instance)
+      // Set after the hit, so the hit that starts combat isn't itself amplified by combat ramps.
+      if (attackerRuntime.combatStartedAt === undefined) attackerRuntime.combatStartedAt = time
 
       if (!killed && targetRuntime.currentHp <= 0) {
         killed = true
