@@ -14,6 +14,8 @@ export const TargetDummySchema = z.object({
   hp: z.number(),
   armor: z.number(),
   mr: z.number(),
+  /** Fraction of max HP the dummy starts the combo at (defaults to 1, full HP). */
+  startHpFraction: z.number().gt(0).max(1).optional(),
   effects: z.array(EffectSchema).optional(),
 }).strict()
 

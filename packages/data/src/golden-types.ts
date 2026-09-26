@@ -7,7 +7,10 @@ export const GoldenScenarioSchema = z.object({
   championId: z.string(),
   level: z.number(),
   build: BuildSchema,
-  target: z.object({ hp: z.number(), armor: z.number(), mr: z.number() }).strict(),
+  target: z.object({
+    hp: z.number(), armor: z.number(), mr: z.number(),
+    startHpFraction: z.number().gt(0).max(1).optional(),
+  }).strict(),
   combo: z.array(z.string().regex(COMBO_ACTION_PATTERN)),
 }).strict()
 export type GoldenScenario = z.infer<typeof GoldenScenarioSchema>

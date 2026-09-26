@@ -73,6 +73,10 @@ function evaluateCondition(
       return opponent.kind === 'champion'
     case 'targetIsMonster':
       return opponent.kind === 'monster'
+    case 'allOf':
+      return condition.conditions.every(
+        (leaf) => evaluateCondition(effect, leaf, self, opponent, opponentRuntime, extra)
+      )
   }
 }
 
@@ -108,10 +112,10 @@ export function simulateCombo(
   const customHandlers = options.customHandlers ?? {}
 
   const attackerRuntime: CombatantRuntime = {
-    currentHp: attacker.sheet.total.hp ?? 0, shieldHp: 0, cooldowns: {}, buffs: {},
+    currentHp: (attacker.sheet.total.hp ?? 0) * attacker.startHpFraction, shieldHp: 0, cooldowns: {}, buffs: {},
   }
   const targetRuntime: CombatantRuntime = {
-    currentHp: target.sheet.total.hp ?? 0, shieldHp: 0, cooldowns: {}, buffs: {},
+    currentHp: (target.sheet.total.hp ?? 0) * target.startHpFraction, shieldHp: 0, cooldowns: {}, buffs: {},
   }
   const attackerEffectsList = combatantEffects(attacker)
   const targetEffectsList = combatantEffects(target)

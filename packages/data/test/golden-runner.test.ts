@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { combatantFromChampion, combatantFromDummy, simulateCombo } from '@wr-calc/calc'
 import type { ComboAction } from '@wr-calc/calc'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { runGoldenCase } from '../src/golden-runner'
@@ -54,6 +54,16 @@ describe('runGoldenCase', () => {
     expect(result.failures[0]).toContain('totalDamage')
   })
 
+  it('starts the target at the scenario\'s startHpFraction', () => {
+    // At 1% of 1000 hp, Nunu's level-1 AA kills; from full hp it would not.
+    const goldenCase: GoldenCase = {
+      scenario: { ...scenario, target: { ...scenario.target, startHpFraction: 0.01 } },
+      expected: { timeToKill: 0 }, tolerance: 0.01, patch: '7.3', source: 'practice-tool',
+    }
+    const result = runGoldenCase(goldenCase, champions, PATCH_7_3_CATALOG)
+    expect(result.failures).toEqual([])
+  })
+
   it('fails with a clear message for an unknown championId', () => {
     const goldenCase: GoldenCase = {
       scenario: { ...scenario, championId: 'does-not-exist' }, expected: {}, tolerance: 0.01,
@@ -83,6 +93,20 @@ describe('loadGoldenCases', () => {
       expect(loadGoldenCases(emptyDir)).toEqual([])
     } finally {
       rmSync(emptyDir, { recursive: true })
+    }
+  })
+
+  it('loads a case whose target starts below full hp', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'golden-start-hp-'))
+    try {
+      const goldenCase: GoldenCase = {
+        scenario: { ...scenario, target: { ...scenario.target, startHpFraction: 0.3 } },
+        expected: {}, tolerance: 0.01, patch: '7.3', source: 'practice-tool',
+      }
+      writeFileSync(join(dir, 'low-hp.json'), JSON.stringify(goldenCase))
+      expect(loadGoldenCases(dir)[0].case.scenario.target.startHpFraction).toBe(0.3)
+    } finally {
+      rmSync(dir, { recursive: true })
     }
   })
 

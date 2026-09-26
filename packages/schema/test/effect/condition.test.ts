@@ -30,4 +30,34 @@ describe('ConditionSchema', () => {
       ConditionSchema.parse({ type: 'targetHpBelow', threshold: 0.3, madeUpField: true })
     ).toThrow()
   })
+
+  it('accepts an allOf condition combining leaf conditions', () => {
+    const result = ConditionSchema.parse({
+      type: 'allOf',
+      conditions: [
+        { type: 'targetHpBelow', threshold: 0.4 },
+        { type: 'sourceKind', value: 'ability' },
+      ],
+    })
+    expect(result.type).toBe('allOf')
+  })
+
+  it('rejects an allOf with fewer than two conditions', () => {
+    expect(() => ConditionSchema.parse({
+      type: 'allOf', conditions: [{ type: 'targetHpBelow', threshold: 0.4 }],
+    })).toThrow()
+  })
+
+  it('rejects a nested allOf', () => {
+    expect(() => ConditionSchema.parse({
+      type: 'allOf',
+      conditions: [
+        { type: 'targetIsChampion' },
+        {
+          type: 'allOf',
+          conditions: [{ type: 'targetIsChampion' }, { type: 'targetIsMonster' }],
+        },
+      ],
+    })).toThrow()
+  })
 })
