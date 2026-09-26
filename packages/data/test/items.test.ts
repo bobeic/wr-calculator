@@ -8,7 +8,7 @@ const STARTER_IDS = [
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
-  'stormsurge',
+  'stormsurge', 'blackfire-torch', 'cryptbloom',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -22,7 +22,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 20 starter items', () => {
+  it('has exactly the 22 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -120,6 +120,39 @@ describe('STARTER_ITEMS', () => {
       damageType: 'magic', damage: 125, ratios: [{ stat: 'ap', value: 0.1 }], cooldownSeconds: 25,
       support: 'partial',
     })
+  })
+
+  it("models Blackfire Torch's 0.5s burn and its +4% AP while the target burns", () => {
+    const torch = STARTER_ITEMS.find((item) => item.id === 'blackfire-torch')!
+    expect(torch.stats).toEqual({ ap: 80, mana: 500, abilityHaste: 20 })
+    expect(torch.effects).toHaveLength(2)
+    expect(torch.effects[0]).toMatchObject({
+      kind: 'dot', damageType: 'magic', tickAmount: 10, ratios: [{ stat: 'ap', value: 0.01 }],
+      tickIntervalSeconds: 0.5, durationSeconds: 3, refresh: 'refresh',
+    })
+    expect(torch.effects[1]).toMatchObject({
+      kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.04,
+      condition: { type: 'targetHasDot', effectId: 'blackfire-torch-baleful-blaze' },
+    })
+  })
+
+  it("models Liandry's Torment's max-HP burn and Madness", () => {
+    const liandrys = STARTER_ITEMS.find((item) => item.id === 'liandrys-torment')!
+    expect(liandrys.effects).toHaveLength(2)
+    expect(liandrys.effects[0]).toMatchObject({
+      kind: 'dot', damageType: 'magic', tickAmount: 0, targetMaxHpRatio: 0.01,
+      tickIntervalSeconds: 0.5, durationSeconds: 3, refresh: 'refresh',
+    })
+    expect(liandrys.effects[1]).toMatchObject({
+      kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 3,
+    })
+  })
+
+  it("can't hold Cryptbloom and Void Staff together", () => {
+    const cryptbloom = STARTER_ITEMS.find((item) => item.id === 'cryptbloom')!
+    const voidStaff = STARTER_ITEMS.find((item) => item.id === 'void-staff')!
+    expect(cryptbloom.exclusiveGroup).toBeDefined()
+    expect(cryptbloom.exclusiveGroup).toBe(voidStaff.exclusiveGroup)
   })
 
   it('declares the Force of Nature max-stacks input once, shared by both Steadfast effects', () => {
