@@ -15,6 +15,7 @@ import { DamageReductionEffectSchema } from './kinds/damage-reduction'
 import { ShieldEffectSchema } from './kinds/shield'
 import { HealEffectSchema } from './kinds/heal'
 import { ActiveEffectSchema } from './kinds/active'
+import { AbilityHitProcEffectSchema } from './kinds/ability-hit-proc'
 import { CustomEffectSchema } from './kinds/custom'
 
 export const EffectSchema = z.discriminatedUnion('kind', [
@@ -34,6 +35,7 @@ export const EffectSchema = z.discriminatedUnion('kind', [
   ShieldEffectSchema,
   HealEffectSchema,
   ActiveEffectSchema,
+  AbilityHitProcEffectSchema,
   CustomEffectSchema,
 ])
 export type Effect = z.infer<typeof EffectSchema>
@@ -55,6 +57,7 @@ export * from './kinds/damage-reduction'
 export * from './kinds/shield'
 export * from './kinds/heal'
 export * from './kinds/active'
+export * from './kinds/ability-hit-proc'
 export * from './kinds/custom'
 export * from './condition'
 export * from './kinds/common'

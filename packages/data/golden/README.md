@@ -8,8 +8,9 @@ Current cases (7.3 practice tool, 2026-09-25): Annie at level 15, one ability pe
 practice dummy (100 armor / 100 MR; its HP is unknown, so `hp` is a placeholder and no
 `timeToKill` is recorded). "clean build" is Spellslinger's Shoes + Rabadon's Deathcap + Void Staff +
 Zhonya's Hourglass, which have no on-hit damage passives. "full build" adds Luden's Echo and
-Infinity Orb; those hits were recorded with Luden's passive on cooldown and the dummy above
-Infinity Orb's low-HP threshold, so neither passive applies.
+Infinity Orb; those hits were recorded with Luden's passive on cooldown (the
+`ludens-echo-on-cooldown` build input) and the dummy above Infinity Orb's low-HP threshold, so
+neither passive applies.
 
 ## Format
 

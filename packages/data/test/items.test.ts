@@ -7,6 +7,7 @@ const STARTER_IDS = [
   'long-sword', 'bf-sword', 'blasting-wand', 'rabadons-deathcap', 'blade-of-the-ruined-king',
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
+  'ludens-echo',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -20,7 +21,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 15 starter items', () => {
+  it('has exactly the 16 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -55,6 +56,21 @@ describe('STARTER_ITEMS', () => {
     const sunder = blackCleaver.effects.find((effect) => effect.id === 'black-cleaver-carve')!
     expect(sunder.condition).toEqual({ type: 'damageType', value: 'physical' })
     expect(sunder.support).toBe('partial')
+  })
+
+  it("models Luden's Echo as a single-target ability-hit proc that can start on cooldown", () => {
+    const ludens = STARTER_ITEMS.find((item) => item.id === 'ludens-echo')!
+    expect(ludens.effects).toHaveLength(1)
+    const echo = ludens.effects[0]
+    expect(echo).toMatchObject({
+      kind: 'abilityHitProc', damageType: 'magic', damage: 155,
+      ratios: [{ stat: 'ap', value: 0.128 }], cooldownSeconds: 9,
+      startOnCooldownInputId: 'ludens-echo-on-cooldown', support: 'partial',
+    })
+    expect(echo.inputs).toEqual([{
+      type: 'boolean', id: 'ludens-echo-on-cooldown',
+      label: "Luden's Echo on cooldown at combo start", default: false,
+    }])
   })
 
   it('declares the Force of Nature max-stacks input once, shared by both Steadfast effects', () => {

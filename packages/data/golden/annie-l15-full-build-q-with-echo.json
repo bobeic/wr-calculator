@@ -12,9 +12,7 @@
       ],
       "boots": "spellslingers-shoes",
       "runes": [],
-      "inputs": {
-        "ludens-echo-on-cooldown": true
-      }
+      "inputs": {}
     },
     "target": {
       "hp": 10000,
@@ -22,11 +20,11 @@
       "mr": 100
     },
     "combo": [
-      "W"
+      "Q"
     ]
   },
   "expected": {
-    "totalDamage": 654
+    "totalDamage": 944
   },
   "tolerance": 0.01,
   "patch": "7.3",

@@ -88,6 +88,32 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'ludens-echo', name: "Luden's Echo", tier: 'legendary',
+    cost: { total: 2800, combine: 500 }, recipe: ['lost-chapter', 'hextech-alternator'],
+    stats: { ap: 100, mana: 500, abilityHaste: 10 }, tags: ['magic'],
+    effects: [{
+      kind: 'abilityHitProc', id: 'ludens-echo-echo', name: 'Echo',
+      description: 'Your next damaging ability or empowered basic attack deals 75 + 8% Ability Power '
+        + 'magic damage to the primary target and up to 5 nearby enemies. For each fewer target hit '
+        + 'by Echo, the primary target takes an additional 20 + 1.2% Ability Power magic damage. '
+        + '(9 second cooldown)',
+      support: 'partial',
+      // Measured in the 7.3 practice tool (2026-09-26): Echo counts "fewer targets" out of 5 total
+      // (main target + up to 4 others), not the 5 nearby the text implies; 1, 2 and 3 dummies gave
+      // 4, 3 and 2 bonus instances on the main target.
+      supportNotes: 'Single target only: modeled as the main target with 4 fewer targets hit '
+        + '(75 + 4 × 20 = 155, 8% + 4 × 1.2% = 12.8% AP). Empowered basic attacks do not trigger '
+        + 'it. The 9-second cooldown is assumed not to be reduced by ability haste.',
+      damageType: 'magic', damage: 155, ratios: [{ stat: 'ap', value: 0.128 }], cooldownSeconds: 9,
+      startOnCooldownInputId: 'ludens-echo-on-cooldown',
+      inputs: [{
+        type: 'boolean', id: 'ludens-echo-on-cooldown',
+        label: "Luden's Echo on cooldown at combo start", default: false,
+      }],
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'black-cleaver', name: 'Black Cleaver', tier: 'legendary',
     cost: { total: 3000, combine: 500 }, recipe: ['long-sword', 'phage', 'kindlegem'],
     stats: { ad: 40, hp: 400, abilityHaste: 20 }, tags: ['physical'],
