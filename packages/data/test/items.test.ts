@@ -7,7 +7,7 @@ const STARTER_IDS = [
   'long-sword', 'bf-sword', 'blasting-wand', 'rabadons-deathcap', 'blade-of-the-ruined-king',
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
-  'ludens-echo',
+  'ludens-echo', 'infinity-orb',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -21,7 +21,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 16 starter items', () => {
+  it('has exactly the 17 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -71,6 +71,19 @@ describe('STARTER_ITEMS', () => {
       type: 'boolean', id: 'ludens-echo-on-cooldown',
       label: "Luden's Echo on cooldown at combo start", default: false,
     }])
+  })
+
+  it("models Infinity Orb's Inevitable Demise as +20% ability damage below 40% target HP", () => {
+    const orb = STARTER_ITEMS.find((item) => item.id === 'infinity-orb')!
+    expect(orb.stats).toEqual({ ap: 110, flatMagicPen: 15 })
+    expect(orb.effects).toHaveLength(1)
+    expect(orb.effects[0]).toMatchObject({
+      kind: 'damageAmp', amount: 0.2, support: 'partial',
+      condition: {
+        type: 'allOf',
+        conditions: [{ type: 'targetHpBelow', threshold: 0.4 }, { type: 'sourceKind', value: 'ability' }],
+      },
+    })
   })
 
   it('declares the Force of Nature max-stacks input once, shared by both Steadfast effects', () => {

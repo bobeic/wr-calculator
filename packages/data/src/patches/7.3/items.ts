@@ -114,6 +114,27 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'infinity-orb', name: 'Infinity Orb', tier: 'legendary',
+    cost: { total: 3100, combine: 600 }, recipe: ['needlessly-large-rod', 'hextech-alternator'],
+    stats: { ap: 110, flatMagicPen: 15 }, tags: ['magic'],
+    effects: [{
+      kind: 'damageAmp', id: 'infinity-orb-inevitable-demise', name: 'Inevitable Demise',
+      description: 'Abilities and empowered attacks Critically Strike for 20% bonus damage against '
+        + 'enemies below 40% Health.',
+      support: 'partial',
+      // Measured in the 7.3 practice tool (2026-09-26): Annie's Q, W and R dealt exactly 1.2x below
+      // 40% HP, while Luden's Echo on the same Q was not amplified (1090 = 879 Q + 211 Echo).
+      supportNotes: 'Empowered basic attacks are not amplified. Luden\'s Echo is correctly excluded '
+        + '(verified in game). The 40% threshold is checked against the target\'s HP before each hit.',
+      amount: 0.2,
+      condition: {
+        type: 'allOf',
+        conditions: [{ type: 'targetHpBelow', threshold: 0.4 }, { type: 'sourceKind', value: 'ability' }],
+      },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'black-cleaver', name: 'Black Cleaver', tier: 'legendary',
     cost: { total: 3000, combine: 500 }, recipe: ['long-sword', 'phage', 'kindlegem'],
     stats: { ad: 40, hp: 400, abilityHaste: 20 }, tags: ['physical'],
