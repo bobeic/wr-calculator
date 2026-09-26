@@ -382,6 +382,23 @@ describe('simulateCombo', () => {
     expect(dotTicks(['R', 'wait:3'])).toHaveLength(3)
   })
 
+  it('fires a damageWindowProc\'s delayed hit once combo damage crosses the threshold', () => {
+    const item = baseItem('test-window-item', {
+      id: 'test-window-passive', name: 'Test Window', description: '', support: 'full',
+      kind: 'damageWindowProc', targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2,
+      damageType: 'true', damage: 40, ratios: [], cooldownSeconds: 25,
+    })
+    const items = new Map([['test-window-item', item]])
+    const champion = championWithAbility()
+    champion.abilities.q.damage = [{ type: 'true', base: 300, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild({ items: ['test-window-item'] }), { items, runes: new Map() }
+    )
+    const result = simulateCombo(attacker, combatantFromDummy(dummy({ hp: 1000 })), ['Q', 'wait:2'], { critMode: 'never' })
+    const procs = result.instances.filter((i) => i.source.id === 'test-window-passive')
+    expect(procs.map((i) => [i.time, i.mitigated])).toEqual([[2, 40]])
+  })
+
   it('resets DoT ticks on refresh instead of stacking a second tick train', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',

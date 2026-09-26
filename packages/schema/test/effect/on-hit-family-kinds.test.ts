@@ -116,6 +116,22 @@ describe('on-hit-family effect kinds', () => {
     expect(result).toMatchObject({ ratios: [] })
   })
 
+  it('parses a damageWindowProc effect', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'damageWindowProc', targetMaxHpFraction: 0.25, windowSeconds: 2.5,
+      delaySeconds: 2, damageType: 'magic', damage: 125, ratios: [{ stat: 'ap', value: 0.1 }],
+      cooldownSeconds: 25,
+    })
+    expect(result.kind).toBe('damageWindowProc')
+  })
+
+  it('rejects a damageWindowProc with a non-positive window', () => {
+    expect(() => EffectSchema.parse({
+      ...base, kind: 'damageWindowProc', targetMaxHpFraction: 0.25, windowSeconds: 0,
+      delaySeconds: 2, damageType: 'magic', damage: 125, cooldownSeconds: 25,
+    })).toThrow()
+  })
+
   it('rejects a dot effect with an invalid refresh rule', () => {
     expect(() =>
       EffectSchema.parse({
