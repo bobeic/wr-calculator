@@ -456,6 +456,34 @@ describe('simulateCombo', () => {
     expect(qHits).toEqual([100, 150, 100])
   })
 
+  it('ignores other dots when a targetHasDot condition names a specific dot effect', () => {
+    const item: Item = {
+      ...baseItem('test-torch', {
+        id: 'other-burn', name: 'Other Burn', description: '', support: 'full',
+        kind: 'dot', damageType: 'true', tickAmount: 0, tickIntervalSeconds: 0.5,
+        durationSeconds: 3, refresh: 'refresh', ratios: [],
+      }),
+      stats: { ap: 100 },
+    }
+    item.effects.push({
+      id: 'test-torch-ap', name: 'Test Torch AP', description: '', support: 'full',
+      kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.5,
+      condition: { type: 'targetHasDot', effectId: 'torch-burn' },
+    })
+    const items = new Map([['test-torch', item]])
+    const champion = championWithAbility()
+    champion.abilities.q.damage = [{ type: 'true', base: 0, ratios: [{ stat: 'ap', value: 1 }], tags: [] }]
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild({ items: ['test-torch'] }), { items, runes: new Map() }
+    )
+    const result = simulateCombo(
+      attacker, combatantFromDummy(dummy({ hp: 10000 })), ['Q', 'Q', 'wait:3'],
+      { critMode: 'never', ignoreCooldowns: true }
+    )
+    const qHits = result.instances.filter((i) => i.source.id === 'q').map((i) => i.mitigated)
+    expect(qHits).toEqual([100, 100])
+  })
+
   it('resets DoT ticks on refresh instead of stacking a second tick train', () => {
     const item = baseItem('test-dot-item', {
       id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',

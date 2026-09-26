@@ -74,8 +74,9 @@ function evaluateCondition(
       return extra?.abilityKey === condition.value
     case 'targetHasDot':
       // Phase 1 only lets the attacker apply dots, so any active dot buff on the target is ours.
-      return Object.entries(opponentRuntime.buffs).some(
-        ([key, buff]) => key.startsWith('dot:') && buff.expiresAt !== undefined && buff.expiresAt >= time
+      return Object.entries(opponentRuntime.buffs).some(([key, buff]) =>
+        (condition.effectId === undefined ? key.startsWith('dot:') : key === `dot:${condition.effectId}`)
+        && buff.expiresAt !== undefined && buff.expiresAt >= time
       )
     case 'targetIsChampion':
       return opponent.kind === 'champion'
