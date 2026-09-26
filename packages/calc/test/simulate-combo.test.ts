@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { simulateCombo } from '../src/simulate-combo'
+import type { ComboAction } from '../src/simulate-combo'
 import { combatantFromChampion, combatantFromDummy } from '../src/combatant'
 import type { Champion, Item, Build, Target } from '@wr-calc/schema'
 
@@ -360,6 +361,25 @@ describe('simulateCombo', () => {
       attacker, combatantFromDummy(dummy({ hp: 2000 })), ['AA', 'AA', 'AA', 'Q'], { critMode: 'never' }
     )
     expect(lowHp.instances.map((i) => i.mitigated)).toEqual([600, 600, 600, 200])
+  })
+
+  it('triggers an abilitySlot-conditioned dot only from that ability', () => {
+    const item = baseItem('test-dot-item', {
+      id: 'test-dot-passive', name: 'Test DoT', description: '', support: 'full',
+      kind: 'dot', damageType: 'magic', tickAmount: 10, tickIntervalSeconds: 1,
+      durationSeconds: 3, refresh: 'refresh', condition: { type: 'abilitySlot', value: 'r' },
+    })
+    const items = new Map([['test-dot-item', item]])
+    const champion = championWithAbility()
+    champion.abilities.r.damage = [{ type: 'magic', base: 100, ratios: [], tags: [] }]
+    const attacker = combatantFromChampion(
+      champion, 1, emptyBuild({ items: ['test-dot-item'] }), { items, runes: new Map() }
+    )
+    const dotTicks = (combo: ComboAction[]) => simulateCombo(
+      attacker, combatantFromDummy(dummy()), combo, { critMode: 'never' }
+    ).instances.filter((i) => i.source.id === 'test-dot-passive')
+    expect(dotTicks(['Q', 'wait:3'])).toHaveLength(0)
+    expect(dotTicks(['R', 'wait:3'])).toHaveLength(3)
   })
 
   it('resets DoT ticks on refresh instead of stacking a second tick train', () => {
