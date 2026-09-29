@@ -24,6 +24,12 @@ Malignance cases (2026-09-26): "malignance build" is the clean build plus Malign
 reduction applies to its own ticks). `q-during-burn` is R then Q while the ground burns: 515 + 574
 (551 without the reduction), so the reduction applies to all magic damage during the burn.
 
+Item batch 3 cases (2026-09-26): "lich bane build" and "morellonomicon build" are the clean build
+plus that item. `q-then-aa` is Q followed by a basic attack, which showed as three numbers: Q 560,
+the attack 45 physical and Lich Bane's spellblade 256 magic (75% base AD + 45% AP). Riftmaker has
+no golden case yet: its fully stacked Q (584) is checked in `test/items.test.ts` until plain Q/W/R
+readings are recorded.
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.
