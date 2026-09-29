@@ -97,8 +97,6 @@ export const STARTER_ITEMS: Item[] = [
     // Unconditional magic pen is a plain stat, not a `penetration`-kind effect (that kind is
     // reserved for conditional pen — see packages/schema/src/effect/kinds/penetration.ts).
     stats: { ap: 95, pctMagicPen: 0.4 }, effects: [], tags: ['magic'],
-    // The shop won't sell Void Staff and Cryptbloom together (in-game, 2026-09-26).
-    exclusiveGroup: 'percent-magic-pen',
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
@@ -106,7 +104,6 @@ export const STARTER_ITEMS: Item[] = [
     cost: { total: 3000, combine: 600 }, recipe: ['amplifying-tome', 'fiendish-codex', 'void-amethyst'],
     // Life from Death only heals allies after a kill, so it has no 1v1 damage effect to model.
     stats: { ap: 75, pctMagicPen: 0.3, abilityHaste: 20 }, effects: [], tags: ['magic'],
-    exclusiveGroup: 'percent-magic-pen',
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {

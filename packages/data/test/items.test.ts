@@ -234,13 +234,6 @@ describe('STARTER_ITEMS', () => {
     })
   })
 
-  it("can't hold Cryptbloom and Void Staff together", () => {
-    const cryptbloom = STARTER_ITEMS.find((item) => item.id === 'cryptbloom')!
-    const voidStaff = STARTER_ITEMS.find((item) => item.id === 'void-staff')!
-    expect(cryptbloom.exclusiveGroup).toBeDefined()
-    expect(cryptbloom.exclusiveGroup).toBe(voidStaff.exclusiveGroup)
-  })
-
   it('declares the Force of Nature max-stacks input once, shared by both Steadfast effects', () => {
     const forceOfNature = STARTER_ITEMS.find((item) => item.id === 'force-of-nature')!
     const stackingEffects = forceOfNature.effects.filter(
@@ -267,7 +260,8 @@ describe('PATCH_7_3_ITEMS', () => {
 
   it('uses the starter item wherever one exists', () => {
     for (const starter of STARTER_ITEMS) {
-      expect(PATCH_7_3_ITEMS.find((item) => item.id === starter.id), starter.id).toBe(starter)
+      // Grouped items are copies carrying their exclusiveGroup, so compare fields, not identity.
+      expect(PATCH_7_3_ITEMS.find((item) => item.id === starter.id), starter.id).toMatchObject(starter)
     }
   })
 
@@ -283,5 +277,57 @@ describe('PATCH_7_3_ITEMS', () => {
       const componentTotal = components.reduce((sum, component) => sum + (component?.cost.total ?? 0), 0)
       expect(item.cost.combine + componentTotal, item.id).toBe(item.cost.total)
     }
+  })
+})
+
+describe('7.3 exclusive item groups', () => {
+  const groupOf = (id: string) => PATCH_7_3_ITEMS.find((item) => item.id === id)!.exclusiveGroup
+  const membersOf = (group: string) =>
+    PATCH_7_3_ITEMS.filter((item) => item.exclusiveGroup === group).map((item) => item.id).sort()
+
+  it('allows one Tear of the Goddess item', () => {
+    expect(membersOf('tear')).toEqual([
+      'archangels-staff', 'manamune', 'seraphs-embrace', 'tear-of-the-goddess', 'whispering-circlet',
+      'winters-approach',
+    ])
+  })
+
+  it('allows one active item', () => {
+    expect(membersOf('active-item')).toEqual([
+      'galeforce', 'gargoyle-stoneplate', 'goredrinker', 'hextech-rocketbelt',
+      'locket-of-the-iron-solari', 'mercurial-scimitar', 'mikaels-blessing', 'quicksilver-sash',
+      'redemption', 'seekers-armguard', 'shurelyas-battlesong', 'stridebreaker', 'zhonyas-hourglass',
+    ])
+  })
+
+  it('allows one armor pen or shred item', () => {
+    expect(membersOf('armor-pen')).toEqual([
+      'black-cleaver', 'dominiks-regards', 'last-whisper', 'mortal-reminder', 'seryldas-grudge',
+      'terminus',
+    ])
+  })
+
+  it('allows one magic pen or shred item', () => {
+    expect(membersOf('magic-pen')).toEqual([
+      'bloodletters-curse', 'cryptbloom', 'void-amethyst', 'void-staff',
+    ])
+  })
+
+  it('leaves pen boots out of the pen groups', () => {
+    expect(groupOf('spellslingers-shoes')).toBeUndefined()
+    expect(groupOf('armorcrusher-boots')).toBeUndefined()
+  })
+
+  it('rejects a build holding two items from one group', () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const catalog = buildCatalog(PATCH_7_3_ITEMS)
+    const build = (items: string[]) => ({ items, runes: [], inputs: {} })
+    expect(() => resolveStats(annie, 15, build(['void-staff', 'bloodletters-curse']), catalog))
+      .toThrow(/magic-pen/)
+    expect(() => resolveStats(annie, 15, build(['zhonyas-hourglass', 'hextech-rocketbelt']), catalog))
+      .toThrow(/active-item/)
+    expect(() => resolveStats(
+      annie, 15, { ...build(['void-staff']), boots: 'spellslingers-shoes' }, catalog
+    )).not.toThrow()
   })
 })

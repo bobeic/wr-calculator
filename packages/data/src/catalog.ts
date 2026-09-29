@@ -18,3 +18,13 @@ export function mergeById<T extends { id: string }>(base: T[], overrides: T[]): 
     ...overrides.filter((entry) => !baseIds.has(entry.id)),
   ]
 }
+
+/** Returns a copy of items with each id listed in groups given that exclusiveGroup. */
+export function withExclusiveGroups(items: Item[], groups: Record<string, string>): Item[] {
+  const ids = new Set(items.map((item) => item.id))
+  const unknown = Object.keys(groups).filter((id) => !ids.has(id))
+  if (unknown.length > 0) {
+    throw new Error(`withExclusiveGroups: unknown item id(s) ${unknown.join(', ')}`)
+  }
+  return items.map((item) => (groups[item.id] ? { ...item, exclusiveGroup: groups[item.id] } : item))
+}
