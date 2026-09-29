@@ -37,6 +37,11 @@ that item. Nashor's `aa` is a basic attack: 45 physical plus Gnaw's 99 magic on-
 Force's empowered attack showed as one number, 152 (the 63 attack plus the 89 spellblade), which
 puts Annie's true level-15 base AD at 89.0-89.33 even though the stat panel rounds it up to 90.
 `q-then-aa` uses Q 477 from the clean build (Trinity adds no AP or pen).
+Bloodletter's Curse and Hextech Rocketbelt each share a one-per-build group with a clean-build
+item, so their builds drop one: "bloodletters build" is Spellslinger's + Rabadon's + Zhonya's +
+Bloodletter's (no Void Staff), and "rocketbelt build" is Spellslinger's + Rabadon's + Void Staff +
+Rocketbelt (no Zhonya's). `q-stacks` is six Qs 3.5s apart: 349, 363, 379, 396, 414, 414 as Vile
+Decay stacks to 30%.
 
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
