@@ -9,6 +9,13 @@ const base = {
 }
 
 describe('remaining effect kinds', () => {
+  it('parses a shield effect with stat ratios', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'shield', amount: 0, durationSeconds: 2, ratios: [{ stat: 'mana', value: 0.16 }],
+    })
+    expect(result).toMatchObject({ ratios: [{ stat: 'mana', value: 0.16 }] })
+  })
+
   it('parses a shield effect', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'shield', amount: 300, durationSeconds: 2.5,
@@ -19,6 +26,17 @@ describe('remaining effect kinds', () => {
   it('parses a heal effect', () => {
     const result = EffectSchema.parse({ ...base, kind: 'heal', amount: 150 })
     expect(result.kind).toBe('heal')
+  })
+
+  it('parses an active effect with stat ratios and extra hits', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'active', cooldownSeconds: 30, damageType: 'magic', damage: 100,
+      ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
+    })
+    expect(result).toMatchObject({ ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 } })
+    expect(() => EffectSchema.parse({
+      ...base, kind: 'active', cooldownSeconds: 30, extraHits: { count: -1, fraction: 0.1 },
+    })).toThrow()
   })
 
   it('parses an active effect', () => {

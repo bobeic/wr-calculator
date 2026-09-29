@@ -32,6 +32,19 @@ build" is the clean build plus Riftmaker (582 AP: Rabadon's multiplies the 7 AP 
 were 541, 562, 573, 584 (the +2% stack is over before Q comes off cooldown); that ladder is
 checked in `test/items.test.ts` with cooldowns ignored.
 
+Item batch 4 cases (2026-09-29): "nashors build" and "trinity build" are the clean build plus
+that item. Nashor's `aa` is a basic attack: 45 physical plus Gnaw's 99 magic on-hit. Trinity
+Force's empowered attack showed as one number, 152 (the 63 attack plus the 89 spellblade), which
+puts Annie's true level-15 base AD at 89.0-89.33 even though the stat panel rounds it up to 90.
+`q-then-aa` uses Q 477 from the clean build (Trinity adds no AP or pen).
+Bloodletter's Curse and Hextech Rocketbelt each share a one-per-build group with a clean-build
+item, so their builds drop one: "bloodletters build" is Spellslinger's + Rabadon's + Zhonya's +
+Bloodletter's (no Void Staff), and "rocketbelt build" is Spellslinger's + Rabadon's + Void Staff +
+Rocketbelt (no Zhonya's). `q-stacks` is six Qs 3.5s apart: 349, 363, 379, 396, 414, 414 as Vile
+Decay stacks to 30%. `protobelt` is the Rocketbelt active with all 7 bolts on the dummy: 170
+(107 for the first bolt, about 10.7 for each extra). Some casts showed an extra ~75 on top, cause
+unknown; the case uses the usual 170.
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.

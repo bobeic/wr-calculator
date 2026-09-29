@@ -10,10 +10,10 @@ const STARTER_IDS = [
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
-  'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker',
+  'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker', 'archangels-staff',
+  'nashors-tooth', 'bloodletters-curse', 'hextech-rocketbelt',
 ].sort()
-// Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
-const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
+const ALLOWED_STARTER_NULLS: string[] = []
 
 function nullPaths(value: unknown, path: string, out: string[]): void {
   if (value === null) out.push(path)
@@ -24,11 +24,11 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 24 starter items', () => {
+  it('has exactly the 28 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
-  it('has no null values except the documented Seraph shield', () => {
+  it('has no null values', () => {
     const found: string[] = []
     for (const item of STARTER_ITEMS) {
       const paths: string[] = []
@@ -203,11 +203,70 @@ describe('STARTER_ITEMS', () => {
     expect(result.instances.map((instance) => Math.ceil(instance.mitigated))).toEqual([541, 562, 573, 584])
   })
 
-  it("can't hold Cryptbloom and Void Staff together", () => {
-    const cryptbloom = STARTER_ITEMS.find((item) => item.id === 'cryptbloom')!
-    const voidStaff = STARTER_ITEMS.find((item) => item.id === 'void-staff')!
-    expect(cryptbloom.exclusiveGroup).toBeDefined()
-    expect(cryptbloom.exclusiveGroup).toBe(voidStaff.exclusiveGroup)
+  it("gives Annie Archangel's Staff's AP from max mana before Rabadon's multiplies it (582 AP in game)", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const build = {
+      items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'archangels-staff'],
+      boots: 'spellslingers-shoes', runes: [], inputs: {},
+    }
+    const sheet = resolveStats(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
+    expect(sheet.total.mana).toBe(1733)
+    expect(sheet.total.ap).toBeCloseTo((430 + 17.33) * 1.3, 6)
+  })
+
+  it("adds 14 mana per Archangel's Staff Mana Charge stack, up to 700", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const catalog = buildCatalog(PATCH_7_3_ITEMS)
+    const build = (stacks: number) => ({
+      items: ['archangels-staff'], runes: [],
+      inputs: { 'archangels-staff-mana-charge': stacks },
+    })
+    expect(resolveStats(annie, 15, build(10), catalog).total.mana).toBe(1733 + 140)
+    expect(resolveStats(annie, 15, build(50), catalog).total.mana).toBe(1733 + 700)
+  })
+
+  it("models Nashor's Tooth's on-hit as 15 + 20% AP magic damage", () => {
+    const nashors = STARTER_ITEMS.find((item) => item.id === 'nashors-tooth')!
+    expect(nashors.effects).toHaveLength(1)
+    expect(nashors.effects[0]).toMatchObject({
+      kind: 'onHit', damageType: 'magic', flat: 15, pctOwnStat: { stat: 'ap', ratio: 0.2 },
+    })
+  })
+
+  it("models Bloodletter's Curse's Vile Decay as a stacking 7.5% magic resist shred on magic damage", () => {
+    const bloodletters = STARTER_ITEMS.find((item) => item.id === 'bloodletters-curse')!
+    expect(bloodletters.effects).toHaveLength(1)
+    expect(bloodletters.effects[0]).toMatchObject({
+      kind: 'resistShred', resist: 'mr', mode: 'percent', amount: 0.075, stacking: true,
+      maxStacks: 4, durationSeconds: 6, condition: { type: 'damageType', value: 'magic' },
+    })
+  })
+
+  it("models Hextech Rocketbelt's bolts as one full hit plus six at 10%", () => {
+    const rocketbelt = STARTER_ITEMS.find((item) => item.id === 'hextech-rocketbelt')!
+    expect(rocketbelt.effects).toHaveLength(1)
+    expect(rocketbelt.effects[0]).toMatchObject({
+      kind: 'active', damageType: 'magic', damage: 100, ratios: [{ stat: 'ap', value: 0.1 }],
+      extraHits: { count: 6, fraction: 0.1 }, cooldownSeconds: 30,
+    })
+  })
+
+  it("gives Annie Seraph's Embrace's AP from 2% of max mana (623 AP in game at 2433 mana)", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const build = {
+      items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'seraphs-embrace'],
+      boots: 'spellslingers-shoes', runes: [], inputs: {},
+    }
+    const sheet = resolveStats(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
+    expect(sheet.total.mana).toBe(2433)
+    expect(sheet.total.ap).toBeCloseTo((430 + 48.66) * 1.3, 6)
+  })
+
+  it("models Seraph's Embrace's Lifeline as a 16% max mana shield for 2 seconds", () => {
+    const seraphs = STARTER_ITEMS.find((item) => item.id === 'seraphs-embrace')!
+    expect(seraphs.effects[1]).toMatchObject({
+      kind: 'shield', amount: 0, durationSeconds: 2, ratios: [{ stat: 'mana', value: 0.16 }],
+    })
   })
 
   it('declares the Force of Nature max-stacks input once, shared by both Steadfast effects', () => {
@@ -236,7 +295,8 @@ describe('PATCH_7_3_ITEMS', () => {
 
   it('uses the starter item wherever one exists', () => {
     for (const starter of STARTER_ITEMS) {
-      expect(PATCH_7_3_ITEMS.find((item) => item.id === starter.id), starter.id).toBe(starter)
+      // Grouped items are copies carrying their exclusiveGroup, so compare fields, not identity.
+      expect(PATCH_7_3_ITEMS.find((item) => item.id === starter.id), starter.id).toMatchObject(starter)
     }
   })
 
@@ -252,5 +312,57 @@ describe('PATCH_7_3_ITEMS', () => {
       const componentTotal = components.reduce((sum, component) => sum + (component?.cost.total ?? 0), 0)
       expect(item.cost.combine + componentTotal, item.id).toBe(item.cost.total)
     }
+  })
+})
+
+describe('7.3 exclusive item groups', () => {
+  const groupOf = (id: string) => PATCH_7_3_ITEMS.find((item) => item.id === id)!.exclusiveGroup
+  const membersOf = (group: string) =>
+    PATCH_7_3_ITEMS.filter((item) => item.exclusiveGroup === group).map((item) => item.id).sort()
+
+  it('allows one Tear of the Goddess item', () => {
+    expect(membersOf('tear')).toEqual([
+      'archangels-staff', 'manamune', 'seraphs-embrace', 'tear-of-the-goddess', 'whispering-circlet',
+      'winters-approach',
+    ])
+  })
+
+  it('allows one active item', () => {
+    expect(membersOf('active-item')).toEqual([
+      'galeforce', 'gargoyle-stoneplate', 'goredrinker', 'hextech-rocketbelt',
+      'locket-of-the-iron-solari', 'mercurial-scimitar', 'mikaels-blessing', 'quicksilver-sash',
+      'redemption', 'seekers-armguard', 'shurelyas-battlesong', 'stridebreaker', 'zhonyas-hourglass',
+    ])
+  })
+
+  it('allows one armor pen or shred item', () => {
+    expect(membersOf('armor-pen')).toEqual([
+      'black-cleaver', 'dominiks-regards', 'last-whisper', 'mortal-reminder', 'seryldas-grudge',
+      'terminus',
+    ])
+  })
+
+  it('allows one magic pen or shred item', () => {
+    expect(membersOf('magic-pen')).toEqual([
+      'bloodletters-curse', 'cryptbloom', 'void-amethyst', 'void-staff',
+    ])
+  })
+
+  it('leaves pen boots out of the pen groups', () => {
+    expect(groupOf('spellslingers-shoes')).toBeUndefined()
+    expect(groupOf('armorcrusher-boots')).toBeUndefined()
+  })
+
+  it('rejects a build holding two items from one group', () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const catalog = buildCatalog(PATCH_7_3_ITEMS)
+    const build = (items: string[]) => ({ items, runes: [], inputs: {} })
+    expect(() => resolveStats(annie, 15, build(['void-staff', 'bloodletters-curse']), catalog))
+      .toThrow(/magic-pen/)
+    expect(() => resolveStats(annie, 15, build(['zhonyas-hourglass', 'hextech-rocketbelt']), catalog))
+      .toThrow(/active-item/)
+    expect(() => resolveStats(
+      annie, 15, { ...build(['void-staff']), boots: 'spellslingers-shoes' }, catalog
+    )).not.toThrow()
   })
 })

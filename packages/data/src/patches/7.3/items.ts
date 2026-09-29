@@ -97,8 +97,6 @@ export const STARTER_ITEMS: Item[] = [
     // Unconditional magic pen is a plain stat, not a `penetration`-kind effect (that kind is
     // reserved for conditional pen — see packages/schema/src/effect/kinds/penetration.ts).
     stats: { ap: 95, pctMagicPen: 0.4 }, effects: [], tags: ['magic'],
-    // The shop won't sell Void Staff and Cryptbloom together (in-game, 2026-09-26).
-    exclusiveGroup: 'percent-magic-pen',
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
@@ -106,7 +104,6 @@ export const STARTER_ITEMS: Item[] = [
     cost: { total: 3000, combine: 600 }, recipe: ['amplifying-tome', 'fiendish-codex', 'void-amethyst'],
     // Life from Death only heals allies after a kill, so it has no 1v1 damage effect to model.
     stats: { ap: 75, pctMagicPen: 0.3, abilityHaste: 20 }, effects: [], tags: ['magic'],
-    exclusiveGroup: 'percent-magic-pen',
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
@@ -368,24 +365,112 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'archangels-staff', name: "Archangel's Staff", tier: 'legendary',
+    cost: { total: 3000, combine: 500 }, recipe: ['fiendish-codex', 'tear-of-the-goddess', 'lost-chapter'],
+    stats: { ap: 60, mana: 500, abilityHaste: 25 }, tags: ['magic'],
+    effects: [
+      {
+        kind: 'statConversion', id: 'archangels-staff-awe', name: 'Awe',
+        description: 'Gain Ability Power equal to 1% of your maximum Mana, and refund 25% of the mana '
+          + 'you spend.',
+        // Measured in the 7.3 practice tool (2026-09-29): 582 AP with 1733 mana and no charges =
+        // (430 + 17.33) x 1.3, so Rabadon's multiplies it.
+        support: 'partial',
+        supportNotes: 'The mana refund is not modeled.',
+        fromStat: 'mana', toStat: 'ap', ratio: 0.01,
+      },
+      {
+        kind: 'stacking', id: 'archangels-staff-mana-charge', name: 'Mana Charge',
+        description: 'Each time you spend Mana, gain +14 Max Mana, up to 700 bonus Mana, at which point '
+          + "this item upgrades into Seraph's Embrace. Triggers up to 3 times every 10 seconds.",
+        support: 'partial',
+        supportNotes: "The charge count is a manual input, not accumulated from casting; at 50 charges "
+          + "the item becomes Seraph's Embrace, which is modeled as its own item.",
+        stat: 'mana', perStack: 14, maxStacks: 50, stackInputId: 'archangels-staff-mana-charge',
+        inputs: [{
+          type: 'stackCount', id: 'archangels-staff-mana-charge', label: "Archangel's Staff Mana Charge stacks",
+          min: 0, max: 50, default: 0,
+        }],
+      },
+    ],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'nashors-tooth', name: "Nashor's Tooth", tier: 'legendary',
+    cost: { total: 2900, combine: 300 }, recipe: ['fiendish-codex', 'blasting-wand', 'recurve-bow'],
+    stats: { ap: 80, attackSpeed: 0.5, abilityHaste: 15 }, tags: ['magic', 'on-hit'],
+    effects: [{
+      kind: 'onHit', id: 'nashors-tooth-gnaw', name: 'Gnaw',
+      description: 'Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit.',
+      // Measured 2026-09-29: a basic attack showed 45 physical and 99 magic (15 + 20% of 585 AP).
+      support: 'partial',
+      supportNotes: 'Reads total AP as bonus AP; the same for champions without base AP.',
+      damageType: 'magic', flat: 15, pctOwnStat: { stat: 'ap', ratio: 0.2 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'bloodletters-curse', name: "Bloodletter's Curse", tier: 'legendary',
+    cost: { total: 2900, combine: 700 }, recipe: ['fiendish-codex', 'haunting-guise'],
+    stats: { ap: 65, hp: 350, abilityHaste: 15 }, tags: ['magic'],
+    effects: [{
+      kind: 'resistShred', id: 'bloodletters-curse-vile-decay', name: 'Vile Decay',
+      description: 'When abilities or passives deal magic damage to champions, reduce their Magic '
+        + 'Resist by 7.5% for 6 seconds, stacking up to 30%.',
+      // Measured in the 7.3 practice tool (2026-09-29): repeated Qs hit for 349, 363, 379, 396,
+      // 414, 414 — each hit adds a stack after it lands, and the % reduction applies before pen.
+      support: 'partial',
+      supportNotes: 'Every magic damage instance adds a stack, including item on-hits and burns; '
+        + 'only ability hits were measured.',
+      resist: 'mr', mode: 'percent', amount: 0.075, stacking: true, maxStacks: 4, durationSeconds: 6,
+      condition: { type: 'damageType', value: 'magic' },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'hextech-rocketbelt', name: 'Hextech Rocketbelt', tier: 'legendary',
+    cost: { total: 2700, combine: 100 }, recipe: ['amplifying-tome', 'hextech-alternator', 'kindlegem'],
+    stats: { ap: 70, hp: 250, abilityHaste: 20 }, tags: ['magic'],
+    effects: [{
+      kind: 'active', id: 'hextech-rocketbelt-protobelt', name: 'Protobelt',
+      description: 'Dash toward the target direction and unleash 7 magic bolts, dealing 100 + 10% '
+        + 'Ability Power magic damage to enemies hit (30s cooldown). If a champion or monster is hit '
+        + 'by more than one missile, each additional missile only deals 10% damage.',
+      // Measured 2026-09-29 (AP 429): totals by bolts hit were 107, 118, 128, 139, 150, 160, 170.
+      // All 7 usually read 170, but sometimes an unexplained extra 75 appeared; not modeled.
+      support: 'partial',
+      supportNotes: 'Assumes all 7 bolts hit a single target (170 at 429 AP). In game an extra ~75 '
+        + 'sometimes appears on top, cause unknown and not modeled. The dash is not modeled.',
+      cooldownSeconds: 30, damageType: 'magic', damage: 100,
+      ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'seraphs-embrace', name: "Seraph's Embrace", tier: 'legendary',
     // Not on wrpocket: it's Archangel's Staff after Mana Charge reaches 700 bonus Mana. Stats are
-    // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana; no extra gold to "buy" it.
+    // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana, matching the in-game tooltip
+    // (2026-09-29); no extra gold to "buy" it.
     cost: { total: 3000, combine: 0 }, recipe: ['archangels-staff'],
     stats: { ap: 60, mana: 1200, abilityHaste: 25 }, tags: ['magic'],
     effects: [
       {
         kind: 'statConversion', id: 'seraphs-embrace-focused-will', name: 'Awe',
-        description: 'Gain Ability Power equal to 1% of your maximum Mana.',
-        support: 'full',
-        fromStat: 'mana', toStat: 'ap', ratio: 0.01,
+        description: 'Grants Ability Power equal to 2% of maximum Mana and refunds 25% of all Mana '
+          + 'spent.',
+        // In-game tooltip and reading (2026-09-29): 623 AP at 2433 Mana = (430 + 48.66) x 1.3.
+        support: 'partial',
+        supportNotes: 'The mana refund is not modeled.',
+        fromStat: 'mana', toStat: 'ap', ratio: 0.02,
       },
       {
         kind: 'shield', id: 'seraphs-embrace-bottomless-well', name: 'Lifeline',
-        description: "Seraph's upgraded shield. Values aren't on wrpocket; verify in-game.",
+        description: 'Damage that puts you under 35% Health grants a shield that absorbs damage equal '
+          + 'to 16% of your maximum Mana for 2 seconds (70 second cooldown).',
         support: 'partial',
-        supportNotes: 'Modeled as a manually toggled shield; trigger and cooldown are not modeled.',
-        amount: null, durationSeconds: null,
+        supportNotes: 'Modeled as a manually toggled shield; the 35% Health trigger and the 70 second '
+          + 'cooldown are not modeled.',
+        amount: 0, durationSeconds: 2, ratios: [{ stat: 'mana', value: 0.16 }],
         condition: { type: 'toggle', inputId: 'seraphs-embrace-shield-used' },
         inputs: [{
           type: 'boolean', id: 'seraphs-embrace-shield-used',

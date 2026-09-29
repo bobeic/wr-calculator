@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildCatalog, mergeById } from '../src/catalog'
+import { buildCatalog, mergeById, withExclusiveGroups } from '../src/catalog'
 import { PATCH_7_3_ITEMS, PATCH_7_3_CATALOG } from '../src/patches/7.3'
 
 describe('buildCatalog', () => {
@@ -34,5 +34,22 @@ describe('mergeById', () => {
     const merged = mergeById(base, [])
     expect(merged).toEqual(base)
     expect(merged).not.toBe(base)
+  })
+})
+
+describe('withExclusiveGroups', () => {
+  const items = [
+    { id: 'a', name: 'A', tier: 'legendary' as const, stats: {}, effects: [], tags: [] },
+    { id: 'b', name: 'B', tier: 'legendary' as const, stats: {}, effects: [], tags: [] },
+  ] as unknown as Parameters<typeof withExclusiveGroups>[0]
+
+  it('sets each listed item\'s exclusiveGroup and leaves the rest untouched', () => {
+    const result = withExclusiveGroups(items, { a: 'group-1' })
+    expect(result.map((item) => item.exclusiveGroup)).toEqual(['group-1', undefined])
+    expect(items[0].exclusiveGroup).toBeUndefined()
+  })
+
+  it('throws when a listed item id is not in the item list', () => {
+    expect(() => withExclusiveGroups(items, { missing: 'group-1' })).toThrow(/missing/)
   })
 })
