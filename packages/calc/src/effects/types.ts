@@ -1,7 +1,8 @@
-import type { Effect, StatKey, Condition, DamageType } from '@wr-calc/schema'
+import type { Effect, StatKey, Condition, DamageType, DamageComponent } from '@wr-calc/schema'
 import type { STAT_RESOLUTION_ORDER, UnverifiedRuleId } from '../rules'
 import type { ResistModifiers } from '../mitigation'
 import type { StatSheet } from '../resolve-stats'
+import type { ResolvedDamageComponent } from '../damage-component'
 
 export type EffectStage = (typeof STAT_RESOLUTION_ORDER)[number]
 
@@ -122,4 +123,6 @@ export interface HookContext {
   ): boolean
   scheduleEvent?(atTime: number, run: (ctx: HookContext) => void, key?: string): void
   cancelScheduled?(key: string): void
+  /** Resolves a damage component for this context's owner against its opponent, right now. */
+  resolveComponent?(component: DamageComponent, ownerName: string): ResolvedDamageComponent
 }

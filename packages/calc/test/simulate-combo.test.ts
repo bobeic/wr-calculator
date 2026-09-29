@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { simulateCombo } from '../src/simulate-combo'
-import { DASH_SECONDS } from '../src/rules'
+import { DASH_SECONDS, ATTACK_SPEED_CAP } from '../src/rules'
 import type { ComboAction } from '../src/simulate-combo'
 import { combatantFromChampion, combatantFromDummy } from '../src/combatant'
 import type { Champion, Item, Build, Target } from '@wr-calc/schema'
@@ -695,6 +695,50 @@ describe('simulateCombo', () => {
         { startedAt: 0, eligible: true },
         { startedAt: DASH_SECONDS, eligible: false },
       ])
+    })
+  })
+
+  describe('empowered attacks in a combo', () => {
+    const noCatalog = { items: new Map(), runes: new Map() }
+    function feintChampion(attackSpeedBonus = 0.5) {
+      const base = championWithAbility()
+      return championWithAbility({
+        abilities: {
+          ...base.abilities,
+          passive: {
+            ...base.abilities.passive,
+            effects: [{
+              id: 'step', name: 'Step', description: '', support: 'full', kind: 'empoweredAttack',
+              grant: { on: 'dashAfterAbility', withinSeconds: 0.5 },
+              maxCharges: 3, durationSeconds: 4, attackSpeedBonus,
+              bonus: { type: 'physical', base: 40, ratios: [], tags: [] },
+            }],
+          },
+        },
+      })
+    }
+
+    it('empowers the attack after ability → dash, with the bonus as its own hit and a faster next swing', () => {
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], { critMode: 'never' })
+      const hits = result.instances.map((i) => [i.source.id, i.mitigated, i.time])
+      // Base AS 1.0; the empowered swing at +50% waits 1/1.5 s before the next attack.
+      expect(hits).toEqual([
+        ['q', 50, 0], ['AA', 60, DASH_SECONDS], ['step', 40, DASH_SECONDS], ['AA', 60, DASH_SECONDS + 1 / 1.5],
+      ])
+    })
+
+    it('keeps the swing attack speed under the attack speed cap', () => {
+      const attacker = combatantFromChampion(feintChampion(5), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], { critMode: 'never' })
+      const attackTimes = result.instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+      expect(attackTimes[1] - attackTimes[0]).toBeCloseTo(1 / ATTACK_SPEED_CAP, 10)
+    })
+
+    it('does not empower an attack after the charges expire', () => {
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'wait:4.5', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'AA'])
     })
   })
 })

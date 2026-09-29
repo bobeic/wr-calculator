@@ -8,7 +8,7 @@ import type { UnverifiedRuleId } from './rules'
 import type { ResistModifiers } from './mitigation'
 import type { StatSheet } from './resolve-stats'
 import type { UnsupportedEffectEntry } from './result-envelope'
-import { critMultiplier, cooldownWithHaste, totalAttackSpeed, DASH_SECONDS } from './rules'
+import { critMultiplier, cooldownWithHaste, totalAttackSpeed, DASH_SECONDS, ATTACK_SPEED_CAP } from './rules'
 import { mitigateDamage, applyDamageReductionFractions, ZERO_RESIST_MODIFIERS } from './mitigation'
 import { resolveEffectHandler } from './effects/registry'
 import { resolveDamageComponent } from './damage-component'
@@ -212,6 +212,10 @@ export function simulateCombo(
         scheduled.push({ time: atTime, run, key })
         scheduled.sort((a, b) => a.time - b.time)
       },
+      resolveComponent: (component, ownerName) => resolveDamageComponent(
+        component, { ...self, sheet: sheetNow(self) }, opponent, opponentRuntime.currentHp,
+        self.level, ownerName
+      ),
       cancelScheduled: (key) => {
         for (let i = scheduled.length - 1; i >= 0; i--) {
           if (scheduled[i].key === key) scheduled.splice(i, 1)
@@ -475,7 +479,15 @@ export function simulateCombo(
       })
       dispatchOnBasicAttack()
 
-      const interval = 1 / Math.max(attackerSheetNow().total.attackSpeed ?? 1, 0.01)
+      const swingBonus = attackerRuntime.swingAttackSpeedBonus ?? 0
+      attackerRuntime.swingAttackSpeedBonus = undefined
+      const sheetAfterSwing = attackerSheetNow()
+      const swingAttackSpeed = swingBonus === 0
+        ? sheetAfterSwing.total.attackSpeed ?? 1
+        : Math.min(ATTACK_SPEED_CAP, totalAttackSpeed(
+          sheetAfterSwing.base.attackSpeed ?? 0, (sheetAfterSwing.bonus.attackSpeed ?? 0) + swingBonus
+        ))
+      const interval = 1 / Math.max(swingAttackSpeed, 0.01)
       time += interval
     } else if (action === 'Q' || action === 'W' || action === 'E' || action === 'R') {
       if (!attacker.abilities) continue
