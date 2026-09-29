@@ -1,6 +1,6 @@
-# ADR: Batch 4 — one-per-build item groups, Archangel's Staff, Nashor's Tooth, Bloodletter's Curse, Hextech Rocketbelt
+# ADR: Batch 4 — one-per-build item groups, Archangel's Staff, Seraph's Embrace, Nashor's Tooth, Bloodletter's Curse, Hextech Rocketbelt
 
-**Status:** Accepted (Seraph's Embrace pending its tooltip)
+**Status:** Accepted
 
 ## Context
 
@@ -12,6 +12,9 @@ Readings from the 7.3 practice tool on 2026-09-29 (Annie level 15, clean build p
   engine's 89 is correct for damage.
 - Archangel's Staff: 582 AP at 1733 mana = (430 + 1% x 1733) x 1.3, so Rabadon's multiplies Awe
   (consistent with the batch 3 conversion-before-multiplier order).
+- Seraph's Embrace (fully charged Archangel's, 2433 mana): 623 AP. Its tooltip says Awe grants 2%
+  of max mana (Archangel's is 1%), and Lifeline shields for 16% of max mana for 2 seconds when
+  damage puts you under 35% Health (70 second cooldown).
 - Nashor's Tooth: a basic attack showed 45 physical and 99 magic (15 + 20% of 585 AP).
 - The user reported shop rules: one champion can hold at most one item from each of these
   groups, components included — a Tear item; an item with an active; an armor pen or armor
@@ -36,6 +39,9 @@ Readings from the 7.3 practice tool on 2026-09-29 (Annie level 15, clean build p
 - **Archangel's Staff:** Awe is a `statConversion` (1% max mana to AP); Mana Charge is a
   `stacking` effect on a 0-50 stack input (+14 mana each). At 50 charges the item becomes
   Seraph's Embrace, which stays its own item. The mana refund is not modeled.
+- **Seraph's Embrace:** Awe ratio 0.02. Lifeline uses a new optional `shield.ratios` (stat
+  ratios added to the shield amount, like `active.ratios`); it stays a manual toggle, with the
+  35% Health trigger and cooldown not modeled.
 - **Nashor's Tooth:** Gnaw is an `onHit` (15 + 20% AP magic). It reads total AP as bonus AP,
   which is the same for every champion until base AP exists.
 
