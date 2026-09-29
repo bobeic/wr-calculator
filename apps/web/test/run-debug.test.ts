@@ -2,10 +2,26 @@ import { describe, it, expect } from 'vitest'
 import { runDebug, toBuild } from '../src/lib/run-debug'
 import type { Stage } from '../src/lib/run-debug'
 import { defaultState } from '../src/lib/debug-state'
-import type { DebugState, DebugTarget } from '../src/lib/debug-state'
+import type { DebugDataset, DebugState, DebugTarget } from '../src/lib/debug-state'
 import { PATCH_7_3_DATASET } from '../src/lib/dataset'
 
 const dataset = PATCH_7_3_DATASET
+
+// Every 7.3 item is fully entered, so the null-report tests add one item with a missing value.
+const unfinishedItem = {
+  ...dataset.catalog.items.get('long-sword')!, id: 'unfinished-item', name: 'Unfinished Item',
+  effects: [{
+    kind: 'shield' as const, id: 'unfinished-shield', name: 'Unfinished Shield', description: '',
+    support: 'partial' as const, amount: null, durationSeconds: 2,
+  }],
+}
+const datasetWithNulls: DebugDataset = {
+  ...dataset,
+  catalog: {
+    ...dataset.catalog,
+    items: new Map([...dataset.catalog.items, [unfinishedItem.id, unfinishedItem]]),
+  },
+}
 const LEGENDARIES = [
   'rabadons-deathcap', 'blade-of-the-ruined-king', 'trinity-force',
   'liandrys-torment', 'void-staff', 'black-cleaver',
@@ -105,22 +121,22 @@ describe('runDebug envelope and nulls', () => {
   })
 
   it('reports each null once even when both builds share an item', () => {
-    const buildA = { items: ['seraphs-embrace'], runes: [], inputs: {} }
-    const buildB = { items: ['seraphs-embrace'], runes: [], inputs: {} }
-    const result = runDebug(state({ buildA, buildB }), dataset)
+    const buildA = { items: ['unfinished-item'], runes: [], inputs: {} }
+    const buildB = { items: ['unfinished-item'], runes: [], inputs: {} }
+    const result = runDebug(state({ buildA, buildB }), datasetWithNulls)
     const paths = result.nulls.map((entry) => entry.path)
-    expect(paths.filter((path) => path === 'item seraphs-embrace › effects[1].amount')).toHaveLength(1)
+    expect(paths.filter((path) => path === 'item unfinished-item › effects[0].amount')).toHaveLength(1)
     expect(paths.some((path) => path.startsWith('champion jinx › '))).toBe(true)
   })
 
   it('includes a champion target and its items in the null report', () => {
     const target: DebugTarget = {
       kind: 'champion', championId: 'annie', level: 9,
-      build: { items: ['seraphs-embrace'], runes: [], inputs: {} },
+      build: { items: ['unfinished-item'], runes: [], inputs: {} },
     }
-    const paths = runDebug(state({ target }), dataset).nulls.map((entry) => entry.path)
+    const paths = runDebug(state({ target }), datasetWithNulls).nulls.map((entry) => entry.path)
     expect(paths.some((path) => path.startsWith('champion annie › '))).toBe(true)
-    expect(paths).toContain('item seraphs-embrace › effects[1].amount')
+    expect(paths).toContain('item unfinished-item › effects[0].amount')
   })
 })
 

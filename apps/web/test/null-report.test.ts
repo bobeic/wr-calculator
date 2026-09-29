@@ -25,9 +25,8 @@ describe('nullReport', () => {
     expect(nullReport([{ label: 'x', value: { a: 1, b: [2] } }])).toEqual([])
   })
 
-  it('reports real patch 7.3 item nulls', () => {
-    const seraph = PATCH_7_3_CATALOG.items.get('seraphs-embrace')!
-    const paths = nullReport([{ label: 'item seraphs-embrace', value: seraph }]).map((entry) => entry.path)
-    expect(paths).toContain('item seraphs-embrace › effects[1].amount')
+  it('reports no nulls for the fully entered patch 7.3 items', () => {
+    const sources = [...PATCH_7_3_CATALOG.items.values()].map((item) => ({ label: `item ${item.id}`, value: item }))
+    expect(nullReport(sources)).toEqual([])
   })
 })
