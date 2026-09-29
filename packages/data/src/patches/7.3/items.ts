@@ -410,6 +410,41 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'bloodletters-curse', name: "Bloodletter's Curse", tier: 'legendary',
+    cost: { total: 2900, combine: 700 }, recipe: ['fiendish-codex', 'haunting-guise'],
+    stats: { ap: 65, hp: 350, abilityHaste: 15 }, tags: ['magic'],
+    effects: [{
+      kind: 'resistShred', id: 'bloodletters-curse-vile-decay', name: 'Vile Decay',
+      description: 'When abilities or passives deal magic damage to champions, reduce their Magic '
+        + 'Resist by 7.5% for 6 seconds, stacking up to 30%.',
+      // Measured in the 7.3 practice tool (2026-09-29): repeated Qs hit for 349, 363, 379, 396,
+      // 414, 414 — each hit adds a stack after it lands, and the % reduction applies before pen.
+      support: 'partial',
+      supportNotes: 'Every magic damage instance adds a stack, including item on-hits and burns; '
+        + 'only ability hits were measured.',
+      resist: 'mr', mode: 'percent', amount: 0.075, stacking: true, maxStacks: 4, durationSeconds: 6,
+      condition: { type: 'damageType', value: 'magic' },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'hextech-rocketbelt', name: 'Hextech Rocketbelt', tier: 'legendary',
+    cost: { total: 2700, combine: 100 }, recipe: ['amplifying-tome', 'hextech-alternator', 'kindlegem'],
+    stats: { ap: 70, hp: 250, abilityHaste: 20 }, tags: ['magic'],
+    effects: [{
+      kind: 'active', id: 'hextech-rocketbelt-protobelt', name: 'Protobelt',
+      description: 'Dash toward the target direction and unleash 7 magic bolts, dealing 100 + 10% '
+        + 'Ability Power magic damage to enemies hit (30s cooldown). If a champion or monster is hit '
+        + 'by more than one missile, each additional missile only deals 10% damage.',
+      // Measured 2026-09-29: the first bolt hit for 107 and each extra bolt for 11 (AP 429).
+      support: 'partial',
+      supportNotes: 'Assumes all 7 bolts hit a single target; the dash is not modeled.',
+      cooldownSeconds: 30, damageType: 'magic', damage: 100,
+      ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'seraphs-embrace', name: "Seraph's Embrace", tier: 'legendary',
     // Not on wrpocket: it's Archangel's Staff after Mana Charge reaches 700 bonus Mana. Stats are
     // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana; no extra gold to "buy" it.

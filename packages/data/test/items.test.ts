@@ -11,7 +11,7 @@ const STARTER_IDS = [
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
   'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker', 'archangels-staff',
-  'nashors-tooth',
+  'nashors-tooth', 'bloodletters-curse', 'hextech-rocketbelt',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -25,7 +25,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 26 starter items', () => {
+  it('has exactly the 28 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -231,6 +231,24 @@ describe('STARTER_ITEMS', () => {
     expect(nashors.effects).toHaveLength(1)
     expect(nashors.effects[0]).toMatchObject({
       kind: 'onHit', damageType: 'magic', flat: 15, pctOwnStat: { stat: 'ap', ratio: 0.2 },
+    })
+  })
+
+  it("models Bloodletter's Curse's Vile Decay as a stacking 7.5% magic resist shred on magic damage", () => {
+    const bloodletters = STARTER_ITEMS.find((item) => item.id === 'bloodletters-curse')!
+    expect(bloodletters.effects).toHaveLength(1)
+    expect(bloodletters.effects[0]).toMatchObject({
+      kind: 'resistShred', resist: 'mr', mode: 'percent', amount: 0.075, stacking: true,
+      maxStacks: 4, durationSeconds: 6, condition: { type: 'damageType', value: 'magic' },
+    })
+  })
+
+  it("models Hextech Rocketbelt's bolts as one full hit plus six at 10%", () => {
+    const rocketbelt = STARTER_ITEMS.find((item) => item.id === 'hextech-rocketbelt')!
+    expect(rocketbelt.effects).toHaveLength(1)
+    expect(rocketbelt.effects[0]).toMatchObject({
+      kind: 'active', damageType: 'magic', damage: 100, ratios: [{ stat: 'ap', value: 0.1 }],
+      extraHits: { count: 6, fraction: 0.1 }, cooldownSeconds: 30,
     })
   })
 
