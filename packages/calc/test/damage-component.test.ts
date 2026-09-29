@@ -18,20 +18,6 @@ function combatant(overrides: Partial<Combatant> = {}): Combatant {
   }
 }
 
-function sheetWith(overrides: Partial<StatSheet>): StatSheet {
-  return {
-    base: {}, bonus: {}, total: {}, breakdown: [], unsupportedEffects: [], dataWarnings: [],
-    unverifiedRules: [], ...overrides,
-  }
-}
-
-function combatantWith(overrides: Partial<Combatant>): Combatant {
-  return {
-    id: 'c', name: 'C', kind: 'champion', level: 15, sheet: sheetWith({}), items: [],
-    runeEffects: [], inputs: {}, startHpFraction: 1, ...overrides,
-  }
-}
-
 describe('resolveDamageComponent', () => {
   it('resolves base plus a totalAd ratio', () => {
     const attacker = combatant({ sheet: sheet({ total: { ad: 100 } }) })
@@ -108,13 +94,17 @@ describe('resolveDamageComponent', () => {
     }
     const result = resolveDamageComponent(component, attacker, target, 1000, 5, 'Test Q')
     expect(result.dataWarnings).toEqual([
-      'Test Q: base is unverified (null)', 'Test Q: ratios.totalAd is unverified (null)',
+      'Test Q: base is unverified (null)',
+      'Test Q: ratios.totalAd is unverified (null)',
     ])
   })
 
   it('grows a ratio coefficient with a second stat (perStat)', () => {
-    const attacker = combatantWith({ sheet: sheetWith({ base: { ad: 100 }, bonus: { ad: 40 }, total: { ad: 140 } }) })
-    const target = combatantWith({ sheet: sheetWith({ total: { hp: 10000 } }) })
+    const attacker = combatant({
+      level: 15,
+      sheet: sheet({ base: { ad: 100 }, bonus: { ad: 40 }, total: { ad: 140 } }),
+    })
+    const target = combatant({ level: 15, sheet: sheet({ total: { hp: 10000 } }) })
     const component: DamageComponent = {
       type: 'physical', base: 120, tags: [],
       ratios: [{ stat: 'targetMaxHp', value: 0.07, perStat: { stat: 'bonusAd', value: 0.0004 } }],
@@ -124,14 +114,19 @@ describe('resolveDamageComponent', () => {
   })
 
   it('warns and uses only the base coefficient when perStat.value is null', () => {
-    const attacker = combatantWith({ sheet: sheetWith({ bonus: { ad: 40 } }) })
-    const target = combatantWith({ sheet: sheetWith({ total: { hp: 10000 } }) })
+    const attacker = combatant({
+      level: 15,
+      sheet: sheet({ bonus: { ad: 40 } }),
+    })
+    const target = combatant({ level: 15, sheet: sheet({ total: { hp: 10000 } }) })
     const component: DamageComponent = {
       type: 'physical', base: 0, tags: [],
       ratios: [{ stat: 'targetMaxHp', value: 0.07, perStat: { stat: 'bonusAd', value: null } }],
     }
     const result = resolveDamageComponent(component, attacker, target, 10000, 15, 'Test Q')
     expect(result.amount).toBeCloseTo(700, 10)
-    expect(result.dataWarnings).toContain('Test Q: ratios.targetMaxHp.perStat.bonusAd is unverified (null)')
+    expect(result.dataWarnings).toContain(
+      'Test Q: ratios.targetMaxHp.perStat.bonusAd is unverified (null)'
+    )
   })
 })
