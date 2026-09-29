@@ -56,10 +56,9 @@ export const STARTER_ITEMS: Item[] = [
       description: 'After using an ability, the next basic attack within 10 seconds deals 200% base '
         + 'Attack Damage as bonus physical damage (1.5 second cooldown).',
       support: 'partial',
-      supportNotes: 'The real bonus is 200% of *base* AD; the spellblade ratio can only reference total '
-        + 'AD, so this overstates damage once you have bonus AD. Valor move speed is not modeled.',
+      supportNotes: 'Valor move speed is not modeled.',
       damageType: 'physical', bonusDamage: 0,
-      ratios: [{ stat: 'ad', value: 2 }], internalCooldownSeconds: 1.5,
+      ratios: [{ stat: 'ad', layer: 'base', value: 2 }], internalCooldownSeconds: 1.5,
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
@@ -251,6 +250,49 @@ export const STARTER_ITEMS: Item[] = [
       targetMaxHpFraction: 0.25, windowSeconds: 2.5, delaySeconds: 2, damageType: 'magic',
       damage: 125, ratios: [{ stat: 'ap', value: 0.1 }], cooldownSeconds: 25,
     }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'lich-bane', name: 'Lich Bane', tier: 'legendary',
+    cost: { total: 2800, combine: 550 }, recipe: ['amplifying-tome', 'aether-wisp', 'sheen'],
+    stats: { ap: 100, moveSpeedPct: 0.05, abilityHaste: 10 }, tags: ['magic'],
+    effects: [{
+      kind: 'spellblade', id: 'lich-bane-spellblade', name: 'Spellblade',
+      description: 'After using an ability, the next basic attack within 10 seconds deals 75% base '
+        + 'Attack Damage + 45% Ability Power as bonus magic damage (1.5 second cooldown).',
+      // Measured in the 7.3 practice tool (2026-09-26): Q then a basic attack showed the attack (45
+      // physical) and the proc (256 magic) as separate numbers, matching 341.7 raw at 89 AD, 611 AP.
+      support: 'full',
+      damageType: 'magic', bonusDamage: 0,
+      ratios: [{ stat: 'ad', layer: 'base', value: 0.75 }, { stat: 'ap', value: 0.45 }],
+      internalCooldownSeconds: 1.5,
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'riftmaker', name: 'Riftmaker', tier: 'legendary',
+    cost: { total: 3100, combine: 900 }, recipe: ['fiendish-codex', 'haunting-guise'],
+    stats: { ap: 70, hp: 350, abilityHaste: 15 }, tags: ['magic'],
+    effects: [
+      {
+        kind: 'statConversion', id: 'riftmaker-void-infusion', name: 'Void Infusion',
+        description: 'Gain Ability Power equal to 2% of your bonus Health.',
+        // Measured 2026-09-26: 582 AP with 350 bonus HP = (440 + 7) x 1.3, so Rabadon's
+        // multiplies the converted AP.
+        support: 'full',
+        fromStat: 'hp', fromLayer: 'bonus', toStat: 'ap', ratio: 0.02,
+      },
+      {
+        kind: 'combatRampAmp', id: 'riftmaker-void-corruption', name: 'Void Corruption',
+        description: 'While in combat with champions, deal 2% additional damage each second, up to 8%.',
+        support: 'partial',
+        // Measured 2026-09-26: a Q 4-5s into combat hit for 584 (540.4 x 1.08). The per-second
+        // timing is assumed to match Liandry's Madness, which was measured tick by tick.
+        supportNotes: 'Combat starts at your first hit and never ends within a combo. Omnivamp is not '
+          + 'modeled.',
+        amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 4,
+      },
+    ],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
