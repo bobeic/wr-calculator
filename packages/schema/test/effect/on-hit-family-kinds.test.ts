@@ -53,6 +53,20 @@ describe('on-hit-family effect kinds', () => {
     expect(result.kind).toBe('spellblade')
   })
 
+  it('accepts a layer on a spellblade ratio entry and rejects an unknown one', () => {
+    const spellblade = (layer: string) => ({
+      ...base,
+      kind: 'spellblade',
+      damageType: 'magic',
+      bonusDamage: 0,
+      ratios: [{ stat: 'ad', layer, value: 0.75 }],
+      internalCooldownSeconds: 1.5,
+    })
+    const result = EffectSchema.parse(spellblade('base'))
+    expect(result.kind === 'spellblade' && result.ratios[0].layer).toBe('base')
+    expect(() => EffectSchema.parse(spellblade('extra'))).toThrow()
+  })
+
   it('rejects an unknown field inside a spellblade ratio entry', () => {
     expect(() =>
       EffectSchema.parse({

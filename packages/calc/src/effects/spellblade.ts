@@ -31,7 +31,7 @@ export const spellbladeHandler: EffectHandler<SpellbladeEffect> = {
 
       let amount = bonusResolved.value
       for (const ratio of effect.ratios) {
-        const statValue = ctx.selfSheet.total[ratio.stat] ?? 0
+        const statValue = ctx.selfSheet[ratio.layer ?? 'total'][ratio.stat] ?? 0
         const ratioResolved = resolveScalar(ratio.value, ctx.level)
         const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
         if (ratioWarning) ctx.addDataWarning(ratioWarning)

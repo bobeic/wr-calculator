@@ -93,12 +93,12 @@ export function cooldownWithHaste(baseCooldownSeconds: number, abilityHaste: num
   return baseCooldownSeconds / (1 + abilityHaste / 100)
 }
 
-// TODO-VERIFY(statResolutionOrder): confirm stat resolution applies in this order — champion
-// base+growth, then flat contributions (item stats, `stat`/`stacking` effects), then
-// `statMultiplier` effects, then `statConversion` effects, then caps — by equipping items that
-// cover multiple stages together and checking the displayed total against each possible
-// ordering.
-export const STAT_RESOLUTION_ORDER = ['flat', 'multiplier', 'conversion'] as const
+// TODO-VERIFY(statResolutionOrder): stat resolution applies champion base+growth, then flat
+// contributions (item stats, `stat`/`stacking` effects), then `statConversion` effects, then
+// `statMultiplier` effects, then caps. Conversion-before-multiplier is verified in game
+// (2026-09-26: Riftmaker's 7 AP from bonus HP was multiplied by Rabadon's, 582 = (440 + 7) x 1.3);
+// still unverified is a % multiplier on a stat a conversion reads (none exists in 7.3 data).
+export const STAT_RESOLUTION_ORDER = ['flat', 'conversion', 'multiplier'] as const
 
 // TODO-VERIFY(resistModificationOrder): confirm resist modification order by applying a flat
 // reduction, a % reduction, and armor pen together on a known-armor dummy and checking the

@@ -19,6 +19,20 @@ describe('statConversionHandler', () => {
     expect(contribution.amount).toBe(30)
   })
 
+  it('converts from the bonus layer when fromLayer is bonus', () => {
+    const effect = {
+      id: 'e1', name: 'Test Conversion', description: '', support: 'full' as const,
+      kind: 'statConversion' as const, fromStat: 'hp' as const, fromLayer: 'bonus' as const,
+      toStat: 'ap' as const, ratio: 0.02,
+    }
+    const statSoFar: StatContext['statSoFar'] = (stat, layer) => {
+      if (stat !== 'hp') return 0
+      return layer === 'bonus' ? 350 : layer === 'total' ? 2630 : 2280
+    }
+    const [contribution] = statConversionHandler.contributeStats!(effect, ctx({ statSoFar }))
+    expect(contribution.amount).toBeCloseTo(7, 10)
+  })
+
   it('flags a data warning when ratio is null', () => {
     const effect = {
       id: 'e1', name: 'Test Conversion', description: '', support: 'full' as const,
