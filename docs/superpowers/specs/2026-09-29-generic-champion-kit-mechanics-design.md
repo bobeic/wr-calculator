@@ -70,7 +70,8 @@ AbilitySchema.effects?: Effect[]   // same Effect union items and runes use
 - **Rank binding:** before they join, every `{ byRank }` scalar inside an ability-owned effect is
   replaced by its value at that ability's rank (currently `maxRank`), via a pure
   `bindAbilityRank(effect, rank)` transform. Handlers stay rank-unaware.
-- Effect ids must be unique across the champion and its build (validated like item effect ids).
+- Kit effect ids are prefixed with the champion id (e.g. `ambessa-…`) so they can't collide with
+  item effect ids (runtime buffs are keyed by effect id); a data test checks prefix and uniqueness.
 
 ### 2.2 Ratios that grow with a second stat
 
