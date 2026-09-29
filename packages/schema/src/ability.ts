@@ -17,6 +17,9 @@ export const AbilityStageSchema = z.object({
 }).strict()
 export type AbilityStage = z.infer<typeof AbilityStageSchema>
 
+// Extract effects array with explicit type annotation using named references to avoid TS7056 serialization overflow.
+export const AbilityEffectsSchema: z.ZodArray<typeof EffectSchema> = z.array(EffectSchema)
+
 export const AbilitySchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -33,7 +36,7 @@ export const AbilitySchema = z.object({
   /** Handler id for kits that don't fit the declarative damage model, e.g. Nunu's Q throw. */
   custom: z.string().optional(),
   /** Mechanics the ability carries, using the same effect kinds as items (e.g. a passive stat). */
-  effects: z.array(EffectSchema).optional(),
+  effects: AbilityEffectsSchema.optional(),
   /** Stages 2..n; the ability's own damage and castTime are stage 1. */
   stages: z.array(AbilityStageSchema).optional(),
   cooldownStartsOn: z.enum(['firstCast', 'lastStage']).optional(),
