@@ -37,6 +37,10 @@ describe('parseCombo', () => {
       ok: false, error: "unknown combo token 'XX'", tokenIndex: 2,
     })
   })
+
+  it('parses dash in any case', () => {
+    expect(parseCombo('Q dash AA DASH')).toEqual({ ok: true, actions: ['Q', 'dash', 'AA', 'dash'] })
+  })
 })
 
 describe('findMissingComboItems', () => {

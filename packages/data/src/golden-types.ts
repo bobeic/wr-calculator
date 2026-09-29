@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { BuildSchema } from '@wr-calc/schema'
 
-const COMBO_ACTION_PATTERN = /^(AA|Q|W|E|R|item:.+|wait:\d+(\.\d+)?)$/
+const COMBO_ACTION_PATTERN = /^(AA|Q|W|E|R|dash|item:.+|wait:\d+(\.\d+)?)$/
 
 export const GoldenScenarioSchema = z.object({
   championId: z.string(),
