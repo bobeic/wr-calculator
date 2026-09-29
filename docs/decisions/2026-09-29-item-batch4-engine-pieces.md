@@ -19,7 +19,9 @@ Readings from the 7.3 practice tool on 2026-09-29 (Annie level 15, clean build p
   shred item (Void Amethyst and its upgrades, Bloodletter's Curse). Pen boots are exempt.
 - Bloodletter's Curse (without Void Staff): repeated Qs hit for 349, 363, 379, 396, 414, 414 —
   a 7.5% MR reduction stack added after each hit, up to 30%, applied before % pen.
-- Hextech Rocketbelt (without Zhonya's): first bolt 107, each extra bolt 11 (10%) at 429 AP.
+- Hextech Rocketbelt (without Zhonya's, 429 AP): totals by bolts hit were 107, 118, 128, 139,
+  150, 160, 170 (each extra bolt 10%). Some casts showed an extra ~75 on top; the user chose to
+  model the usual 170 and note the rest.
 
 ## Decision
 

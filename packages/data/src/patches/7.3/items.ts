@@ -436,9 +436,11 @@ export const STARTER_ITEMS: Item[] = [
       description: 'Dash toward the target direction and unleash 7 magic bolts, dealing 100 + 10% '
         + 'Ability Power magic damage to enemies hit (30s cooldown). If a champion or monster is hit '
         + 'by more than one missile, each additional missile only deals 10% damage.',
-      // Measured 2026-09-29: the first bolt hit for 107 and each extra bolt for 11 (AP 429).
+      // Measured 2026-09-29 (AP 429): totals by bolts hit were 107, 118, 128, 139, 150, 160, 170.
+      // All 7 usually read 170, but sometimes an unexplained extra 75 appeared; not modeled.
       support: 'partial',
-      supportNotes: 'Assumes all 7 bolts hit a single target; the dash is not modeled.',
+      supportNotes: 'Assumes all 7 bolts hit a single target (170 at 429 AP). In game an extra ~75 '
+        + 'sometimes appears on top, cause unknown and not modeled. The dash is not modeled.',
       cooldownSeconds: 30, damageType: 'magic', damage: 100,
       ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
     }],
