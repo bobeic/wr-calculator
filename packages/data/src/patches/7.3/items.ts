@@ -368,6 +368,51 @@ export const STARTER_ITEMS: Item[] = [
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
+    id: 'archangels-staff', name: "Archangel's Staff", tier: 'legendary',
+    cost: { total: 3000, combine: 500 }, recipe: ['fiendish-codex', 'tear-of-the-goddess', 'lost-chapter'],
+    stats: { ap: 60, mana: 500, abilityHaste: 25 }, tags: ['magic'],
+    effects: [
+      {
+        kind: 'statConversion', id: 'archangels-staff-awe', name: 'Awe',
+        description: 'Gain Ability Power equal to 1% of your maximum Mana, and refund 25% of the mana '
+          + 'you spend.',
+        // Measured in the 7.3 practice tool (2026-09-29): 582 AP with 1733 mana and no charges =
+        // (430 + 17.33) x 1.3, so Rabadon's multiplies it.
+        support: 'partial',
+        supportNotes: 'The mana refund is not modeled.',
+        fromStat: 'mana', toStat: 'ap', ratio: 0.01,
+      },
+      {
+        kind: 'stacking', id: 'archangels-staff-mana-charge', name: 'Mana Charge',
+        description: 'Each time you spend Mana, gain +14 Max Mana, up to 700 bonus Mana, at which point '
+          + "this item upgrades into Seraph's Embrace. Triggers up to 3 times every 10 seconds.",
+        support: 'partial',
+        supportNotes: "The charge count is a manual input, not accumulated from casting; at 50 charges "
+          + "the item becomes Seraph's Embrace, which is modeled as its own item.",
+        stat: 'mana', perStack: 14, maxStacks: 50, stackInputId: 'archangels-staff-mana-charge',
+        inputs: [{
+          type: 'stackCount', id: 'archangels-staff-mana-charge', label: "Archangel's Staff Mana Charge stacks",
+          min: 0, max: 50, default: 0,
+        }],
+      },
+    ],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'nashors-tooth', name: "Nashor's Tooth", tier: 'legendary',
+    cost: { total: 2900, combine: 300 }, recipe: ['fiendish-codex', 'blasting-wand', 'recurve-bow'],
+    stats: { ap: 80, attackSpeed: 0.5, abilityHaste: 15 }, tags: ['magic', 'on-hit'],
+    effects: [{
+      kind: 'onHit', id: 'nashors-tooth-gnaw', name: 'Gnaw',
+      description: 'Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit.',
+      // Measured 2026-09-29: a basic attack showed 45 physical and 99 magic (15 + 20% of 585 AP).
+      support: 'partial',
+      supportNotes: 'Reads total AP as bonus AP; the same for champions without base AP.',
+      damageType: 'magic', flat: 15, pctOwnStat: { stat: 'ap', ratio: 0.2 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
     id: 'seraphs-embrace', name: "Seraph's Embrace", tier: 'legendary',
     // Not on wrpocket: it's Archangel's Staff after Mana Charge reaches 700 bonus Mana. Stats are
     // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana; no extra gold to "buy" it.

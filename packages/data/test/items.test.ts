@@ -10,7 +10,8 @@ const STARTER_IDS = [
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
-  'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker',
+  'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker', 'archangels-staff',
+  'nashors-tooth',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -24,7 +25,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 24 starter items', () => {
+  it('has exactly the 26 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -201,6 +202,36 @@ describe('STARTER_ITEMS', () => {
       attacker, target, ['Q', 'wait:1', 'Q', 'wait:1', 'Q', 'wait:1', 'Q'], { ignoreCooldowns: true }
     )
     expect(result.instances.map((instance) => Math.ceil(instance.mitigated))).toEqual([541, 562, 573, 584])
+  })
+
+  it("gives Annie Archangel's Staff's AP from max mana before Rabadon's multiplies it (582 AP in game)", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const build = {
+      items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'archangels-staff'],
+      boots: 'spellslingers-shoes', runes: [], inputs: {},
+    }
+    const sheet = resolveStats(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
+    expect(sheet.total.mana).toBe(1733)
+    expect(sheet.total.ap).toBeCloseTo((430 + 17.33) * 1.3, 6)
+  })
+
+  it("adds 14 mana per Archangel's Staff Mana Charge stack, up to 700", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const catalog = buildCatalog(PATCH_7_3_ITEMS)
+    const build = (stacks: number) => ({
+      items: ['archangels-staff'], runes: [],
+      inputs: { 'archangels-staff-mana-charge': stacks },
+    })
+    expect(resolveStats(annie, 15, build(10), catalog).total.mana).toBe(1733 + 140)
+    expect(resolveStats(annie, 15, build(50), catalog).total.mana).toBe(1733 + 700)
+  })
+
+  it("models Nashor's Tooth's on-hit as 15 + 20% AP magic damage", () => {
+    const nashors = STARTER_ITEMS.find((item) => item.id === 'nashors-tooth')!
+    expect(nashors.effects).toHaveLength(1)
+    expect(nashors.effects[0]).toMatchObject({
+      kind: 'onHit', damageType: 'magic', flat: 15, pctOwnStat: { stat: 'ap', ratio: 0.2 },
+    })
   })
 
   it("can't hold Cryptbloom and Void Staff together", () => {
