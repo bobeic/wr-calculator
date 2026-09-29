@@ -45,6 +45,27 @@ describe('activeHandler.activate', () => {
     expect(dealt).toEqual({ type: 'magic', amount: 80 })
   })
 
+  it('adds stat ratios and deals each extra hit as its own instance at a fraction of the first', () => {
+    const effect = {
+      id: 'e1', name: 'Test Bolts', description: '', support: 'full' as const,
+      kind: 'active' as const, cooldownSeconds: 30, damageType: 'magic' as const, damage: 100,
+      ratios: [{ stat: 'ap' as const, value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
+    }
+    const amounts: number[] = []
+    const selfSheet = { ...sheet(), total: { ap: 429 } }
+    const c = ctx({
+      selfSheet,
+      dealDamage: (input) => {
+        amounts.push(input.amount)
+        return { time: 0, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
+      },
+    })
+    activeHandler.activate!(effect, c)
+    expect(amounts).toHaveLength(7)
+    expect(amounts[0]).toBeCloseTo(142.9, 10)
+    for (const extra of amounts.slice(1)) expect(extra).toBeCloseTo(14.29, 10)
+  })
+
   it('does nothing when this active has no damage component', () => {
     const effect = {
       id: 'e1', name: 'Test Active', description: '', support: 'full' as const,

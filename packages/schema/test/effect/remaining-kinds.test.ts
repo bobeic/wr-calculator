@@ -21,6 +21,17 @@ describe('remaining effect kinds', () => {
     expect(result.kind).toBe('heal')
   })
 
+  it('parses an active effect with stat ratios and extra hits', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'active', cooldownSeconds: 30, damageType: 'magic', damage: 100,
+      ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
+    })
+    expect(result).toMatchObject({ ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 } })
+    expect(() => EffectSchema.parse({
+      ...base, kind: 'active', cooldownSeconds: 30, extraHits: { count: -1, fraction: 0.1 },
+    })).toThrow()
+  })
+
   it('parses an active effect', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'active', cooldownSeconds: 60, damageType: 'magic', damage: 200,
