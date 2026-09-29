@@ -1,7 +1,6 @@
-# ADR: Batch 4 — one-per-build item groups, Archangel's Staff, Nashor's Tooth
+# ADR: Batch 4 — one-per-build item groups, Archangel's Staff, Nashor's Tooth, Bloodletter's Curse, Hextech Rocketbelt
 
-**Status:** Accepted (Bloodletter's Curse, Hextech Rocketbelt and Seraph's Embrace pending
-retests)
+**Status:** Accepted (Seraph's Embrace pending its tooltip)
 
 ## Context
 
@@ -18,6 +17,9 @@ Readings from the 7.3 practice tool on 2026-09-29 (Annie level 15, clean build p
   groups, components included — a Tear item; an item with an active; an armor pen or armor
   shred item (Last Whisper and its upgrades, Terminus, Black Cleaver); a magic pen or magic
   shred item (Void Amethyst and its upgrades, Bloodletter's Curse). Pen boots are exempt.
+- Bloodletter's Curse (without Void Staff): repeated Qs hit for 349, 363, 379, 396, 414, 414 —
+  a 7.5% MR reduction stack added after each hit, up to 30%, applied before % pen.
+- Hextech Rocketbelt (without Zhonya's): first bolt 107, each extra bolt 11 (10%) at 429 AP.
 
 ## Decision
 
@@ -34,6 +36,13 @@ Readings from the 7.3 practice tool on 2026-09-29 (Annie level 15, clean build p
   Seraph's Embrace, which stays its own item. The mana refund is not modeled.
 - **Nashor's Tooth:** Gnaw is an `onHit` (15 + 20% AP magic). It reads total AP as bonus AP,
   which is the same for every champion until base AP exists.
+
+- **Bloodletter's Curse** reuses `resistShred` (percent MR, stacking to 4, 6s), gated on magic
+  damage like Black Cleaver is gated on physical. Any magic instance adds a stack; only ability
+  hits were measured.
+- **`active.ratios` and `active.extraHits`** (both optional): the active's damage adds stat
+  ratios, and each extra hit is its own instance at `fraction` of the first. Rocketbelt uses
+  6 extra hits at 10%, assuming all 7 bolts hit one target.
 
 ## Consequences
 
