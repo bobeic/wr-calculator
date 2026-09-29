@@ -40,6 +40,18 @@ describe('shieldHandler.onAbilityCast', () => {
     expect(self.shieldHp).toBe(60)
   })
 
+  it('adds stat ratios of the caster to the shield amount', () => {
+    const self = runtime()
+    const c = ctx({ self, selfSheet: sheet({ total: { mana: 2433 } }) })
+    const effect = {
+      id: 'e1', name: 'Test Shield', description: '', support: 'full' as const,
+      kind: 'shield' as const, amount: 0, durationSeconds: 2,
+      ratios: [{ stat: 'mana' as const, value: 0.16 }],
+    }
+    shieldHandler.hooks!.onAbilityCast!(effect, c, 'q')
+    expect(self.shieldHp).toBeCloseTo(0.16 * 2433, 10)
+  })
+
   it('flags a data warning when amount is null', () => {
     const c = ctx()
     const effect = {

@@ -9,6 +9,13 @@ const base = {
 }
 
 describe('remaining effect kinds', () => {
+  it('parses a shield effect with stat ratios', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'shield', amount: 0, durationSeconds: 2, ratios: [{ stat: 'mana', value: 0.16 }],
+    })
+    expect(result).toMatchObject({ ratios: [{ stat: 'mana', value: 0.16 }] })
+  })
+
   it('parses a shield effect', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'shield', amount: 300, durationSeconds: 2.5,

@@ -14,7 +14,14 @@ export const shieldHandler: EffectHandler<ShieldEffect> = {
       const durationWarning = scalarWarning(effect.name, 'durationSeconds', durationResolved)
       if (durationWarning) ctx.addDataWarning(durationWarning)
 
-      ctx.self.shieldHp += amountResolved.value
+      let amount = amountResolved.value
+      for (const ratio of effect.ratios ?? []) {
+        const ratioResolved = resolveScalar(ratio.value, ctx.level)
+        const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
+        if (ratioWarning) ctx.addDataWarning(ratioWarning)
+        amount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
+      }
+      ctx.self.shieldHp += amount
     },
   },
 }
