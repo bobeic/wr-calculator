@@ -75,6 +75,10 @@ export interface CombatantRuntime {
   buffs: Record<string, RuntimeBuff>
   /** When this combatant first dealt damage in the combo; unset until then. */
   combatStartedAt?: number
+  /** The last ability cast that can feed a feint: when it ended, and whether a dash used it. */
+  lastAbilityCast?: { at: number; feintUsed: boolean }
+  /** Extra bonus attack speed for the swing in progress (e.g. an empowered attack), then cleared. */
+  swingAttackSpeedBonus?: number
 }
 
 export type AbilityKey = 'q' | 'w' | 'e' | 'r'

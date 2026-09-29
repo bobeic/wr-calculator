@@ -576,4 +576,61 @@ describe('simulateCombo', () => {
     expect(result.instances.every((i) => Number.isFinite(i.time))).toBe(true)
     expect(result.dataWarnings.some((w) => w.includes('Invalid wait duration'))).toBe(true)
   })
+
+  describe('recast stages', () => {
+    const noCatalog = { items: new Map(), runes: new Map() }
+    function stagedChampion(cooldownStartsOn?: 'firstCast' | 'lastStage') {
+      const base = championWithAbility()
+      return championWithAbility({
+        abilities: {
+          ...base.abilities,
+          q: {
+            ...base.abilities.q, cooldown: 9,
+            damage: [{ type: 'true', base: 100, ratios: [], tags: [] }],
+            stages: [{
+              id: 'q2', name: 'Q2', trigger: 'press', windowSeconds: 3.5,
+              damage: [{ type: 'true', base: 200, ratios: [], tags: [] }],
+            }],
+            ...(cooldownStartsOn ? { cooldownStartsOn } : {}),
+          },
+        },
+      })
+    }
+
+    it('casts the next stage on a second press inside the window', () => {
+      const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q'])
+      expect(result.instances.map((i) => [i.source.id, i.mitigated])).toEqual([['q', 100], ['q2', 200]])
+    })
+
+    it('casts nothing when the window has lapsed and the ability is still on cooldown', () => {
+      const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:4', 'Q'])
+      expect(result.instances.map((i) => i.source.id)).toEqual(['q'])
+    })
+
+    it('starts the cooldown on the first cast by default', () => {
+      const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:8', 'Q'])
+      expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'q2', 'q'])
+      expect(result.unverifiedRules).toContain('stageCooldownStart')
+    })
+
+    it('with lastStage, starts the cooldown at the last stage', () => {
+      const attacker = combatantFromChampion(stagedChampion('lastStage'), 1, emptyBuild(), noCatalog)
+      const early = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:8', 'Q'])
+      expect(early.instances.map((i) => i.source.id)).toEqual(['q', 'q2'])
+      const late = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:9', 'Q'])
+      expect(late.instances.map((i) => i.source.id)).toEqual(['q', 'q2', 'q'])
+    })
+
+    it('with lastStage, starts the cooldown when the window lapses without a recast', () => {
+      const attacker = combatantFromChampion(stagedChampion('lastStage'), 1, emptyBuild(), noCatalog)
+      // Window closes at 3.5s; cooldown 9s from then → Q is back at 12.5s, not 9s.
+      const tooEarly = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:12', 'Q'])
+      expect(tooEarly.instances.map((i) => i.source.id)).toEqual(['q'])
+      const ready = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:12.5', 'Q'])
+      expect(ready.instances.map((i) => i.source.id)).toEqual(['q', 'q'])
+    })
+  })
 })
