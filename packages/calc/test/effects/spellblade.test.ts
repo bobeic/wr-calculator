@@ -62,6 +62,27 @@ describe('spellbladeHandler', () => {
     expect(self.cooldowns['spellblade:e1']).toBe(1.5)
   })
 
+  it('reads a ratio from the layer it names', () => {
+    const self = runtime({ buffs: { 'spellblade:e2': {} } })
+    const layered = {
+      ...effect, id: 'e2', damageType: 'magic' as const, bonusDamage: 0,
+      ratios: [
+        { stat: 'ad' as const, layer: 'base' as const, value: 0.75 },
+        { stat: 'ap' as const, value: 0.45 },
+      ],
+    }
+    let amount: number | undefined
+    const c = ctx({
+      self, selfSheet: sheet({ base: { ad: 89 }, bonus: { ad: 40 }, total: { ad: 129, ap: 611 } }),
+      dealDamage: (input) => {
+        amount = input.amount
+        return { time: 0, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
+      },
+    })
+    spellbladeHandler.hooks!.onBasicAttack!(layered, c)
+    expect(amount).toBeCloseTo(0.75 * 89 + 0.45 * 611, 10)
+  })
+
   it('does not re-prime while on internal cooldown', () => {
     const self = runtime({ cooldowns: { 'spellblade:e1': 10 } })
     const c = ctx({ self, time: 5 })

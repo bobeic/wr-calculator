@@ -28,6 +28,16 @@ describe('simple effect kinds', () => {
     expect(result.kind).toBe('statConversion')
   })
 
+  it('accepts a statConversion fromLayer and rejects an unknown one', () => {
+    const bonus = EffectSchema.parse({
+      ...base, kind: 'statConversion', fromStat: 'hp', fromLayer: 'bonus', toStat: 'ap', ratio: 0.02,
+    })
+    expect(bonus).toMatchObject({ fromLayer: 'bonus' })
+    expect(() => EffectSchema.parse({
+      ...base, kind: 'statConversion', fromStat: 'hp', fromLayer: 'extra', toStat: 'ap', ratio: 0.02,
+    })).toThrow()
+  })
+
   it('parses a stacking effect', () => {
     const result = EffectSchema.parse({
       ...base, kind: 'stacking', stat: 'ad', perStack: 2, maxStacks: 5, stackInputId: 'stacks',

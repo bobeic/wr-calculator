@@ -107,7 +107,7 @@ describe('totalAttackSpeed', () => {
 
 describe('STAT_RESOLUTION_ORDER', () => {
   it('defines the three effect-driven stat resolution stages in order', () => {
-    expect(STAT_RESOLUTION_ORDER).toEqual(['flat', 'multiplier', 'conversion'])
+    expect(STAT_RESOLUTION_ORDER).toEqual(['flat', 'conversion', 'multiplier'])
   })
 })
 

@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { ItemSchema } from '@wr-calc/schema'
-import { PATCH_7_3_ITEMS, STARTER_ITEMS } from '../src/patches/7.3'
+import { combatantFromChampion, combatantFromDummy, resolveStats, simulateCombo } from '@wr-calc/calc'
+import { PATCH_7_3_CHAMPIONS, PATCH_7_3_ITEMS, STARTER_ITEMS } from '../src/patches/7.3'
+import { buildCatalog } from '../src/catalog'
 import { GENERATED_ITEMS } from '../src/patches/7.3/generated/items'
 
 const STARTER_IDS = [
@@ -8,7 +10,7 @@ const STARTER_IDS = [
   'trinity-force', 'liandrys-torment', 'void-staff', 'black-cleaver', 'infinity-edge',
   'navori-quickblades', 'heartsteel', 'seraphs-embrace', 'plated-steelcaps', 'force-of-nature',
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
-  'stormsurge', 'blackfire-torch', 'cryptbloom',
+  'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker',
 ].sort()
 // Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
 const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
@@ -22,7 +24,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 22 starter items', () => {
+  it('has exactly the 24 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -146,6 +148,59 @@ describe('STARTER_ITEMS', () => {
     expect(liandrys.effects[1]).toMatchObject({
       kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 3,
     })
+  })
+
+  it("reads base AD for Trinity Force's and Lich Bane's spellblades", () => {
+    const trinity = STARTER_ITEMS.find((item) => item.id === 'trinity-force')!
+    expect(trinity.effects[0]).toMatchObject({
+      kind: 'spellblade', damageType: 'physical', bonusDamage: 0,
+      ratios: [{ stat: 'ad', layer: 'base', value: 2 }], internalCooldownSeconds: 1.5,
+    })
+    const lichBane = STARTER_ITEMS.find((item) => item.id === 'lich-bane')!
+    expect(lichBane.effects).toHaveLength(1)
+    expect(lichBane.effects[0]).toMatchObject({
+      kind: 'spellblade', damageType: 'magic', bonusDamage: 0,
+      ratios: [{ stat: 'ad', layer: 'base', value: 0.75 }, { stat: 'ap', value: 0.45 }],
+      internalCooldownSeconds: 1.5,
+    })
+  })
+
+  it("gives Annie Riftmaker's AP from bonus HP before Rabadon's multiplies it (582 AP in game)", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const build = {
+      items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'riftmaker'],
+      boots: 'spellslingers-shoes', runes: [], inputs: {},
+    }
+    const sheet = resolveStats(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
+    expect(sheet.bonus.hp).toBe(350)
+    expect(sheet.total.ap).toBeCloseTo((440 + 7) * 1.3, 6)
+  })
+
+  it("models Riftmaker's Void Corruption as a 4-stack combat ramp", () => {
+    const riftmaker = STARTER_ITEMS.find((item) => item.id === 'riftmaker')!
+    expect(riftmaker.effects).toHaveLength(2)
+    expect(riftmaker.effects[0]).toMatchObject({
+      kind: 'statConversion', fromStat: 'hp', fromLayer: 'bonus', toStat: 'ap', ratio: 0.02,
+    })
+    expect(riftmaker.effects[1]).toMatchObject({
+      kind: 'combatRampAmp', amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 4,
+    })
+  })
+
+  it("ramps Annie's Q through Void Corruption's stacks as measured (541, 562, 573, 584)", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const build = {
+      items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'riftmaker'],
+      boots: 'spellslingers-shoes', runes: [], inputs: {},
+    }
+    const attacker = combatantFromChampion(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
+    const target = combatantFromDummy({ kind: 'dummy', hp: 10000, armor: 100, mr: 100 })
+    // Cooldowns are ignored so Q can land at 2, 3 and 4 stacks; the +2% stack is never reachable
+    // in game, since it lasts only the first second of combat.
+    const result = simulateCombo(
+      attacker, target, ['Q', 'wait:1', 'Q', 'wait:1', 'Q', 'wait:1', 'Q'], { ignoreCooldowns: true }
+    )
+    expect(result.instances.map((instance) => Math.ceil(instance.mitigated))).toEqual([541, 562, 573, 584])
   })
 
   it("can't hold Cryptbloom and Void Staff together", () => {

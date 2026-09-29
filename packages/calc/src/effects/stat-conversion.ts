@@ -6,7 +6,7 @@ export const statConversionHandler: EffectHandler<StatConversionEffect> = {
   kind: 'statConversion',
   stage: 'conversion',
   contributeStats(effect, ctx) {
-    const basis = ctx.statSoFar(effect.fromStat, 'total')
+    const basis = ctx.statSoFar(effect.fromStat, effect.fromLayer ?? 'total')
     const resolved = resolveScalar(effect.ratio, ctx.level)
     return [{
       stat: effect.toStat,

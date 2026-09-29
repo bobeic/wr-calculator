@@ -182,7 +182,26 @@ describe('resolveStats', () => {
     expect(sheet.combatContributions![0].contributions[0].amount).toBeCloseTo(18, 6)
   })
 
-  it('applies statConversion using the post-multiplier total of the source stat', () => {
+  it('applies % multipliers to stats gained from a statConversion', () => {
+    const item = itemWithStats('riftmaker-like', 0)
+    item.stats = { ap: 100, hp: 350 }
+    item.effects = [
+      {
+        id: 'conv', name: 'Test Conversion', description: '', support: 'full',
+        kind: 'statConversion', fromStat: 'hp', fromLayer: 'bonus', toStat: 'ap', ratio: 0.02,
+      },
+      {
+        id: 'mult', name: 'Test Multiplier', description: '', support: 'full',
+        kind: 'statMultiplier', stat: 'ap', layer: 'total', amount: 0.3,
+      },
+    ]
+    const items = new Map([['riftmaker-like', item]])
+    const build = emptyBuild({ items: ['riftmaker-like'] })
+    const sheet = resolveStats(validChampion(), 1, build, { items, runes: new Map() })
+    expect(sheet.total.ap).toBeCloseTo((100 + 7) * 1.3, 6)
+  })
+
+  it('applies statConversion using the flat total of the source stat', () => {
     const item = itemWithStats('conversion-item', 0)
     item.stats = { ap: 100 }
     item.effects = [{
