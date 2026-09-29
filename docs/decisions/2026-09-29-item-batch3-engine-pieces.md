@@ -13,8 +13,9 @@ Item batch 3 was measured in the 7.3 practice tool on 2026-09-26 (Annie level 15
   Trinity Force) were overstated for champions with bonus AD.
 - Riftmaker: the stat panel showed 582 AP and 2630 max HP. 350 bonus HP x 2% = 7 AP, and
   (440 + 7) x 1.3 = 581.1, so Rabadon's multiplies AP gained from a conversion. The engine ran
-  conversions after multipliers (it would show 579). A Q 4-5s into combat hit for 584
-  (540.4 x 1.08), confirming Void Corruption's 8% cap.
+  conversions after multipliers (it would show 579). Q hit for 541 out of combat and 562, 573,
+  584 at 2, 3 and 4 stacks of Void Corruption (540.2 x 1.04 / 1.06 / 1.08); the 1-stack Q can't
+  be reached in game.
 - Morellonomicon: stats only; Grievous Wounds is out of scope for 1v1 damage.
 
 ## Decision
@@ -26,8 +27,8 @@ Item batch 3 was measured in the 7.3 practice tool on 2026-09-26 (Annie level 15
   reads bonus HP.
 - **Spellblade `ratios[].layer`** (optional, same values, default total). Lich Bane and Trinity
   Force read base AD.
-- **Riftmaker's Void Corruption reuses `combatRampAmp`** with 4 stacks of 2%. Its per-second
-  timing is assumed to match Liandry's Madness, which was measured tick by tick.
+- **Riftmaker's Void Corruption reuses `combatRampAmp`** with 4 stacks of 2%, on the same timing
+  as Liandry's Madness.
 
 Both new fields are optional rather than zod defaults so existing typed data doesn't need them.
 

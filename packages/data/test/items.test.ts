@@ -187,7 +187,7 @@ describe('STARTER_ITEMS', () => {
     })
   })
 
-  it("amplifies Annie's Q by 8% once Void Corruption is full (584 in game, 4s into combat)", () => {
+  it("ramps Annie's Q through Void Corruption's stacks as measured (541, 562, 573, 584)", () => {
     const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
     const build = {
       items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'riftmaker'],
@@ -195,11 +195,12 @@ describe('STARTER_ITEMS', () => {
     }
     const attacker = combatantFromChampion(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
     const target = combatantFromDummy({ kind: 'dummy', hp: 10000, armor: 100, mr: 100 })
-    const result = simulateCombo(attacker, target, ['Q', 'wait:4', 'Q'])
-    const [firstQ, secondQ] = result.instances
-    expect(result.instances).toHaveLength(2)
-    expect(secondQ.mitigated / firstQ.mitigated).toBeCloseTo(1.08, 10)
-    expect(Math.ceil(secondQ.mitigated)).toBe(584)
+    // Cooldowns are ignored so Q can land at 2, 3 and 4 stacks; the +2% stack is never reachable
+    // in game, since it lasts only the first second of combat.
+    const result = simulateCombo(
+      attacker, target, ['Q', 'wait:1', 'Q', 'wait:1', 'Q', 'wait:1', 'Q'], { ignoreCooldowns: true }
+    )
+    expect(result.instances.map((instance) => Math.ceil(instance.mitigated))).toEqual([541, 562, 573, 584])
   })
 
   it("can't hold Cryptbloom and Void Staff together", () => {

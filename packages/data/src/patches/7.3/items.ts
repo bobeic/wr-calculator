@@ -286,8 +286,8 @@ export const STARTER_ITEMS: Item[] = [
         kind: 'combatRampAmp', id: 'riftmaker-void-corruption', name: 'Void Corruption',
         description: 'While in combat with champions, deal 2% additional damage each second, up to 8%.',
         support: 'partial',
-        // Measured 2026-09-26: a Q 4-5s into combat hit for 584 (540.4 x 1.08). The per-second
-        // timing is assumed to match Liandry's Madness, which was measured tick by tick.
+        // Measured 2026-09-26/29: Q hit for 541 out of combat, then 562, 573 and 584 at 2, 3 and 4
+        // stacks (540.2 x 1.04 / 1.06 / 1.08).
         supportNotes: 'Combat starts at your first hit and never ends within a combo. Omnivamp is not '
           + 'modeled.',
         amountPerStack: 0.02, stackIntervalSeconds: 1, maxStacks: 4,
