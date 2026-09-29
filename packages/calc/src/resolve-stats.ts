@@ -6,6 +6,7 @@ import {
 } from './rules'
 import type { UnverifiedRuleId } from './rules'
 import { resolveScalar, scalarWarning } from './resolve-scalar'
+import { championKitEffects } from './kit-effects'
 import { contributeStats, stageOf } from './effects/registry'
 import type { StatContribution, StatContext, StatLayer, StatSource } from './effects/types'
 import type { UnsupportedEffectEntry } from './result-envelope'
@@ -140,6 +141,7 @@ export function resolveStats(
   }
 
   const effects: Effect[] = [
+    ...championKitEffects(champion),
     ...items.flatMap((item) => item.effects),
     ...runes.flatMap((rune) => rune.effects),
   ]

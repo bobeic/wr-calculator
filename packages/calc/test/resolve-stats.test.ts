@@ -370,4 +370,17 @@ describe('resolveStats', () => {
     const level7Sheet = resolveStats(validChampion(), 7, emptyBuild(), { items: new Map(), runes: new Map() })
     expect(sheet.base.hp).toBe(level7Sheet.base.hp)
   })
+
+  it("applies a stat effect carried by the champion's own ability at that ability's rank", () => {
+    const champion = validChampion()
+    champion.abilities.r = {
+      ...champion.abilities.r,
+      effects: [{
+        id: 'r-pen', name: 'Pen', description: '', support: 'full',
+        kind: 'stat', stat: 'pctArmorPen', amount: { byRank: [0.1, 0.2, 0.3] },
+      }],
+    }
+    const sheet = resolveStats(champion, 15, emptyBuild(), { items: new Map(), runes: new Map() })
+    expect(sheet.total.pctArmorPen).toBeCloseTo(0.3, 10)
+  })
 })

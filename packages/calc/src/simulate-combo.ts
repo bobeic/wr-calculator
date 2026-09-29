@@ -42,7 +42,12 @@ export interface ComboResult {
 }
 
 function combatantEffects(combatant: Combatant): Effect[] {
-  return [...combatant.items.flatMap((item) => item.effects), ...combatant.runeEffects]
+  // Kit effects first, so a champion's own empowered-attack bonus lands before item on-hits.
+  return [
+    ...(combatant.kitEffects ?? []),
+    ...combatant.items.flatMap((item) => item.effects),
+    ...combatant.runeEffects,
+  ]
 }
 
 function evaluateCondition(

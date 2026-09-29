@@ -1,4 +1,5 @@
 import type { Champion, Build, Item, Effect, Target } from '@wr-calc/schema'
+import { championKitEffects } from './kit-effects'
 import { resolveStats } from './resolve-stats'
 import type { StatCatalog, StatSheet } from './resolve-stats'
 import { MAX_CHAMPION_LEVEL } from './rules'
@@ -11,6 +12,8 @@ export interface Combatant {
   sheet: StatSheet
   items: Item[]
   runeEffects: Effect[]
+  /** Effects carried by the champion's own abilities, rank values already bound. */
+  kitEffects?: Effect[]
   inputs: Record<string, number | boolean>
   /** Fraction of max HP this combatant starts a combo at. */
   startHpFraction: number
@@ -32,7 +35,7 @@ export function combatantFromChampion(
   const runeEffects = build.runes.flatMap((id) => catalog.runes.get(id)!.effects)
   return {
     id: champion.id, name: champion.name, kind: 'champion', level, sheet, items, runeEffects,
-    inputs: build.inputs, startHpFraction: 1, abilities: champion.abilities,
+    kitEffects: championKitEffects(champion), inputs: build.inputs, startHpFraction: 1, abilities: champion.abilities,
   }
 }
 
