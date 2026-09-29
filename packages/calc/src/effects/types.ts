@@ -94,6 +94,8 @@ export interface HookHandlers<E extends Effect> {
   onBasicAttack?(effect: E, ctx: HookContext): void
   onAbilityCast?(effect: E, ctx: HookContext, abilityKey: AbilityKey): void
   onAbilityHit?(effect: E, ctx: HookContext, abilityKey: AbilityKey, instances: DamageInstance[]): void
+  /** A dash (e.g. a feint) that started at `dashStartedAt` has just ended. */
+  onDash?(effect: E, ctx: HookContext, dashStartedAt: number): void
   onDamageDealt?(effect: E, ctx: HookContext, instance: DamageInstance): void
   onTick?(effect: E, ctx: HookContext, deltaSeconds: number): void
 }

@@ -8,7 +8,7 @@ import type { UnverifiedRuleId } from './rules'
 import type { ResistModifiers } from './mitigation'
 import type { StatSheet } from './resolve-stats'
 import type { UnsupportedEffectEntry } from './result-envelope'
-import { critMultiplier, cooldownWithHaste, totalAttackSpeed } from './rules'
+import { critMultiplier, cooldownWithHaste, totalAttackSpeed, DASH_SECONDS } from './rules'
 import { mitigateDamage, applyDamageReductionFractions, ZERO_RESIST_MODIFIERS } from './mitigation'
 import { resolveEffectHandler } from './effects/registry'
 import { resolveDamageComponent } from './damage-component'
@@ -21,7 +21,8 @@ import { resolveScalar, scalarWarning } from './resolve-scalar'
  */
 const MAX_DAMAGE_CHAIN_DEPTH = 64
 
-export type ComboAction = 'AA' | 'Q' | 'W' | 'E' | 'R' | `item:${string}` | `wait:${number}`
+export type ComboAction =
+  'AA' | 'Q' | 'W' | 'E' | 'R' | 'dash' | `item:${string}` | `wait:${number}`
 
 export interface SimulateComboOptions {
   critMode?: 'expected' | 'always' | 'never'
@@ -376,6 +377,17 @@ export function simulateCombo(
     }
   }
 
+  function dispatchOnDash(dashStartedAt: number) {
+    const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
+    for (const effect of attackerEffectsList) {
+      const handler = resolve(effect)
+      if (!handler?.hooks?.onDash) continue
+      if (!conditionAllows(effect, ctx)) continue
+      handler.hooks.onDash(effect, ctx, dashStartedAt)
+      trackSupport(effect)
+    }
+  }
+
   // Open recast windows: which stage (index into ability.stages) comes next, and until when.
   const stageWindows: Partial<Record<AbilityKey, { nextStage: number; closesAt: number }>> = {}
 
@@ -498,6 +510,31 @@ export function simulateCombo(
       }
 
       dispatchOnAbilityHit(abilityKey, hitInstances)
+    } else if (action === 'dash') {
+      const dashStartedAt = time
+      // Windows are judged at the start of the dash; the stage itself lands at its end.
+      const dashStages: AbilityKey[] = []
+      if (attacker.abilities) {
+        for (const abilityKey of ['q', 'w', 'e', 'r'] as const) {
+          settleStageWindow(abilityKey)
+          const window = stageWindows[abilityKey]
+          const stages = attacker.abilities[abilityKey].stages ?? []
+          if (window && stages[window.nextStage].trigger === 'dash') dashStages.push(abilityKey)
+        }
+      }
+      unverifiedRuleIds.add('dashDuration')
+      time += DASH_SECONDS
+      flushScheduledEvents(time)
+      for (const abilityKey of dashStages) {
+        const window = stageWindows[abilityKey]!
+        const stage = attacker.abilities![abilityKey].stages![window.nextStage]
+        // A dash-triggered stage doesn't update lastAbilityCast, so it can't feed another feint.
+        const hitInstances = castStage(abilityKey, stage)
+        advanceStageWindow(abilityKey, window.nextStage + 1)
+        dispatchOnAbilityHit(abilityKey, hitInstances)
+      }
+      dispatchOnDash(dashStartedAt)
+      if (attackerRuntime.lastAbilityCast) attackerRuntime.lastAbilityCast.feintUsed = true
     } else if (action.startsWith('item:')) {
       const itemId = action.slice(5)
       const item = attacker.items.find((candidate) => candidate.id === itemId)

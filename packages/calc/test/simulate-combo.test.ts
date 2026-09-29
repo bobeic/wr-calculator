@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { simulateCombo } from '../src/simulate-combo'
+import { DASH_SECONDS } from '../src/rules'
 import type { ComboAction } from '../src/simulate-combo'
 import { combatantFromChampion, combatantFromDummy } from '../src/combatant'
 import type { Champion, Item, Build, Target } from '@wr-calc/schema'
@@ -631,6 +632,69 @@ describe('simulateCombo', () => {
       expect(tooEarly.instances.map((i) => i.source.id)).toEqual(['q'])
       const ready = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:12.5', 'Q'])
       expect(ready.instances.map((i) => i.source.id)).toEqual(['q', 'q'])
+    })
+  })
+
+  describe('dash', () => {
+    const noCatalog = { items: new Map(), runes: new Map() }
+    function dashStageChampion() {
+      const base = championWithAbility()
+      return championWithAbility({
+        abilities: {
+          ...base.abilities,
+          e: {
+            ...base.abilities.e, cooldown: 9,
+            damage: [{ type: 'true', base: 50, ratios: [], tags: [] }],
+            stages: [{
+              id: 'e2', name: 'E2', trigger: 'dash', windowSeconds: 0.5,
+              damage: [{ type: 'true', base: 50, ratios: [], tags: [] }],
+            }],
+          },
+        },
+      })
+    }
+
+    it('takes DASH_SECONDS and fires a dash-triggered stage at the end of the dash', () => {
+      const attacker = combatantFromChampion(dashStageChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['E', 'dash'])
+      expect(result.instances.map((i) => [i.source.id, i.time])).toEqual([['e', 0], ['e2', DASH_SECONDS]])
+      expect(result.unverifiedRules).toContain('dashDuration')
+    })
+
+    it('does not fire a dash stage once its window has lapsed, or on a key press', () => {
+      const attacker = combatantFromChampion(dashStageChampion(), 1, emptyBuild(), noCatalog)
+      const lapsed = simulateCombo(attacker, combatantFromDummy(dummy()), ['E', 'wait:1', 'dash'])
+      expect(lapsed.instances.map((i) => i.source.id)).toEqual(['e'])
+      const pressed = simulateCombo(attacker, combatantFromDummy(dummy()), ['E', 'E'])
+      expect(pressed.instances.map((i) => i.source.id)).toEqual(['e'])
+    })
+
+    it('dispatches onDash with the dash start time and lets one cast feed only one feint', () => {
+      const seen: { startedAt: number; eligible: boolean }[] = []
+      const item = baseItem('dash-probe', {
+        id: 'dash-probe-effect', name: 'Probe', description: '', support: 'full',
+        kind: 'custom', handler: 'dash-probe',
+      })
+      const attacker = combatantFromChampion(
+        championWithAbility(), 1, emptyBuild({ items: ['dash-probe'] }),
+        { items: new Map([['dash-probe', item]]), runes: new Map() }
+      )
+      simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'dash'], {
+        customHandlers: {
+          'dash-probe': {
+            kind: 'custom',
+            hooks: {
+              onDash: (_effect, ctx, dashStartedAt) => {
+                seen.push({ startedAt: dashStartedAt, eligible: ctx.self.lastAbilityCast?.feintUsed === false })
+              },
+            },
+          },
+        },
+      })
+      expect(seen).toEqual([
+        { startedAt: 0, eligible: true },
+        { startedAt: DASH_SECONDS, eligible: false },
+      ])
     })
   })
 })
