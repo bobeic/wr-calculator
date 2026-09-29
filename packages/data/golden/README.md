@@ -32,6 +32,12 @@ build" is the clean build plus Riftmaker (582 AP: Rabadon's multiplies the 7 AP 
 were 541, 562, 573, 584 (the +2% stack is over before Q comes off cooldown); that ladder is
 checked in `test/items.test.ts` with cooldowns ignored.
 
+Item batch 4 cases (2026-09-29): "nashors build" and "trinity build" are the clean build plus
+that item. Nashor's `aa` is a basic attack: 45 physical plus Gnaw's 99 magic on-hit. Trinity
+Force's empowered attack showed as one number, 152 (the 63 attack plus the 89 spellblade), which
+puts Annie's true level-15 base AD at 89.0-89.33 even though the stat panel rounds it up to 90.
+`q-then-aa` uses Q 477 from the clean build (Trinity adds no AP or pen).
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.
