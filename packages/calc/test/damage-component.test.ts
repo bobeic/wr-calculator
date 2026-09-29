@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { resolveDamageComponent } from '../src/damage-component'
 import type { Combatant } from '../src/combatant'
 import type { StatSheet } from '../src/resolve-stats'
+import type { DamageComponent } from '@wr-calc/schema'
 
 function sheet(overrides: Partial<StatSheet> = {}): StatSheet {
   return {
@@ -13,6 +14,20 @@ function sheet(overrides: Partial<StatSheet> = {}): StatSheet {
 function combatant(overrides: Partial<Combatant> = {}): Combatant {
   return {
     id: 'c1', name: 'Test', kind: 'champion', level: 5, sheet: sheet(), items: [],
+    runeEffects: [], inputs: {}, startHpFraction: 1, ...overrides,
+  }
+}
+
+function sheetWith(overrides: Partial<StatSheet>): StatSheet {
+  return {
+    base: {}, bonus: {}, total: {}, breakdown: [], unsupportedEffects: [], dataWarnings: [],
+    unverifiedRules: [], ...overrides,
+  }
+}
+
+function combatantWith(overrides: Partial<Combatant>): Combatant {
+  return {
+    id: 'c', name: 'C', kind: 'champion', level: 15, sheet: sheetWith({}), items: [],
     runeEffects: [], inputs: {}, startHpFraction: 1, ...overrides,
   }
 }
@@ -95,5 +110,28 @@ describe('resolveDamageComponent', () => {
     expect(result.dataWarnings).toEqual([
       'Test Q: base is unverified (null)', 'Test Q: ratios.totalAd is unverified (null)',
     ])
+  })
+
+  it('grows a ratio coefficient with a second stat (perStat)', () => {
+    const attacker = combatantWith({ sheet: sheetWith({ base: { ad: 100 }, bonus: { ad: 40 }, total: { ad: 140 } }) })
+    const target = combatantWith({ sheet: sheetWith({ total: { hp: 10000 } }) })
+    const component: DamageComponent = {
+      type: 'physical', base: 120, tags: [],
+      ratios: [{ stat: 'targetMaxHp', value: 0.07, perStat: { stat: 'bonusAd', value: 0.0004 } }],
+    }
+    const result = resolveDamageComponent(component, attacker, target, 10000, 15, 'Test Q')
+    expect(result.amount).toBeCloseTo(120 + (0.07 + 0.0004 * 40) * 10000, 10)
+  })
+
+  it('warns and uses only the base coefficient when perStat.value is null', () => {
+    const attacker = combatantWith({ sheet: sheetWith({ bonus: { ad: 40 } }) })
+    const target = combatantWith({ sheet: sheetWith({ total: { hp: 10000 } }) })
+    const component: DamageComponent = {
+      type: 'physical', base: 0, tags: [],
+      ratios: [{ stat: 'targetMaxHp', value: 0.07, perStat: { stat: 'bonusAd', value: null } }],
+    }
+    const result = resolveDamageComponent(component, attacker, target, 10000, 15, 'Test Q')
+    expect(result.amount).toBeCloseTo(700, 10)
+    expect(result.dataWarnings).toContain('Test Q: ratios.targetMaxHp.perStat.bonusAd is unverified (null)')
   })
 })

@@ -39,7 +39,17 @@ export function resolveDamageComponent(
     const ratioResolved = resolveScalar(ratio.value, level, rank)
     const ratioWarning = scalarWarning(ownerName, `ratios.${ratio.stat}`, ratioResolved)
     if (ratioWarning) dataWarnings.push(ratioWarning)
-    amount += statValue * ratioResolved.value
+    let coefficient = ratioResolved.value
+    if (ratio.perStat) {
+      const perResolved = resolveScalar(ratio.perStat.value, level, rank)
+      const perWarning = scalarWarning(
+        ownerName, `ratios.${ratio.stat}.perStat.${ratio.perStat.stat}`, perResolved
+      )
+      if (perWarning) dataWarnings.push(perWarning)
+      coefficient += perResolved.value
+        * resolveRatioStat(ratio.perStat.stat, attacker, target, targetCurrentHp)
+    }
+    amount += statValue * coefficient
   }
 
   return { type: component.type, amount: amount * (component.hits ?? 1), dataWarnings }
