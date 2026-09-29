@@ -449,22 +449,28 @@ export const STARTER_ITEMS: Item[] = [
   {
     id: 'seraphs-embrace', name: "Seraph's Embrace", tier: 'legendary',
     // Not on wrpocket: it's Archangel's Staff after Mana Charge reaches 700 bonus Mana. Stats are
-    // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana; no extra gold to "buy" it.
+    // Archangel's (60 AP, 500 Mana, 25 AH) plus that 700 Mana, matching the in-game tooltip
+    // (2026-09-29); no extra gold to "buy" it.
     cost: { total: 3000, combine: 0 }, recipe: ['archangels-staff'],
     stats: { ap: 60, mana: 1200, abilityHaste: 25 }, tags: ['magic'],
     effects: [
       {
         kind: 'statConversion', id: 'seraphs-embrace-focused-will', name: 'Awe',
-        description: 'Gain Ability Power equal to 1% of your maximum Mana.',
-        support: 'full',
-        fromStat: 'mana', toStat: 'ap', ratio: 0.01,
+        description: 'Grants Ability Power equal to 2% of maximum Mana and refunds 25% of all Mana '
+          + 'spent.',
+        // In-game tooltip and reading (2026-09-29): 623 AP at 2433 Mana = (430 + 48.66) x 1.3.
+        support: 'partial',
+        supportNotes: 'The mana refund is not modeled.',
+        fromStat: 'mana', toStat: 'ap', ratio: 0.02,
       },
       {
         kind: 'shield', id: 'seraphs-embrace-bottomless-well', name: 'Lifeline',
-        description: "Seraph's upgraded shield. Values aren't on wrpocket; verify in-game.",
+        description: 'Damage that puts you under 35% Health grants a shield that absorbs damage equal '
+          + 'to 16% of your maximum Mana for 2 seconds (70 second cooldown).',
         support: 'partial',
-        supportNotes: 'Modeled as a manually toggled shield; trigger and cooldown are not modeled.',
-        amount: null, durationSeconds: null,
+        supportNotes: 'Modeled as a manually toggled shield; the 35% Health trigger and the 70 second '
+          + 'cooldown are not modeled.',
+        amount: 0, durationSeconds: 2, ratios: [{ stat: 'mana', value: 0.16 }],
         condition: { type: 'toggle', inputId: 'seraphs-embrace-shield-used' },
         inputs: [{
           type: 'boolean', id: 'seraphs-embrace-shield-used',

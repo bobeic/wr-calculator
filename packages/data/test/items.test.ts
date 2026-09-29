@@ -13,8 +13,7 @@ const STARTER_IDS = [
   'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker', 'archangels-staff',
   'nashors-tooth', 'bloodletters-curse', 'hextech-rocketbelt',
 ].sort()
-// Seraph's Embrace isn't on wrpocket (it's Archangel's Staff's upgraded form), so its shield has no source values yet.
-const ALLOWED_STARTER_NULLS = ['seraphs-embrace › effects[1].amount', 'seraphs-embrace › effects[1].durationSeconds']
+const ALLOWED_STARTER_NULLS: string[] = []
 
 function nullPaths(value: unknown, path: string, out: string[]): void {
   if (value === null) out.push(path)
@@ -29,7 +28,7 @@ describe('STARTER_ITEMS', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
-  it('has no null values except the documented Seraph shield', () => {
+  it('has no null values', () => {
     const found: string[] = []
     for (const item of STARTER_ITEMS) {
       const paths: string[] = []
@@ -249,6 +248,24 @@ describe('STARTER_ITEMS', () => {
     expect(rocketbelt.effects[0]).toMatchObject({
       kind: 'active', damageType: 'magic', damage: 100, ratios: [{ stat: 'ap', value: 0.1 }],
       extraHits: { count: 6, fraction: 0.1 }, cooldownSeconds: 30,
+    })
+  })
+
+  it("gives Annie Seraph's Embrace's AP from 2% of max mana (623 AP in game at 2433 mana)", () => {
+    const annie = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'annie')!
+    const build = {
+      items: ['rabadons-deathcap', 'void-staff', 'zhonyas-hourglass', 'seraphs-embrace'],
+      boots: 'spellslingers-shoes', runes: [], inputs: {},
+    }
+    const sheet = resolveStats(annie, 15, build, buildCatalog(PATCH_7_3_ITEMS))
+    expect(sheet.total.mana).toBe(2433)
+    expect(sheet.total.ap).toBeCloseTo((430 + 48.66) * 1.3, 6)
+  })
+
+  it("models Seraph's Embrace's Lifeline as a 16% max mana shield for 2 seconds", () => {
+    const seraphs = STARTER_ITEMS.find((item) => item.id === 'seraphs-embrace')!
+    expect(seraphs.effects[1]).toMatchObject({
+      kind: 'shield', amount: 0, durationSeconds: 2, ratios: [{ stat: 'mana', value: 0.16 }],
     })
   })
 
