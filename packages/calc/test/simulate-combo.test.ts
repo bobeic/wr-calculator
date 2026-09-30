@@ -614,7 +614,7 @@ describe('simulateCombo', () => {
       const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
       const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:8', 'Q'])
       expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'q2', 'q'])
-      expect(result.unverifiedRules).toContain('stageCooldownStart')
+      expect(result.unverifiedRules).not.toContain('stageCooldownStart')
     })
 
     it('with lastStage, starts the cooldown at the last stage', () => {

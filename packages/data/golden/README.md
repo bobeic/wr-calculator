@@ -45,6 +45,15 @@ Decay stacks to 30%. `protobelt` is the Rocketbelt active with all 7 bolts on th
 (107 for the first bolt, about 10.7 for each extra). Some casts showed an extra ~75 on top, cause
 unknown; the case uses the usual 170.
 
+Ambessa cases (2026-09-30): Ambessa at level 15 with Q/W/E rank 4 and R rank 3 (so 30% armor pen
+from R's passive), a rune page with no AD or pen. "bf-sword" adds a B.F. Sword (+40 bonus AD).
+`q` is Cunning Sweep's edge hit and `q-then-slam` adds Sundering Slam's first-target hit (483 + 506).
+`e-then-feint` is Lacerate and its dash recast. In `e-feint-empowered-aa` the empowered attack
+showed as one number (95, or 125 with the sword) holding the attack and Drakehound's Step's bonus.
+`no-items-aa` uses a 2% tolerance: the engine's 71.18 shows as 72, which is outside 1% of such a
+small number. R is left out until its full-HP reading (270, versus 236 from 400 base damage) is
+explained.
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.

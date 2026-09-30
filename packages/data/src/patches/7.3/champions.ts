@@ -5,8 +5,6 @@ import { WRPOCKET_7_3_PROVENANCE } from './provenance'
 // the ability text with this repo's generic kit mechanics. These replace the generated entries with
 // the same id. Values marked "unverified" are placeholders until checked in the practice tool.
 
-const UNVERIFIED = 'Placeholder from the ability text; not yet checked in the practice tool.'
-
 /** "4/5/6/7% (+0.04% per bonus AD) of the target's max Health", as a damage ratio. */
 const Q_MAX_HP_RATIO = {
   stat: 'targetMaxHp' as const,
@@ -37,12 +35,14 @@ const AMBESSA: Champion = {
       effects: [{
         kind: 'empoweredAttack', id: 'ambessa-passive-drakehounds-step', name: "Drakehound's Step",
         description: 'After an ability, a feint dash empowers her next attack within 4 seconds: 50% '
-          + 'Attack Speed, more range, 5 + 2.5 (based on level) (+25% bonus AD) bonus physical '
-          + 'damage and 50 Energy. Stacks up to 3 times.',
+          + 'Attack Speed, more range, 5-40 (based on level) (+25% bonus AD) bonus physical damage '
+          + 'and 50/60/70 Energy (at levels 1/6/11). Stacks up to 3 times.',
         support: 'partial',
-        supportNotes: `${UNVERIFIED} Level scaling assumed 5 + 2.5 per level; feint window assumed 0.5s. `
-          + 'Energy and range are not modeled.',
-        grant: { on: 'dashAfterAbility', withinSeconds: 0.5 },
+        // Verified 2026-09-30: 40 (+25% bonus AD) at level 15, 3 charges on one refreshed 4s timer,
+        // and the bonus lands in the same damage number as the attack.
+        supportNotes: 'Feint window of 0.275s is from the WR wiki, not checked in the practice tool. '
+          + 'Values below level 15 assume a straight line from 5 to 40. Energy and range are not modeled.',
+        grant: { on: 'dashAfterAbility', withinSeconds: 0.275 },
         maxCharges: 3, durationSeconds: 4, attackSpeedBonus: 0.5,
         bonus: {
           type: 'physical',
@@ -88,19 +88,22 @@ const AMBESSA: Champion = {
     },
     r: {
       id: 'ambessa-r', name: 'PUBLIC EXECUTION', maxRank: 3, cooldown: { byRank: [80, 70, 60] },
-      // The 1-second suppression before the slam (unverified).
-      castTime: 1, flags: {},
+      // 0.55s cast plus the 0.75s suppression before the slam (WR wiki; not timed in game).
+      castTime: 1.3, flags: {},
+      // 10/17.5/25% (+5% per 100 bonus AD) missing HP since patch 7.2b (WR wiki patch history).
       damage: [{
         type: 'physical', base: { byRank: [200, 300, 400] },
         ratios: [{
-          stat: 'targetMissingHp', value: 0.1, perStat: { stat: 'bonusAd', value: 0.0005 },
+          stat: 'targetMissingHp', value: { byRank: [0.1, 0.175, 0.25] },
+          perStat: { stat: 'bonusAd', value: 0.0005 },
         }],
         tags: [],
       }],
       effects: [{
         kind: 'stat', id: 'ambessa-r-passive-armor-pen', name: 'Public Execution (passive)',
         description: 'Gains 10/20/30% Armor Penetration.',
-        support: 'partial', supportNotes: `${UNVERIFIED} Spell vamp is not modeled.`,
+        // Verified 2026-09-30: a level-15 attack on the 100-armor dummy dealt 72 (121 x 100/170).
+        support: 'partial', supportNotes: 'Spell vamp is not modeled.',
         stat: 'pctArmorPen', amount: { byRank: [0.1, 0.2, 0.3] },
       }],
     },
