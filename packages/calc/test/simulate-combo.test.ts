@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { simulateCombo } from '../src/simulate-combo'
+import { DASH_SECONDS, ATTACK_SPEED_CAP } from '../src/rules'
 import type { ComboAction } from '../src/simulate-combo'
 import { combatantFromChampion, combatantFromDummy } from '../src/combatant'
 import type { Champion, Item, Build, Target } from '@wr-calc/schema'
@@ -575,5 +576,169 @@ describe('simulateCombo', () => {
     )
     expect(result.instances.every((i) => Number.isFinite(i.time))).toBe(true)
     expect(result.dataWarnings.some((w) => w.includes('Invalid wait duration'))).toBe(true)
+  })
+
+  describe('recast stages', () => {
+    const noCatalog = { items: new Map(), runes: new Map() }
+    function stagedChampion(cooldownStartsOn?: 'firstCast' | 'lastStage') {
+      const base = championWithAbility()
+      return championWithAbility({
+        abilities: {
+          ...base.abilities,
+          q: {
+            ...base.abilities.q, cooldown: 9,
+            damage: [{ type: 'true', base: 100, ratios: [], tags: [] }],
+            stages: [{
+              id: 'q2', name: 'Q2', trigger: 'press', windowSeconds: 3.5,
+              damage: [{ type: 'true', base: 200, ratios: [], tags: [] }],
+            }],
+            ...(cooldownStartsOn ? { cooldownStartsOn } : {}),
+          },
+        },
+      })
+    }
+
+    it('casts the next stage on a second press inside the window', () => {
+      const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q'])
+      expect(result.instances.map((i) => [i.source.id, i.mitigated])).toEqual([['q', 100], ['q2', 200]])
+    })
+
+    it('casts nothing when the window has lapsed and the ability is still on cooldown', () => {
+      const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:4', 'Q'])
+      expect(result.instances.map((i) => i.source.id)).toEqual(['q'])
+    })
+
+    it('starts the cooldown on the first cast by default', () => {
+      const attacker = combatantFromChampion(stagedChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:8', 'Q'])
+      expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'q2', 'q'])
+      expect(result.unverifiedRules).toContain('stageCooldownStart')
+    })
+
+    it('with lastStage, starts the cooldown at the last stage', () => {
+      const attacker = combatantFromChampion(stagedChampion('lastStage'), 1, emptyBuild(), noCatalog)
+      const early = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:8', 'Q'])
+      expect(early.instances.map((i) => i.source.id)).toEqual(['q', 'q2'])
+      const late = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'Q', 'wait:9', 'Q'])
+      expect(late.instances.map((i) => i.source.id)).toEqual(['q', 'q2', 'q'])
+    })
+
+    it('with lastStage, starts the cooldown when the window lapses without a recast', () => {
+      const attacker = combatantFromChampion(stagedChampion('lastStage'), 1, emptyBuild(), noCatalog)
+      // Window closes at 3.5s; cooldown 9s from then → Q is back at 12.5s, not 9s.
+      const tooEarly = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:12', 'Q'])
+      expect(tooEarly.instances.map((i) => i.source.id)).toEqual(['q'])
+      const ready = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:12.5', 'Q'])
+      expect(ready.instances.map((i) => i.source.id)).toEqual(['q', 'q'])
+    })
+  })
+
+  describe('dash', () => {
+    const noCatalog = { items: new Map(), runes: new Map() }
+    function dashStageChampion() {
+      const base = championWithAbility()
+      return championWithAbility({
+        abilities: {
+          ...base.abilities,
+          e: {
+            ...base.abilities.e, cooldown: 9,
+            damage: [{ type: 'true', base: 50, ratios: [], tags: [] }],
+            stages: [{
+              id: 'e2', name: 'E2', trigger: 'dash', windowSeconds: 0.5,
+              damage: [{ type: 'true', base: 50, ratios: [], tags: [] }],
+            }],
+          },
+        },
+      })
+    }
+
+    it('takes DASH_SECONDS and fires a dash-triggered stage at the end of the dash', () => {
+      const attacker = combatantFromChampion(dashStageChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['E', 'dash'])
+      expect(result.instances.map((i) => [i.source.id, i.time])).toEqual([['e', 0], ['e2', DASH_SECONDS]])
+      expect(result.unverifiedRules).toContain('dashDuration')
+    })
+
+    it('does not fire a dash stage once its window has lapsed, or on a key press', () => {
+      const attacker = combatantFromChampion(dashStageChampion(), 1, emptyBuild(), noCatalog)
+      const lapsed = simulateCombo(attacker, combatantFromDummy(dummy()), ['E', 'wait:1', 'dash'])
+      expect(lapsed.instances.map((i) => i.source.id)).toEqual(['e'])
+      const pressed = simulateCombo(attacker, combatantFromDummy(dummy()), ['E', 'E'])
+      expect(pressed.instances.map((i) => i.source.id)).toEqual(['e'])
+    })
+
+    it('dispatches onDash with the dash start time and lets one cast feed only one feint', () => {
+      const seen: { startedAt: number; eligible: boolean }[] = []
+      const item = baseItem('dash-probe', {
+        id: 'dash-probe-effect', name: 'Probe', description: '', support: 'full',
+        kind: 'custom', handler: 'dash-probe',
+      })
+      const attacker = combatantFromChampion(
+        championWithAbility(), 1, emptyBuild({ items: ['dash-probe'] }),
+        { items: new Map([['dash-probe', item]]), runes: new Map() }
+      )
+      simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'dash'], {
+        customHandlers: {
+          'dash-probe': {
+            kind: 'custom',
+            hooks: {
+              onDash: (_effect, ctx, dashStartedAt) => {
+                seen.push({ startedAt: dashStartedAt, eligible: ctx.self.lastAbilityCast?.feintUsed === false })
+              },
+            },
+          },
+        },
+      })
+      expect(seen).toEqual([
+        { startedAt: 0, eligible: true },
+        { startedAt: DASH_SECONDS, eligible: false },
+      ])
+    })
+  })
+
+  describe('empowered attacks in a combo', () => {
+    const noCatalog = { items: new Map(), runes: new Map() }
+    function feintChampion(attackSpeedBonus = 0.5) {
+      const base = championWithAbility()
+      return championWithAbility({
+        abilities: {
+          ...base.abilities,
+          passive: {
+            ...base.abilities.passive,
+            effects: [{
+              id: 'step', name: 'Step', description: '', support: 'full', kind: 'empoweredAttack',
+              grant: { on: 'dashAfterAbility', withinSeconds: 0.5 },
+              maxCharges: 3, durationSeconds: 4, attackSpeedBonus,
+              bonus: { type: 'physical', base: 40, ratios: [], tags: [] },
+            }],
+          },
+        },
+      })
+    }
+
+    it('empowers the attack after ability → dash, with the bonus as its own hit and a faster next swing', () => {
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], { critMode: 'never' })
+      const hits = result.instances.map((i) => [i.source.id, i.mitigated, i.time])
+      // Base AS 1.0; the empowered swing at +50% waits 1/1.5 s before the next attack.
+      expect(hits).toEqual([
+        ['q', 50, 0], ['AA', 60, DASH_SECONDS], ['step', 40, DASH_SECONDS], ['AA', 60, DASH_SECONDS + 1 / 1.5],
+      ])
+    })
+
+    it('keeps the swing attack speed under the attack speed cap', () => {
+      const attacker = combatantFromChampion(feintChampion(5), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], { critMode: 'never' })
+      const attackTimes = result.instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+      expect(attackTimes[1] - attackTimes[0]).toBeCloseTo(1 / ATTACK_SPEED_CAP, 10)
+    })
+
+    it('does not empower an attack after the charges expire', () => {
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild(), noCatalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'wait:4.5', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'AA'])
+    })
   })
 })

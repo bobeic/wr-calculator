@@ -13,19 +13,28 @@ export const ChampionBaseStatsSchema = statKeyRecord(
   z.object({ base: z.number(), perLevel: z.number() })
 ).omit({ attackSpeed: true })
 
+// Extract abilities object with explicit type annotation using named references to avoid TS7056 serialization overflow.
+export const ChampionAbilitiesSchema: z.ZodObject<{
+  passive: typeof AbilitySchema
+  q: typeof AbilitySchema
+  w: typeof AbilitySchema
+  e: typeof AbilitySchema
+  r: typeof AbilitySchema
+}> = z.object({
+  passive: AbilitySchema,
+  q: AbilitySchema,
+  w: AbilitySchema,
+  e: AbilitySchema,
+  r: AbilitySchema,
+}).strict()
+
 export const ChampionSchema = z.object({
   id: z.string(),
   name: z.string(),
   resource: z.enum(['mana', 'energy', 'none', 'other']),
   baseStats: ChampionBaseStatsSchema,
   attackSpeed: z.object({ base: z.number(), ratio: z.number().optional() }).strict(),
-  abilities: z.object({
-    passive: AbilitySchema,
-    q: AbilitySchema,
-    w: AbilitySchema,
-    e: AbilitySchema,
-    r: AbilitySchema,
-  }).strict(),
+  abilities: ChampionAbilitiesSchema,
   provenance: ProvenanceSchema,
 }).strict()
 export type Champion = z.infer<typeof ChampionSchema>

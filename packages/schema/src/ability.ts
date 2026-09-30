@@ -1,25 +1,24 @@
 import { z } from 'zod'
 import { NullableScalarSchema } from './scalar'
+import { DamageComponentSchema } from './damage-component'
+import { EffectSchema } from './effect/effect'
 
-export const DamageTypeSchema = z.enum(['physical', 'magic', 'true'])
-export type DamageType = z.infer<typeof DamageTypeSchema>
+export * from './damage-component'
 
-export const DamageRatioStatSchema = z.enum([
-  'totalAd', 'bonusAd', 'ap', 'maxHp', 'bonusHp',
-  'targetMaxHp', 'targetCurrentHp', 'targetMissingHp',
-])
-export type DamageRatioStat = z.infer<typeof DamageRatioStatSchema>
-
-export const DamageComponentSchema = z.object({
-  type: DamageTypeSchema,
-  base: NullableScalarSchema,
-  ratios: z.array(
-    z.object({ stat: DamageRatioStatSchema, value: NullableScalarSchema }).strict()
-  ),
-  hits: z.number().optional(),
-  tags: z.array(z.string()),
+/** A follow-up cast of an ability (e.g. a recast), available while its window is open. */
+export const AbilityStageSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  trigger: z.enum(['press', 'dash']),
+  /** Measured from the end of the previous stage's cast. */
+  windowSeconds: z.number().positive(),
+  castTime: z.number().nonnegative().optional(),
+  damage: z.array(DamageComponentSchema),
 }).strict()
-export type DamageComponent = z.infer<typeof DamageComponentSchema>
+export type AbilityStage = z.infer<typeof AbilityStageSchema>
+
+// Extract effects array with explicit type annotation using named references to avoid TS7056 serialization overflow.
+export const AbilityEffectsSchema: z.ZodArray<typeof EffectSchema> = z.array(EffectSchema)
 
 export const AbilitySchema = z.object({
   id: z.string(),
@@ -36,5 +35,10 @@ export const AbilitySchema = z.object({
   }).strict(),
   /** Handler id for kits that don't fit the declarative damage model, e.g. Nunu's Q throw. */
   custom: z.string().optional(),
+  /** Mechanics the ability carries, using the same effect kinds as items (e.g. a passive stat). */
+  effects: AbilityEffectsSchema.optional(),
+  /** Stages 2..n; the ability's own damage and castTime are stage 1. */
+  stages: z.array(AbilityStageSchema).optional(),
+  cooldownStartsOn: z.enum(['firstCast', 'lastStage']).optional(),
 }).strict()
 export type Ability = z.infer<typeof AbilitySchema>

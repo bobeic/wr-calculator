@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { resolveDamageComponent } from '../src/damage-component'
 import type { Combatant } from '../src/combatant'
 import type { StatSheet } from '../src/resolve-stats'
+import type { DamageComponent } from '@wr-calc/schema'
 
 function sheet(overrides: Partial<StatSheet> = {}): StatSheet {
   return {
@@ -93,7 +94,39 @@ describe('resolveDamageComponent', () => {
     }
     const result = resolveDamageComponent(component, attacker, target, 1000, 5, 'Test Q')
     expect(result.dataWarnings).toEqual([
-      'Test Q: base is unverified (null)', 'Test Q: ratios.totalAd is unverified (null)',
+      'Test Q: base is unverified (null)',
+      'Test Q: ratios.totalAd is unverified (null)',
     ])
+  })
+
+  it('grows a ratio coefficient with a second stat (perStat)', () => {
+    const attacker = combatant({
+      level: 15,
+      sheet: sheet({ base: { ad: 100 }, bonus: { ad: 40 }, total: { ad: 140 } }),
+    })
+    const target = combatant({ level: 15, sheet: sheet({ total: { hp: 10000 } }) })
+    const component: DamageComponent = {
+      type: 'physical', base: 120, tags: [],
+      ratios: [{ stat: 'targetMaxHp', value: 0.07, perStat: { stat: 'bonusAd', value: 0.0004 } }],
+    }
+    const result = resolveDamageComponent(component, attacker, target, 10000, 15, 'Test Q')
+    expect(result.amount).toBeCloseTo(120 + (0.07 + 0.0004 * 40) * 10000, 10)
+  })
+
+  it('warns and uses only the base coefficient when perStat.value is null', () => {
+    const attacker = combatant({
+      level: 15,
+      sheet: sheet({ bonus: { ad: 40 } }),
+    })
+    const target = combatant({ level: 15, sheet: sheet({ total: { hp: 10000 } }) })
+    const component: DamageComponent = {
+      type: 'physical', base: 0, tags: [],
+      ratios: [{ stat: 'targetMaxHp', value: 0.07, perStat: { stat: 'bonusAd', value: null } }],
+    }
+    const result = resolveDamageComponent(component, attacker, target, 10000, 15, 'Test Q')
+    expect(result.amount).toBeCloseTo(700, 10)
+    expect(result.dataWarnings).toContain(
+      'Test Q: ratios.targetMaxHp.perStat.bonusAd is unverified (null)'
+    )
   })
 })

@@ -12,13 +12,17 @@ function tokenize(text: string): string[] {
   return text.trim().split(/\s+/).filter((token) => token !== '')
 }
 
-/** Parses combo text like "Q AA item:trinity-force wait:0.5 R" into simulateCombo actions. */
+/** Parses combo text like "Q AA dash item:trinity-force wait:0.5 R" into simulateCombo actions. */
 export function parseCombo(text: string): ComboParse {
   const actions: ComboAction[] = []
   for (const [tokenIndex, token] of tokenize(text).entries()) {
     const simple = SIMPLE_ACTIONS.find((action) => action === token.toUpperCase())
     if (simple) {
       actions.push(simple)
+      continue
+    }
+    if (token.toLowerCase() === 'dash') {
+      actions.push('dash')
       continue
     }
     const colon = token.indexOf(':')

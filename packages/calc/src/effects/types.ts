@@ -1,7 +1,8 @@
-import type { Effect, StatKey, Condition, DamageType } from '@wr-calc/schema'
+import type { Effect, StatKey, Condition, DamageType, DamageComponent } from '@wr-calc/schema'
 import type { STAT_RESOLUTION_ORDER, UnverifiedRuleId } from '../rules'
 import type { ResistModifiers } from '../mitigation'
 import type { StatSheet } from '../resolve-stats'
+import type { ResolvedDamageComponent } from '../damage-component'
 
 export type EffectStage = (typeof STAT_RESOLUTION_ORDER)[number]
 
@@ -75,6 +76,10 @@ export interface CombatantRuntime {
   buffs: Record<string, RuntimeBuff>
   /** When this combatant first dealt damage in the combo; unset until then. */
   combatStartedAt?: number
+  /** The last ability cast that can feed a feint: when it ended, and whether a dash used it. */
+  lastAbilityCast?: { at: number; feintUsed: boolean }
+  /** Extra bonus attack speed for the swing in progress (e.g. an empowered attack), then cleared. */
+  swingAttackSpeedBonus?: number
 }
 
 export type AbilityKey = 'q' | 'w' | 'e' | 'r'
@@ -90,6 +95,8 @@ export interface HookHandlers<E extends Effect> {
   onBasicAttack?(effect: E, ctx: HookContext): void
   onAbilityCast?(effect: E, ctx: HookContext, abilityKey: AbilityKey): void
   onAbilityHit?(effect: E, ctx: HookContext, abilityKey: AbilityKey, instances: DamageInstance[]): void
+  /** A dash (e.g. a feint) that started at `dashStartedAt` has just ended. */
+  onDash?(effect: E, ctx: HookContext, dashStartedAt: number): void
   onDamageDealt?(effect: E, ctx: HookContext, instance: DamageInstance): void
   onTick?(effect: E, ctx: HookContext, deltaSeconds: number): void
 }
@@ -116,4 +123,6 @@ export interface HookContext {
   ): boolean
   scheduleEvent?(atTime: number, run: (ctx: HookContext) => void, key?: string): void
   cancelScheduled?(key: string): void
+  /** Resolves a damage component for this context's owner against its opponent, right now. */
+  resolveComponent?(component: DamageComponent, ownerName: string): ResolvedDamageComponent
 }

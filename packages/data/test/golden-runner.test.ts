@@ -8,6 +8,7 @@ import { runGoldenCase } from '../src/golden-runner'
 import { loadGoldenCases } from '../src/golden-loader'
 import { buildChampionMap } from '../src/champion-map'
 import type { GoldenCase } from '../src/golden-types'
+import { GoldenScenarioSchema } from '../src/golden-types'
 import { PATCH_7_3_CHAMPIONS, PATCH_7_3_CATALOG } from '../src/patches/7.3'
 
 const champions = buildChampionMap(PATCH_7_3_CHAMPIONS)
@@ -82,6 +83,16 @@ describe('runGoldenCase', () => {
     const result = runGoldenCase(goldenCase, champions, PATCH_7_3_CATALOG)
     expect(result.passed).toBe(false)
     expect(result.failures[0]).toContain('does-not-exist')
+  })
+})
+
+describe('GoldenScenarioSchema', () => {
+  it('accepts a dash action in a combo', () => {
+    const parsed = GoldenScenarioSchema.parse({
+      championId: 'ambessa', level: 15, build: { items: [], runes: [], inputs: {} },
+      target: { hp: 10000, armor: 100, mr: 100 }, combo: ['E', 'dash', 'AA'],
+    })
+    expect(parsed.combo).toEqual(['E', 'dash', 'AA'])
   })
 })
 

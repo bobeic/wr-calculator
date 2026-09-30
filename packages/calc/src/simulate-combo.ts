@@ -1,4 +1,4 @@
-import type { Effect, DamageType, Condition } from '@wr-calc/schema'
+import type { Effect, DamageType, Condition, AbilityStage } from '@wr-calc/schema'
 import type { Combatant } from './combatant'
 import type {
   AbilityKey, CombatantRuntime, ConditionExtra, DamageInstance, EffectHandler, HookContext,
@@ -8,7 +8,7 @@ import type { UnverifiedRuleId } from './rules'
 import type { ResistModifiers } from './mitigation'
 import type { StatSheet } from './resolve-stats'
 import type { UnsupportedEffectEntry } from './result-envelope'
-import { critMultiplier, cooldownWithHaste, totalAttackSpeed } from './rules'
+import { critMultiplier, cooldownWithHaste, totalAttackSpeed, DASH_SECONDS, ATTACK_SPEED_CAP } from './rules'
 import { mitigateDamage, applyDamageReductionFractions, ZERO_RESIST_MODIFIERS } from './mitigation'
 import { resolveEffectHandler } from './effects/registry'
 import { resolveDamageComponent } from './damage-component'
@@ -21,7 +21,8 @@ import { resolveScalar, scalarWarning } from './resolve-scalar'
  */
 const MAX_DAMAGE_CHAIN_DEPTH = 64
 
-export type ComboAction = 'AA' | 'Q' | 'W' | 'E' | 'R' | `item:${string}` | `wait:${number}`
+export type ComboAction =
+  'AA' | 'Q' | 'W' | 'E' | 'R' | 'dash' | `item:${string}` | `wait:${number}`
 
 export interface SimulateComboOptions {
   critMode?: 'expected' | 'always' | 'never'
@@ -42,7 +43,12 @@ export interface ComboResult {
 }
 
 function combatantEffects(combatant: Combatant): Effect[] {
-  return [...combatant.items.flatMap((item) => item.effects), ...combatant.runeEffects]
+  // Kit effects first, so a champion's own empowered-attack bonus lands before item on-hits.
+  return [
+    ...(combatant.kitEffects ?? []),
+    ...combatant.items.flatMap((item) => item.effects),
+    ...combatant.runeEffects,
+  ]
 }
 
 function evaluateCondition(
@@ -206,6 +212,10 @@ export function simulateCombo(
         scheduled.push({ time: atTime, run, key })
         scheduled.sort((a, b) => a.time - b.time)
       },
+      resolveComponent: (component, ownerName) => resolveDamageComponent(
+        component, { ...self, sheet: sheetNow(self) }, opponent, opponentRuntime.currentHp,
+        self.level, ownerName
+      ),
       cancelScheduled: (key) => {
         for (let i = scheduled.length - 1; i >= 0; i--) {
           if (scheduled[i].key === key) scheduled.splice(i, 1)
@@ -371,6 +381,84 @@ export function simulateCombo(
     }
   }
 
+  function dispatchOnDash(dashStartedAt: number) {
+    const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
+    for (const effect of attackerEffectsList) {
+      const handler = resolve(effect)
+      if (!handler?.hooks?.onDash) continue
+      if (!conditionAllows(effect, ctx)) continue
+      handler.hooks.onDash(effect, ctx, dashStartedAt)
+      trackSupport(effect)
+    }
+  }
+
+  // Open recast windows: which stage (index into ability.stages) comes next, and until when.
+  const stageWindows: Partial<Record<AbilityKey, { nextStage: number; closesAt: number }>> = {}
+
+  function startCooldown(abilityKey: AbilityKey, from: number) {
+    const ability = attacker.abilities![abilityKey]
+    const rank = ability.maxRank
+    const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
+    const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
+    if (cooldownWarning) dataWarnings.push(cooldownWarning)
+    const attackerTotal = attackerSheetNow().total
+    const ultimateHaste = abilityKey === 'r' ? attackerTotal.ultimateHaste ?? 0 : 0
+    const hastedCooldown = cooldownWithHaste(
+      cooldownResolved.value, (attackerTotal.abilityHaste ?? 0) + ultimateHaste
+    )
+    unverifiedRuleIds.add('abilityHasteFormula')
+    attackerRuntime.cooldowns[abilityKey] = from + hastedCooldown
+  }
+
+  function startsCooldownOnLastStage(abilityKey: AbilityKey): boolean {
+    return attacker.abilities![abilityKey].cooldownStartsOn === 'lastStage'
+  }
+
+  /** Closes a window that has lapsed; a lastStage ability's cooldown starts when it closed. */
+  function settleStageWindow(abilityKey: AbilityKey) {
+    const window = stageWindows[abilityKey]
+    if (!window || time <= window.closesAt) return
+    delete stageWindows[abilityKey]
+    if (startsCooldownOnLastStage(abilityKey)) startCooldown(abilityKey, window.closesAt)
+  }
+
+  /** Opens the window for `nextStage`, or closes it (starting a lastStage cooldown) if none is left. */
+  function advanceStageWindow(abilityKey: AbilityKey, nextStage: number) {
+    const stages = attacker.abilities![abilityKey].stages ?? []
+    if (nextStage < stages.length) {
+      stageWindows[abilityKey] = { nextStage, closesAt: time + stages[nextStage].windowSeconds }
+      return
+    }
+    delete stageWindows[abilityKey]
+    if (startsCooldownOnLastStage(abilityKey)) startCooldown(abilityKey, time)
+  }
+
+  /** Casts one stage: its cast time, cast hooks and damage. The caller dispatches onAbilityHit. */
+  function castStage(
+    abilityKey: AbilityKey, stage: Pick<AbilityStage, 'id' | 'name' | 'castTime' | 'damage'>
+  ): DamageInstance[] {
+    const ability = attacker.abilities![abilityKey]
+    time += stage.castTime ?? 0
+    flushScheduledEvents(time)
+    dispatchOnAbilityCast(abilityKey)
+    // No per-ability rank input yet: every ability is assumed fully ranked (see
+    // docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md).
+    const rank = ability.maxRank
+    const hitInstances: DamageInstance[] = []
+    for (const component of stage.damage) {
+      const resolved = resolveDamageComponent(
+        component, { ...attacker, sheet: attackerSheetNow() }, target, targetRuntime.currentHp,
+        attacker.level, stage.name, rank
+      )
+      resolved.dataWarnings.forEach((warning) => dataWarnings.push(warning))
+      hitInstances.push(performDamage({
+        type: resolved.type, amount: resolved.amount,
+        source: { kind: 'ability', id: stage.id, name: stage.name },
+      }))
+    }
+    return hitInstances
+  }
+
   for (const action of sequence) {
     if (killed) break
 
@@ -391,47 +479,74 @@ export function simulateCombo(
       })
       dispatchOnBasicAttack()
 
-      const interval = 1 / Math.max(attackerSheetNow().total.attackSpeed ?? 1, 0.01)
+      const swingBonus = attackerRuntime.swingAttackSpeedBonus ?? 0
+      attackerRuntime.swingAttackSpeedBonus = undefined
+      const sheetAfterSwing = attackerSheetNow()
+      const swingAttackSpeed = swingBonus === 0
+        ? sheetAfterSwing.total.attackSpeed ?? 1
+        : Math.min(ATTACK_SPEED_CAP, totalAttackSpeed(
+          sheetAfterSwing.base.attackSpeed ?? 0, (sheetAfterSwing.bonus.attackSpeed ?? 0) + swingBonus
+        ))
+      const interval = 1 / Math.max(swingAttackSpeed, 0.01)
       time += interval
     } else if (action === 'Q' || action === 'W' || action === 'E' || action === 'R') {
       if (!attacker.abilities) continue
       const abilityKey = action.toLowerCase() as AbilityKey
       const ability = attacker.abilities[abilityKey]
+      const stages = ability.stages ?? []
+
+      settleStageWindow(abilityKey)
+      const window = stageWindows[abilityKey]
+      if (window && stages[window.nextStage].trigger === 'press') {
+        const hitInstances = castStage(abilityKey, stages[window.nextStage])
+        attackerRuntime.lastAbilityCast = { at: time, feintUsed: false }
+        advanceStageWindow(abilityKey, window.nextStage + 1)
+        dispatchOnAbilityHit(abilityKey, hitInstances)
+        continue
+      }
+
       const availableAt = attackerRuntime.cooldowns[abilityKey] ?? 0
       if (!ignoreCooldowns && time < availableAt) continue
 
-      time += ability.castTime
-      flushScheduledEvents(time)
-      dispatchOnAbilityCast(abilityKey)
-
-      // No per-ability rank input yet: every ability is assumed fully ranked (see
-      // docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md).
-      const rank = ability.maxRank
-      const hitInstances: DamageInstance[] = []
-      for (const component of ability.damage) {
-        const resolved = resolveDamageComponent(
-          component, { ...attacker, sheet: attackerSheetNow() }, target, targetRuntime.currentHp,
-          attacker.level, ability.name, rank
-        )
-        resolved.dataWarnings.forEach((warning) => dataWarnings.push(warning))
-        hitInstances.push(performDamage({
-          type: resolved.type, amount: resolved.amount,
-          source: { kind: 'ability', id: ability.id, name: ability.name },
-        }))
+      const hitInstances = castStage(abilityKey, ability)
+      attackerRuntime.lastAbilityCast = { at: time, feintUsed: false }
+      if (stages.length > 0) {
+        unverifiedRuleIds.add('stageCooldownStart')
+        stageWindows[abilityKey] = { nextStage: 0, closesAt: time + stages[0].windowSeconds }
+      }
+      if (stages.length > 0 && startsCooldownOnLastStage(abilityKey)) {
+        // Unavailable until the chain ends; settle/advanceStageWindow set the real cooldown.
+        attackerRuntime.cooldowns[abilityKey] = Infinity
+      } else {
+        startCooldown(abilityKey, time)
       }
 
-      const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
-      const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
-      if (cooldownWarning) dataWarnings.push(cooldownWarning)
-      const attackerTotal = attackerSheetNow().total
-      const ultimateHaste = abilityKey === 'r' ? attackerTotal.ultimateHaste ?? 0 : 0
-      const hastedCooldown = cooldownWithHaste(
-        cooldownResolved.value, (attackerTotal.abilityHaste ?? 0) + ultimateHaste
-      )
-      unverifiedRuleIds.add('abilityHasteFormula')
-      attackerRuntime.cooldowns[abilityKey] = time + hastedCooldown
-
       dispatchOnAbilityHit(abilityKey, hitInstances)
+    } else if (action === 'dash') {
+      const dashStartedAt = time
+      // Windows are judged at the start of the dash; the stage itself lands at its end.
+      const dashStages: AbilityKey[] = []
+      if (attacker.abilities) {
+        for (const abilityKey of ['q', 'w', 'e', 'r'] as const) {
+          settleStageWindow(abilityKey)
+          const window = stageWindows[abilityKey]
+          const stages = attacker.abilities[abilityKey].stages ?? []
+          if (window && stages[window.nextStage].trigger === 'dash') dashStages.push(abilityKey)
+        }
+      }
+      unverifiedRuleIds.add('dashDuration')
+      time += DASH_SECONDS
+      flushScheduledEvents(time)
+      for (const abilityKey of dashStages) {
+        const window = stageWindows[abilityKey]!
+        const stage = attacker.abilities![abilityKey].stages![window.nextStage]
+        // A dash-triggered stage doesn't update lastAbilityCast, so it can't feed another feint.
+        const hitInstances = castStage(abilityKey, stage)
+        advanceStageWindow(abilityKey, window.nextStage + 1)
+        dispatchOnAbilityHit(abilityKey, hitInstances)
+      }
+      dispatchOnDash(dashStartedAt)
+      if (attackerRuntime.lastAbilityCast) attackerRuntime.lastAbilityCast.feintUsed = true
     } else if (action.startsWith('item:')) {
       const itemId = action.slice(5)
       const item = attacker.items.find((candidate) => candidate.id === itemId)
