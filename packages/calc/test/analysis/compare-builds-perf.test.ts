@@ -51,22 +51,27 @@ describe('compareBuilds performance', () => {
 
     // Warm-up call: excludes one-time JIT/module-evaluation cost from the measurement below,
     // which has nothing to do with compareBuilds's actual algorithmic complexity.
-    compareBuilds(
+    let result = compareBuilds(
       { champion, level: 1, build: buildA, catalog: { items, runes: new Map() } },
       { champion, level: 1, build: buildB, catalog: { items, runes: new Map() } },
       target, scenario
     )
 
-    const start = performance.now()
-    const result = compareBuilds(
-      { champion, level: 1, build: buildA, catalog: { items, runes: new Map() } },
-      { champion, level: 1, build: buildB, catalog: { items, runes: new Map() } },
-      target, scenario
-    )
-    const elapsed = performance.now() - start
+    // The median of several runs, so a GC pause or a busy parallel test worker can't fail one sample.
+    const timings: number[] = []
+    for (let run = 0; run < 21; run++) {
+      const start = performance.now()
+      result = compareBuilds(
+        { champion, level: 1, build: buildA, catalog: { items, runes: new Map() } },
+        { champion, level: 1, build: buildB, catalog: { items, runes: new Map() } },
+        target, scenario
+      )
+      timings.push(performance.now() - start)
+    }
+    const median = [...timings].sort((x, y) => x - y)[Math.floor(timings.length / 2)]
 
     expect(result.a).toHaveLength(6)
     expect(result.b).toHaveLength(6)
-    expect(elapsed).toBeLessThan(5)
+    expect(median).toBeLessThan(5)
   })
 })
