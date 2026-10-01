@@ -58,7 +58,7 @@ describe('renderPatchDiff', () => {
   })
 
   it('lists auto-applied items with their changes and counts them', () => {
-    expect(report).toContain('- 1 hand-modelled items took number-only changes from wrpocket automatically')
+    expect(report).toContain('- 1 hand-modelled items took number-only changes automatically (confirmed by the official notes)')
     const section = report.slice(report.indexOf('## Applied automatically'), report.indexOf('## Still stale'))
     expect(section).toContain("### item deaths-dance (Death's Dance)")
     expect(section).toContain('- `price`: 3200 → 3300')

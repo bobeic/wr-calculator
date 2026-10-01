@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { diffSnapshots } from '../../scripts/patch/diff'
-import { autoAppliedItems, buildPatchDiff, flagHandModelled, goldenRefs, goldensUsing } from '../../scripts/patch/patch-diff'
+import { buildPatchDiff, flagHandModelled, goldenRefs, goldensUsing } from '../../scripts/patch/patch-diff'
 import type { GoldenRef } from '../../scripts/patch/patch-diff'
 import type { LoadedGoldenCase } from '../../src/golden-loader'
 import { makeRawChampion, makeRawItem, makeSnapshot } from './fixtures'
@@ -64,39 +64,55 @@ describe('flagHandModelled', () => {
   })
 })
 
-describe('autoAppliedItems', () => {
-  const item = (id: string, overrides: Parameters<typeof makeRawItem>[0] = {}) => makeRawItem({ id, name: { en: id }, ...overrides })
-  const base = [item('price'), item('stat'), item('text'), item('added-stat'), item('pinned'), item('covered'), item('generated')]
-  const changed = makeSnapshot('7.3a', '2026-09-29 16:09:43', [
-    item('price', { price: '600', components: ['dagger'], tier: 'epic' }),
-    item('stat', { numeric_stats: { attackDamage: 15 } }),
-    item('text', { price: '600', description: { en: '+12 Attack Damage. New passive.' } }),
-    item('added-stat', { numeric_stats: { attackDamage: 12, armor: 5 } }),
-    item('pinned', { price: '600' }),
-    item('covered', { price: '600' }),
-    item('generated', { price: '600' }),
+describe('auto-apply of synced item changes', () => {
+  const item = (id: string, name: string, overrides: Parameters<typeof makeRawItem>[0] = {}) => makeRawItem({ id, name: { en: name }, ...overrides })
+  const ids = ['price', 'stat', 'text', 'added-stat', 'pinned', 'unconfirmed', 'contradicted']
+  const names: Record<string, string> = {
+    price: 'Price Item', stat: 'Stat Item', text: 'Text Item', 'added-stat': 'Added Stat', pinned: 'Pinned Item',
+    unconfirmed: 'Quiet Item', contradicted: 'Wrong Item',
+  }
+  const base = makeSnapshot('7.3', '2026-09-23 10:19:27', ids.map((id) => item(id, names[id])), [])
+  const after = makeSnapshot('7.3a', '2026-09-29 16:09:43', [
+    item('price', names.price, { price: '600', components: ['dagger'], tier: 'epic' }),
+    item('stat', names.stat, { numeric_stats: { attackDamage: 15 } }),
+    item('text', names.text, { price: '600', description: { en: '+12 Attack Damage. New passive.' } }),
+    item('added-stat', names['added-stat'], { numeric_stats: { attackDamage: 12, armor: 5 } }),
+    item('pinned', names.pinned, { price: '600' }),
+    item('unconfirmed', names.unconfirmed, { price: '600' }),
+    item('contradicted', names.contradicted, { price: '600' }),
   ], [])
-  const itemDiff = diffSnapshots(makeSnapshot('7.3', '2026-09-23 10:19:27', base, []), changed)
-  const hand = { items: ['price', 'stat', 'text', 'added-stat', 'pinned', 'covered'], champions: [] }
-
-  it('applies price, recipe, tier and stat value changes; flags text changes, added stats, pinned and covered items', () => {
-    const applied = autoAppliedItems(itemDiff, hand, { items: ['covered'], champions: [] }, ['pinned'])
-    expect(applied.map((entry) => entry.id)).toEqual(['price', 'stat'])
-    const flags = flagHandModelled(itemDiff, hand, { items: ['covered'], champions: [] }, [], applied)
-    expect(flags.map((flag) => flag.id)).toEqual(['added-stat', 'pinned', 'text'])
+  const line = (text: string, value: string) => ({ group: null, text, before: 'x', after: value })
+  const notes = {
+    patch: '7.3a', url: 'u', title: '', published: '',
+    entries: [
+      ...['price', 'text', 'added-stat', 'pinned'].map((id) => ({ source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names[id], lines: [line('Cost', '600')] })),
+      { source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names.stat, lines: [line('AD', '15')] },
+      { source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names.contradicted, lines: [line('Cost', '650')] },
+    ],
+  }
+  const run = (withNotes: boolean) => buildPatchDiff({
+    before: base, after, handModelled: { items: ids, champions: [] }, previousStale: [], covered: NONE, goldens: [],
+    notesBefore: [], notesAfter: [], notes: withNotes ? { url: 'u', notes } : null, autoApply: { pinnedItems: ['pinned'] },
   })
 
-  it('reports auto-applied items in buildPatchDiff only when autoApply is on', () => {
-    const input = {
-      before: makeSnapshot('7.3', '2026-09-23 10:19:27', base, []), after: changed, handModelled: hand, previousStale: [],
-      covered: NONE, goldens: [], notesBefore: [], notesAfter: [], notes: null,
+  it('applies synced changes the notes confirm; flags text, added stats, pins, unconfirmed and contradicted changes', () => {
+    const result = run(true)
+    expect(result.autoApplied.map((entry) => entry.id)).toEqual(['price', 'stat'])
+    expect(result.needsReview.map((flag) => flag.id).sort()).toEqual(['added-stat', 'contradicted', 'pinned', 'text', 'unconfirmed'])
+  })
+
+  it('never auto-clears a synced change just because the notes leave it out', () => {
+    expect(run(true).officialNotes?.autoReviewed).toEqual([])
+  })
+
+  it('auto-applies nothing without the official notes, or when autoApply is off', () => {
+    expect(run(false).autoApplied).toEqual([])
+    expect(run(false).needsReview).toHaveLength(7)
+    const { autoApply: _, ...input } = {
+      before: base, after, handModelled: { items: ids, champions: [] }, previousStale: [], covered: NONE, goldens: [],
+      notesBefore: [], notesAfter: [], notes: { url: 'u', notes }, autoApply: undefined,
     }
-    const on = buildPatchDiff({ ...input, autoApply: { pinnedItems: [] } })
-    expect(on.autoApplied.map((entry) => entry.id)).toEqual(['covered', 'pinned', 'price', 'stat'])
-    expect(on.needsReview.map((flag) => flag.id)).toEqual(['added-stat', 'text'])
-    const off = buildPatchDiff(input)
-    expect(off.autoApplied).toEqual([])
-    expect(off.needsReview).toHaveLength(6)
+    expect(buildPatchDiff(input).autoApplied).toEqual([])
   })
 })
 
@@ -139,7 +155,8 @@ describe('buildPatchDiff', () => {
     expect(again.carriedStale).toEqual([])
   })
 
-  it('auto-clears flags the official notes do not mention', () => {
+  // trinity-force's only change is its price, which the overlay syncs; a notes-only auto-clear would hide it.
+  it('keeps a synced change the official notes do not mention flagged instead of auto-clearing it', () => {
     const notes = {
       patch: '7.3a', url: 'u', title: '', published: '',
       entries: [{ source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: 'Long Sword', lines: [] }],
@@ -148,8 +165,8 @@ describe('buildPatchDiff', () => {
       before, after, handModelled: { items: ['trinity-force'], champions: [] }, previousStale: [],
       covered: NONE, goldens: [], notesBefore: [], notesAfter: [], notes: { url: 'u', notes },
     })
-    expect(withNotes.needsReview).toEqual([])
-    expect(withNotes.officialNotes?.autoReviewed.map((entry) => entry.id)).toEqual(['trinity-force'])
+    expect(withNotes.needsReview.map((flag) => flag.id)).toEqual(['trinity-force'])
+    expect(withNotes.officialNotes?.autoReviewed).toEqual([])
   })
 
   it('keeps a previously stale flag in needsReview instead of auto-clearing it', () => {
