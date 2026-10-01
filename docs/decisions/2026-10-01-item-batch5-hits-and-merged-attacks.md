@@ -17,6 +17,8 @@ so the engine needs a notion of "one hit" that is independent of how many damage
 2. **Merged attacks.** `beforeBasicAttack` returns an `AttackModifier`. Physical bonuses merge into
    the attack instance as `parts`, and damage amps apply per part. `empoweredAttack` and
    `spellblade` moved to this mechanism. The empowered bonus has source kind `passive`.
+   `AttackModifier.empowered` marks a swing that spent an empowered-attack charge, which
+   `hitStackProc`'s `empoweredAttack` trigger reads via `HitInfo.empowered`.
 3. **New effect kinds.**
    - `hitStackProc`: counts hits (by `stacksFrom`), stacks live on the target, and the proc is an
      instant hit or a damage over time. No stacks are gained while the proc is on cooldown.
