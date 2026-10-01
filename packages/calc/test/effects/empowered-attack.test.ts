@@ -67,30 +67,21 @@ describe('empoweredAttackHandler', () => {
     expect(self.buffs['empowered:step']?.stacks).toBe(1)
   })
 
-  it('spends one charge per basic attack: bonus damage as its own instance and swing attack speed', () => {
+  it('spends one charge per basic attack: a passive bonus on the attack and swing attack speed', () => {
     const self = runtime({ buffs: { 'empowered:step': { stacks: 2, expiresAt: 4 } } })
-    const dealt: { id: string; kind: string; amount: number }[] = []
-    const c = ctx({
-      self, time: 1,
-      dealDamage: (input) => {
-        dealt.push({ id: input.source.id, kind: input.source.kind, amount: input.amount })
-        return { time: 1, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
-      },
+    const modifier = empoweredAttackHandler.hooks!.beforeBasicAttack!(feint, ctx({ self, time: 1 }))
+    expect(modifier).toEqual({
+      empowered: true,
+      bonus: [{ type: 'physical', amount: 40, source: { kind: 'passive', id: 'step', name: 'Step' } }],
     })
-    empoweredAttackHandler.hooks!.onBasicAttack!(feint, c)
-    expect(dealt).toEqual([{ id: 'step', kind: 'basicAttack', amount: 40 }])
     expect(self.buffs['empowered:step'].stacks).toBe(1)
     expect(self.swingAttackSpeedBonus).toBe(0.5)
   })
 
   it('does nothing on a basic attack once the charges have expired', () => {
     const self = runtime({ buffs: { 'empowered:step': { stacks: 2, expiresAt: 4 } } })
-    let called = false
-    empoweredAttackHandler.hooks!.onBasicAttack!(feint, ctx({
-      self, time: 4.1,
-      dealDamage: (input) => { called = true; return { time: 0, source: input.source, type: input.type, raw: 0, mitigated: 0, targetHpAfter: 0 } },
-    }))
-    expect(called).toBe(false)
+    const modifier = empoweredAttackHandler.hooks!.beforeBasicAttack!(feint, ctx({ self, time: 4.1 }))
+    expect(modifier).toBeUndefined()
     expect(self.swingAttackSpeedBonus).toBeUndefined()
   })
 })

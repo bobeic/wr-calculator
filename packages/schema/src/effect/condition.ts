@@ -10,7 +10,7 @@ const LEAF_CONDITIONS = [
   }).strict(),
   z.object({
     type: z.literal('sourceKind'),
-    value: z.enum(['basicAttack', 'ability', 'item', 'other']),
+    value: z.enum(['basicAttack', 'ability', 'item', 'passive', 'other']),
   }).strict(),
   // Known only to ability cast/hit hooks (e.g. a burn applied when the ultimate hits), not to
   // per-damage-instance checks like damageAmp.

@@ -10,7 +10,7 @@ describe('EFFECT_HANDLERS', () => {
   it('registers every effect kind except custom', () => {
     expect(Object.keys(EFFECT_HANDLERS).sort()).toEqual([
       'abilityHitProc', 'active', 'combatRampAmp', 'cooldownRefund', 'damageAmp', 'damageReduction', 'damageWindowProc',
-      'dot', 'empoweredAttack', 'heal', 'onHit',
+      'dot', 'empoweredAttack', 'guaranteedCrit', 'heal', 'hitStackAmp', 'hitStackProc', 'onHit',
       'penetration', 'procEveryN', 'resistShred', 'shield', 'spellblade', 'stacking', 'stat',
       'statConversion', 'statMultiplier',
     ])

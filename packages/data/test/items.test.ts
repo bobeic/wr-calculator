@@ -12,6 +12,8 @@ const STARTER_IDS = [
   'ludens-echo', 'infinity-orb', 'horizon-focus', 'malignance',
   'stormsurge', 'blackfire-torch', 'cryptbloom', 'lich-bane', 'riftmaker', 'archangels-staff',
   'nashors-tooth', 'bloodletters-curse', 'hextech-rocketbelt',
+  'eclipse', 'seryldas-grudge', 'spear-of-shojin', 'sundered-sky', 'steraks-gage', 'deaths-dance',
+  'guardian-angel', 'maw-of-malmortius',
 ].sort()
 const ALLOWED_STARTER_NULLS: string[] = []
 
@@ -24,7 +26,7 @@ function nullPaths(value: unknown, path: string, out: string[]): void {
 }
 
 describe('STARTER_ITEMS', () => {
-  it('has exactly the 28 starter items', () => {
+  it('has exactly the 36 starter items', () => {
     expect(STARTER_ITEMS.map((item) => item.id).sort()).toEqual(STARTER_IDS)
   })
 
@@ -36,6 +38,47 @@ describe('STARTER_ITEMS', () => {
       found.push(...paths.map((path) => `${item.id} ›${path.replace(/^\./, ' ')}`))
     }
     expect(found).toEqual(ALLOWED_STARTER_NULLS)
+  })
+
+  const ambessa = PATCH_7_3_CHAMPIONS.find((champion) => champion.id === 'ambessa')!
+  const dummyTarget = () => combatantFromDummy({ kind: 'dummy', hp: 10000, armor: 100, mr: 100 })
+  const ambessaWith = (items: string[]) => combatantFromChampion(
+    ambessa, 15, { items, runes: [], inputs: {} }, buildCatalog(PATCH_7_3_ITEMS)
+  )
+
+  it("procs Eclipse's Ever Rising Moon for 6% max HP on the second hit", () => {
+    const result = simulateCombo(ambessaWith(['eclipse']), dummyTarget(), ['AA', 'W'], { critMode: 'never' })
+    const proc = result.instances.find((i) => i.source.id === 'eclipse-ever-rising-moon')!
+    expect(proc.raw).toBeCloseTo(600, 6)
+    expect(proc.hitId).toBe(result.instances.find((i) => i.source.id === 'ambessa-w')!.hitId)
+  })
+
+  it("burns for 8 Frostbite ticks after Serylda's Grudge's third ability hit", () => {
+    const result = simulateCombo(
+      ambessaWith(['seryldas-grudge']), dummyTarget(), ['Q', 'W', 'E', 'wait:2'], { critMode: 'never' }
+    )
+    const ticks = result.instances.filter((i) => i.source.id === 'seryldas-grudge-frostbite')
+    expect(ticks).toHaveLength(8)
+    // Level 15: 40 + 40% of 50 bonus AD per tick.
+    expect(ticks[0].raw).toBeCloseTo(40 + 0.4 * 50, 6)
+  })
+
+  it("gives Spear of Shojin 20 basic ability haste and a 3%-per-hit ability ramp to 12%", () => {
+    const shojin = STARTER_ITEMS.find((item) => item.id === 'spear-of-shojin')!
+    expect(shojin.stats.basicAbilityHaste).toBe(20)
+    expect(shojin.effects.find((effect) => effect.id === 'spear-of-shojin-focused-will'))
+      .toMatchObject({ kind: 'hitStackAmp', amountPerStack: 0.03, maxStacks: 4, appliesTo: ['ability', 'passive'] })
+  })
+
+  it("crits Ambessa's first attack at 160% with Sundered Sky, and not the second", () => {
+    const result = simulateCombo(ambessaWith(['sundered-sky']), dummyTarget(), ['AA', 'AA'], { critMode: 'never' })
+    const attacks = result.instances.filter((i) => i.source.id === 'AA').map((i) => i.raw)
+    expect(attacks[0]).toBeCloseTo(attacks[1] * 1.6, 6)
+  })
+
+  it("gives Sterak's Gage AD equal to half of base AD", () => {
+    const sheet = resolveStats(ambessa, 15, { items: ['steraks-gage'], runes: [], inputs: {} }, buildCatalog(PATCH_7_3_ITEMS))
+    expect(sheet.bonus.ad).toBeCloseTo(sheet.base.ad! * 0.5, 6)
   })
 
   it('matches its generated counterpart on cost, recipe and every generated stat', () => {
@@ -346,6 +389,10 @@ describe('7.3 exclusive item groups', () => {
     expect(membersOf('magic-pen')).toEqual([
       'bloodletters-curse', 'cryptbloom', 'void-amethyst', 'void-staff',
     ])
+  })
+
+  it('allows one Lifeline item', () => {
+    expect(membersOf('lifeline')).toEqual(['maw-of-malmortius', 'steraks-gage'])
   })
 
   it('leaves pen boots out of the pen groups', () => {

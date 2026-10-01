@@ -578,6 +578,34 @@ describe('simulateCombo', () => {
     expect(result.dataWarnings.some((w) => w.includes('Invalid wait duration'))).toBe(true)
   })
 
+  it('crits the first attack at a guaranteedCrit multiplier even with crits off, and not the second', () => {
+    const sky = baseItem('test-sky', {
+      id: 'test-sky-strike', name: 'Sky', description: '', support: 'full', kind: 'guaranteedCrit',
+      critMultiplier: 1.6, cooldownSeconds: 6,
+    })
+    const catalog = { items: new Map([[sky.id, sky]]), runes: new Map() }
+    const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [sky.id] }), catalog)
+    const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'AA'], { critMode: 'never' })
+    expect(result.instances.map((i) => i.mitigated)).toEqual([60 * 1.6, 60])
+  })
+
+  it('applies basicAbilityHaste to Q/W/E cooldowns but not R', () => {
+    const haste: Item = {
+      id: 'test-haste', name: 'test-haste', tier: 'basic', cost: { total: 1000, combine: 1000 }, recipe: [],
+      stats: { basicAbilityHaste: 100 }, effects: [], tags: [],
+      provenance: { source: 'manual', patch: '0.0.0', verifiedInGame: false },
+    }
+    const catalog = { items: new Map([[haste.id, haste]]), runes: new Map() }
+    const base = championWithAbility()
+    const champion = championWithAbility({
+      abilities: { ...base.abilities, r: { ...base.abilities.r, damage: [{ type: 'magic', base: 10, ratios: [], tags: [] }] } },
+    })
+    const attacker = combatantFromChampion(champion, 1, emptyBuild({ items: [haste.id] }), catalog)
+    const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'R', 'wait:4', 'Q', 'R'])
+    // Q's 8s cooldown halves to 4s; R's 100s is untouched.
+    expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'r', 'q'])
+  })
+
   describe('recast stages', () => {
     const noCatalog = { items: new Map(), runes: new Map() }
     function stagedChampion(cooldownStartsOn?: 'firstCast' | 'lastStage') {
@@ -718,14 +746,65 @@ describe('simulateCombo', () => {
       })
     }
 
-    it('empowers the attack after ability → dash, with the bonus as its own hit and a faster next swing', () => {
+    it('merges the empowered bonus into the attack after ability → dash, with a faster next swing', () => {
       const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild(), noCatalog)
       const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], { critMode: 'never' })
       const hits = result.instances.map((i) => [i.source.id, i.mitigated, i.time])
       // Base AS 1.0; the empowered swing at +50% waits 1/1.5 s before the next attack.
-      expect(hits).toEqual([
-        ['q', 50, 0], ['AA', 60, DASH_SECONDS], ['step', 40, DASH_SECONDS], ['AA', 60, DASH_SECONDS + 1 / 1.5],
+      expect(hits).toEqual([['q', 50, 0], ['AA', 100, DASH_SECONDS], ['AA', 60, DASH_SECONDS + 1 / 1.5]])
+      expect(result.instances[1].parts).toEqual([
+        { source: { kind: 'basicAttack', id: 'AA', name: 'Basic Attack' }, amount: 60 },
+        { source: { kind: 'passive', id: 'step', name: 'Step' }, amount: 40 },
       ])
+      expect(result.instances[2].parts).toBeUndefined()
+    })
+
+    it('counts only empowered attacks toward an empoweredAttack-triggered proc', () => {
+      const proc = baseItem('test-empowered-proc', {
+        id: 'test-empowered-proc-passive', name: 'Empowered proc', description: '', support: 'full',
+        kind: 'hitStackProc', stacksToProc: 2, stackWindowSeconds: 30, cooldownSeconds: 0,
+        stacksFrom: ['empoweredAttack'],
+        damage: { type: 'physical', base: 100, ratios: [], tags: [] }, delivery: { kind: 'instant' },
+      })
+      const catalog = { items: new Map([[proc.id, proc]]), runes: new Map() }
+      const attacker = () => combatantFromChampion(feintChampion(), 1, emptyBuild({ items: [proc.id] }), catalog)
+      const options = { critMode: 'never' as const, ignoreCooldowns: true }
+      const once = simulateCombo(attacker(), combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], options)
+      expect(once.instances.some((i) => i.source.id === 'test-empowered-proc-passive')).toBe(false)
+      const twice = simulateCombo(
+        attacker(), combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'Q', 'dash', 'AA'], options
+      )
+      const procs = twice.instances.filter((i) => i.source.id === 'test-empowered-proc-passive')
+      const secondAttack = twice.instances.filter((i) => i.source.id === 'AA')[1]
+      expect(procs).toHaveLength(1)
+      expect(procs[0].hitId).toBe(secondAttack.hitId)
+    })
+
+    it('gives Black Cleaver-style shred one stack for an empowered attack, not two', () => {
+      const shred = baseItem('test-shred', {
+        id: 'test-shred-passive', name: 'Shred', description: '', support: 'full',
+        kind: 'resistShred', resist: 'armor', mode: 'percent', amount: 0.06, stacking: true,
+        maxStacks: 5, durationSeconds: 6,
+      })
+      const catalog = { items: new Map([[shred.id, shred]]), runes: new Map() }
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild({ items: [shred.id] }), catalog)
+      const result = simulateCombo(
+        attacker, combatantFromDummy(dummy({ armor: 100 })), ['Q', 'dash', 'AA', 'AA'], { critMode: 'never' }
+      )
+      // Q adds 1 stack, the merged empowered attack 1 more: the last attack sees 100 × (1 − 0.12) armor.
+      expect(result.instances[2].mitigated).toBeCloseTo(60 * 100 / 188, 10)
+    })
+
+    it('amplifies only the parts whose source a damage amp names', () => {
+      const amp = baseItem('test-amp', {
+        id: 'test-amp-passive', name: 'Amp', description: '', support: 'full', kind: 'damageAmp',
+        condition: { type: 'sourceKind', value: 'passive' }, amount: 0.5,
+      })
+      const catalog = { items: new Map([[amp.id, amp]]), runes: new Map() }
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild({ items: [amp.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA'], { critMode: 'never' })
+      expect(result.instances[1].raw).toBeCloseTo(60 + 40 * 1.5, 10)
+      expect(result.instances[1].parts?.map((part) => part.amount)).toEqual([60, 60])
     })
 
     it('keeps the swing attack speed under the attack speed cap', () => {
@@ -739,6 +818,118 @@ describe('simulateCombo', () => {
       const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild(), noCatalog)
       const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'wait:4.5', 'AA'], { critMode: 'never' })
       expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'AA'])
+    })
+
+    it('amplifies only the passive part of a merged attack with a Shojin-style hitStackAmp', () => {
+      const will = baseItem('test-will', {
+        id: 'test-will-amp', name: 'Will', description: '', support: 'full', kind: 'hitStackAmp',
+        amountPerStack: 0.03, maxStacks: 4, durationSeconds: 6, appliesTo: ['ability', 'passive'],
+      })
+      const catalog = { items: new Map([[will.id, will]]), runes: new Map() }
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild({ items: [will.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'Q'], {
+        critMode: 'never', ignoreCooldowns: true,
+      })
+      // Q (no stacks yet) 50; the attack after one stack: 60 + 40 × 1.03; the second Q after two: 50 × 1.06.
+      expect(result.instances.map((i) => i.raw)).toEqual([50, 60 + 40 * 1.03, 50 * 1.06].map((value) => expect.closeTo(value, 10)))
+      expect(result.instances[1].parts?.map((part) => part.amount)).toEqual([60, expect.closeTo(41.2, 10)])
+    })
+  })
+
+  describe('hits', () => {
+    it('gives each attack and each cast its own hit id, shared by that hit\'s on-hit damage', () => {
+      const onHit = baseItem('test-onhit', {
+        id: 'test-onhit-passive', name: 'On-Hit', description: '', support: 'full',
+        kind: 'onHit', damageType: 'magic', flat: 10,
+      })
+      const catalog = { items: new Map([[onHit.id, onHit]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [onHit.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'Q'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.hitId])).toEqual([
+        ['AA', 1], ['test-onhit-passive', 1], ['q', 2],
+      ])
+    })
+
+    it('leaves dot ticks without a hit id, even when they land during a later hit', () => {
+      const burn = baseItem('test-burn', {
+        id: 'test-burn-dot', name: 'Burn', description: '', support: 'full', kind: 'dot',
+        damageType: 'magic', tickAmount: 5, tickIntervalSeconds: 1, durationSeconds: 1,
+        refresh: 'refresh', ratios: [],
+      })
+      const catalog = { items: new Map([[burn.id, burn]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [burn.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'wait:1', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.hitId])).toEqual([
+        ['q', 1], ['test-burn-dot', undefined], ['AA', 2],
+      ])
+    })
+
+    it('keeps a magic spellblade as its own instance in the attack\'s hit', () => {
+      const blade = baseItem('test-blade', {
+        id: 'test-blade-spellblade', name: 'Blade', description: '', support: 'full',
+        kind: 'spellblade', damageType: 'magic', bonusDamage: 30, ratios: [], internalCooldownSeconds: 1.5,
+      })
+      const catalog = { items: new Map([[blade.id, blade]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [blade.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.mitigated, i.hitId, i.parts])).toEqual([
+        ['q', 50, 1, undefined], ['AA', 60, 2, undefined], ['test-blade-spellblade', 30, 2, undefined],
+      ])
+    })
+
+    it('merges a physical spellblade into the attack, like Trinity Force', () => {
+      const blade = baseItem('test-blade', {
+        id: 'test-blade-spellblade', name: 'Blade', description: '', support: 'full',
+        kind: 'spellblade', damageType: 'physical', bonusDamage: 30, ratios: [], internalCooldownSeconds: 1.5,
+      })
+      const catalog = { items: new Map([[blade.id, blade]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [blade.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.mitigated])).toEqual([['q', 50], ['AA', 90]])
+      expect(result.totalsBySource).toEqual({ q: 50, AA: 90 })
+    })
+
+    it('procs an Eclipse-style hitStackProc on the second hit, inside that hit', () => {
+      const moon = baseItem('test-moon', {
+        id: 'test-moon-proc', name: 'Moon', description: '', support: 'full', kind: 'hitStackProc',
+        stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6, stacksFrom: ['basicAttack', 'ability'],
+        damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.06 }], tags: [] },
+        delivery: { kind: 'instant' },
+      })
+      const catalog = { items: new Map([[moon.id, moon]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [moon.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'Q'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.mitigated, i.hitId])).toEqual([
+        ['AA', 60, 1], ['q', 50, 2], ['test-moon-proc', 60, 2],
+      ])
+    })
+
+    it('does not stack from an ability stage that deals no damage', () => {
+      const moon = baseItem('test-moon', {
+        id: 'test-moon-proc', name: 'Moon', description: '', support: 'full', kind: 'hitStackProc',
+        stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6, stacksFrom: ['basicAttack', 'ability'],
+        damage: { type: 'physical', base: 100, ratios: [], tags: [] }, delivery: { kind: 'instant' },
+      })
+      const catalog = { items: new Map([[moon.id, moon]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [moon.id] }), catalog)
+      // championWithAbility's W deals no damage.
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['W', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => i.source.id)).toEqual(['AA'])
+    })
+
+    it('gives dot-delivered proc ticks no hit id', () => {
+      const frost = baseItem('test-frost', {
+        id: 'test-frost-proc', name: 'Frost', description: '', support: 'full', kind: 'hitStackProc',
+        stacksToProc: 2, stackWindowSeconds: 6, cooldownSeconds: 5, stacksFrom: ['basicAttack', 'ability'],
+        damage: { type: 'physical', base: 10, ratios: [], tags: [] },
+        delivery: { kind: 'dot', tickIntervalSeconds: 0.5, durationSeconds: 1 },
+      })
+      const catalog = { items: new Map([[frost.id, frost]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [frost.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'Q', 'wait:1'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.hitId])).toEqual([
+        ['AA', 1], ['q', 2], ['test-frost-proc', undefined], ['test-frost-proc', undefined],
+      ])
     })
   })
 })

@@ -75,4 +75,45 @@ describe('remaining effect kinds', () => {
     expect(() => EffectSchema.parse({ ...effect, maxCharges: 0 })).toThrow()
     expect(() => EffectSchema.parse({ ...effect, grant: { on: 'onKill' } })).toThrow()
   })
+
+  it('parses a hitStackProc with instant and dot delivery', () => {
+    const eclipse = EffectSchema.parse({
+      ...base, kind: 'hitStackProc', stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6,
+      stacksFrom: ['basicAttack', 'ability'],
+      damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.06 }], tags: [] },
+      delivery: { kind: 'instant' },
+    })
+    expect(eclipse.kind).toBe('hitStackProc')
+    const frostbite = EffectSchema.parse({
+      ...base, kind: 'hitStackProc', stacksToProc: 3, stackWindowSeconds: 6, cooldownSeconds: 5,
+      stacksFrom: ['ability', 'empoweredAttack'],
+      damage: { type: 'physical', base: { levelRange: { min: 12, max: 40 } }, ratios: [{ stat: 'bonusAd', value: 0.4 }], tags: [] },
+      delivery: { kind: 'dot', tickIntervalSeconds: 0.25, durationSeconds: 2 },
+    })
+    expect(frostbite).toMatchObject({ delivery: { kind: 'dot' } })
+  })
+
+  it('rejects a hitStackProc that procs on a single stack or counts nothing', () => {
+    const valid = {
+      ...base, kind: 'hitStackProc', stacksToProc: 2, stackWindowSeconds: 1, cooldownSeconds: 1,
+      stacksFrom: ['ability'], damage: { type: 'physical', base: 1, ratios: [], tags: [] },
+      delivery: { kind: 'instant' },
+    }
+    expect(() => EffectSchema.parse({ ...valid, stacksToProc: 1 })).toThrow()
+    expect(() => EffectSchema.parse({ ...valid, stacksFrom: [] })).toThrow()
+  })
+
+  it('parses a hitStackAmp limited to ability and passive damage', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'hitStackAmp', amountPerStack: 0.03, maxStacks: 4, durationSeconds: 6,
+      appliesTo: ['ability', 'passive'],
+    })
+    expect(result).toMatchObject({ kind: 'hitStackAmp', appliesTo: ['ability', 'passive'] })
+    expect(() => EffectSchema.parse({ ...result, appliesTo: [] })).toThrow()
+  })
+
+  it('parses a guaranteedCrit', () => {
+    const result = EffectSchema.parse({ ...base, kind: 'guaranteedCrit', critMultiplier: 1.6, cooldownSeconds: 6 })
+    expect(result).toMatchObject({ kind: 'guaranteedCrit', critMultiplier: 1.6 })
+  })
 })

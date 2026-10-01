@@ -43,11 +43,13 @@ describe('Ambessa', () => {
     expect(result.instances[0].mitigated).toBeCloseTo(121 * 100 / 170, 6)
   })
 
-  it('runs the full kit: Sweep, Slam, Lacerate and its dash recast, then an empowered attack', () => {
+  it('runs the full kit: Sweep, Slam, Lacerate and its dash recast, then an empowered attack as one hit', () => {
     const result = simulateCombo(attacker(), dummy(), ['Q', 'Q', 'E', 'dash', 'AA'], { critMode: 'never' })
     expect(result.instances.map((i) => i.source.id)).toEqual([
       'ambessa-q', 'ambessa-q-sundering-slam', 'ambessa-e', 'ambessa-e-recast', 'AA',
-      'ambessa-passive-drakehounds-step',
+    ])
+    expect(result.instances[4].parts?.map((part) => part.source.id)).toEqual([
+      'AA', 'ambessa-passive-drakehounds-step',
     ])
   })
 })

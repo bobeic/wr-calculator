@@ -525,4 +525,111 @@ export const STARTER_ITEMS: Item[] = [
     ],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
+  {
+    id: 'eclipse', name: 'Eclipse', tier: 'legendary',
+    cost: { total: 2900, combine: 500 }, recipe: ['caulfields-warhammer', 'caulfields-warhammer'],
+    stats: { ad: 65, abilityHaste: 20 }, tags: ['physical'],
+    effects: [{
+      kind: 'hitStackProc', id: 'eclipse-ever-rising-moon', name: 'Ever Rising Moon',
+      description: 'Hitting an enemy champion inflicts a stack for 1.8 seconds, up to one per attack '
+        + 'or cast. Inflicting 2 stacks consumes them to deal 6% of the target\'s max Health as '
+        + 'bonus physical damage and grant a 140 (+35% bonus AD) shield for 2 seconds (6s cooldown).',
+      support: 'partial',
+      supportNotes: 'Melee values (WR wiki). The shield is not modeled; item effects, crowd '
+        + 'control and damage over time don\'t add stacks here.',
+      stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6,
+      stacksFrom: ['basicAttack', 'ability'],
+      damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.06 }], tags: [] },
+      delivery: { kind: 'instant' },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'seryldas-grudge', name: 'Serylda’s Grudge', tier: 'legendary',
+    cost: { total: 3100, combine: 700 }, recipe: ['caulfields-warhammer', 'last-whisper'],
+    // wrpocket says 50 AD / 35% pen; the WR wiki says 40 AD / 33%. Unverified until the tooltip check.
+    stats: { ad: 50, pctArmorPen: 0.35, abilityHaste: 15 }, tags: ['physical'],
+    effects: [{
+      kind: 'hitStackProc', id: 'seryldas-grudge-frostbite', name: 'Frostbite',
+      description: 'Ability damage and empowered attacks add a stack (up to 3, 6 seconds). At 3 '
+        + 'stacks, deals 12-40 (based on level) (+40% bonus AD) physical damage every 0.25 seconds '
+        + 'for 2 seconds and applies 50% Grievous Wounds for 3 seconds (5s cooldown).',
+      support: 'partial',
+      supportNotes: 'Icy\'s slow and the Grievous Wounds are not modeled. "Empowered attacks" is '
+        + 'read as attacks that spend an empowered-attack charge.',
+      stacksToProc: 3, stackWindowSeconds: 6, cooldownSeconds: 5,
+      stacksFrom: ['ability', 'empoweredAttack'],
+      damage: {
+        type: 'physical', base: { levelRange: { min: 12, max: 40 } },
+        ratios: [{ stat: 'bonusAd', value: 0.4 }], tags: [],
+      },
+      delivery: { kind: 'dot', tickIntervalSeconds: 0.25, durationSeconds: 2 },
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'spear-of-shojin', name: 'Spear of Shojin', tier: 'legendary',
+    cost: { total: 3100, combine: 700 }, recipe: ['jaurims-fist', 'jaurims-fist'],
+    // basicAbilityHaste 20: Dragonforce, "+20 basic ability haste" (WR wiki).
+    stats: { ad: 40, hp: 450, basicAbilityHaste: 20 }, tags: ['physical'],
+    effects: [{
+      kind: 'hitStackAmp', id: 'spear-of-shojin-focused-will', name: 'Focused Will',
+      description: 'Dealing damage to enemy champions or monsters increases your ability and '
+        + 'passive damage by 3% for 6 seconds, stacking up to 12%.',
+      support: 'partial',
+      supportNotes: 'Stacks once per attack or cast; damage over time doesn\'t add stacks here.',
+      amountPerStack: 0.03, maxStacks: 4, durationSeconds: 6, appliesTo: ['ability', 'passive'],
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'sundered-sky', name: 'Sundered Sky', tier: 'legendary',
+    // Stats from wrpocket 7.3; Lightshield Strike's text and values from the WR wiki.
+    cost: { total: 2900, combine: 500 }, recipe: ['caulfields-warhammer', 'jaurims-fist'],
+    stats: { ad: 40, hp: 350, abilityHaste: 15 }, tags: ['physical'],
+    effects: [{
+      kind: 'guaranteedCrit', id: 'sundered-sky-lightshield-strike', name: 'Lightshield Strike',
+      description: 'Your next basic attack against a champion critically strikes for 160% damage '
+        + 'and heals you for 125% base AD (+6% missing Health) (6s cooldown per target).',
+      support: 'partial', supportNotes: 'The heal is not modeled.',
+      critMultiplier: 1.6, cooldownSeconds: 6,
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'steraks-gage', name: "Sterak's Gage", tier: 'legendary',
+    // Stats from wrpocket 7.3; Heavy Handed's text and values from the WR wiki.
+    cost: { total: 3200, combine: 500 }, recipe: ['bf-sword', 'jaurims-fist'],
+    stats: { hp: 400, tenacity: 0.2 }, tags: ['physical'],
+    effects: [{
+      kind: 'statConversion', id: 'steraks-gage-heavy-handed', name: 'Heavy Handed',
+      description: 'Gain bonus Attack Damage equal to 50% base AD.',
+      support: 'partial',
+      supportNotes: 'Lifeline\'s shield and Sterak\'s Fury\'s tenacity are not modeled.',
+      fromStat: 'ad', fromLayer: 'base', toStat: 'ad', ratio: 0.5,
+    }],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'deaths-dance', name: "Death's Dance", tier: 'legendary',
+    cost: { total: 3200, combine: 300 }, recipe: ['caulfields-warhammer', 'pickaxe', 'chain-vest'],
+    // Cauterize and Defy only protect the holder, so a 1v1 damage calculation doesn't model them.
+    // wrpocket says 50 AD / 45 armor; the WR wiki says 35 AD / 40 armor.
+    stats: { ad: 50, armor: 45, abilityHaste: 15 }, effects: [], tags: ['physical'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'guardian-angel', name: 'Guardian Angel', tier: 'legendary',
+    cost: { total: 3200, combine: 800 }, recipe: ['bf-sword', 'chain-vest'],
+    // The revive only protects the holder. wrpocket says 45 AD; the WR wiki says 40.
+    stats: { ad: 45, armor: 40 }, effects: [], tags: ['physical'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
+  {
+    id: 'maw-of-malmortius', name: 'Maw of Malmortius', tier: 'legendary',
+    cost: { total: 3000, combine: 600 }, recipe: ['hexdrinker', 'hexdrinker'],
+    // Lifeline's magic shield and omnivamp only help the holder, so they aren't modeled.
+    stats: { ad: 55, mr: 45, abilityHaste: 10 }, effects: [], tags: ['physical'],
+    provenance: WRPOCKET_7_3_PROVENANCE,
+  },
 ]
