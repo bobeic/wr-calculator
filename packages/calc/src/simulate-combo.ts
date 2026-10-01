@@ -511,7 +511,6 @@ export function simulateCombo(
       const hitInstances = castStage(abilityKey, ability)
       attackerRuntime.lastAbilityCast = { at: time, feintUsed: false }
       if (stages.length > 0) {
-        unverifiedRuleIds.add('stageCooldownStart')
         stageWindows[abilityKey] = { nextStage: 0, closesAt: time + stages[0].windowSeconds }
       }
       if (stages.length > 0 && startsCooldownOnLastStage(abilityKey)) {

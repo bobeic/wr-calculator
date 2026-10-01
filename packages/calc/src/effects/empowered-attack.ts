@@ -16,7 +16,6 @@ function grantCharge(effect: EmpoweredAttackEffect, ctx: HookContext): void {
     stacks: Math.min(liveCharges(effect, ctx) + 1, effect.maxCharges),
     expiresAt: ctx.time + effect.durationSeconds,
   }
-  ctx.addUnverifiedRule('empoweredChargeExpiry')
 }
 
 export const empoweredAttackHandler: EffectHandler<EmpoweredAttackEffect> = {

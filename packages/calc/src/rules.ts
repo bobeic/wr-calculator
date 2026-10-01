@@ -97,13 +97,9 @@ export function cooldownWithHaste(baseCooldownSeconds: number, abilityHaste: num
 // practice tool by recording it and counting frames from input to the dash ending.
 export const DASH_SECONDS = 0.2
 
-// TODO-VERIFY(empoweredChargeExpiry): charges from one empoweredAttack effect share a single
-// expiry refreshed on each grant — check by stacking 3 feints, waiting until just before the
-// first charge's own 4s would end, and seeing whether all remaining attacks stay empowered.
-
-// TODO-VERIFY(stageCooldownStart): a staged ability's cooldown starts on its first cast unless its
-// data says `cooldownStartsOn: 'lastStage'` — check by casting stage 1 and stage 2 and reading when
-// the cooldown timer starts.
+// Confirmed 2026-09-30 (user, in-game with Ambessa): charges from one empoweredAttack effect share a
+// single expiry that each grant refreshes (three feints gave three empowered attacks), and a staged
+// ability's cooldown starts on its first cast unless its data says `cooldownStartsOn: 'lastStage'`.
 
 // TODO-VERIFY(statResolutionOrder): stat resolution applies champion base+growth, then flat
 // contributions (item stats, `stat`/`stacking` effects), then `statConversion` effects, then
@@ -150,7 +146,5 @@ export const UNVERIFIED_RULE_IDS = [
   'damageAmpTiming',
   'abilityHasteFormula',
   'dashDuration',
-  'empoweredChargeExpiry',
-  'stageCooldownStart',
 ] as const
 export type UnverifiedRuleId = (typeof UNVERIFIED_RULE_IDS)[number]
