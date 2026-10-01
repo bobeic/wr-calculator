@@ -20,6 +20,9 @@ const GROUP_MEMBERS: Record<string, string[]> = {
   ],
   // % magic pen items plus Bloodletter's Curse's magic resist shred; one of any of them.
   'magic-pen': ['void-amethyst', 'void-staff', 'cryptbloom', 'bloodletters-curse'],
+  // One Lifeline item. Seraph's Embrace's passive is also called Lifeline, but an item has a
+  // single group and Seraph's is already in `tear`; whether it also blocks these is unconfirmed.
+  lifeline: ['steraks-gage', 'maw-of-malmortius'],
 }
 
 export const EXCLUSIVE_GROUPS: Record<string, string> = Object.fromEntries(
