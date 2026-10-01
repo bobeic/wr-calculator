@@ -20,6 +20,14 @@ describe('patch registry', () => {
     for (const id of PATCH_IDS) expect(getPatchDataset(id).id).toBe(id)
   })
 
+  it('7.3a has every flagged entry reviewed or overridden, with the Death\'s Dance price rise', () => {
+    const dataset = getPatchDataset('7.3a')
+    expect([...dataset.stale.items.keys(), ...dataset.stale.champions.keys()]).toEqual([])
+    const deathsDance = dataset.items.find((item) => item.id === 'deaths-dance')
+    expect(deathsDance?.cost).toEqual({ total: 3300, combine: 400 })
+    expect(deathsDance?.provenance.patch).toBe('7.3a')
+  })
+
   it('throws for an unknown patch, naming the known ones', () => {
     expect(() => getPatchDataset('6.0')).toThrow("unknown patch '6.0' (known: ")
   })
