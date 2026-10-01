@@ -8,6 +8,7 @@ describe('defaultState', () => {
     expect(defaultState(datasetFor('7.3'))).toEqual({
       championId: 'aatrox',
       level: 15,
+      abilityRanks: {},
       buildA: { items: [], runes: [], inputs: {} },
       buildB: { items: [], runes: [], inputs: {} },
       target: { kind: 'preset', presetId: 'squishy' },

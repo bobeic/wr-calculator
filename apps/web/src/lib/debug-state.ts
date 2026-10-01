@@ -15,6 +15,10 @@ export type DebugTarget =
   | { kind: 'dummy'; hp: number; armor: number; mr: number }
   | { kind: 'champion'; championId: string; level: number; build: DebugBuild }
 
+/** Ability ranks for the attacking champion; a slot left out is at its max rank. */
+export type AbilityRanks = Partial<Record<'q' | 'w' | 'e' | 'r', number>>
+export const RANK_SLOTS = ['q', 'w', 'e', 'r'] as const
+
 export type CritMode = 'expected' | 'always' | 'never'
 export const CRIT_MODES: readonly CritMode[] = ['expected', 'always', 'never']
 
@@ -24,6 +28,7 @@ export const MAX_DURATION_SECONDS = 120
 export interface DebugState {
   championId: string
   level: number
+  abilityRanks: AbilityRanks
   buildA: DebugBuild
   buildB: DebugBuild
   target: DebugTarget
@@ -54,6 +59,7 @@ export function defaultState(dataset: DebugDataset): DebugState {
   return {
     championId,
     level: MAX_CHAMPION_LEVEL,
+    abilityRanks: {},
     buildA: emptyBuild(),
     buildB: emptyBuild(),
     target: { kind: 'preset', presetId },

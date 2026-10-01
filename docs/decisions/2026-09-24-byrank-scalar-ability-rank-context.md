@@ -86,3 +86,17 @@ follow-up. Implementation:
 - The debug page's notice now says ability values assume max rank.
 
 This accepts option 1's stated downside: a low-level scenario still shows max-rank ability numbers.
+
+## Update 2026-10-01: per-ability rank input (option 2's input half)
+
+`Build.abilityRanks` (optional `{ q, w, e, r }`, each 1..maxRank) sets the rank each ability is used at. An
+ability left out stays at max rank, so every existing build, golden case and test is unchanged.
+- `combatantFromChampion` rejects a rank outside 1..maxRank and records the effective ranks on
+  `Combatant.abilityRanks`.
+- The ranks bind kit effects (`championKitEffects`), both in `resolveStats` and on the combatant: Ambessa's R
+  passive armor pen follows R's rank.
+- `simulateCombo` uses them for ability damage and cooldowns.
+- The debug page has Q/W/E/R rank inputs next to the level (blank means max rank), shared by builds A and B
+  and stored in the URL as `ranks`. A champion target stays at max rank.
+
+Not done: deriving ranks from champion level with a skill order. The ranks are explicit.

@@ -13,6 +13,7 @@ function decode(query: string) {
 const FULL_STATE: DebugState = {
   championId: 'jinx',
   level: 11,
+  abilityRanks: { q: 3, r: 1 },
   buildA: {
     items: ['trinity-force', 'heartsteel'], boots: 'plated-steelcaps', runes: [],
     inputs: { 'heartsteel-stacks': 5, 'seraphs-embrace-shield-used': true },
@@ -26,6 +27,11 @@ const FULL_STATE: DebugState = {
 }
 
 describe('encodeState / decodeState', () => {
+  it('leaves ranks out of the URL when every ability is at max rank, and rejects malformed ranks', () => {
+    expect(encodeState({ ...FULL_STATE, abilityRanks: {} })).not.toContain('ranks=')
+    expect(decode('ranks=%7B%22q%22%3A0%7D').issues).toEqual(['ability ranks: malformed, reset to max rank'])
+  })
+
   it('round-trips a full state with no issues', () => {
     expect(decode(encodeState(FULL_STATE))).toEqual({ state: FULL_STATE, issues: [] })
   })

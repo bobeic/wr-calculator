@@ -153,3 +153,22 @@ describe('toBuild', () => {
     expect('enchant' in build).toBe(false)
   })
 })
+
+describe('ability ranks', () => {
+  const total = (result: ReturnType<typeof runDebug>): number => {
+    if (!result.comboA.ok) throw new Error(result.comboA.error)
+    return Object.values(result.comboA.value.totalsByType).reduce((sum, value) => sum + (value ?? 0), 0)
+  }
+
+  it('passes the attacker ranks to both builds; a lower R rank deals less', () => {
+    const max = runDebug(state({ combo: 'R' }), dataset)
+    const low = runDebug(state({ combo: 'R', abilityRanks: { r: 1 } }), dataset)
+    expect(total(low)).toBeLessThan(total(max))
+    expect(toBuild(state().buildA, dataset, { r: 1 }).abilityRanks).toEqual({ r: 1 })
+  })
+
+  it('reports a rank above max as a stage error', () => {
+    const result = runDebug(state({ abilityRanks: { r: 9 } }), dataset)
+    expect(result.comboA).toMatchObject({ ok: false, error: expect.stringMatching(/rank 9 is outside/) })
+  })
+})

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
 import { CURRENT_PATCH } from '@wr-calc/data'
 import { CURRENT_DATASET } from '../lib/dataset'
-import { CRIT_MODES, MAX_DURATION_SECONDS } from '../lib/debug-state'
+import { CRIT_MODES, MAX_DURATION_SECONDS, RANK_SLOTS } from '../lib/debug-state'
 import type { DebugState } from '../lib/debug-state'
 import { decodeState, encodeState } from '../lib/url-state'
 import { findMissingComboItems, parseCombo, parsePriority } from '../lib/parse-combo'
@@ -43,9 +43,9 @@ export function DebugPage() {
     <main>
       <h1>wr-calc debug (patch {CURRENT_PATCH})</h1>
       <p>
-        Ability values assume every ability is at max rank (see{' '}
-        docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md); there is no per-ability rank
-        input yet.
+        Ability values use the ranks set below; a blank rank means max rank (see{' '}
+        docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md). Ranks apply to the attacker in
+        both builds; a champion target is always at max rank.
       </p>
       <NullsPanel nulls={result.nulls} />
       {initial.issues.length > 0 && (
@@ -72,7 +72,25 @@ export function DebugPage() {
             const level = Number(event.target.value)
             if (Number.isInteger(level) && level >= 1 && level <= MAX_CHAMPION_LEVEL) update({ level })
           }} />
-        </label>
+        </label>{' '}
+        <span>
+          Ability ranks (blank = max):{' '}
+          {RANK_SLOTS.map((slot) => (
+            <label key={slot}>
+              {slot.toUpperCase()}{' '}
+              <input
+                type="number" min={1} max={dataset.champions.get(state.championId)?.abilities[slot].maxRank}
+                placeholder={String(dataset.champions.get(state.championId)?.abilities[slot].maxRank ?? '')}
+                value={state.abilityRanks[slot] ?? ''} style={{ width: '3em' }}
+                onChange={(event) => {
+                  const { [slot]: _, ...rest } = state.abilityRanks
+                  const rank = Number(event.target.value)
+                  update({ abilityRanks: event.target.value === '' || !Number.isInteger(rank) || rank < 1 ? rest : { ...rest, [slot]: rank } })
+                }}
+              />{' '}
+            </label>
+          ))}
+        </span>
         <BuildEditor label="Build A" build={state.buildA} catalog={dataset.catalog} onChange={(buildA) => update({ buildA })} />
         <BuildEditor label="Build B" build={state.buildB} catalog={dataset.catalog} onChange={(buildB) => update({ buildB })} />
         <TargetEditor target={state.target} dataset={dataset} onChange={(target) => update({ target })} />

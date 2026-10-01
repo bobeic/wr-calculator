@@ -4,7 +4,7 @@ import type {
   UnverifiedRuleId, AbilityKey,
 } from '@wr-calc/calc'
 import { combatantFromChampion, combatantFromDummy, compareBuilds, simulateCombo } from '@wr-calc/calc'
-import type { DebugBuild, DebugDataset, DebugState, DebugTarget } from './debug-state'
+import type { AbilityRanks, DebugBuild, DebugDataset, DebugState, DebugTarget } from './debug-state'
 import { parseCombo, parsePriority } from './parse-combo'
 import { resolveInputs } from './collect-inputs'
 import { nullReport } from './null-report'
@@ -46,12 +46,13 @@ function mapStage<T, U>(stage: Stage<T>, fn: (value: T) => U): Stage<U> {
   return stage.ok ? { ok: true, value: fn(stage.value) } : stage
 }
 
-/** Converts a debug-page build into an engine Build, filling declared input defaults. */
-export function toBuild(build: DebugBuild, dataset: DebugDataset): Build {
+/** Converts a debug-page build into an engine Build, filling declared input defaults and the attacker's ability ranks. */
+export function toBuild(build: DebugBuild, dataset: DebugDataset, abilityRanks: AbilityRanks = {}): Build {
   const result: Build = {
     items: build.items, runes: build.runes, inputs: resolveInputs(build, dataset.catalog),
   }
   if (build.boots !== undefined) result.boots = build.boots
+  if (Object.keys(abilityRanks).length > 0) result.abilityRanks = abilityRanks
   return result
 }
 
@@ -126,10 +127,10 @@ function nullSources(state: DebugState, dataset: DebugDataset): NullSource[] {
 export function runDebug(state: DebugState, dataset: DebugDataset): DebugResult {
   const champion = attempt(() => requireChampion(dataset, state.championId))
   const attackerA = attempt(() => combatantFromChampion(
-    need('champion', champion), state.level, toBuild(state.buildA, dataset), dataset.catalog,
+    need('champion', champion), state.level, toBuild(state.buildA, dataset, state.abilityRanks), dataset.catalog,
   ))
   const attackerB = attempt(() => combatantFromChampion(
-    need('champion', champion), state.level, toBuild(state.buildB, dataset), dataset.catalog,
+    need('champion', champion), state.level, toBuild(state.buildB, dataset, state.abilityRanks), dataset.catalog,
   ))
   const target = attempt(() => targetCombatant(state.target, dataset))
 
@@ -152,7 +153,7 @@ export function runDebug(state: DebugState, dataset: DebugDataset): DebugResult 
     need('build B', attackerB)
     const side = (build: DebugBuild) => ({
       champion: need('champion', champion), level: state.level,
-      build: toBuild(build, dataset), catalog: dataset.catalog,
+      build: toBuild(build, dataset, state.abilityRanks), catalog: dataset.catalog,
     })
     return compareBuilds(side(state.buildA), side(state.buildB), need('target', target), {
       durationSeconds: state.durationSeconds,

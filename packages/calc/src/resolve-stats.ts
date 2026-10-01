@@ -128,7 +128,7 @@ export function resolveStats(
   }
 
   const effects: Effect[] = [
-    ...championKitEffects(champion),
+    ...championKitEffects(champion, build.abilityRanks),
     ...items.flatMap((item) => item.effects),
     ...runes.flatMap((rune) => rune.effects),
   ]

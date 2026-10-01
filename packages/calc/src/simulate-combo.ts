@@ -439,7 +439,7 @@ export function simulateCombo(
 
   function startCooldown(abilityKey: AbilityKey, from: number) {
     const ability = attacker.abilities![abilityKey]
-    const rank = ability.maxRank
+    const rank = attacker.abilityRanks?.[abilityKey] ?? ability.maxRank
     const cooldownResolved = resolveScalar(ability.cooldown, attacker.level, rank)
     const cooldownWarning = scalarWarning(ability.name, 'cooldown', cooldownResolved)
     if (cooldownWarning) dataWarnings.push(cooldownWarning)
@@ -486,9 +486,8 @@ export function simulateCombo(
     flushScheduledEvents(time)
     currentHitId = nextHitId++
     dispatchOnAbilityCast(abilityKey)
-    // No per-ability rank input yet: every ability is assumed fully ranked (see
-    // docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md).
-    const rank = ability.maxRank
+    // The build's rank for this ability, or max rank (docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md).
+    const rank = attacker.abilityRanks?.[abilityKey] ?? ability.maxRank
     const hitInstances: DamageInstance[] = []
     for (const component of stage.damage) {
       const resolved = resolveDamageComponent(

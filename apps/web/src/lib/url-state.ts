@@ -15,6 +15,13 @@ const BuildParamSchema = z.object({
   inputs: z.record(z.string(), z.union([z.number(), z.boolean()])),
 }).strict()
 
+const RanksParamSchema = z.object({
+  q: z.number().int().min(1).optional(),
+  w: z.number().int().min(1).optional(),
+  e: z.number().int().min(1).optional(),
+  r: z.number().int().min(1).optional(),
+}).strict()
+
 const TargetParamSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('preset'), presetId: z.string() }).strict(),
   z.object({
@@ -33,6 +40,7 @@ export function encodeState(state: DebugState): string {
   const params = new URLSearchParams()
   params.set('champ', state.championId)
   params.set('lvl', String(state.level))
+  if (Object.keys(state.abilityRanks).length > 0) params.set('ranks', JSON.stringify(state.abilityRanks))
   params.set('a', JSON.stringify(state.buildA))
   params.set('b', JSON.stringify(state.buildB))
   params.set('t', JSON.stringify(state.target))
@@ -135,6 +143,13 @@ export function decodeState(
     params.get('lvl'), 'level', defaults.level,
     (value) => Number.isInteger(value) && value >= 1 && value <= MAX_CHAMPION_LEVEL, issues,
   )
+  let abilityRanks = defaults.abilityRanks
+  const ranks = params.get('ranks')
+  if (ranks !== null) {
+    const parsed = RanksParamSchema.safeParse(parseJson(ranks))
+    if (parsed.success) abilityRanks = parsed.data
+    else issues.push('ability ranks: malformed, reset to max rank')
+  }
   const buildA = decodeBuild(params.get('a'), 'build A', dataset, issues)
   const buildB = decodeBuild(params.get('b'), 'build B', dataset, issues)
   const target = decodeTarget(params.get('t'), defaults.target, dataset, issues)
@@ -153,7 +168,7 @@ export function decodeState(
 
   return {
     state: {
-      championId, level, buildA, buildB, target,
+      championId, level, abilityRanks, buildA, buildB, target,
       combo: params.get('combo') ?? defaults.combo,
       priority: params.get('prio') ?? defaults.priority,
       durationSeconds, critMode,

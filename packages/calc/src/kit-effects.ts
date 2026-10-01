@@ -1,4 +1,4 @@
-import type { Champion, Effect } from '@wr-calc/schema'
+import type { Build, Champion, Effect } from '@wr-calc/schema'
 
 const ABILITY_SLOTS = ['passive', 'q', 'w', 'e', 'r'] as const
 
@@ -17,11 +17,17 @@ export function bindAbilityRank<T>(value: T, rank: number): T {
   ) as T
 }
 
-/** The effects a champion's own abilities carry, with rank values bound at each ability's max rank. */
-export function championKitEffects(champion: Champion): Effect[] {
-  // No per-ability rank input yet: abilities are fully ranked, as in simulateCombo.
+/** The rank an ability is used at: the build's rank for it, clamped to 1..maxRank, or its max rank. */
+export function abilityRankFor(champion: Champion, slot: (typeof ABILITY_SLOTS)[number], ranks?: Build['abilityRanks']): number {
+  const ability = champion.abilities[slot]
+  const chosen = slot === 'passive' ? undefined : ranks?.[slot]
+  return chosen === undefined ? ability.maxRank : Math.min(Math.max(chosen, 1), ability.maxRank)
+}
+
+/** The effects a champion's own abilities carry, with rank values bound at each ability's rank (max rank by default). */
+export function championKitEffects(champion: Champion, ranks?: Build['abilityRanks']): Effect[] {
   return ABILITY_SLOTS.flatMap((slot) => {
     const ability = champion.abilities[slot]
-    return (ability.effects ?? []).map((effect) => bindAbilityRank(effect, ability.maxRank))
+    return (ability.effects ?? []).map((effect) => bindAbilityRank(effect, abilityRankFor(champion, slot, ranks)))
   })
 }
