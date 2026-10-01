@@ -86,7 +86,8 @@ export function crossCheckNotes(input: CrossCheckInput): NotesCrossCheck {
   const isCovered = (ref: EntryRef): boolean => listFor(input.covered, ref.kind).includes(ref.id)
   const staleKeys = new Set(input.previousStale.map(refKey))
 
-  const autoReviewed: ReviewedEntry[] = input.flags
+  // With nothing outside excluded sections, "not mentioned" proves nothing, so nothing is auto-cleared.
+  const autoReviewed: ReviewedEntry[] = included.length === 0 ? [] : input.flags
     .filter((flag) => flag.severity === 'changed' && !blocking.has(refKey(flag)) && !staleKeys.has(refKey(flag)) && !namedLoosely(flag))
     .map((flag) => ({
       kind: flag.kind, id: flag.id,

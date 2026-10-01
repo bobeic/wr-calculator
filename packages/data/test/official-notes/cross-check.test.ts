@@ -148,6 +148,13 @@ describe('crossCheckNotes', () => {
     expect(check.mentioned[0].lines.map((line) => line.status)).toEqual(['reflected', 'not found'])
   })
 
+  it('auto-clears nothing when the notes have no entries outside excluded sections', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const excludedOnly = run(before, after, notes([{ heading: 'Augments', section: 'GAME MODE CHANGES', excluded: true }]), ['a'])
+    expect(excludedOnly).toMatchObject({ found: true, autoReviewed: [], excludedCount: 1 })
+    expect(run(before, after, notes([]), ['a']).autoReviewed).toEqual([])
+  })
+
   it('throws when the page has entries but none match', () => {
     expect(() => run(before, before, notes([{ heading: 'Nexus' }, { heading: 'Smite' }]), [])).toThrow(/none of its 2 entries matched/)
   })
