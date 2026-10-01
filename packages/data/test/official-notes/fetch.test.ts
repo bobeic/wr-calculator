@@ -41,6 +41,13 @@ describe('loadNotes', () => {
     expect((await loadNotes(opts))?.title).toBe('t')
   })
 
+  it('offline with --notes-url: prefers the committed snapshot over fetching', async () => {
+    const fail = async (): Promise<never> => { throw new Error('must not fetch') }
+    const opts = options({ offline: true, allowFetch: true, fetchPage: fail })
+    writeFileSync(opts.snapshotFile, JSON.stringify({ patch: '7.3a', url: 'u', title: 't', published: 'p', entries: [] }))
+    expect((await loadNotes(opts))?.title).toBe('t')
+  })
+
   it('offline with --notes-url: fetches', async () => {
     expect((await loadNotes(options({ offline: true, allowFetch: true })))?.entries).toHaveLength(18)
   })

@@ -224,7 +224,7 @@ async function run(options: Options): Promise<void> {
     await writeFile(join(staged.reports, 'PATCH_DIFF.md'), renderPatchDiff(diff))
     await writeFile(join(staged.generated, 'notes-review.ts'), renderNotesReview(diff.officialNotes, plan.patch))
     if (notes !== null) await writeFile(join(staged.reports, 'official-notes.json'), stableStringify(notes))
-    notesSummary = diff.officialNotes === null
+    notesSummary = diff.officialNotes === null || !diff.officialNotes.found
       ? `Official notes: not found at ${url}`
       : `Official notes: ${diff.officialNotes.autoReviewed.length} auto-cleared, ${diff.officialNotes.notesFlags.length} notes-only flags`
   }

@@ -14,7 +14,7 @@ export interface LoadNotesOptions {
   snapshotFile: string
   /** --from-cache run: don't fetch unless allowFetch. */
   offline: boolean
-  /** True when --notes-url was given: an offline run may fetch then. */
+  /** True when --notes-url was given: an offline run falls back to fetching when it has neither cache nor snapshot. */
   allowFetch: boolean
   fetchPage: (url: string) => Promise<{ status: number; text: () => Promise<string> }>
 }
@@ -30,9 +30,9 @@ const OfficialNotesSchema = z.object({
 /** Loads the official notes from the page cache, the committed snapshot or the web; null if not published. */
 export async function loadNotes(options: LoadNotesOptions): Promise<OfficialNotes | null> {
   if (existsSync(options.cacheFile)) return parseNotesPage(readFileSync(options.cacheFile, 'utf-8'), options.patch, options.url)
-  if (options.offline && !options.allowFetch) {
-    if (!existsSync(options.snapshotFile)) return null
-    return OfficialNotesSchema.parse(JSON.parse(readFileSync(options.snapshotFile, 'utf-8')))
+  if (options.offline) {
+    if (existsSync(options.snapshotFile)) return OfficialNotesSchema.parse(JSON.parse(readFileSync(options.snapshotFile, 'utf-8')))
+    if (!options.allowFetch) return null
   }
   const response = await options.fetchPage(options.url)
   if (response.status === 404) return null
