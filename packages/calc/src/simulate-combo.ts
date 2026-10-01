@@ -1,8 +1,8 @@
 import type { Effect, DamageType, Condition, AbilityStage } from '@wr-calc/schema'
 import type { Combatant } from './combatant'
 import type {
-  AbilityKey, CombatantRuntime, ConditionExtra, DamageInstance, EffectHandler, HookContext,
-  RawDamageInstanceInput,
+  AbilityKey, AttackModifier, CombatantRuntime, ConditionExtra, DamageInstance, EffectHandler, HookContext,
+  DamagePart, HitInfo, RawDamageInstanceInput,
 } from './effects/types'
 import type { UnverifiedRuleId } from './rules'
 import type { ResistModifiers } from './mitigation'
@@ -43,7 +43,7 @@ export interface ComboResult {
 }
 
 function combatantEffects(combatant: Combatant): Effect[] {
-  // Kit effects first, so a champion's own empowered-attack bonus lands before item on-hits.
+  // Kit effects first, so a champion's own empowered-attack bonus is listed before item bonuses.
   return [
     ...(combatant.kitEffects ?? []),
     ...combatant.items.flatMap((item) => item.effects),
@@ -146,6 +146,9 @@ export function simulateCombo(
   let overkill: number | undefined
   let damageDepth = 0
   let chainAborted = false
+  // The open hit (a basic attack or an ability stage cast); scheduled damage runs outside it.
+  let nextHitId = 1
+  let currentHitId: number | undefined
 
   const trackSupport = (effect: Effect) => {
     if (effect.support !== 'full' && !unsupportedByEffectId.has(effect.id)) {
@@ -228,7 +231,10 @@ export function simulateCombo(
     while (scheduled.length > 0 && scheduled[0].time <= upTo) {
       const event = scheduled.shift()!
       time = event.time
+      const openHit = currentHitId
+      currentHitId = undefined
       event.run(buildCtx(attacker, attackerRuntime, target, targetRuntime))
+      currentHitId = openHit
     }
     time = upTo
   }
@@ -265,16 +271,25 @@ export function simulateCombo(
     try {
       const attackerCtx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
 
-      let raw = input.amount
-      for (const effect of attackerEffectsList) {
-        const handler = resolve(effect)
-        if (!handler?.damageMultiplier) continue
-        const multiplier = handler.damageMultiplier(effect, attackerCtx, input)
-        if (multiplier === 1) continue
-        raw *= multiplier
-        unverifiedRuleIds.add('damageAmpTiming')
-        trackSupport(effect)
+      // Each merged part is amplified on its own source (e.g. a passive-only amp), then summed.
+      const pieces: DamagePart[] = input.parts ?? [{ source: input.source, amount: input.amount }]
+      const ampedParts: DamagePart[] = []
+      for (const piece of pieces) {
+        let amount = piece.amount
+        for (const effect of attackerEffectsList) {
+          const handler = resolve(effect)
+          if (!handler?.damageMultiplier) continue
+          const multiplier = handler.damageMultiplier(
+            effect, attackerCtx, { type: input.type, amount: piece.amount, source: piece.source }
+          )
+          if (multiplier === 1) continue
+          amount *= multiplier
+          unverifiedRuleIds.add('damageAmpTiming')
+          trackSupport(effect)
+        }
+        ampedParts.push({ source: piece.source, amount })
       }
+      const raw = ampedParts.reduce((sum, part) => sum + part.amount, 0)
 
       const resistBase = input.type === 'physical' ? target.sheet.total.armor ?? 0
         : input.type === 'magic' ? target.sheet.total.mr ?? 0 : 0
@@ -321,6 +336,8 @@ export function simulateCombo(
       const instance: DamageInstance = {
         time, source: input.source, type: input.type, raw, mitigated,
         targetHpAfter: targetRuntime.currentHp,
+        ...(currentHitId !== undefined && { hitId: currentHitId }),
+        ...(input.parts && { parts: ampedParts }),
       }
       instances.push(instance)
       // Set after the hit, so the hit that starts combat isn't itself amplified by combat ramps.
@@ -355,6 +372,31 @@ export function simulateCombo(
       if (!handler?.hooks?.onBasicAttack) continue
       if (!conditionAllows(effect, ctx)) continue
       handler.hooks.onBasicAttack(effect, ctx)
+      trackSupport(effect)
+    }
+  }
+
+  function dispatchBeforeBasicAttack(): AttackModifier[] {
+    const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
+    const modifiers: AttackModifier[] = []
+    for (const effect of attackerEffectsList) {
+      const handler = resolve(effect)
+      if (!handler?.hooks?.beforeBasicAttack) continue
+      if (!conditionAllows(effect, ctx)) continue
+      const modifier = handler.hooks.beforeBasicAttack(effect, ctx)
+      trackSupport(effect)
+      if (modifier) modifiers.push(modifier)
+    }
+    return modifiers
+  }
+
+  function dispatchOnHitLanded(hit: HitInfo) {
+    const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
+    for (const effect of attackerEffectsList) {
+      const handler = resolve(effect)
+      if (!handler?.hooks?.onHitLanded) continue
+      if (!conditionAllows(effect, ctx)) continue
+      handler.hooks.onHitLanded(effect, ctx, hit)
       trackSupport(effect)
     }
   }
@@ -440,6 +482,7 @@ export function simulateCombo(
     const ability = attacker.abilities![abilityKey]
     time += stage.castTime ?? 0
     flushScheduledEvents(time)
+    currentHitId = nextHitId++
     dispatchOnAbilityCast(abilityKey)
     // No per-ability rank input yet: every ability is assumed fully ranked (see
     // docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md).
@@ -459,6 +502,15 @@ export function simulateCombo(
     return hitInstances
   }
 
+  /** Runs a cast stage's ability-hit hooks, then its hit hooks if it dealt damage, and closes the hit. */
+  function finishAbilityHit(abilityKey: AbilityKey, hitInstances: DamageInstance[]) {
+    dispatchOnAbilityHit(abilityKey, hitInstances)
+    if (hitInstances.length > 0 && currentHitId !== undefined) {
+      dispatchOnHitLanded({ id: currentHitId, kind: 'ability', empowered: false, abilityKey })
+    }
+    currentHitId = undefined
+  }
+
   for (const action of sequence) {
     if (killed) break
 
@@ -473,11 +525,35 @@ export function simulateCombo(
       const critMult = critMultiplier(critChance, bonusCritDamage, critMode)
       unverifiedRuleIds.add('critDamageMultiplier')
 
+      currentHitId = nextHitId++
+      const modifiers = dispatchBeforeBasicAttack()
+      const critOverrides = modifiers.flatMap((modifier) =>
+        modifier.critMultiplier === undefined ? [] : [modifier.critMultiplier])
+      const swingCrit = critOverrides.length > 0 ? Math.max(...critOverrides) : critMult
+      const bonuses = modifiers.flatMap((modifier) => modifier.bonus ?? [])
+      const mergedBonuses = bonuses.filter((bonus) => bonus.type === 'physical')
+      const attackSource = { kind: 'basicAttack', id: 'AA', name: 'Basic Attack' } as const
+      const attackAmount = (attackerTotal.ad ?? 0) * swingCrit
       performDamage({
-        type: 'physical', amount: (attackerTotal.ad ?? 0) * critMult,
-        source: { kind: 'basicAttack', id: 'AA', name: 'Basic Attack' },
+        type: 'physical',
+        amount: attackAmount + mergedBonuses.reduce((sum, bonus) => sum + bonus.amount, 0),
+        source: attackSource,
+        ...(mergedBonuses.length > 0 && {
+          parts: [
+            { source: attackSource, amount: attackAmount },
+            ...mergedBonuses.map((bonus) => ({ source: bonus.source, amount: bonus.amount })),
+          ],
+        }),
       })
+      for (const bonus of bonuses.filter((candidate) => candidate.type !== 'physical')) {
+        performDamage(bonus)
+      }
       dispatchOnBasicAttack()
+      dispatchOnHitLanded({
+        id: currentHitId, kind: 'basicAttack',
+        empowered: modifiers.some((modifier) => modifier.empowered === true),
+      })
+      currentHitId = undefined
 
       const swingBonus = attackerRuntime.swingAttackSpeedBonus ?? 0
       attackerRuntime.swingAttackSpeedBonus = undefined
@@ -501,7 +577,7 @@ export function simulateCombo(
         const hitInstances = castStage(abilityKey, stages[window.nextStage])
         attackerRuntime.lastAbilityCast = { at: time, feintUsed: false }
         advanceStageWindow(abilityKey, window.nextStage + 1)
-        dispatchOnAbilityHit(abilityKey, hitInstances)
+        finishAbilityHit(abilityKey, hitInstances)
         continue
       }
 
@@ -520,7 +596,7 @@ export function simulateCombo(
         startCooldown(abilityKey, time)
       }
 
-      dispatchOnAbilityHit(abilityKey, hitInstances)
+      finishAbilityHit(abilityKey, hitInstances)
     } else if (action === 'dash') {
       const dashStartedAt = time
       // Windows are judged at the start of the dash; the stage itself lands at its end.
@@ -542,7 +618,7 @@ export function simulateCombo(
         // A dash-triggered stage doesn't update lastAbilityCast, so it can't feed another feint.
         const hitInstances = castStage(abilityKey, stage)
         advanceStageWindow(abilityKey, window.nextStage + 1)
-        dispatchOnAbilityHit(abilityKey, hitInstances)
+        finishAbilityHit(abilityKey, hitInstances)
       }
       dispatchOnDash(dashStartedAt)
       if (attackerRuntime.lastAbilityCast) attackerRuntime.lastAbilityCast.feintUsed = true

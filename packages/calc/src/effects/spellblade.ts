@@ -15,9 +15,9 @@ export const spellbladeHandler: EffectHandler<SpellbladeEffect> = {
       if (!ctx.ignoreCooldowns && ctx.time < availableAt) return
       ctx.self.buffs[key] = {}
     },
-    onBasicAttack(effect, ctx) {
+    beforeBasicAttack(effect, ctx) {
       const key = buffKey(effect)
-      if (!ctx.self.buffs[key]) return
+      if (!ctx.self.buffs[key]) return undefined
       delete ctx.self.buffs[key]
 
       const icdResolved = resolveScalar(effect.internalCooldownSeconds, ctx.level)
@@ -38,10 +38,12 @@ export const spellbladeHandler: EffectHandler<SpellbladeEffect> = {
         amount += statValue * ratioResolved.value
       }
 
-      ctx.dealDamage({
-        type: effect.damageType, amount,
-        source: { kind: 'item', id: effect.id, name: effect.name },
-      })
+      return {
+        bonus: [{
+          type: effect.damageType, amount,
+          source: { kind: 'item', id: effect.id, name: effect.name },
+        }],
+      }
     },
   },
 }

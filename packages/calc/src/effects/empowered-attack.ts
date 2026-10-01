@@ -33,9 +33,9 @@ export const empoweredAttackHandler: EffectHandler<EmpoweredAttackEffect> = {
       if (dashStartedAt - cast.at > (effect.grant.withinSeconds ?? 0)) return
       grantCharge(effect, ctx)
     },
-    onBasicAttack(effect, ctx) {
+    beforeBasicAttack(effect, ctx) {
       const charges = liveCharges(effect, ctx)
-      if (charges === 0) return
+      if (charges === 0) return undefined
       const key = buffKey(effect)
       if (charges === 1) delete ctx.self.buffs[key]
       else ctx.self.buffs[key] = { ...ctx.self.buffs[key], stacks: charges - 1 }
@@ -48,10 +48,13 @@ export const empoweredAttackHandler: EffectHandler<EmpoweredAttackEffect> = {
       }
       const resolved = ctx.resolveComponent(effect.bonus, effect.name)
       resolved.dataWarnings.forEach((warning) => ctx.addDataWarning(warning))
-      ctx.dealDamage({
-        type: resolved.type, amount: resolved.amount,
-        source: { kind: 'basicAttack', id: effect.id, name: effect.name },
-      })
+      return {
+        empowered: true,
+        bonus: [{
+          type: resolved.type, amount: resolved.amount,
+          source: { kind: 'passive', id: effect.id, name: effect.name },
+        }],
+      }
     },
   },
 }

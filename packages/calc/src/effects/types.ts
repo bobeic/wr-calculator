@@ -40,7 +40,7 @@ export interface EffectHandler<E extends Effect = Effect> {
   activate?(effect: E, ctx: HookContext): void
 }
 
-export type SourceKind = 'basicAttack' | 'ability' | 'item' | 'other'
+export type SourceKind = 'basicAttack' | 'ability' | 'item' | 'passive' | 'other'
 
 export interface DamageSource {
   kind: SourceKind
@@ -48,10 +48,14 @@ export interface DamageSource {
   name: string
 }
 
+export interface DamagePart { source: DamageSource; amount: number }
+
 export interface RawDamageInstanceInput {
   type: DamageType
   amount: number
   source: DamageSource
+  /** Same-hit damage merged into this instance; when set, it replaces `amount`, and each part is amplified on its own source. */
+  parts?: DamagePart[]
 }
 
 export interface DamageInstance {
@@ -61,6 +65,26 @@ export interface DamageInstance {
   raw: number
   mitigated: number
   targetHpAfter: number
+  /** The basic attack or ability stage cast this instance belongs to; unset for dot ticks and other scheduled damage. */
+  hitId?: number
+  /** The merged parts after damage amps, when this instance merged several sources. */
+  parts?: DamagePart[]
+}
+
+export interface AttackModifier {
+  /** Extra damage on this attack. Physical parts merge into the attack's instance; others are their own instances in the same hit. */
+  bonus?: Omit<RawDamageInstanceInput, 'parts'>[]
+  /** Replaces the attack's crit multiplier for this swing; the highest override wins. */
+  critMultiplier?: number
+  /** True when this swing spent an empowered-attack charge. */
+  empowered?: boolean
+}
+
+export interface HitInfo {
+  id: number
+  kind: 'basicAttack' | 'ability'
+  empowered: boolean
+  abilityKey?: AbilityKey
 }
 
 export interface RuntimeBuff {
@@ -93,6 +117,9 @@ export interface ConditionExtra {
 
 export interface HookHandlers<E extends Effect> {
   onBasicAttack?(effect: E, ctx: HookContext): void
+  beforeBasicAttack?(effect: E, ctx: HookContext): AttackModifier | undefined
+  /** Once per hit that dealt damage, after all of its damage and hooks. */
+  onHitLanded?(effect: E, ctx: HookContext, hit: HitInfo): void
   onAbilityCast?(effect: E, ctx: HookContext, abilityKey: AbilityKey): void
   onAbilityHit?(effect: E, ctx: HookContext, abilityKey: AbilityKey, instances: DamageInstance[]): void
   /** A dash (e.g. a feint) that started at `dashStartedAt` has just ended. */

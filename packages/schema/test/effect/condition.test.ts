@@ -2,6 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { ConditionSchema } from '../../src/effect/condition'
 
 describe('ConditionSchema', () => {
+  it('accepts passive as a source kind', () => {
+    expect(ConditionSchema.parse({ type: 'sourceKind', value: 'passive' }))
+      .toEqual({ type: 'sourceKind', value: 'passive' })
+  })
+
   it('accepts a targetHpBelow condition', () => {
     const result = ConditionSchema.parse({ type: 'targetHpBelow', threshold: 0.3 })
     expect(result.type).toBe('targetHpBelow')
