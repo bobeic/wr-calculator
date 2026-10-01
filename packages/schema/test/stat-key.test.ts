@@ -11,4 +11,8 @@ describe('StatKeySchema', () => {
   it('rejects an unknown stat key', () => {
     expect(() => StatKeySchema.parse('unknownStat')).toThrow()
   })
+
+  it('has a basic-ability haste stat next to ultimate haste', () => {
+    expect(StatKeySchema.parse('basicAbilityHaste')).toBe('basicAbilityHaste')
+  })
 })

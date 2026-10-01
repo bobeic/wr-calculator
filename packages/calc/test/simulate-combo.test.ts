@@ -578,6 +578,34 @@ describe('simulateCombo', () => {
     expect(result.dataWarnings.some((w) => w.includes('Invalid wait duration'))).toBe(true)
   })
 
+  it('crits the first attack at a guaranteedCrit multiplier even with crits off, and not the second', () => {
+    const sky = baseItem('test-sky', {
+      id: 'test-sky-strike', name: 'Sky', description: '', support: 'full', kind: 'guaranteedCrit',
+      critMultiplier: 1.6, cooldownSeconds: 6,
+    })
+    const catalog = { items: new Map([[sky.id, sky]]), runes: new Map() }
+    const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [sky.id] }), catalog)
+    const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'AA'], { critMode: 'never' })
+    expect(result.instances.map((i) => i.mitigated)).toEqual([60 * 1.6, 60])
+  })
+
+  it('applies basicAbilityHaste to Q/W/E cooldowns but not R', () => {
+    const haste: Item = {
+      id: 'test-haste', name: 'test-haste', tier: 'basic', cost: { total: 1000, combine: 1000 }, recipe: [],
+      stats: { basicAbilityHaste: 100 }, effects: [], tags: [],
+      provenance: { source: 'manual', patch: '0.0.0', verifiedInGame: false },
+    }
+    const catalog = { items: new Map([[haste.id, haste]]), runes: new Map() }
+    const base = championWithAbility()
+    const champion = championWithAbility({
+      abilities: { ...base.abilities, r: { ...base.abilities.r, damage: [{ type: 'magic', base: 10, ratios: [], tags: [] }] } },
+    })
+    const attacker = combatantFromChampion(champion, 1, emptyBuild({ items: [haste.id] }), catalog)
+    const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'R', 'wait:4', 'Q', 'R'])
+    // Q's 8s cooldown halves to 4s; R's 100s is untouched.
+    expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'r', 'q'])
+  })
+
   describe('recast stages', () => {
     const noCatalog = { items: new Map(), runes: new Map() }
     function stagedChampion(cooldownStartsOn?: 'firstCast' | 'lastStage') {

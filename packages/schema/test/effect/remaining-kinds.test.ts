@@ -111,4 +111,9 @@ describe('remaining effect kinds', () => {
     expect(result).toMatchObject({ kind: 'hitStackAmp', appliesTo: ['ability', 'passive'] })
     expect(() => EffectSchema.parse({ ...result, appliesTo: [] })).toThrow()
   })
+
+  it('parses a guaranteedCrit', () => {
+    const result = EffectSchema.parse({ ...base, kind: 'guaranteedCrit', critMultiplier: 1.6, cooldownSeconds: 6 })
+    expect(result).toMatchObject({ kind: 'guaranteedCrit', critMultiplier: 1.6 })
+  })
 })
