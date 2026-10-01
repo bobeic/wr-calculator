@@ -532,14 +532,16 @@ export const STARTER_ITEMS: Item[] = [
     effects: [{
       kind: 'hitStackProc', id: 'eclipse-ever-rising-moon', name: 'Ever Rising Moon',
       description: 'Hitting an enemy champion inflicts a stack for 1.8 seconds, up to one per attack '
-        + 'or cast. Inflicting 2 stacks consumes them to deal 6% of the target\'s max Health as '
-        + 'bonus physical damage and grant a 140 (+35% bonus AD) shield for 2 seconds (6s cooldown).',
+        + 'or cast. Inflicting 2 stacks consumes them to deal 7% of the target\'s max Health as '
+        + 'bonus physical damage and grant a 150 (+40% bonus AD) shield for 2 seconds (6s cooldown).',
       support: 'partial',
-      supportNotes: 'Melee values (WR wiki). The shield is not modeled; item effects, crowd '
-        + 'control and damage over time don\'t add stacks here.',
+      // 7% per wrpocket's 7.3 text, confirmed in game on 7.3a (2026-10-01); the WR wiki's 6% was out of date.
+      supportNotes: 'Melee values (3.5% for ranged is not modeled). The shield is not modeled; item effects, '
+        + 'crowd control and damage over time don\'t add stacks here. In game the proc shows as one number with '
+        + 'the hit that triggers it.',
       stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6,
       stacksFrom: ['basicAttack', 'ability'],
-      damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.06 }], tags: [] },
+      damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.07 }], tags: [] },
       delivery: { kind: 'instant' },
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,
@@ -549,22 +551,9 @@ export const STARTER_ITEMS: Item[] = [
     cost: { total: 3100, combine: 700 }, recipe: ['caulfields-warhammer', 'last-whisper'],
     // 50 AD / 35% pen per the official 7.3 notes (40 AD -> 50, pen added); the WR wiki still shows pre-7.3 values.
     stats: { ad: 50, pctArmorPen: 0.35, abilityHaste: 15 }, tags: ['physical'],
-    effects: [{
-      kind: 'hitStackProc', id: 'seryldas-grudge-frostbite', name: 'Frostbite',
-      description: 'Ability damage and empowered attacks add a stack (up to 3, 6 seconds). At 3 '
-        + 'stacks, deals 12-40 (based on level) (+40% bonus AD) physical damage every 0.25 seconds '
-        + 'for 2 seconds and applies 50% Grievous Wounds for 3 seconds (5s cooldown).',
-      support: 'partial',
-      supportNotes: 'Icy\'s slow and the Grievous Wounds are not modeled. "Empowered attacks" is '
-        + 'read as attacks that spend an empowered-attack charge.',
-      stacksToProc: 3, stackWindowSeconds: 6, cooldownSeconds: 5,
-      stacksFrom: ['ability', 'empoweredAttack'],
-      damage: {
-        type: 'physical', base: { levelRange: { min: 12, max: 40 } },
-        ratios: [{ stat: 'bonusAd', value: 0.4 }], tags: [],
-      },
-      delivery: { kind: 'dot', tickIntervalSeconds: 0.25, durationSeconds: 2 },
-    }],
+    // No Frostbite burn: wrpocket's 7.3 text has only Icy (a slow, not modelled), confirmed in game on 7.3a
+    // (2026-10-01). The burn came from an out-of-date WR wiki page.
+    effects: [],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {

@@ -11,7 +11,7 @@ the durable reference — same pattern as
 
 ## Decision — the following are accepted Phase 1 gaps
 
-1. **`goldEfficiency(item)` is not implemented in Step 5.** The spec requires it to derive stat gold
+1. **RESOLVED (2026-10-01; see `2026-10-01-build-impact-and-gold-efficiency.md`).** **`goldEfficiency(item)` is not implemented in Step 5.** The spec requires it to derive stat gold
    values from basic items in the real data, but `packages/data` is still an empty stub (Step 6,
    "real data skeletons", hasn't run). It isn't a dependency of `compareBuilds`'s output (`gold`
    there is cumulative item cost, not efficiency), so nothing in Step 5 needed it. Pick up in Step 6.

@@ -1,0 +1,659 @@
+{
+  "from": "7.3",
+  "items": [
+    {
+      "after": {
+        "cost": 3100,
+        "efficiency": 1.0376344086021505
+      },
+      "before": {
+        "cost": 3100,
+        "efficiency": 1.0376344086021505
+      },
+      "changes": [
+        "effects"
+      ],
+      "id": "blade-of-the-ruined-king",
+      "name": "Blade of the Ruined King"
+    },
+    {
+      "after": {
+        "cost": 3300,
+        "efficiency": 1.2449494949494948
+      },
+      "before": {
+        "cost": 3200,
+        "efficiency": 1.2838541666666665
+      },
+      "changes": [
+        "cost"
+      ],
+      "id": "deaths-dance",
+      "name": "Death's Dance"
+    },
+    {
+      "after": {
+        "cost": 3100,
+        "efficiency": 1.0483870967741935
+      },
+      "before": {
+        "cost": 3100,
+        "efficiency": 0.9408602150537634
+      },
+      "changes": [
+        "stats"
+      ],
+      "id": "yun-tal-wildarrows",
+      "name": "Yun Tal Wildarrows"
+    }
+  ],
+  "scenarios": [
+    {
+      "after": 94.70588235294117,
+      "before": 94.70588235294117,
+      "label": "ambessa-l15-bf-sword-aa"
+    },
+    {
+      "after": 109.41176470588236,
+      "before": 109.41176470588236,
+      "label": "ambessa-l15-bf-sword-e"
+    },
+    {
+      "after": 342.9411764705883,
+      "before": 342.9411764705883,
+      "label": "ambessa-l15-bf-sword-e-feint-empowered-aa"
+    },
+    {
+      "after": 590.5882352941177,
+      "before": 590.5882352941177,
+      "label": "ambessa-l15-bf-sword-q"
+    },
+    {
+      "after": 1211.7647058823532,
+      "before": 1211.7647058823532,
+      "label": "ambessa-l15-bf-sword-q-then-slam"
+    },
+    {
+      "after": 112.94117647058823,
+      "before": 112.94117647058823,
+      "label": "ambessa-l15-bf-sword-w"
+    },
+    {
+      "after": 94.70588235294117,
+      "before": 94.70588235294117,
+      "label": "ambessa-l15-black-cleaver-aa"
+    },
+    {
+      "after": 191.81082807067338,
+      "before": 191.81082807067338,
+      "label": "ambessa-l15-black-cleaver-aa-aa"
+    },
+    {
+      "after": 109.41176470588236,
+      "before": 109.41176470588236,
+      "label": "ambessa-l15-black-cleaver-e"
+    },
+    {
+      "after": 990.0297363832199,
+      "before": 990.0297363832199,
+      "label": "ambessa-l15-black-cleaver-e-feint-empowered-aa-q"
+    },
+    {
+      "after": 590.5882352941177,
+      "before": 590.5882352941177,
+      "label": "ambessa-l15-black-cleaver-q"
+    },
+    {
+      "after": 1227.5001773930321,
+      "before": 1227.5001773930321,
+      "label": "ambessa-l15-black-cleaver-q-then-slam"
+    },
+    {
+      "after": 112.94117647058823,
+      "before": 112.94117647058823,
+      "label": "ambessa-l15-black-cleaver-w"
+    },
+    {
+      "after": 100.58823529411765,
+      "before": 100.58823529411765,
+      "label": "ambessa-l15-deaths-dance-aa"
+    },
+    {
+      "after": 113.23529411764706,
+      "before": 113.23529411764706,
+      "label": "ambessa-l15-deaths-dance-e"
+    },
+    {
+      "after": 617.6470588235294,
+      "before": 617.6470588235294,
+      "label": "ambessa-l15-deaths-dance-q"
+    },
+    {
+      "after": 1267.6470588235293,
+      "before": 1267.6470588235293,
+      "label": "ambessa-l15-deaths-dance-q-then-slam"
+    },
+    {
+      "after": 117.64705882352942,
+      "before": 117.64705882352942,
+      "label": "ambessa-l15-deaths-dance-w"
+    },
+    {
+      "after": 109.41176470588236,
+      "before": 109.41176470588236,
+      "label": "ambessa-l15-eclipse-aa"
+    },
+    {
+      "after": 118.97058823529412,
+      "before": 118.97058823529412,
+      "label": "ambessa-l15-eclipse-e"
+    },
+    {
+      "after": 649.7058823529412,
+      "before": 649.7058823529412,
+      "label": "ambessa-l15-eclipse-e-then-feint-proc"
+    },
+    {
+      "after": 658.2352941176471,
+      "before": 658.2352941176471,
+      "label": "ambessa-l15-eclipse-q"
+    },
+    {
+      "after": 124.70588235294117,
+      "before": 124.70588235294117,
+      "label": "ambessa-l15-eclipse-w"
+    },
+    {
+      "after": 97.64705882352942,
+      "before": 97.64705882352942,
+      "label": "ambessa-l15-guardian-angel-aa"
+    },
+    {
+      "after": 111.32352941176471,
+      "before": 111.32352941176471,
+      "label": "ambessa-l15-guardian-angel-e"
+    },
+    {
+      "after": 604.1176470588235,
+      "before": 604.1176470588235,
+      "label": "ambessa-l15-guardian-angel-q"
+    },
+    {
+      "after": 1239.7058823529412,
+      "before": 1239.7058823529412,
+      "label": "ambessa-l15-guardian-angel-q-then-slam"
+    },
+    {
+      "after": 115.29411764705883,
+      "before": 115.29411764705883,
+      "label": "ambessa-l15-guardian-angel-w"
+    },
+    {
+      "after": 103.52941176470588,
+      "before": 103.52941176470588,
+      "label": "ambessa-l15-maw-of-malmortius-aa"
+    },
+    {
+      "after": 115.14705882352942,
+      "before": 115.14705882352942,
+      "label": "ambessa-l15-maw-of-malmortius-e"
+    },
+    {
+      "after": 631.1764705882354,
+      "before": 631.1764705882354,
+      "label": "ambessa-l15-maw-of-malmortius-q"
+    },
+    {
+      "after": 1295.5882352941176,
+      "before": 1295.5882352941176,
+      "label": "ambessa-l15-maw-of-malmortius-q-then-slam"
+    },
+    {
+      "after": 120,
+      "before": 120,
+      "label": "ambessa-l15-maw-of-malmortius-w"
+    },
+    {
+      "after": 71.17647058823529,
+      "before": 71.17647058823529,
+      "label": "ambessa-l15-no-items-aa"
+    },
+    {
+      "after": 94.11764705882354,
+      "before": 94.11764705882354,
+      "label": "ambessa-l15-no-items-e"
+    },
+    {
+      "after": 282.94117647058823,
+      "before": 282.94117647058823,
+      "label": "ambessa-l15-no-items-e-feint-empowered-aa"
+    },
+    {
+      "after": 188.23529411764707,
+      "before": 188.23529411764707,
+      "label": "ambessa-l15-no-items-e-then-feint"
+    },
+    {
+      "after": 482.35294117647067,
+      "before": 482.35294117647067,
+      "label": "ambessa-l15-no-items-q"
+    },
+    {
+      "after": 988.2352941176473,
+      "before": 988.2352941176473,
+      "label": "ambessa-l15-no-items-q-then-slam"
+    },
+    {
+      "after": 94.11764705882354,
+      "before": 94.11764705882354,
+      "label": "ambessa-l15-no-items-w"
+    },
+    {
+      "after": 94.70588235294117,
+      "before": 94.70588235294117,
+      "label": "ambessa-l15-spear-of-shojin-aa"
+    },
+    {
+      "after": 109.41176470588236,
+      "before": 109.41176470588236,
+      "label": "ambessa-l15-spear-of-shojin-e"
+    },
+    {
+      "after": 590.5882352941177,
+      "before": 590.5882352941177,
+      "label": "ambessa-l15-spear-of-shojin-q"
+    },
+    {
+      "after": 1230.4,
+      "before": 1230.4,
+      "label": "ambessa-l15-spear-of-shojin-q-then-slam"
+    },
+    {
+      "after": 1499.9764705882355,
+      "before": 1499.9764705882355,
+      "label": "ambessa-l15-spear-of-shojin-q-w-e-q"
+    },
+    {
+      "after": 112.94117647058823,
+      "before": 112.94117647058823,
+      "label": "ambessa-l15-spear-of-shojin-w"
+    },
+    {
+      "after": 106.76470588235294,
+      "before": 106.76470588235294,
+      "label": "ambessa-l15-steraks-gage-aa"
+    },
+    {
+      "after": 117.25,
+      "before": 117.25,
+      "label": "ambessa-l15-steraks-gage-e"
+    },
+    {
+      "after": 646.0588235294119,
+      "before": 646.0588235294119,
+      "label": "ambessa-l15-steraks-gage-q"
+    },
+    {
+      "after": 1326.3235294117649,
+      "before": 1326.3235294117649,
+      "label": "ambessa-l15-steraks-gage-q-then-slam"
+    },
+    {
+      "after": 122.58823529411765,
+      "before": 122.58823529411765,
+      "label": "ambessa-l15-steraks-gage-w"
+    },
+    {
+      "after": 151.5294117647059,
+      "before": 151.5294117647059,
+      "label": "ambessa-l15-sundered-sky-aa"
+    },
+    {
+      "after": 246.23529411764707,
+      "before": 246.23529411764707,
+      "label": "ambessa-l15-sundered-sky-aa-aa"
+    },
+    {
+      "after": 109.41176470588236,
+      "before": 109.41176470588236,
+      "label": "ambessa-l15-sundered-sky-e"
+    },
+    {
+      "after": 590.5882352941177,
+      "before": 590.5882352941177,
+      "label": "ambessa-l15-sundered-sky-q"
+    },
+    {
+      "after": 1211.7647058823532,
+      "before": 1211.7647058823532,
+      "label": "ambessa-l15-sundered-sky-q-then-slam"
+    },
+    {
+      "after": 112.94117647058823,
+      "before": 112.94117647058823,
+      "label": "ambessa-l15-sundered-sky-w"
+    },
+    {
+      "after": 542.723880597015,
+      "before": 542.723880597015,
+      "label": "annie-l15-blackfire-build-q"
+    },
+    {
+      "after": 1046.3059701492539,
+      "before": 1046.3059701492539,
+      "label": "annie-l15-blackfire-build-q-after-w"
+    },
+    {
+      "after": 613.6940298507465,
+      "before": 613.6940298507465,
+      "label": "annie-l15-blackfire-build-q-burn"
+    },
+    {
+      "after": 508.20895522388065,
+      "before": 508.20895522388065,
+      "label": "annie-l15-blackfire-build-r"
+    },
+    {
+      "after": 492.1641791044776,
+      "before": 492.1641791044776,
+      "label": "annie-l15-blackfire-build-w"
+    },
+    {
+      "after": 348.1034482758621,
+      "before": 348.1034482758621,
+      "label": "annie-l15-bloodletters-build-q"
+    },
+    {
+      "after": 2311.237542751982,
+      "before": 2311.237542751982,
+      "label": "annie-l15-bloodletters-build-q-stacks"
+    },
+    {
+      "after": 342.0689655172414,
+      "before": 342.0689655172414,
+      "label": "annie-l15-bloodletters-build-r"
+    },
+    {
+      "after": 321.4942528735632,
+      "before": 321.4942528735632,
+      "label": "annie-l15-bloodletters-build-w"
+    },
+    {
+      "after": 476.75373134328356,
+      "before": 476.75373134328356,
+      "label": "annie-l15-clean-build-q"
+    },
+    {
+      "after": 461.6417910447761,
+      "before": 461.6417910447761,
+      "label": "annie-l15-clean-build-r"
+    },
+    {
+      "after": 437.83582089552243,
+      "before": 437.83582089552243,
+      "label": "annie-l15-clean-build-w"
+    },
+    {
+      "after": 878.218487394958,
+      "before": 878.218487394958,
+      "label": "annie-l15-full-build-low-hp-ludens-on-cooldown-q"
+    },
+    {
+      "after": 1089.5731092436974,
+      "before": 1089.5731092436974,
+      "label": "annie-l15-full-build-low-hp-q-with-echo"
+    },
+    {
+      "after": 731.8487394957983,
+      "before": 731.8487394957983,
+      "label": "annie-l15-full-build-ludens-on-cooldown-q"
+    },
+    {
+      "after": 657.4789915966386,
+      "before": 657.4789915966386,
+      "label": "annie-l15-full-build-ludens-on-cooldown-r"
+    },
+    {
+      "after": 653.6134453781513,
+      "before": 653.6134453781513,
+      "label": "annie-l15-full-build-ludens-on-cooldown-w"
+    },
+    {
+      "after": 943.2033613445378,
+      "before": 943.2033613445378,
+      "label": "annie-l15-full-build-q-with-echo"
+    },
+    {
+      "after": 596.9962686567164,
+      "before": 596.9962686567164,
+      "label": "annie-l15-horizon-build-hypershot-q"
+    },
+    {
+      "after": 559.0298507462687,
+      "before": 559.0298507462687,
+      "label": "annie-l15-horizon-build-hypershot-r"
+    },
+    {
+      "after": 541.3805970149255,
+      "before": 541.3805970149255,
+      "label": "annie-l15-horizon-build-hypershot-w"
+    },
+    {
+      "after": 542.723880597015,
+      "before": 542.723880597015,
+      "label": "annie-l15-horizon-build-q"
+    },
+    {
+      "after": 508.20895522388065,
+      "before": 508.20895522388065,
+      "label": "annie-l15-horizon-build-r"
+    },
+    {
+      "after": 492.1641791044776,
+      "before": 492.1641791044776,
+      "label": "annie-l15-horizon-build-w"
+    },
+    {
+      "after": 1569.6805970149255,
+      "before": 1569.6805970149255,
+      "label": "annie-l15-liandrys-build-madness-q"
+    },
+    {
+      "after": 534.4776119402986,
+      "before": 534.4776119402986,
+      "label": "annie-l15-liandrys-build-q"
+    },
+    {
+      "after": 1003.134328358209,
+      "before": 1003.134328358209,
+      "label": "annie-l15-liandrys-build-q-burn"
+    },
+    {
+      "after": 502.3880597014926,
+      "before": 502.3880597014926,
+      "label": "annie-l15-liandrys-build-r"
+    },
+    {
+      "after": 485.3731343283582,
+      "before": 485.3731343283582,
+      "label": "annie-l15-liandrys-build-w"
+    },
+    {
+      "after": 559.2164179104478,
+      "before": 559.2164179104478,
+      "label": "annie-l15-lich-bane-build-q"
+    },
+    {
+      "after": 858.7164157910448,
+      "before": 858.7164157910448,
+      "label": "annie-l15-lich-bane-build-q-then-aa"
+    },
+    {
+      "after": 519.8507462686567,
+      "before": 519.8507462686567,
+      "label": "annie-l15-lich-bane-build-r"
+    },
+    {
+      "after": 505.7462686567165,
+      "before": 505.7462686567165,
+      "label": "annie-l15-lich-bane-build-w"
+    },
+    {
+      "after": 157.5,
+      "before": 157.5,
+      "label": "annie-l15-ludens-only-ludens-on-cooldown-q"
+    },
+    {
+      "after": 241.4,
+      "before": 241.4,
+      "label": "annie-l15-ludens-only-q-with-echo"
+    },
+    {
+      "after": 550.9701492537314,
+      "before": 550.9701492537314,
+      "label": "annie-l15-malignance-build-q"
+    },
+    {
+      "after": 1087.2441364605543,
+      "before": 1087.2441364605543,
+      "label": "annie-l15-malignance-build-q-during-burn"
+    },
+    {
+      "after": 514.0298507462686,
+      "before": 514.0298507462686,
+      "label": "annie-l15-malignance-build-r"
+    },
+    {
+      "after": 723.4242606841567,
+      "before": 723.4242606841567,
+      "label": "annie-l15-malignance-build-r-with-burn"
+    },
+    {
+      "after": 498.955223880597,
+      "before": 498.955223880597,
+      "label": "annie-l15-malignance-build-w"
+    },
+    {
+      "after": 538.6007462686567,
+      "before": 538.6007462686567,
+      "label": "annie-l15-morellonomicon-build-q"
+    },
+    {
+      "after": 505.29850746268653,
+      "before": 505.29850746268653,
+      "label": "annie-l15-morellonomicon-build-r"
+    },
+    {
+      "after": 488.768656716418,
+      "before": 488.768656716418,
+      "label": "annie-l15-morellonomicon-build-w"
+    },
+    {
+      "after": 143.00746168656718,
+      "before": 143.00746168656718,
+      "label": "annie-l15-nashors-build-aa"
+    },
+    {
+      "after": 542.723880597015,
+      "before": 542.723880597015,
+      "label": "annie-l15-nashors-build-q"
+    },
+    {
+      "after": 508.20895522388065,
+      "before": 508.20895522388065,
+      "label": "annie-l15-nashors-build-r"
+    },
+    {
+      "after": 492.1641791044776,
+      "before": 492.1641791044776,
+      "label": "annie-l15-nashors-build-w"
+    },
+    {
+      "after": 115,
+      "before": 115,
+      "label": "annie-l15-no-items-q"
+    },
+    {
+      "after": 766.7899159663865,
+      "before": 766.7899159663865,
+      "label": "annie-l15-orb-build-low-hp-q"
+    },
+    {
+      "after": 710.3193277310925,
+      "before": 710.3193277310925,
+      "label": "annie-l15-orb-build-low-hp-r"
+    },
+    {
+      "after": 692.5714285714286,
+      "before": 692.5714285714286,
+      "label": "annie-l15-orb-build-low-hp-w"
+    },
+    {
+      "after": 638.9915966386554,
+      "before": 638.9915966386554,
+      "label": "annie-l15-orb-build-q"
+    },
+    {
+      "after": 591.9327731092437,
+      "before": 591.9327731092437,
+      "label": "annie-l15-orb-build-r"
+    },
+    {
+      "after": 577.1428571428571,
+      "before": 577.1428571428571,
+      "label": "annie-l15-orb-build-w"
+    },
+    {
+      "after": 540.25,
+      "before": 540.25,
+      "label": "annie-l15-riftmaker-build-q"
+    },
+    {
+      "after": 506.46268656716427,
+      "before": 506.46268656716427,
+      "label": "annie-l15-riftmaker-build-r"
+    },
+    {
+      "after": 1123.72,
+      "before": 1123.72,
+      "label": "annie-l15-riftmaker-build-void-corruption-q"
+    },
+    {
+      "after": 490.1268656716418,
+      "before": 490.1268656716418,
+      "label": "annie-l15-riftmaker-build-w"
+    },
+    {
+      "after": 170.62686567164184,
+      "before": 170.62686567164184,
+      "label": "annie-l15-rocketbelt-build-protobelt"
+    },
+    {
+      "after": 443.7686567164179,
+      "before": 443.7686567164179,
+      "label": "annie-l15-rocketbelt-build-q"
+    },
+    {
+      "after": 438.3582089552239,
+      "before": 438.3582089552239,
+      "label": "annie-l15-rocketbelt-build-r"
+    },
+    {
+      "after": 410.67164179104475,
+      "before": 410.67164179104475,
+      "label": "annie-l15-rocketbelt-build-w"
+    },
+    {
+      "after": 62.499999,
+      "before": 62.499999,
+      "label": "annie-l15-trinity-build-aa"
+    },
+    {
+      "after": 628.2537283432836,
+      "before": 628.2537283432836,
+      "label": "annie-l15-trinity-build-q-then-aa"
+    }
+  ],
+  "statPrices": [],
+  "to": "7.3a"
+}

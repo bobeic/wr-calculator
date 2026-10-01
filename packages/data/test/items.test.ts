@@ -46,21 +46,20 @@ describe('STARTER_ITEMS', () => {
     ambessa, 15, { items, runes: [], inputs: {} }, buildCatalog(PATCH_7_3_ITEMS)
   )
 
-  it("procs Eclipse's Ever Rising Moon for 6% max HP on the second hit", () => {
+  it("procs Eclipse's Ever Rising Moon for 7% max HP on the second hit", () => {
     const result = simulateCombo(ambessaWith(['eclipse']), dummyTarget(), ['AA', 'W'], { critMode: 'never' })
     const proc = result.instances.find((i) => i.source.id === 'eclipse-ever-rising-moon')!
-    expect(proc.raw).toBeCloseTo(600, 6)
+    expect(proc.raw).toBeCloseTo(700, 6)
     expect(proc.hitId).toBe(result.instances.find((i) => i.source.id === 'ambessa-w')!.hitId)
   })
 
-  it("burns for 8 Frostbite ticks after Serylda's Grudge's third ability hit", () => {
+  // No Frostbite burn in game (2026-10-01): Serylda's is armor pen and stats only. The dot delivery itself is
+  // covered by packages/calc/test/effects/hit-stack-proc.test.ts.
+  it("gives Serylda's Grudge no damaging passive", () => {
     const result = simulateCombo(
       ambessaWith(['seryldas-grudge']), dummyTarget(), ['Q', 'W', 'E', 'wait:2'], { critMode: 'never' }
     )
-    const ticks = result.instances.filter((i) => i.source.id === 'seryldas-grudge-frostbite')
-    expect(ticks).toHaveLength(8)
-    // Level 15: 40 + 40% of 50 bonus AD per tick.
-    expect(ticks[0].raw).toBeCloseTo(40 + 0.4 * 50, 6)
+    expect(result.instances.filter((i) => !i.source.id.startsWith('ambessa'))).toEqual([])
   })
 
   it("gives Spear of Shojin 20 basic ability haste and a 3%-per-hit ability ramp to 12%", () => {

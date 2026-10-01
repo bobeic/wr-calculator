@@ -42,19 +42,9 @@ export const OVERRIDE_ITEMS: Item[] = [
     pctTargetCurrentHp: 0.06,
   }),
   // Practice tool, 2026-10-01 (Ambessa, 10,000 HP / 100 armor dummy, 30% armor pen): the proc dealt 412 after
-  // armor, i.e. 700 = 7% max HP. wrpocket's 7% is right; the WR wiki's 6% was out of date.
-  withEffect('eclipse', 'eclipse-ever-rising-moon', {
-    description: 'Hitting an enemy champion inflicts a stack for 1.8 seconds, up to one per attack '
-      + 'or cast. Inflicting 2 stacks consumes them to deal 7% of the target\'s max Health as '
-      + 'bonus physical damage and grant a 150 (+40% bonus AD) shield for 2 seconds (6s cooldown).',
-    supportNotes: 'Melee values (7% confirmed in game; 3.5% for ranged is not modeled). The shield is not modeled; '
-      + 'item effects, crowd control and damage over time don\'t add stacks here. In game the proc shows as one '
-      + 'number with the hit that triggers it.',
-    damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.07 }], tags: [] },
-  }),
-  // Practice tool, 2026-10-01: no Frostbite burn. The in-game description has only Icy ("damaging active abilities
-  // and empowered attacks slow enemies below 60% Health by 30% for 1 second"), matching wrpocket; the burn came from
-  // an out-of-date WR wiki page. Icy's slow isn't modelled, so Serylda's is stats only.
-  { ...inherited('seryldas-grudge'), effects: [], provenance: IN_GAME_7_3A },
+  // armor, i.e. 700 = 7% max HP, as the (corrected) 7.3 model already says. Marks it verified in game.
+  { ...inherited('eclipse'), provenance: IN_GAME_7_3A },
+  // Practice tool, 2026-10-01: no Frostbite burn, only Icy's slow (not modelled), as the corrected 7.3 model says.
+  { ...inherited('seryldas-grudge'), provenance: IN_GAME_7_3A },
 ]
 export const OVERRIDE_CHAMPIONS: Champion[] = []

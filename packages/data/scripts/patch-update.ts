@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -264,6 +265,11 @@ async function run(options: Options): Promise<void> {
   console.log(`${plan.kind} ${plan.patch}: ${mapped.champions.length} champions, ${mapped.items.length} items, ${mapped.notes.length} mapper notes.`)
   if (previous !== null) console.log(`Diff against ${previous}: ${needsReview} hand-modelled entries need review. See ${join(patchDir, 'PATCH_DIFF.md')}`)
   if (notesSummary !== '') console.log(notesSummary)
+  if (previous !== null) {
+    // A fresh process: this one loaded the patch registry before the new patch's files existed.
+    const impact = spawnSync(process.execPath, [...process.execArgv, join(DATA_ROOT, 'scripts', 'build-impact.ts'), previous, plan.patch], { stdio: 'inherit' })
+    if (impact.status !== 0) console.error(`Build impact report failed; rerun with: pnpm patch:impact ${previous} ${plan.patch}`)
+  }
 }
 
 run(parseArgs(process.argv.slice(2))).catch((error: unknown) => {
