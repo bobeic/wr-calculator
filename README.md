@@ -40,7 +40,8 @@ No environment variables are required.
 
 - **new patch:** writes `packages/data/snapshots/wrpocket/<patch>/` (trimmed source data),
   `packages/data/src/patches/<patch>/` (regenerated `generated/`, stub `overrides.ts` and
-  `reviewed.ts`, `PATCH_DIFF.md`, `patch-diff.json`) and makes it the current patch;
+  `reviewed.ts`, `provenance.ts` and `layer.ts`, `PATCH_DIFF.md`, `patch-diff.json`) and makes it the
+  current patch;
 - **same patch, newer data:** regenerates that patch in place;
 - **nothing new:** writes nothing. `--refresh` re-downloads and regenerates anyway.
 
@@ -48,6 +49,10 @@ Hand-modelled entries are inherited from the previous patch. If wrpocket changed
 under "Needs review" in `PATCH_DIFF.md` and marked `staleSince` in the data. Clear it by writing an
 override in the patch's `overrides.ts` (values changed) or adding it to `reviewed.ts` with a note
 (nothing we model changed). Nothing is written if any stage fails.
+
+`--from-cache <dir>` reads the raw responses from a local cache folder named
+`<patch>-<YYYYMMDDhhmmss>` instead of the network; it was used to bootstrap 7.3. When that patch's
+generated files already exist, it checks that regenerating reproduces them.
 
 ## Environment Variables
 
