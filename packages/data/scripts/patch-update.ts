@@ -222,18 +222,24 @@ async function run(options: Options): Promise<void> {
       notesBefore: mapSnapshot(before, provenance).notes,
       notesAfter: mapped.notes,
       notes: { url, notes },
-      autoApply: { handItems: dataset.items.filter((item) => dataset.handModelled.items.some((hand) => hand.id === item.id)) },
+      autoApply: {
+        handItems: dataset.items.filter((item) => dataset.handModelled.items.some((hand) => hand.id === item.id)),
+        handChampions: dataset.champions.filter((champion) => dataset.handModelled.champions.some((hand) => hand.id === champion.id)),
+      },
     })
     needsReview = diff.needsReview.length
-    if (diff.autoApplied.length > 0) console.log(`${diff.autoApplied.length} hand-modelled items took number-only changes from wrpocket automatically.`)
+    if (diff.autoApplied.length > 0) console.log(`${diff.autoApplied.length} hand-modelled entries took number-only changes from wrpocket automatically.`)
     // Auto-applied items took their new values from wrpocket, so they don't go stale.
     const changedIds = changedIdsOf(diffSnapshots(before, committed))
-    const applied = new Set(diff.autoApplied.map((entry) => entry.id))
-    await writeFile(join(staged.generated, 'changed-ids.ts'), renderChangedIds({ ...changedIds, items: changedIds.items.filter((id) => !applied.has(id)) }, plan.patch))
+    const applied = new Set(diff.autoApplied.map((entry) => `${entry.kind} ${entry.id}`))
+    await writeFile(join(staged.generated, 'changed-ids.ts'), renderChangedIds({
+      items: changedIds.items.filter((id) => !applied.has(`item ${id}`)),
+      champions: changedIds.champions.filter((id) => !applied.has(`champion ${id}`)),
+    }, plan.patch))
     await writeFile(join(staged.reports, 'patch-diff.json'), stableStringify(diff))
     await writeFile(join(staged.reports, 'PATCH_DIFF.md'), renderPatchDiff(diff))
     await writeFile(join(staged.generated, 'notes-review.ts'), renderNotesReview(diff.officialNotes, plan.patch))
-    await writeFile(join(staged.generated, 'text-sync.ts'), renderTextSync(diff.textSync, plan.patch))
+    await writeFile(join(staged.generated, 'text-sync.ts'), renderTextSync(diff.textSync, plan.patch, diff.championSync))
     if (notes !== null) await writeFile(join(staged.reports, 'official-notes.json'), stableStringify(notes))
     notesSummary = diff.officialNotes === null || !diff.officialNotes.found
       ? `Official notes: not found at ${url}`

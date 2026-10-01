@@ -20,6 +20,7 @@ const DIFF: PatchDiff = {
   autoApplied: [
     { kind: 'item', id: 'deaths-dance', name: "Death's Dance", goldens: [], changes: [{ field: 'price', before: '3200', after: '3300' }] },
   ],
+  championSync: [],
   textSync: [{ itemId: 'deaths-dance', effectId: 'dd-cauterize', path: 'ratio', value: 0.35, note: '30 -> 35' }],
   carriedStale: [{ kind: 'champion', id: 'ambessa', name: 'Ambessa', since: '7.2' }],
   items: [], champions: [
@@ -59,7 +60,7 @@ describe('renderPatchDiff', () => {
   })
 
   it('lists auto-applied items with their changes and counts them', () => {
-    expect(report).toContain('- 1 hand-modelled items took number-only changes from wrpocket automatically')
+    expect(report).toContain('- 1 hand-modelled entries took number-only changes from wrpocket automatically')
     const section = report.slice(report.indexOf('## Applied automatically'), report.indexOf('## Still stale'))
     expect(section).toContain("### item deaths-dance (Death's Dance)")
     expect(section).toContain('- `price`: 3200 → 3300')

@@ -35,6 +35,8 @@ export const ChampionSchema = z.object({
   baseStats: ChampionBaseStatsSchema,
   attackSpeed: z.object({ base: z.number(), ratio: z.number().optional() }).strict(),
   abilities: ChampionAbilitiesSchema,
+  /** Hand-modelled champions only: fields kept as written instead of synced from the patch data, e.g. 'baseStats.ad'. */
+  sourcePins: z.array(z.string()).optional(),
   provenance: ProvenanceSchema,
 }).strict()
 export type Champion = z.infer<typeof ChampionSchema>

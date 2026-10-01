@@ -65,6 +65,14 @@ function scalingByOccurrence(rows: Array<{ type: string; value: string }>): Reco
   }))
 }
 
+/** A champion's scaling rows keyed by the diff's field names, e.g. 'q.scaling.强化伤害#2' -> '70/100/130/160'. */
+export function championRows(champion: SnapshotChampion): Record<string, string> {
+  return Object.fromEntries(Object.entries(champion.abilities).flatMap(([key, ability]) => {
+    const label = SLOT_BY_KEY.get(key) ?? key
+    return Object.entries(scalingByOccurrence(ability.scaling)).map(([type, value]): [string, string] => [`${label}.scaling.${type}`, value])
+  }))
+}
+
 function diffChampion(before: SnapshotChampion, after: SnapshotChampion): FieldChange[] {
   const abilityChanges = unionKeys(before.abilities, after.abilities).flatMap((key) => {
     const label = SLOT_BY_KEY.get(key) ?? key

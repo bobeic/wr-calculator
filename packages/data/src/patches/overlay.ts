@@ -2,7 +2,7 @@ import type { Champion, Item, Provenance } from '@wr-calc/schema'
 import type { StatCatalog } from '@wr-calc/calc'
 import { buildCatalog, mergeById, withExclusiveGroups } from '../catalog'
 import type { TargetPreset } from './7.3/targets'
-import { syncItem } from './source-sync'
+import { syncChampion, syncItem } from './source-sync'
 
 /** Ids of every source record that changed or disappeared since the previous patch. */
 export interface ChangedIds {
@@ -29,6 +29,16 @@ export interface TextUpdate {
   note: string
 }
 
+/** A per-rank number on a hand-modelled champion, taken from wrpocket's scaling rows (generated/text-sync.ts). */
+export interface ChampionUpdate {
+  championId: string
+  /** Path inside the champion, e.g. 'abilities.q.damage[0].base'. */
+  path: string
+  value: number | { byRank: number[] }
+  /** The scaling row it came from, for the report: 'q.scaling.强化伤害: 60/80/100/120 -> 65/85/105/125'. */
+  note: string
+}
+
 /** Everything one patch folder contributes to its dataset. */
 export interface PatchLayer {
   id: string
@@ -41,6 +51,8 @@ export interface PatchLayer {
   changedIds: ChangedIds
   /** Effect numbers updated from wrpocket text; applied to inherited hand-modelled items before overrides. */
   textSync?: TextUpdate[]
+  /** Ability numbers updated from wrpocket's scaling rows; applied to inherited hand-modelled champions before overrides. */
+  championSync?: ChampionUpdate[]
   /** Replaces the inherited groups when set; required on the root patch. */
   exclusiveGroups?: Record<string, string>
   /** Replaces the inherited targets when set; required on the root patch. */
@@ -79,17 +91,45 @@ function markStale<T extends { id: string; provenance: Provenance }>(entries: T[
   })
 }
 
-function setPath(target: Record<string, unknown>, path: string, value: number): void {
+function parentOf(target: Record<string, unknown>, path: string): { node: Record<string, unknown>; last: string } {
   const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.')
   let node: Record<string, unknown> = target
   for (const key of keys.slice(0, -1)) {
     const next = node[key]
-    if (typeof next !== 'object' || next === null) throw new Error(`text sync path ${path} does not exist`)
+    if (typeof next !== 'object' || next === null) throw new Error(`sync path ${path} does not exist`)
     node = next as Record<string, unknown>
   }
-  const last = keys[keys.length - 1]
+  return { node, last: keys[keys.length - 1] }
+}
+
+function setPath(target: Record<string, unknown>, path: string, value: number): void {
+  const { node, last } = parentOf(target, path)
   if (typeof node[last] !== 'number') throw new Error(`text sync path ${path} is not a number`)
   node[last] = value
+}
+
+/** Sets a number or { byRank } at a path that already holds one of the two. */
+function setPathValue(target: Record<string, unknown>, path: string, value: number | { byRank: number[] }): void {
+  const { node, last } = parentOf(target, path)
+  const current = node[last]
+  if (typeof current !== 'number' && !(typeof current === 'object' && current !== null && 'byRank' in current)) {
+    throw new Error(`champion sync path ${path} is not a number or byRank`)
+  }
+  node[last] = value
+}
+
+/** Applies champion updates to copies of the champions they name; an update for an unknown champion or path throws. */
+export function applyChampionSync(champions: Champion[], updates: ChampionUpdate[]): Champion[] {
+  if (updates.length === 0) return champions
+  const changed = new Map<string, Champion>()
+  for (const update of updates) {
+    const champion = changed.get(update.championId) ?? champions.find((entry) => entry.id === update.championId)
+    if (champion === undefined) throw new Error(`champion sync names unknown champion ${update.championId}`)
+    const copy: Champion = changed.get(update.championId) ?? structuredClone(champion)
+    setPathValue(copy as unknown as Record<string, unknown>, update.path, update.value)
+    changed.set(update.championId, copy)
+  }
+  return champions.map((champion) => changed.get(champion.id) ?? champion)
 }
 
 /** Applies text-sync updates to copies of the items they name; an update for an unknown item or effect throws. */
@@ -126,7 +166,7 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
   }
   const handModelled = {
     items: mergeById(applyTextSync(inheritedItems, layer.textSync ?? []), layer.overrideItems),
-    champions: mergeById(inheritedChampions, layer.overrideChampions),
+    champions: mergeById(applyChampionSync(inheritedChampions, layer.championSync ?? []), layer.overrideChampions),
   }
   const generatedById = new Map(layer.generatedItems.map((entry) => [entry.id, entry]))
   // A stale item's new wrpocket values are unconfirmed, so it keeps the values it last had; it syncs again once covered.
@@ -136,6 +176,12 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
     return syncItem(entry, kept ?? generatedById.get(entry.id))
   })
   const merged = mergeById(layer.generatedItems, markStale(syncedItems, stale.items))
+  const generatedChampionsById = new Map(layer.generatedChampions.map((entry) => [entry.id, entry]))
+  const previousChampions = new Map((previous?.champions ?? []).map((entry) => [entry.id, entry]))
+  const syncedChampions = handModelled.champions.map((entry) => {
+    const kept = stale.champions.has(entry.id) ? previousChampions.get(entry.id) : undefined
+    return syncChampion(entry, kept ?? generatedChampionsById.get(entry.id))
+  })
   // Inherited groups drop ids wrpocket removed (the report lists the removal); a layer's own groups stay strict.
   const presentIds = new Set(merged.map((entry) => entry.id))
   const exclusiveGroups = layer.exclusiveGroups ?? Object.fromEntries(
@@ -145,7 +191,7 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
   return {
     id: layer.id,
     items,
-    champions: mergeById(layer.generatedChampions, markStale(handModelled.champions, stale.champions)),
+    champions: mergeById(layer.generatedChampions, markStale(syncedChampions, stale.champions)),
     catalog: buildCatalog(items, []),
     targets: layer.targets ?? previous?.targets ?? [],
     exclusiveGroups,

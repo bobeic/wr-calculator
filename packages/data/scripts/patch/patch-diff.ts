@@ -1,12 +1,15 @@
-import type { Item } from '@wr-calc/schema'
+import type { Champion, Item } from '@wr-calc/schema'
 import type { LoadedGoldenCase } from '../../src/golden-loader'
-import type { TextUpdate } from '../../src/patches/overlay'
+import { CHAMPION_LINKS } from '../../src/patches/champion-links'
+import type { ChampionLinks } from '../../src/patches/champion-links'
+import type { ChampionUpdate, TextUpdate } from '../../src/patches/overlay'
 import { ITEM_TEXT_LINKS } from '../../src/patches/text-links'
 import type { ItemTextLinks } from '../../src/patches/text-links'
 import { crossCheckNotes, numberTokens } from '../official-notes/cross-check'
 import type { NotesCrossCheck, OfficialNotes } from '../official-notes/types'
 import { diffSnapshots, MISSING } from './diff'
 import type { Snapshot } from './snapshot'
+import { checkChampion } from './champion-sync'
 import { checkDescription } from './text-sync'
 import type { EntryDiff, EntryRef, FieldChange, Flag, IdLists, NoteRef, PatchDiff, ReportedDiff, SnapshotDiff, StaleRef } from './types'
 
@@ -53,6 +56,41 @@ export interface AutoApplyInput {
   /** Effective items (synced, text-synced) as the previous patch had them, for every hand-modelled id. */
   handItems: Item[]
   links?: Record<string, ItemTextLinks>
+  /** Effective hand-modelled champions as the previous patch had them. */
+  handChampions?: Champion[]
+  championLinks?: Record<string, ChampionLinks>
+}
+
+/** True when the notes, if they mention the entry, agree: reflected in wrpocket and holding each changed linked number. */
+function notesAgree(officialNotes: NotesCrossCheck | null, ref: EntryRef, changedNumbers: string[]): boolean {
+  const entries = officialNotes?.found === true
+    ? officialNotes.mentioned.filter((entry) => entry.ref.kind === ref.kind && entry.ref.id === ref.id)
+    : []
+  if (entries.length === 0) return true
+  if (entries.some((entry) => entry.status !== 'reflected')) return false
+  const notesNumbers = new Set(entries.flatMap((entry) => entry.lines.flatMap((line) => (line.after === null ? [] : numberTokens(line.after)))))
+  return changedNumbers.every((number) => notesNumbers.has(number))
+}
+
+/**
+ * Flagged hand-modelled champions whose changes all apply without a hand edit (see checkChampion): base stats synced
+ * from wrpocket's level table, linked scaling rows, and descriptions that change only by those rows' numbers.
+ * The same notes rule as items: the notes needn't mention it, but mustn't contradict it.
+ */
+export function autoAppliedChampions(flags: Flag[], officialNotes: NotesCrossCheck | null, input: AutoApplyInput): { applied: Flag[]; championSync: ChampionUpdate[] } {
+  const links = input.championLinks ?? CHAMPION_LINKS
+  const champions = new Map((input.handChampions ?? []).map((champion) => [champion.id, champion]))
+  const applied: Flag[] = []
+  const championSync: ChampionUpdate[] = []
+  for (const flag of flags) {
+    const champion = champions.get(flag.id)
+    if (flag.kind !== 'champion' || flag.severity !== 'changed' || champion === undefined || (champion.sourcePins ?? []).length > 0) continue
+    const check = checkChampion(flag.id, flag.changes, links[flag.id], champion)
+    if (!check.ok || !notesAgree(officialNotes, flag, check.changedNumbers)) continue
+    applied.push(flag)
+    championSync.push(...check.updates)
+  }
+  return { applied, championSync }
 }
 
 /**
@@ -76,14 +114,7 @@ export function autoAppliedItems(flags: Flag[], officialNotes: NotesCrossCheck |
       ? { ok: true as const, updates: [], changedLinkedNumbers: [] }
       : checkDescription(flag.id, description.before, description.after, links[flag.id], item)
     if (!check.ok) continue
-    const entries = officialNotes?.found === true
-      ? officialNotes.mentioned.filter((entry) => entry.ref.kind === 'item' && entry.ref.id === flag.id)
-      : []
-    if (entries.length > 0) {
-      if (entries.some((entry) => entry.status !== 'reflected')) continue
-      const notesNumbers = new Set(entries.flatMap((entry) => entry.lines.flatMap((line) => (line.after === null ? [] : numberTokens(line.after)))))
-      if (!check.changedLinkedNumbers.every((number) => notesNumbers.has(number))) continue
-    }
+    if (!notesAgree(officialNotes, flag, check.changedLinkedNumbers)) continue
     applied.push(flag)
     textSync.push(...check.updates)
   }
@@ -129,9 +160,11 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     patch: input.after.meta.patch, url: input.notes.url, notes: input.notes.notes, after: input.after, diff,
     flags, handModelled: input.handModelled, covered: input.covered, goldens: input.goldens, previousStale: input.previousStale,
   })
-  const { applied: autoApplied, textSync } = input.autoApply === undefined
-    ? { applied: [], textSync: [] }
-    : autoAppliedItems(flags, officialNotes, input.autoApply)
+  const items = input.autoApply === undefined ? { applied: [], textSync: [] } : autoAppliedItems(flags, officialNotes, input.autoApply)
+  const champions = input.autoApply === undefined ? { applied: [], championSync: [] } : autoAppliedChampions(flags, officialNotes, input.autoApply)
+  const autoApplied = [...champions.applied, ...items.applied]
+  const { textSync } = items
+  const { championSync } = champions
   const resolved = new Set([...(officialNotes?.autoReviewed ?? []), ...autoApplied].map((entry) => `${entry.kind}\u0000${entry.id}`))
   const needsReview = [...flags.filter((flag) => !resolved.has(`${flag.kind}\u0000${flag.id}`)), ...(officialNotes?.notesFlags ?? [])]
   const withGoldens = (entries: EntryDiff[]): ReportedDiff[] =>
@@ -148,6 +181,7 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     needsReview,
     autoApplied: autoApplied.map(({ kind, id, name, changes, goldens }) => ({ kind, id, name, changes, goldens })),
     textSync,
+    championSync,
     carriedStale: input.previousStale
       .filter((entry) => !coveredIds(entry.kind).has(entry.id) && !flagged.has(`${entry.kind}\u0000${entry.id}`)).sort(compareRefs),
     items: withGoldens(diff.items),

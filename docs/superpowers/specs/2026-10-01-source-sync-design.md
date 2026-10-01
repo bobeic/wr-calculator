@@ -1,6 +1,6 @@
 # Source sync: number-only patch changes apply automatically
 
-**Status:** Phases 1 and 2 implemented. Phase 3 is a proposal.
+**Status:** Phases 1, 2 and 3 implemented.
 **Date:** 2026-10-01
 **Builds on:** `2026-10-01-patch-update-pipeline-design.md`, `2026-10-01-official-notes-cross-check-design.md`,
 `2026-10-01-cn-preview-brainstorm.md` §8–9
@@ -101,17 +101,29 @@ wrpocket-only text change and the model keeps 7%. Of the four items the notes ch
 is hand-modelled, and its description was reworded, so it stays flagged for a human. The rule pays off
 when the notes change a modelled item's numbers and wrpocket's text changes only in those numbers.
 
-## 4. Phase 3 (proposal): champions
+## 4. Phase 3: champions (implemented)
 
-Champion base stats and per-rank ability tables (`q.scaling.<label>`) are structured numbers in
-wrpocket. These are the same kind of numbers phase 1 syncs, so the same pattern applies:
+- **Base stats.** `syncChampion` takes `baseStats` and `attackSpeed` from the generated entry, which is fitted from
+  wrpocket's level table. Ambessa's hand values already equal it. `Champion.sourcePins` keeps a hand value,
+  and the stale-hold rule applies as for items.
+- **Ability numbers.** `src/patches/champion-links.ts` links a champion path to a wrpocket scaling row, keyed as
+  the diff keys it (`q.scaling.强化伤害#2`). An optional formula handles percentages and flat costs.
+  `ignore` lists rows the model doesn't use (Ambessa's center hit, other targets, R's damage reduction and
+  healing). Ambessa has 18 links; the guard test checks each against the current row and model, and that
+  every row is linked or ignored.
+- **Check** (`scripts/patch/champion-sync.ts` `checkChampion`). A champion's changes qualify when all of
+  these hold:
+  - every changed row is linked or ignored, and keeps its rank count;
+  - every linked row's old value equals the model;
+  - every description change is number-only, with each moved number found in a changed row's new values.
+    A ratio change that only appears in the text (60% → 70% bonus AD) therefore stays flagged.
 
-- sync `baseStats` and the per-rank tables a hand-modelled ability reads from;
-- auto-apply rank-table value changes, with the same official-notes confirmation;
-- flag text changes and any label that is added or removed.
-
-The linear-growth caveat (ADR `2026-09-24-linear-stat-growth-and-200-crit-base`) has to be checked
-before base stats sync.
+  A name change fails.
+- **Auto-apply** (`autoAppliedChampions`) uses the same notes rule as items: the notes needn't mention it, but
+  mustn't contradict it. Updates go to `generated/text-sync.ts` as `CHAMPION_SYNC`, and `layer.ts` passes
+  them as `championSync`. The overlay applies them to inherited hand-modelled champions before overrides.
+- **Not linked yet:** ratios that exist only in the text (Q's 60%/90% bonus AD, R's missing-HP ratio, the
+  passive's 5–40 by level and 25% bonus AD). A change to them is flagged, which is the safe default.
 
 ## 5. Tencent as a preview track (later)
 

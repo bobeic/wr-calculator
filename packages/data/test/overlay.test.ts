@@ -9,7 +9,7 @@ const item = (id: string, ad = 10): Item => ({
 })
 // A hand-modelled item whose ad is pinned, so these tests see the hand value rather than the synced one.
 const hand = (id: string, ad: number): Item => ({ ...item(id, ad), sourcePins: ['stats.ad'] })
-const champion = { id: 'ambessa', name: 'Ambessa', provenance: PROV } as unknown as Champion
+const champion = { id: 'ambessa', name: 'Ambessa', baseStats: {}, attackSpeed: { base: 0.6 }, provenance: PROV } as unknown as Champion
 const NO_CHANGES = { items: [], champions: [] }
 
 const root: PatchLayer = {
