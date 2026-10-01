@@ -19,6 +19,7 @@ import { abilityHitProcHandler } from './ability-hit-proc'
 import { damageWindowProcHandler } from './damage-window-proc'
 import { combatRampAmpHandler } from './combat-ramp-amp'
 import { empoweredAttackHandler } from './empowered-attack'
+import { hitStackAmpHandler } from './hit-stack-amp'
 import { hitStackProcHandler } from './hit-stack-proc'
 import { CUSTOM_HANDLERS } from '../custom/registry'
 
@@ -47,6 +48,7 @@ export const EFFECT_HANDLERS: Partial<Record<EffectKind, EffectHandler<any>>> = 
   damageWindowProc: damageWindowProcHandler,
   combatRampAmp: combatRampAmpHandler,
   empoweredAttack: empoweredAttackHandler,
+  hitStackAmp: hitStackAmpHandler,
   hitStackProc: hitStackProcHandler,
 }
 

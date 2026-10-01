@@ -770,6 +770,21 @@ describe('simulateCombo', () => {
       const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'wait:4.5', 'AA'], { critMode: 'never' })
       expect(result.instances.map((i) => i.source.id)).toEqual(['q', 'AA'])
     })
+
+    it('amplifies only the passive part of a merged attack with a Shojin-style hitStackAmp', () => {
+      const will = baseItem('test-will', {
+        id: 'test-will-amp', name: 'Will', description: '', support: 'full', kind: 'hitStackAmp',
+        amountPerStack: 0.03, maxStacks: 4, durationSeconds: 6, appliesTo: ['ability', 'passive'],
+      })
+      const catalog = { items: new Map([[will.id, will]]), runes: new Map() }
+      const attacker = combatantFromChampion(feintChampion(), 1, emptyBuild({ items: [will.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'Q'], {
+        critMode: 'never', ignoreCooldowns: true,
+      })
+      // Q (no stacks yet) 50; the attack after one stack: 60 + 40 × 1.03; the second Q after two: 50 × 1.06.
+      expect(result.instances.map((i) => i.raw)).toEqual([50, 60 + 40 * 1.03, 50 * 1.06].map((value) => expect.closeTo(value, 10)))
+      expect(result.instances[1].parts?.map((part) => part.amount)).toEqual([60, expect.closeTo(41.2, 10)])
+    })
   })
 
   describe('hits', () => {

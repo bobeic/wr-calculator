@@ -102,4 +102,13 @@ describe('remaining effect kinds', () => {
     expect(() => EffectSchema.parse({ ...valid, stacksToProc: 1 })).toThrow()
     expect(() => EffectSchema.parse({ ...valid, stacksFrom: [] })).toThrow()
   })
+
+  it('parses a hitStackAmp limited to ability and passive damage', () => {
+    const result = EffectSchema.parse({
+      ...base, kind: 'hitStackAmp', amountPerStack: 0.03, maxStacks: 4, durationSeconds: 6,
+      appliesTo: ['ability', 'passive'],
+    })
+    expect(result).toMatchObject({ kind: 'hitStackAmp', appliesTo: ['ability', 'passive'] })
+    expect(() => EffectSchema.parse({ ...result, appliesTo: [] })).toThrow()
+  })
 })
