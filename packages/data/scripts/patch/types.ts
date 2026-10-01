@@ -1,3 +1,4 @@
+import type { TextUpdate } from '../../src/patches/overlay'
 import type { NotesCrossCheck } from '../official-notes/types'
 
 export type EntryKind = 'item' | 'champion'
@@ -71,6 +72,8 @@ export interface PatchDiff {
   needsReview: Flag[]
   /** Hand-modelled items whose changes were all applied from wrpocket by the overlay's source sync; no review needed. */
   autoApplied: ReportedDiff[]
+  /** Effect numbers the auto-applied items took from wrpocket's text; written to generated/text-sync.ts. */
+  textSync: TextUpdate[]
   carriedStale: StaleRef[]
   items: ReportedDiff[]
   champions: ReportedDiff[]

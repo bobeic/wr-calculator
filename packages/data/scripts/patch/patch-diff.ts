@@ -1,8 +1,13 @@
+import type { Item } from '@wr-calc/schema'
 import type { LoadedGoldenCase } from '../../src/golden-loader'
-import { crossCheckNotes } from '../official-notes/cross-check'
+import type { TextUpdate } from '../../src/patches/overlay'
+import { ITEM_TEXT_LINKS } from '../../src/patches/text-links'
+import type { ItemTextLinks } from '../../src/patches/text-links'
+import { crossCheckNotes, numberTokens } from '../official-notes/cross-check'
 import type { NotesCrossCheck, OfficialNotes } from '../official-notes/types'
 import { diffSnapshots, MISSING } from './diff'
 import type { Snapshot } from './snapshot'
+import { checkDescription } from './text-sync'
 import type { EntryDiff, EntryRef, FieldChange, Flag, IdLists, NoteRef, PatchDiff, ReportedDiff, SnapshotDiff, StaleRef } from './types'
 
 /** What a golden case touches, for matching against changed entries. */
@@ -43,18 +48,44 @@ export function isSyncedChange(change: FieldChange): boolean {
   return change.field.startsWith('stats.') && change.before !== MISSING && change.after !== MISSING
 }
 
+/** What auto-apply needs: the previous patch's effective hand-modelled items and the text links. */
+export interface AutoApplyInput {
+  /** Effective items (synced, text-synced) as the previous patch had them, for every hand-modelled id. */
+  handItems: Item[]
+  links?: Record<string, ItemTextLinks>
+}
+
 /**
- * Flagged items whose every change the overlay's source sync applies, confirmed by the official notes: the notes
- * mention the item and every new number in them shows up in wrpocket. wrpocket sometimes carries CN-only or
- * regressed values (7.3a BotRK), so an unconfirmed change stays flagged. Pinned items are never auto-applied.
+ * Flagged items the official notes confirm and whose every change applies without a hand edit: synced fields
+ * (price, recipe, tier, stat values), plus description changes where only linked or ignored numbers move. The notes
+ * must mention the item with every new number matching wrpocket (reflected), and contain each changed linked number.
+ * wrpocket sometimes carries CN-only or regressed values (7.3a BotRK), so anything unconfirmed stays flagged.
+ * Pinned items are never auto-applied.
  */
-export function autoAppliedItems(flags: Flag[], officialNotes: NotesCrossCheck | null, pinnedItems: string[]): Flag[] {
-  if (officialNotes === null || !officialNotes.found) return []
-  const pinned = new Set(pinnedItems)
-  const confirmed = new Set(officialNotes.mentioned
-    .filter((entry) => entry.ref.kind === 'item' && entry.status === 'reflected').map((entry) => entry.ref.id))
-  return flags.filter((flag) => flag.kind === 'item' && flag.severity === 'changed' && !pinned.has(flag.id)
-    && confirmed.has(flag.id) && flag.changes.every(isSyncedChange))
+export function autoAppliedItems(flags: Flag[], officialNotes: NotesCrossCheck | null, input: AutoApplyInput): { applied: Flag[]; textSync: TextUpdate[] } {
+  const none = { applied: [], textSync: [] }
+  if (officialNotes === null || !officialNotes.found) return none
+  const links = input.links ?? ITEM_TEXT_LINKS
+  const items = new Map(input.handItems.map((item) => [item.id, item]))
+  const applied: Flag[] = []
+  const textSync: TextUpdate[] = []
+  for (const flag of flags) {
+    const item = items.get(flag.id)
+    if (flag.kind !== 'item' || flag.severity !== 'changed' || item === undefined || (item.sourcePins ?? []).length > 0) continue
+    const entries = officialNotes.mentioned.filter((entry) => entry.ref.kind === 'item' && entry.ref.id === flag.id)
+    if (entries.length === 0 || entries.some((entry) => entry.status !== 'reflected')) continue
+    if (!flag.changes.every((change) => isSyncedChange(change) || change.field === 'description')) continue
+    const description = flag.changes.find((change) => change.field === 'description')
+    const check = description === undefined
+      ? { ok: true as const, updates: [], changedLinkedNumbers: [] }
+      : checkDescription(flag.id, description.before, description.after, links[flag.id], item)
+    if (!check.ok) continue
+    const notesNumbers = new Set(entries.flatMap((entry) => entry.lines.flatMap((line) => (line.after === null ? [] : numberTokens(line.after)))))
+    if (!check.changedLinkedNumbers.every((number) => notesNumbers.has(number))) continue
+    applied.push(flag)
+    textSync.push(...check.updates)
+  }
+  return { applied, textSync }
 }
 
 /** Flags hand-modelled entries that changed or disappeared and are not covered; removed ones first. */
@@ -82,8 +113,8 @@ export interface BuildPatchDiffInput {
   notesAfter: NoteRef[]
   /** The official notes for the new patch; null when no notes stage ran. */
   notes: { url: string; notes: OfficialNotes | null } | null
-  /** Turns on auto-apply of notes-confirmed synced item changes; pinnedItems are hand-modelled items with sourcePins. Omitted: everything is flagged. */
-  autoApply?: { pinnedItems: string[] }
+  /** Turns on auto-apply of notes-confirmed number-only item changes. Omitted: everything is flagged. */
+  autoApply?: AutoApplyInput
 }
 
 const noteKey = (note: NoteRef): string => `${note.subject}\u0000${note.note}`
@@ -96,7 +127,9 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     patch: input.after.meta.patch, url: input.notes.url, notes: input.notes.notes, after: input.after, diff,
     flags, handModelled: input.handModelled, covered: input.covered, goldens: input.goldens, previousStale: input.previousStale,
   })
-  const autoApplied = input.autoApply === undefined ? [] : autoAppliedItems(flags, officialNotes, input.autoApply.pinnedItems)
+  const { applied: autoApplied, textSync } = input.autoApply === undefined
+    ? { applied: [], textSync: [] }
+    : autoAppliedItems(flags, officialNotes, input.autoApply)
   const resolved = new Set([...(officialNotes?.autoReviewed ?? []), ...autoApplied].map((entry) => `${entry.kind}\u0000${entry.id}`))
   const needsReview = [...flags.filter((flag) => !resolved.has(`${flag.kind}\u0000${flag.id}`)), ...(officialNotes?.notesFlags ?? [])]
   const withGoldens = (entries: EntryDiff[]): ReportedDiff[] =>
@@ -112,6 +145,7 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     toUpdated: input.after.meta.updated,
     needsReview,
     autoApplied: autoApplied.map(({ kind, id, name, changes, goldens }) => ({ kind, id, name, changes, goldens })),
+    textSync,
     carriedStale: input.previousStale
       .filter((entry) => !coveredIds(entry.kind).has(entry.id) && !flagged.has(`${entry.kind}\u0000${entry.id}`)).sort(compareRefs),
     items: withGoldens(diff.items),

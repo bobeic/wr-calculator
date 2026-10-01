@@ -15,7 +15,7 @@ None.
 
 ## Applied automatically
 
-Hand-modelled items whose only changes are in the name, price, tier, recipe or stat values, and which the official notes mention with every new number matching wrpocket. The overlay takes these from wrpocket (`src/patches/source-sync.ts`), so no override is needed. Synced changes the notes don't confirm stay under Needs review; list a field in the item's `sourcePins` to keep a hand-written value instead.
+Hand-modelled items whose only changes are in the name, price, tier, recipe or stat values, or numbers in the description that `src/patches/text-links.ts` ties to the model, and which the official notes mention with every new number matching wrpocket. The overlay applies these (`src/patches/source-sync.ts`, `generated/text-sync.ts`), so no override is needed. Changes the notes don't confirm stay under Needs review; list a field in the item's `sourcePins` to keep a hand-written value instead.
 
 None.
 

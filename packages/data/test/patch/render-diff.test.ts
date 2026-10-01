@@ -20,6 +20,7 @@ const DIFF: PatchDiff = {
   autoApplied: [
     { kind: 'item', id: 'deaths-dance', name: "Death's Dance", goldens: [], changes: [{ field: 'price', before: '3200', after: '3300' }] },
   ],
+  textSync: [{ itemId: 'deaths-dance', effectId: 'dd-cauterize', path: 'ratio', value: 0.35, note: '30 -> 35' }],
   carriedStale: [{ kind: 'champion', id: 'ambessa', name: 'Ambessa', since: '7.2' }],
   items: [], champions: [
     { kind: 'champion', id: 'annie', name: 'Annie', goldens: ['annie-q.json'], changes: [{ field: 'stats.ad', before: 'Lv1 52', after: 'Lv1 55' }] },
@@ -62,6 +63,7 @@ describe('renderPatchDiff', () => {
     const section = report.slice(report.indexOf('## Applied automatically'), report.indexOf('## Still stale'))
     expect(section).toContain("### item deaths-dance (Death's Dance)")
     expect(section).toContain('- `price`: 3200 → 3300')
+    expect(section).toContain('- deaths-dance `dd-cauterize.ratio` = 0.35 (text 30 -> 35)')
   })
 
   it('labels a notes-only flag', () => {

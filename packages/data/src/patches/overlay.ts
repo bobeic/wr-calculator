@@ -17,6 +17,18 @@ export interface ReviewedEntry {
   note: string
 }
 
+/** One effect number taken from wrpocket's description text, confirmed by the official notes (generated/text-sync.ts). */
+export interface TextUpdate {
+  itemId: string
+  /** Omitted for a field on the item itself, e.g. path 'stats.critDamage'. */
+  effectId?: string
+  /** Path inside the effect (or the item), e.g. 'pctTargetCurrentHp' or 'ratios[0].value'. */
+  path: string
+  value: number
+  /** The description numbers it came from, for the report: '7% -> 6%'. */
+  note: string
+}
+
 /** Everything one patch folder contributes to its dataset. */
 export interface PatchLayer {
   id: string
@@ -27,6 +39,8 @@ export interface PatchLayer {
   overrideChampions: Champion[]
   reviewed: ReviewedEntry[]
   changedIds: ChangedIds
+  /** Effect numbers updated from wrpocket text; applied to inherited hand-modelled items before overrides. */
+  textSync?: TextUpdate[]
   /** Replaces the inherited groups when set; required on the root patch. */
   exclusiveGroups?: Record<string, string>
   /** Replaces the inherited targets when set; required on the root patch. */
@@ -65,6 +79,36 @@ function markStale<T extends { id: string; provenance: Provenance }>(entries: T[
   })
 }
 
+function setPath(target: Record<string, unknown>, path: string, value: number): void {
+  const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.')
+  let node: Record<string, unknown> = target
+  for (const key of keys.slice(0, -1)) {
+    const next = node[key]
+    if (typeof next !== 'object' || next === null) throw new Error(`text sync path ${path} does not exist`)
+    node = next as Record<string, unknown>
+  }
+  const last = keys[keys.length - 1]
+  if (typeof node[last] !== 'number') throw new Error(`text sync path ${path} is not a number`)
+  node[last] = value
+}
+
+/** Applies text-sync updates to copies of the items they name; an update for an unknown item or effect throws. */
+export function applyTextSync(items: Item[], updates: TextUpdate[]): Item[] {
+  if (updates.length === 0) return items
+  const byId = new Map(items.map((item) => [item.id, item]))
+  const changed = new Map<string, Item>()
+  for (const update of updates) {
+    const item = changed.get(update.itemId) ?? byId.get(update.itemId)
+    if (item === undefined) throw new Error(`text sync names unknown item ${update.itemId}`)
+    const copy: Item = changed.get(update.itemId) ?? structuredClone(item)
+    const target = update.effectId === undefined ? copy : copy.effects.find((entry) => entry.id === update.effectId)
+    if (target === undefined) throw new Error(`text sync names unknown effect ${update.effectId} on ${update.itemId}`)
+    setPath(target as unknown as Record<string, unknown>, update.path, update.value)
+    changed.set(update.itemId, copy)
+  }
+  return items.map((item) => changed.get(item.id) ?? item)
+}
+
 /** Builds a patch's dataset from its layer over the previous patch's dataset (null for the root). */
 export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | null): PatchDataset {
   if (previous === null && (layer.exclusiveGroups === undefined || layer.targets === undefined)) {
@@ -81,7 +125,7 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
     champions: nextStale(layer.id, inheritedChampions, previous?.stale.champions ?? new Map(), layer.changedIds.champions, covered('champion', layer.overrideChampions)),
   }
   const handModelled = {
-    items: mergeById(inheritedItems, layer.overrideItems),
+    items: mergeById(applyTextSync(inheritedItems, layer.textSync ?? []), layer.overrideItems),
     champions: mergeById(inheritedChampions, layer.overrideChampions),
   }
   const generatedById = new Map(layer.generatedItems.map((entry) => [entry.id, entry]))

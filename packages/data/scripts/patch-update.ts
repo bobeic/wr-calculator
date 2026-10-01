@@ -17,7 +17,7 @@ import { renderPatchDiff } from './patch/render-diff'
 import { metaFromCacheDir, planRun, stripGeneratorHeader } from './patch/run-plan'
 import type { RunPlan } from './patch/run-plan'
 import {
-  provenanceName, renderChangedIds, renderLayersModule, scaffoldFiles, writeMissingFiles,
+  provenanceName, renderChangedIds, renderLayersModule, renderTextSync, scaffoldFiles, writeMissingFiles,
 } from './patch/scaffold'
 import { buildSnapshot, trimMeta } from './patch/snapshot'
 import type { Snapshot, SnapshotMeta } from './patch/snapshot'
@@ -221,7 +221,7 @@ async function run(options: Options): Promise<void> {
       notesBefore: mapSnapshot(before, provenance).notes,
       notesAfter: mapped.notes,
       notes: { url, notes },
-      autoApply: { pinnedItems: dataset.handModelled.items.filter((item) => (item.sourcePins ?? []).length > 0).map((item) => item.id) },
+      autoApply: { handItems: dataset.items.filter((item) => dataset.handModelled.items.some((hand) => hand.id === item.id)) },
     })
     needsReview = diff.needsReview.length
     if (diff.autoApplied.length > 0) console.log(`${diff.autoApplied.length} hand-modelled items took number-only changes the official notes confirm, automatically.`)
@@ -232,6 +232,7 @@ async function run(options: Options): Promise<void> {
     await writeFile(join(staged.reports, 'patch-diff.json'), stableStringify(diff))
     await writeFile(join(staged.reports, 'PATCH_DIFF.md'), renderPatchDiff(diff))
     await writeFile(join(staged.generated, 'notes-review.ts'), renderNotesReview(diff.officialNotes, plan.patch))
+    await writeFile(join(staged.generated, 'text-sync.ts'), renderTextSync(diff.textSync, plan.patch))
     if (notes !== null) await writeFile(join(staged.reports, 'official-notes.json'), stableStringify(notes))
     notesSummary = diff.officialNotes === null || !diff.officialNotes.found
       ? `Official notes: not found at ${url}`

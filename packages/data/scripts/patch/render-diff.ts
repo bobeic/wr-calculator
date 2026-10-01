@@ -74,11 +74,17 @@ export function renderPatchDiff(diff: PatchDiff): string {
       `${label(flag)}: ${SEVERITY_LABEL[flag.severity]}`, flag.goldens, flag.changes, mentionedInNotes(diff, flag), notesLinesFor(diff, flag),
     ))),
     '## Applied automatically', '',
-    'Hand-modelled items whose only changes are in the name, price, tier, recipe or stat values, and which the official '
-      + 'notes mention with every new number matching wrpocket. The overlay takes these from wrpocket '
-      + '(`src/patches/source-sync.ts`), so no override is needed. Synced changes the notes don\'t confirm stay under '
-      + 'Needs review; list a field in the item\'s `sourcePins` to keep a hand-written value instead.', '',
+    'Hand-modelled items whose only changes are in the name, price, tier, recipe or stat values, or numbers in the '
+      + 'description that `src/patches/text-links.ts` ties to the model, and which the official notes mention with every '
+      + 'new number matching wrpocket. The overlay applies these (`src/patches/source-sync.ts`, `generated/text-sync.ts`), '
+      + 'so no override is needed. Changes the notes don\'t confirm stay under Needs review; list a field in the item\'s '
+      + '`sourcePins` to keep a hand-written value instead.', '',
     ...renderDiffs(diff.autoApplied),
+    ...(diff.textSync.length === 0 ? [] : [
+      'Effect numbers taken from the text:', '',
+      ...diff.textSync.map((update) => `- ${update.itemId} \`${update.effectId === undefined ? '' : `${update.effectId}.`}${update.path}\` = ${update.value} (text ${update.note})`),
+      '',
+    ]),
     ...renderNotesSection(diff.officialNotes),
     '## Still stale from earlier patches', '',
     ...orNone(diff.carriedStale.map((entry) => `- ${label(entry)}, stale since ${entry.since}`)),

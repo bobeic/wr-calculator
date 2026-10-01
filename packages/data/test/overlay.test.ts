@@ -129,5 +129,16 @@ describe('source sync of hand-modelled items', () => {
     const reviewed = buildPatchDataset({ ...pending, reviewed: [{ kind: 'item', id: 'hand', note: 'checked' }] }, rootDataset)
     expect(reviewed.items.find((entry) => entry.id === 'hand')?.cost).toEqual({ total: 3400, combine: 600 })
   })
+
+  it('applies a layer\'s text sync to inherited items before overrides, and the next patch inherits it', () => {
+    const rootDataset = buildPatchDataset(layer([handItem]), null)
+    const synced = buildPatchDataset({
+      ...layer([]), id: '7.3a', exclusiveGroups: undefined, targets: undefined,
+      textSync: [{ itemId: 'hand', effectId: 'x', path: 'amount', value: 0.35, note: '30 -> 35' }],
+    }, rootDataset)
+    expect(synced.items.find((entry) => entry.id === 'hand')?.effects[0]).toMatchObject({ amount: 0.35 })
+    const next = buildPatchDataset({ ...layer([]), id: '7.3b', exclusiveGroups: undefined, targets: undefined }, synced)
+    expect(next.items.find((entry) => entry.id === 'hand')?.effects[0]).toMatchObject({ amount: 0.35 })
+  })
 })
 

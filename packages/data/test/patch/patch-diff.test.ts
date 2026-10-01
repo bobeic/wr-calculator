@@ -1,3 +1,4 @@
+import type { Item } from '@wr-calc/schema'
 import { describe, it, expect } from 'vitest'
 import { diffSnapshots } from '../../scripts/patch/diff'
 import { buildPatchDiff, flagHandModelled, goldenRefs, goldensUsing } from '../../scripts/patch/patch-diff'
@@ -64,14 +65,15 @@ describe('flagHandModelled', () => {
   })
 })
 
-describe('auto-apply of synced item changes', () => {
+describe('auto-apply of number-only item changes', () => {
   const item = (id: string, name: string, overrides: Parameters<typeof makeRawItem>[0] = {}) => makeRawItem({ id, name: { en: name }, ...overrides })
-  const ids = ['price', 'stat', 'text', 'added-stat', 'pinned', 'unconfirmed', 'contradicted']
+  const ids = ['price', 'stat', 'text', 'added-stat', 'pinned', 'unconfirmed', 'contradicted', 'linked', 'linked-unconfirmed']
   const names: Record<string, string> = {
     price: 'Price Item', stat: 'Stat Item', text: 'Text Item', 'added-stat': 'Added Stat', pinned: 'Pinned Item',
-    unconfirmed: 'Quiet Item', contradicted: 'Wrong Item',
+    unconfirmed: 'Quiet Item', contradicted: 'Wrong Item', linked: 'Linked Item', 'linked-unconfirmed': 'Unsure Item',
   }
-  const base = makeSnapshot('7.3', '2026-09-23 10:19:27', ids.map((id) => item(id, names[id])), [])
+  const strike = (pctHp: number): { en: string } => ({ en: `Strike: Attacks deal ${pctHp}% of current Health.` })
+  const base = makeSnapshot('7.3', '2026-09-23 10:19:27', ids.map((id) => item(id, names[id], id.startsWith('linked') ? { description: strike(7) } : {})), [])
   const after = makeSnapshot('7.3a', '2026-09-29 16:09:43', [
     item('price', names.price, { price: '600', components: ['dagger'], tier: 'epic' }),
     item('stat', names.stat, { numeric_stats: { attackDamage: 15 } }),
@@ -80,25 +82,44 @@ describe('auto-apply of synced item changes', () => {
     item('pinned', names.pinned, { price: '600' }),
     item('unconfirmed', names.unconfirmed, { price: '600' }),
     item('contradicted', names.contradicted, { price: '600' }),
+    item('linked', names.linked, { description: strike(6) }),
+    item('linked-unconfirmed', names['linked-unconfirmed'], { description: strike(6) }),
   ], [])
   const line = (text: string, value: string) => ({ group: null, text, before: 'x', after: value })
+  const entry = (id: string, lines: ReturnType<typeof line>[]) => ({ source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names[id], lines })
   const notes = {
     patch: '7.3a', url: 'u', title: '', published: '',
     entries: [
-      ...['price', 'text', 'added-stat', 'pinned'].map((id) => ({ source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names[id], lines: [line('Cost', '600')] })),
-      { source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names.stat, lines: [line('AD', '15')] },
-      { source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: names.contradicted, lines: [line('Cost', '650')] },
+      ...['price', 'text', 'added-stat', 'pinned'].map((id) => entry(id, [line('Cost', '600')])),
+      entry('stat', [line('AD', '15')]),
+      entry('contradicted', [line('Cost', '650')]),
+      entry('linked', [line('Damage', '6%')]),
+      entry('linked-unconfirmed', [line('Range', '500')]),
     ],
   }
+  const model = (id: string): Item => ({
+    id, name: names[id], tier: 'basic', cost: { total: 500, combine: 500 }, recipe: [], stats: { ad: 12 }, tags: [],
+    effects: [{ kind: 'onHit', id: `${id}-strike`, name: 'Strike', description: '', support: 'full', damageType: 'physical', pctTargetCurrentHp: 0.07 } as unknown as Item['effects'][number]],
+    provenance: { source: 'wiki', patch: '7.3', verifiedInGame: false },
+    ...(id === 'pinned' ? { sourcePins: ['cost'] } : {}),
+  })
+  const links = Object.fromEntries(['linked', 'linked-unconfirmed'].map((id) => [id, {
+    links: [{ effectId: `${id}-strike`, path: 'pctTargetCurrentHp', capture: [/deal (\d+)% of current Health/], value: ([n]: number[]) => n / 100 }],
+  }]))
   const run = (withNotes: boolean) => buildPatchDiff({
     before: base, after, handModelled: { items: ids, champions: [] }, previousStale: [], covered: NONE, goldens: [],
-    notesBefore: [], notesAfter: [], notes: withNotes ? { url: 'u', notes } : null, autoApply: { pinnedItems: ['pinned'] },
+    notesBefore: [], notesAfter: [], notes: withNotes ? { url: 'u', notes } : null, autoApply: { handItems: ids.map(model), links },
   })
 
-  it('applies synced changes the notes confirm; flags text, added stats, pins, unconfirmed and contradicted changes', () => {
+  it('applies changes the notes confirm; flags wording, added stats, pins, unconfirmed and contradicted changes', () => {
     const result = run(true)
-    expect(result.autoApplied.map((entry) => entry.id)).toEqual(['price', 'stat'])
-    expect(result.needsReview.map((flag) => flag.id).sort()).toEqual(['added-stat', 'contradicted', 'pinned', 'text', 'unconfirmed'])
+    expect(result.autoApplied.map((entry) => entry.id)).toEqual(['linked', 'price', 'stat'])
+    expect(result.needsReview.map((flag) => flag.id).sort())
+      .toEqual(['added-stat', 'contradicted', 'linked-unconfirmed', 'pinned', 'text', 'unconfirmed'])
+  })
+
+  it('turns a confirmed linked description number into a text-sync update', () => {
+    expect(run(true).textSync).toEqual([{ itemId: 'linked', effectId: 'linked-strike', path: 'pctTargetCurrentHp', value: 0.06, note: '7 -> 6' }])
   })
 
   it('never auto-clears a synced change just because the notes leave it out', () => {
@@ -107,7 +128,8 @@ describe('auto-apply of synced item changes', () => {
 
   it('auto-applies nothing without the official notes, or when autoApply is off', () => {
     expect(run(false).autoApplied).toEqual([])
-    expect(run(false).needsReview).toHaveLength(7)
+    expect(run(false).textSync).toEqual([])
+    expect(run(false).needsReview).toHaveLength(9)
     const { autoApply: _, ...input } = {
       before: base, after, handModelled: { items: ids, champions: [] }, previousStale: [], covered: NONE, goldens: [],
       notesBefore: [], notesAfter: [], notes: { url: 'u', notes }, autoApply: undefined,
