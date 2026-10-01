@@ -22,6 +22,9 @@ export const hitStackAmpHandler: EffectHandler<HitStackAmpEffect> = {
     },
   },
   damageMultiplier(effect, ctx, input) {
+    if (effect.condition && !ctx.conditionMet(
+      effect, effect.condition, { damageType: input.type, sourceKind: input.source.kind }
+    )) return 1
     if (!effect.appliesTo.includes(input.source.kind)) return 1
     return 1 + liveStacks(effect, ctx) * effect.amountPerStack
   },

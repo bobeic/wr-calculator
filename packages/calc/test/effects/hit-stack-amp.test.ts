@@ -45,6 +45,13 @@ describe('hitStackAmpHandler', () => {
     expect(hitStackAmpHandler.damageMultiplier!(focusedWill, ctx({ self, time: 1 }), attackDamage)).toBe(1)
   })
 
+  it('does not amplify while its own condition fails', () => {
+    const self = runtime({ buffs: { 'hitStackAmp:will': { stacks: 3, expiresAt: 6 } } })
+    const conditional: HitStackAmpEffect = { ...focusedWill, condition: { type: 'sourceKind', value: 'passive' } }
+    const failing = ctx({ self, time: 1, conditionMet: () => false })
+    expect(hitStackAmpHandler.damageMultiplier!(conditional, failing, abilityDamage)).toBe(1)
+  })
+
   it('does nothing once the stacks have expired, and restarts from one', () => {
     const self = runtime({ buffs: { 'hitStackAmp:will': { stacks: 3, expiresAt: 6 } } })
     expect(hitStackAmpHandler.damageMultiplier!(focusedWill, ctx({ self, time: 7 }), abilityDamage)).toBe(1)
