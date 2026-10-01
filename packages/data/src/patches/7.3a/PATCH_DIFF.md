@@ -12,6 +12,85 @@ Clear a flag by writing an override in `overrides.ts` (values changed) or adding
 
 None.
 
+## Official notes cross-check
+
+From the [official notes](https://wildrift.leagueoflegends.com/en-us/news/game-updates/wild-rift-patch-notes-7-3a/), published 2026-09-29.
+
+- 0 flags auto-cleared as wrpocket-only
+- 0 hand-modelled entries changed in the notes but not in wrpocket
+- 15 notes entries matched, 1 unmatched, 2 game-mode / system entries skipped
+
+"Reflected" means every number in a line's new value appears somewhere in wrpocket's record for that entry. It is a heuristic for spotting wrpocket lagging behind the notes; it never clears a flag.
+
+### Auto-cleared
+
+None.
+
+### Matched notes entries
+
+- champion hwei (Hwei): partly
+  - Signature of the Visionary: Damage: 33 - 333 (Based on level) + 33%Ability Power → 40-285 (Based on level) + 30% Ability Power (reflected)
+  - Subject: Disaster - Devastating Fire: Damage: 50/90/130/170 + 75% Ability Power + 4%/5%/6%/7% Maximum Health → 50/85/120/155 + 70% Ability Power + 4%/5%/6%/7% Maximum Health (reflected)
+  - Subject: Disaster - Severing Bolt: Damage Ratio based on Health lost: 150%/200%/250%/300% → 100%/150%/200%/250% (not found)
+  - Spiraling Despair: Explosion Damage: 250/350/450 + 75% Ability Power → 200/300/400 + 70% Ability Power (reflected)
+- champion samira (Samira): partly
+  - Base Stats: Health per level：128 → 136 (not found)
+  - Base Stats: Armor per level：5 → 5.5 (not found)
+  - Base Stats: Magic Resistance per level：1.4 → 2 (reflected)
+  - Daredevil Impulse: Minimum Attack Damage ratio for melee damage: 3.5% - 10.5% (Based on level) → 5.8% - 17% (Based on level) (reflected)
+  - Daredevil Impulse: Maximum Attack Damage ratio for melee damage: 7% - 21% (Based on level) → 11.6% - 34% (Based on level) (reflected)
+  - Flair: Attack Damage ratio: 110% → 125% (reflected)
+  - Inferno Trigger: Attack Damage ratio per shot: 40% → 50% (reflected)
+- champion rammus (Rammus): reflected
+  - Base Stats: Armor：45 → 40 (reflected)
+  - Defensive Ball Curl: Armor ratio: 45%/50%/55%/60% → 30%/40%/50%/60% (reflected)
+- champion malphite (Malphite): reflected
+  - Thunderclap: Armor Damage Ratio: 20% → 15% (reflected)
+  - Ground Slam: Armor Damage ratio: 45% → 40% (reflected)
+  - Unstoppable Force: Cooldown: 75/70/65s → 85/80/75s (reflected)
+- champion tristana (Tristana): partly
+  - Rapid Fire: Attack Speed: 50/75/100/125% → 60/80/100/120% (reflected)
+  - Rocket Jump: Cooldown: 22/20/18/16s → 20/18/16/14s (reflected)
+  - Explosive Charge: Explosion Damage: (80/100/120/140 + 100% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 40% + (Crit Damage - 2) × 40% × Critical Rate)→ (80/110/140/170 + 120% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 50% + (Crit Damage - 2) × 50% × Critical Rate) (not found)
+- champion draven (Draven): reflected
+  - Spinning Axe: Bonus Attack Damage ratio: 80/90/100/110% → 90/100/110/120% (reflected)
+  - Blood Rush: Attack Speed: 20/25/30/35% → 25/30/35/40% (reflected)
+  - Whirling Death: Bonus Attack Damage ratio: 130% → 150% (reflected)
+- champion caitlyn (Caitlyn): partly
+  - Base stats: Attack Speed per level: 0.04 → 0.025 (not found)
+  - Headshot: 60% -100% (Based on level) → 60% -90% (Based on level) (reflected)
+- champion senna (Senna): not in wrpocket
+  - Base Stats: Attack Speed ratio: 0.4 → 0.3 (not found)
+  - Base Stats: Base Attack Speed: 0.4 → 0.3 (not found)
+  - Base Stats: Base Bonus Attack Speed0.6 → 1.1 (not found)
+  - Base Stats: Attack Speed per level: 0.05 → 0.025 (not found)
+  - Base Stats: Bonus Attack Speed now provides less benefit toward reducing her basic attack windup. (no numbers)
+- champion syndra (Syndra): reflected
+  - Transcendent: Upgrade threshold: 40/60/80/100/120 → 50/75/100/125/150 (reflected)
+  - Force of Will: Ability Power ratio: 60% → 50% (reflected)
+  - Force of Will: Slow: 20%/25%/30%/35% → 25% (reflected)
+- champion swain (Swain): reflected
+  - Ravenous Flock: Health Restored: 3% - 4.5% (Based on level) + 0.5% Ability Power -> 4.5% - 6% + 0.2% Ability Power (reflected)
+  - Nevermove: Ability Power ratio of the repeated damage: 25% → 40% (reflected)
+- champion yuumi (Yuumi): reflected
+  - You and Me!: Healing and Shield Power: 8%/9%/10%/11% + 0.02% Ability Power → 6%/7%/8%/9% + 0.01%a Ability Power (reflected)
+- champion viego (Viego): reflected
+  - Blade of the Ruined King: Passive Damage: 2%/3%/4%/5% → 3%/4%/5%/6% (reflected)
+  - Blade of the Ruined King: Crit Damage ratio: 80% → 85% (reflected)
+  - Heartbreaker: Crit stats ratio: 50%→ 70% (reflected)
+- item yun-tal-wildarrows (Yun Tal Wildarrows): reflected
+  - Base Stats: Attack Speed: 25% → 35% (reflected)
+  - Flurry: Attack Speed: 25% → 35% (reflected)
+  - Flurry: Cooldown: 20s → 25s (reflected)
+- item whispering-circlet (Whispering Circlet): reflected
+  - Harmony: Healing and Shield Power: 0.5% → 0.25% (reflected)
+- item deaths-dance (Death's Dance): reflected
+  - Base Stats: 3200 → 3300 (reflected)
+
+### Unmatched notes entries
+
+- ITEMS: Diadem of Songs
+
 ## Still stale from earlier patches
 
 None.

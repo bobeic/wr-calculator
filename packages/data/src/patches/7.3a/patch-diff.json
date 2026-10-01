@@ -20265,6 +20265,488 @@
     ]
   },
   "needsReview": [],
+  "officialNotes": {
+    "autoReviewed": [],
+    "excludedCount": 2,
+    "found": true,
+    "mentioned": [
+      {
+        "heading": "HWEI",
+        "lines": [
+          {
+            "after": "40-285 (Based on level) + 30% Ability Power",
+            "before": "33 - 333 (Based on level) + 33%Ability Power",
+            "group": "Signature of the Visionary",
+            "status": "reflected",
+            "text": "Damage: 33 - 333 (Based on level) + 33%Ability Power → 40-285 (Based on level) + 30% Ability Power"
+          },
+          {
+            "after": "50/85/120/155 + 70% Ability Power + 4%/5%/6%/7% Maximum Health",
+            "before": "50/90/130/170 + 75% Ability Power + 4%/5%/6%/7% Maximum Health",
+            "group": "Subject: Disaster - Devastating Fire",
+            "status": "reflected",
+            "text": "Damage: 50/90/130/170 + 75% Ability Power + 4%/5%/6%/7% Maximum Health → 50/85/120/155 + 70% Ability Power + 4%/5%/6%/7% Maximum Health"
+          },
+          {
+            "after": "100%/150%/200%/250%",
+            "before": "150%/200%/250%/300%",
+            "group": "Subject: Disaster - Severing Bolt",
+            "status": "not found",
+            "text": "Damage Ratio based on Health lost: 150%/200%/250%/300% → 100%/150%/200%/250%"
+          },
+          {
+            "after": "200/300/400 + 70% Ability Power",
+            "before": "250/350/450 + 75% Ability Power",
+            "group": "Spiraling Despair",
+            "status": "reflected",
+            "text": "Explosion Damage: 250/350/450 + 75% Ability Power → 200/300/400 + 70% Ability Power"
+          }
+        ],
+        "ref": {
+          "id": "hwei",
+          "kind": "champion",
+          "name": "Hwei"
+        },
+        "status": "partly"
+      },
+      {
+        "heading": "SAMIRA",
+        "lines": [
+          {
+            "after": "136",
+            "before": "128",
+            "group": "Base Stats",
+            "status": "not found",
+            "text": "Health per level：128 → 136"
+          },
+          {
+            "after": "5.5",
+            "before": "5",
+            "group": "Base Stats",
+            "status": "not found",
+            "text": "Armor per level：5 → 5.5"
+          },
+          {
+            "after": "2",
+            "before": "1.4",
+            "group": "Base Stats",
+            "status": "reflected",
+            "text": "Magic Resistance per level：1.4 → 2"
+          },
+          {
+            "after": "5.8% - 17% (Based on level)",
+            "before": "3.5% - 10.5% (Based on level)",
+            "group": "Daredevil Impulse",
+            "status": "reflected",
+            "text": "Minimum Attack Damage ratio for melee damage: 3.5% - 10.5% (Based on level) → 5.8% - 17% (Based on level)"
+          },
+          {
+            "after": "11.6% - 34% (Based on level)",
+            "before": "7% - 21% (Based on level)",
+            "group": "Daredevil Impulse",
+            "status": "reflected",
+            "text": "Maximum Attack Damage ratio for melee damage: 7% - 21% (Based on level) → 11.6% - 34% (Based on level)"
+          },
+          {
+            "after": "125%",
+            "before": "110%",
+            "group": "Flair",
+            "status": "reflected",
+            "text": "Attack Damage ratio: 110% → 125%"
+          },
+          {
+            "after": "50%",
+            "before": "40%",
+            "group": "Inferno Trigger",
+            "status": "reflected",
+            "text": "Attack Damage ratio per shot: 40% → 50%"
+          }
+        ],
+        "ref": {
+          "id": "samira",
+          "kind": "champion",
+          "name": "Samira"
+        },
+        "status": "partly"
+      },
+      {
+        "heading": "RAMMUS",
+        "lines": [
+          {
+            "after": "40",
+            "before": "45",
+            "group": "Base Stats",
+            "status": "reflected",
+            "text": "Armor：45 → 40"
+          },
+          {
+            "after": "30%/40%/50%/60%",
+            "before": "45%/50%/55%/60%",
+            "group": "Defensive Ball Curl",
+            "status": "reflected",
+            "text": "Armor ratio: 45%/50%/55%/60% → 30%/40%/50%/60%"
+          }
+        ],
+        "ref": {
+          "id": "rammus",
+          "kind": "champion",
+          "name": "Rammus"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "MALPHITE",
+        "lines": [
+          {
+            "after": "15%",
+            "before": "20%",
+            "group": "Thunderclap",
+            "status": "reflected",
+            "text": "Armor Damage Ratio: 20% → 15%"
+          },
+          {
+            "after": "40%",
+            "before": "45%",
+            "group": "Ground Slam",
+            "status": "reflected",
+            "text": "Armor Damage ratio: 45% → 40%"
+          },
+          {
+            "after": "85/80/75s",
+            "before": "75/70/65s",
+            "group": "Unstoppable Force",
+            "status": "reflected",
+            "text": "Cooldown: 75/70/65s → 85/80/75s"
+          }
+        ],
+        "ref": {
+          "id": "malphite",
+          "kind": "champion",
+          "name": "Malphite"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "TRISTANA",
+        "lines": [
+          {
+            "after": "60/80/100/120%",
+            "before": "50/75/100/125%",
+            "group": "Rapid Fire",
+            "status": "reflected",
+            "text": "Attack Speed: 50/75/100/125% → 60/80/100/120%"
+          },
+          {
+            "after": "20/18/16/14s",
+            "before": "22/20/18/16s",
+            "group": "Rocket Jump",
+            "status": "reflected",
+            "text": "Cooldown: 22/20/18/16s → 20/18/16/14s"
+          },
+          {
+            "after": "(80/110/140/170 + 120% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 50% + (Crit Damage - 2) × 50% × Critical Rate)",
+            "before": "(80/100/120/140 + 100% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 40% + (Crit Damage - 2) × 40% × Critical Rate)",
+            "group": "Explosive Charge",
+            "status": "not found",
+            "text": "Explosion Damage: (80/100/120/140 + 100% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 40% + (Crit Damage - 2) × 40% × Critical Rate)→ (80/110/140/170 + 120% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 50% + (Crit Damage - 2) × 50% × Critical Rate)"
+          }
+        ],
+        "ref": {
+          "id": "tristana",
+          "kind": "champion",
+          "name": "Tristana"
+        },
+        "status": "partly"
+      },
+      {
+        "heading": "DRAVEN",
+        "lines": [
+          {
+            "after": "90/100/110/120%",
+            "before": "80/90/100/110%",
+            "group": "Spinning Axe",
+            "status": "reflected",
+            "text": "Bonus Attack Damage ratio: 80/90/100/110% → 90/100/110/120%"
+          },
+          {
+            "after": "25/30/35/40%",
+            "before": "20/25/30/35%",
+            "group": "Blood Rush",
+            "status": "reflected",
+            "text": "Attack Speed: 20/25/30/35% → 25/30/35/40%"
+          },
+          {
+            "after": "150%",
+            "before": "130%",
+            "group": "Whirling Death",
+            "status": "reflected",
+            "text": "Bonus Attack Damage ratio: 130% → 150%"
+          }
+        ],
+        "ref": {
+          "id": "draven",
+          "kind": "champion",
+          "name": "Draven"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "CAITLYN",
+        "lines": [
+          {
+            "after": "0.025",
+            "before": "0.04",
+            "group": "Base stats",
+            "status": "not found",
+            "text": "Attack Speed per level: 0.04 → 0.025"
+          },
+          {
+            "after": "60% -90% (Based on level)",
+            "before": "60% -100% (Based on level)",
+            "group": "Headshot",
+            "status": "reflected",
+            "text": "60% -100% (Based on level) → 60% -90% (Based on level)"
+          }
+        ],
+        "ref": {
+          "id": "caitlyn",
+          "kind": "champion",
+          "name": "Caitlyn"
+        },
+        "status": "partly"
+      },
+      {
+        "heading": "SENNA",
+        "lines": [
+          {
+            "after": "0.3",
+            "before": "0.4",
+            "group": "Base Stats",
+            "status": "not found",
+            "text": "Attack Speed ratio: 0.4 → 0.3"
+          },
+          {
+            "after": "0.3",
+            "before": "0.4",
+            "group": "Base Stats",
+            "status": "not found",
+            "text": "Base Attack Speed: 0.4 → 0.3"
+          },
+          {
+            "after": "1.1",
+            "before": "Base Bonus Attack Speed0.6",
+            "group": "Base Stats",
+            "status": "not found",
+            "text": "Base Bonus Attack Speed0.6 → 1.1"
+          },
+          {
+            "after": "0.025",
+            "before": "0.05",
+            "group": "Base Stats",
+            "status": "not found",
+            "text": "Attack Speed per level: 0.05 → 0.025"
+          },
+          {
+            "after": null,
+            "before": null,
+            "group": "Base Stats",
+            "status": "no numbers",
+            "text": "Bonus Attack Speed now provides less benefit toward reducing her basic attack windup."
+          }
+        ],
+        "ref": {
+          "id": "senna",
+          "kind": "champion",
+          "name": "Senna"
+        },
+        "status": "not in wrpocket"
+      },
+      {
+        "heading": "SYNDRA",
+        "lines": [
+          {
+            "after": "50/75/100/125/150",
+            "before": "40/60/80/100/120",
+            "group": "Transcendent",
+            "status": "reflected",
+            "text": "Upgrade threshold: 40/60/80/100/120 → 50/75/100/125/150"
+          },
+          {
+            "after": "50%",
+            "before": "60%",
+            "group": "Force of Will",
+            "status": "reflected",
+            "text": "Ability Power ratio: 60% → 50%"
+          },
+          {
+            "after": "25%",
+            "before": "20%/25%/30%/35%",
+            "group": "Force of Will",
+            "status": "reflected",
+            "text": "Slow: 20%/25%/30%/35% → 25%"
+          }
+        ],
+        "ref": {
+          "id": "syndra",
+          "kind": "champion",
+          "name": "Syndra"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "SWAIN",
+        "lines": [
+          {
+            "after": "4.5% - 6% + 0.2% Ability Power",
+            "before": "3% - 4.5% (Based on level) + 0.5% Ability Power",
+            "group": "Ravenous Flock",
+            "status": "reflected",
+            "text": "Health Restored: 3% - 4.5% (Based on level) + 0.5% Ability Power -> 4.5% - 6% + 0.2% Ability Power"
+          },
+          {
+            "after": "40%",
+            "before": "25%",
+            "group": "Nevermove",
+            "status": "reflected",
+            "text": "Ability Power ratio of the repeated damage: 25% → 40%"
+          }
+        ],
+        "ref": {
+          "id": "swain",
+          "kind": "champion",
+          "name": "Swain"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "YUUMI",
+        "lines": [
+          {
+            "after": "6%/7%/8%/9% + 0.01%a Ability Power",
+            "before": "8%/9%/10%/11% + 0.02% Ability Power",
+            "group": "You and Me!",
+            "status": "reflected",
+            "text": "Healing and Shield Power: 8%/9%/10%/11% + 0.02% Ability Power → 6%/7%/8%/9% + 0.01%a Ability Power"
+          }
+        ],
+        "ref": {
+          "id": "yuumi",
+          "kind": "champion",
+          "name": "Yuumi"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "VIEGO",
+        "lines": [
+          {
+            "after": "3%/4%/5%/6%",
+            "before": "2%/3%/4%/5%",
+            "group": "Blade of the Ruined King",
+            "status": "reflected",
+            "text": "Passive Damage: 2%/3%/4%/5% → 3%/4%/5%/6%"
+          },
+          {
+            "after": "85%",
+            "before": "80%",
+            "group": "Blade of the Ruined King",
+            "status": "reflected",
+            "text": "Crit Damage ratio: 80% → 85%"
+          },
+          {
+            "after": "70%",
+            "before": "50%",
+            "group": "Heartbreaker",
+            "status": "reflected",
+            "text": "Crit stats ratio: 50%→ 70%"
+          }
+        ],
+        "ref": {
+          "id": "viego",
+          "kind": "champion",
+          "name": "Viego"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "Yun Tal Wildarrows",
+        "lines": [
+          {
+            "after": "35%",
+            "before": "25%",
+            "group": "Base Stats",
+            "status": "reflected",
+            "text": "Attack Speed: 25% → 35%"
+          },
+          {
+            "after": "35%",
+            "before": "25%",
+            "group": "Flurry",
+            "status": "reflected",
+            "text": "Attack Speed: 25% → 35%"
+          },
+          {
+            "after": "25s",
+            "before": "20s",
+            "group": "Flurry",
+            "status": "reflected",
+            "text": "Cooldown: 20s → 25s"
+          }
+        ],
+        "ref": {
+          "id": "yun-tal-wildarrows",
+          "kind": "item",
+          "name": "Yun Tal Wildarrows"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "Whispering Circlet",
+        "lines": [
+          {
+            "after": "0.25%",
+            "before": "0.5%",
+            "group": "Harmony",
+            "status": "reflected",
+            "text": "Healing and Shield Power: 0.5% → 0.25%"
+          }
+        ],
+        "ref": {
+          "id": "whispering-circlet",
+          "kind": "item",
+          "name": "Whispering Circlet"
+        },
+        "status": "reflected"
+      },
+      {
+        "heading": "Death's Dance",
+        "lines": [
+          {
+            "after": "3300",
+            "before": "3200",
+            "group": "Base Stats",
+            "status": "reflected",
+            "text": "3200 → 3300"
+          }
+        ],
+        "ref": {
+          "id": "deaths-dance",
+          "kind": "item",
+          "name": "Death's Dance"
+        },
+        "status": "reflected"
+      }
+    ],
+    "notesFlags": [],
+    "published": "2026-09-29T09:00:00.000Z",
+    "unmatched": [
+      {
+        "heading": "Diadem of Songs",
+        "section": "ITEMS"
+      }
+    ],
+    "url": "https://wildrift.leagueoflegends.com/en-us/news/game-updates/wild-rift-patch-notes-7-3a/"
+  },
   "removed": [],
   "to": "7.3a",
   "toUpdated": "2026-09-29 16:09:43"

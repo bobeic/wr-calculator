@@ -36,3 +36,12 @@ patches loadable side by side, so a single global dataset no longer fits.
 - Staleness is visible in the data and in `PATCH_DIFF.md`.
 - A mid-patch wrpocket update regenerates that patch in place.
 - The CN preview (step 4) can be another layer.
+
+## Step 2: official notes cross-check (2026-10-01)
+
+The official patch notes are parsed and committed next to the wrpocket snapshots
+(`snapshots/official-notes/`). Flags the notes don't mention are auto-cleared through a generated
+`notes-review.ts` that `layer.ts` merges into `reviewed`. Entries only the notes change are merged into
+`changedIds`. The overlay is unchanged. Hand reviews and overrides still take precedence, and nothing
+writes data values automatically. See `docs/superpowers/specs/2026-10-01-official-notes-cross-check-design.md`
+and ADR `2026-10-01-data-source-priority.md`.

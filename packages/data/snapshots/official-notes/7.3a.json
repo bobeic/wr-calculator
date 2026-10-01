@@ -1,0 +1,536 @@
+{
+  "entries": [
+    {
+      "excluded": false,
+      "heading": "HWEI",
+      "lines": [
+        {
+          "after": "40-285 (Based on level) + 30% Ability Power",
+          "before": "33 - 333 (Based on level) + 33%Ability Power",
+          "group": "Signature of the Visionary",
+          "text": "Damage: 33 - 333 (Based on level) + 33%Ability Power → 40-285 (Based on level) + 30% Ability Power"
+        },
+        {
+          "after": "50/85/120/155 + 70% Ability Power + 4%/5%/6%/7% Maximum Health",
+          "before": "50/90/130/170 + 75% Ability Power + 4%/5%/6%/7% Maximum Health",
+          "group": "Subject: Disaster - Devastating Fire",
+          "text": "Damage: 50/90/130/170 + 75% Ability Power + 4%/5%/6%/7% Maximum Health → 50/85/120/155 + 70% Ability Power + 4%/5%/6%/7% Maximum Health"
+        },
+        {
+          "after": "100%/150%/200%/250%",
+          "before": "150%/200%/250%/300%",
+          "group": "Subject: Disaster - Severing Bolt",
+          "text": "Damage Ratio based on Health lost: 150%/200%/250%/300% → 100%/150%/200%/250%"
+        },
+        {
+          "after": "200/300/400 + 70% Ability Power",
+          "before": "250/350/450 + 75% Ability Power",
+          "group": "Spiraling Despair",
+          "text": "Explosion Damage: 250/350/450 + 75% Ability Power → 200/300/400 + 70% Ability Power"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "SAMIRA",
+      "lines": [
+        {
+          "after": "136",
+          "before": "128",
+          "group": "Base Stats",
+          "text": "Health per level：128 → 136"
+        },
+        {
+          "after": "5.5",
+          "before": "5",
+          "group": "Base Stats",
+          "text": "Armor per level：5 → 5.5"
+        },
+        {
+          "after": "2",
+          "before": "1.4",
+          "group": "Base Stats",
+          "text": "Magic Resistance per level：1.4 → 2"
+        },
+        {
+          "after": "5.8% - 17% (Based on level)",
+          "before": "3.5% - 10.5% (Based on level)",
+          "group": "Daredevil Impulse",
+          "text": "Minimum Attack Damage ratio for melee damage: 3.5% - 10.5% (Based on level) → 5.8% - 17% (Based on level)"
+        },
+        {
+          "after": "11.6% - 34% (Based on level)",
+          "before": "7% - 21% (Based on level)",
+          "group": "Daredevil Impulse",
+          "text": "Maximum Attack Damage ratio for melee damage: 7% - 21% (Based on level) → 11.6% - 34% (Based on level)"
+        },
+        {
+          "after": "125%",
+          "before": "110%",
+          "group": "Flair",
+          "text": "Attack Damage ratio: 110% → 125%"
+        },
+        {
+          "after": "50%",
+          "before": "40%",
+          "group": "Inferno Trigger",
+          "text": "Attack Damage ratio per shot: 40% → 50%"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "RAMMUS",
+      "lines": [
+        {
+          "after": "40",
+          "before": "45",
+          "group": "Base Stats",
+          "text": "Armor：45 → 40"
+        },
+        {
+          "after": "30%/40%/50%/60%",
+          "before": "45%/50%/55%/60%",
+          "group": "Defensive Ball Curl",
+          "text": "Armor ratio: 45%/50%/55%/60% → 30%/40%/50%/60%"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "MALPHITE",
+      "lines": [
+        {
+          "after": "15%",
+          "before": "20%",
+          "group": "Thunderclap",
+          "text": "Armor Damage Ratio: 20% → 15%"
+        },
+        {
+          "after": "40%",
+          "before": "45%",
+          "group": "Ground Slam",
+          "text": "Armor Damage ratio: 45% → 40%"
+        },
+        {
+          "after": "85/80/75s",
+          "before": "75/70/65s",
+          "group": "Unstoppable Force",
+          "text": "Cooldown: 75/70/65s → 85/80/75s"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "TRISTANA",
+      "lines": [
+        {
+          "after": "60/80/100/120%",
+          "before": "50/75/100/125%",
+          "group": "Rapid Fire",
+          "text": "Attack Speed: 50/75/100/125% → 60/80/100/120%"
+        },
+        {
+          "after": "20/18/16/14s",
+          "before": "22/20/18/16s",
+          "group": "Rocket Jump",
+          "text": "Cooldown: 22/20/18/16s → 20/18/16/14s"
+        },
+        {
+          "after": "(80/110/140/170 + 120% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 50% + (Crit Damage - 2) × 50% × Critical Rate)",
+          "before": "(80/100/120/140 + 100% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 40% + (Crit Damage - 2) × 40% × Critical Rate)",
+          "group": "Explosive Charge",
+          "text": "Explosion Damage: (80/100/120/140 + 100% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 40% + (Crit Damage - 2) × 40% × Critical Rate)→ (80/110/140/170 + 120% Bonus Attack Damage + 50% Ability Power) × (1 + Critical Rate × 50% + (Crit Damage - 2) × 50% × Critical Rate)"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "DRAVEN",
+      "lines": [
+        {
+          "after": "90/100/110/120%",
+          "before": "80/90/100/110%",
+          "group": "Spinning Axe",
+          "text": "Bonus Attack Damage ratio: 80/90/100/110% → 90/100/110/120%"
+        },
+        {
+          "after": "25/30/35/40%",
+          "before": "20/25/30/35%",
+          "group": "Blood Rush",
+          "text": "Attack Speed: 20/25/30/35% → 25/30/35/40%"
+        },
+        {
+          "after": "150%",
+          "before": "130%",
+          "group": "Whirling Death",
+          "text": "Bonus Attack Damage ratio: 130% → 150%"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "CAITLYN",
+      "lines": [
+        {
+          "after": "0.025",
+          "before": "0.04",
+          "group": "Base stats",
+          "text": "Attack Speed per level: 0.04 → 0.025"
+        },
+        {
+          "after": "60% -90% (Based on level)",
+          "before": "60% -100% (Based on level)",
+          "group": "Headshot",
+          "text": "60% -100% (Based on level) → 60% -90% (Based on level)"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "SENNA",
+      "lines": [
+        {
+          "after": "0.3",
+          "before": "0.4",
+          "group": "Base Stats",
+          "text": "Attack Speed ratio: 0.4 → 0.3"
+        },
+        {
+          "after": "0.3",
+          "before": "0.4",
+          "group": "Base Stats",
+          "text": "Base Attack Speed: 0.4 → 0.3"
+        },
+        {
+          "after": "1.1",
+          "before": "Base Bonus Attack Speed0.6",
+          "group": "Base Stats",
+          "text": "Base Bonus Attack Speed0.6 → 1.1"
+        },
+        {
+          "after": "0.025",
+          "before": "0.05",
+          "group": "Base Stats",
+          "text": "Attack Speed per level: 0.05 → 0.025"
+        },
+        {
+          "after": null,
+          "before": null,
+          "group": "Base Stats",
+          "text": "Bonus Attack Speed now provides less benefit toward reducing her basic attack windup."
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "SYNDRA",
+      "lines": [
+        {
+          "after": "50/75/100/125/150",
+          "before": "40/60/80/100/120",
+          "group": "Transcendent",
+          "text": "Upgrade threshold: 40/60/80/100/120 → 50/75/100/125/150"
+        },
+        {
+          "after": "50%",
+          "before": "60%",
+          "group": "Force of Will",
+          "text": "Ability Power ratio: 60% → 50%"
+        },
+        {
+          "after": "25%",
+          "before": "20%/25%/30%/35%",
+          "group": "Force of Will",
+          "text": "Slow: 20%/25%/30%/35% → 25%"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "SWAIN",
+      "lines": [
+        {
+          "after": "4.5% - 6% + 0.2% Ability Power",
+          "before": "3% - 4.5% (Based on level) + 0.5% Ability Power",
+          "group": "Ravenous Flock",
+          "text": "Health Restored: 3% - 4.5% (Based on level) + 0.5% Ability Power -> 4.5% - 6% + 0.2% Ability Power"
+        },
+        {
+          "after": "40%",
+          "before": "25%",
+          "group": "Nevermove",
+          "text": "Ability Power ratio of the repeated damage: 25% → 40%"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "YUUMI",
+      "lines": [
+        {
+          "after": "6%/7%/8%/9% + 0.01%a Ability Power",
+          "before": "8%/9%/10%/11% + 0.02% Ability Power",
+          "group": "You and Me!",
+          "text": "Healing and Shield Power: 8%/9%/10%/11% + 0.02% Ability Power → 6%/7%/8%/9% + 0.01%a Ability Power"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "VIEGO",
+      "lines": [
+        {
+          "after": "3%/4%/5%/6%",
+          "before": "2%/3%/4%/5%",
+          "group": "Blade of the Ruined King",
+          "text": "Passive Damage: 2%/3%/4%/5% → 3%/4%/5%/6%"
+        },
+        {
+          "after": "85%",
+          "before": "80%",
+          "group": "Blade of the Ruined King",
+          "text": "Crit Damage ratio: 80% → 85%"
+        },
+        {
+          "after": "70%",
+          "before": "50%",
+          "group": "Heartbreaker",
+          "text": "Crit stats ratio: 50%→ 70%"
+        }
+      ],
+      "section": "",
+      "source": "champion-blade"
+    },
+    {
+      "excluded": false,
+      "heading": "Yun Tal Wildarrows",
+      "lines": [
+        {
+          "after": "35%",
+          "before": "25%",
+          "group": "Base Stats",
+          "text": "Attack Speed: 25% → 35%"
+        },
+        {
+          "after": "35%",
+          "before": "25%",
+          "group": "Flurry",
+          "text": "Attack Speed: 25% → 35%"
+        },
+        {
+          "after": "25s",
+          "before": "20s",
+          "group": "Flurry",
+          "text": "Cooldown: 20s → 25s"
+        }
+      ],
+      "section": "ITEMS",
+      "source": "rich-text"
+    },
+    {
+      "excluded": false,
+      "heading": "Whispering Circlet",
+      "lines": [
+        {
+          "after": "0.25%",
+          "before": "0.5%",
+          "group": "Harmony",
+          "text": "Healing and Shield Power: 0.5% → 0.25%"
+        }
+      ],
+      "section": "ITEMS",
+      "source": "rich-text"
+    },
+    {
+      "excluded": false,
+      "heading": "Diadem of Songs",
+      "lines": [
+        {
+          "after": "0.25%",
+          "before": "0.5%",
+          "group": "Harmony",
+          "text": "Healing and Shield Power: 0.5% → 0.25%"
+        }
+      ],
+      "section": "ITEMS",
+      "source": "rich-text"
+    },
+    {
+      "excluded": false,
+      "heading": "Death's Dance",
+      "lines": [
+        {
+          "after": "3300",
+          "before": "3200",
+          "group": "Base Stats",
+          "text": "3200 → 3300"
+        }
+      ],
+      "section": "ITEMS",
+      "source": "rich-text"
+    },
+    {
+      "excluded": true,
+      "heading": "Augment Adjustments",
+      "lines": [
+        {
+          "after": "11",
+          "before": "7",
+          "group": null,
+          "text": "Trigger distance: 7 → 11。"
+        },
+        {
+          "after": "8",
+          "before": "12",
+          "group": null,
+          "text": "Steelbuff multiplier per stack: 12 → 8。"
+        },
+        {
+          "after": null,
+          "before": null,
+          "group": null,
+          "text": "Improved Rhythm Hunter’s visual effects."
+        },
+        {
+          "after": null,
+          "before": null,
+          "group": null,
+          "text": "When obtaining this Augment in the fifth round or later, immediately gain the number of stacks that would be granted by using 6 rerolls (180 stacks)."
+        },
+        {
+          "after": "9",
+          "before": "8",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Attack Range: 8 → 9"
+        },
+        {
+          "after": "200%",
+          "before": "150%",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Shield ratio gained: 150% → 200%"
+        },
+        {
+          "after": null,
+          "before": null,
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Each individual ability now has a 1s cooldown per target."
+        },
+        {
+          "after": "2s",
+          "before": "5s",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Cooldown per target: 5s → 2s"
+        },
+        {
+          "after": "30 Attack Damage, 60 Ability Power, 40 Armor, 40 Magic Resistance",
+          "before": "35 Attack Damage, 70 Ability Power, 50 Armor, 50 Magic Resistance",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Stats gained after casting your ultimate: 35 Attack Damage, 70 Ability Power, 50 Armor, 50 Magic Resistance → 30 Attack Damage, 60 Ability Power, 40 Armor, 40 Magic Resistance."
+        },
+        {
+          "after": "30%",
+          "before": "20%",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Damage amplification for the other damage type: 20% → 30%."
+        },
+        {
+          "after": "Pre-mitigation damage",
+          "before": "Post-mitigation damage",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Damage tracking: Post-mitigation damage → Pre-mitigation damage."
+        },
+        {
+          "after": "12",
+          "before": "8",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Damage increase per stack: 8 → 12."
+        },
+        {
+          "after": null,
+          "before": null,
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "The cooldown of the bonus damage is now affected by Ability Haste; gaining stacks itself has no cooldown."
+        },
+        {
+          "after": "66 stacks",
+          "before": "100 stacks",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Maximum Stack: 100 stacks → 66 stacks"
+        },
+        {
+          "after": "44.44%",
+          "before": "50%",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Critical Rate cap: 50% → 44.44%"
+        },
+        {
+          "after": "444%",
+          "before": "150%",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Conversion ratio for Critical Rate exceeding the cap: 150% → 444%"
+        },
+        {
+          "after": "400%",
+          "before": "305%",
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "Maximum Conversion cap: 305% → 400%"
+        },
+        {
+          "after": null,
+          "before": null,
+          "group": "We're slightly reverting some of the previous nerfs, though these effects will still be weaker overall than in the previous patch.",
+          "text": "After this change, you can reach the Crit Damage cap without Infinity Edge."
+        }
+      ],
+      "section": "AAA ARAM",
+      "source": "rich-text"
+    },
+    {
+      "excluded": true,
+      "heading": "Champion Adjustment",
+      "lines": [
+        {
+          "after": "85%",
+          "before": "90%",
+          "group": null,
+          "text": "Damage Taken: 90% → 85%"
+        },
+        {
+          "after": "90%",
+          "before": "100%",
+          "group": null,
+          "text": "Damage Taken: 100% → 90%"
+        }
+      ],
+      "section": "AAA ARAM",
+      "source": "rich-text"
+    }
+  ],
+  "patch": "7.3a",
+  "published": "2026-09-29T09:00:00.000Z",
+  "title": "Wild Rift Patch Notes 7.3a",
+  "url": "https://wildrift.leagueoflegends.com/en-us/news/game-updates/wild-rift-patch-notes-7-3a/"
+}

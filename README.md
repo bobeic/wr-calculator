@@ -50,6 +50,21 @@ under "Needs review" in `PATCH_DIFF.md` and marked `staleSince` in the data. Cle
 override in the patch's `overrides.ts` (values changed) or adding it to `reviewed.ts` with a note
 (nothing we model changed). Nothing is written if any stage fails.
 
+The run also fetches the official patch notes
+(`https://wildrift.leagueoflegends.com/en-us/news/game-updates/wild-rift-patch-notes-<id>/`, or
+`--notes-url <url>`), commits them parsed under `packages/data/snapshots/official-notes/<patch>.json`
+and cross-checks them against the wrpocket diff:
+
+- a flagged entry the notes don't mention is auto-cleared as a wrpocket-only change
+  (`generated/notes-review.ts`);
+- a hand-modelled entry the notes change but wrpocket didn't is flagged;
+- `PATCH_DIFF.md`'s "Official notes cross-check" section shows, for each notes entry, whether
+  wrpocket's data already has the new numbers.
+
+If the notes page doesn't exist yet (HTTP 404), the import runs without it and nothing is auto-cleared.
+A `--from-cache` run uses the cached page or the committed notes snapshot, and fetches only with
+`--notes-url`.
+
 `--from-cache <dir>` reads the raw responses from a local cache folder named
 `<patch>-<YYYYMMDDhhmmss>` instead of the network; it was used to bootstrap 7.3. When that patch's
 generated files already exist, it checks that regenerating reproduces them.
