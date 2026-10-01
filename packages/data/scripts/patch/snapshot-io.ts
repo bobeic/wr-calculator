@@ -32,8 +32,9 @@ export async function listSnapshotMetas(root: string): Promise<SnapshotMeta[]> {
   let names: string[]
   try {
     names = await readdir(root)
-  } catch {
-    return []
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+    throw error
   }
   const metas = await Promise.all(
     names.map(async (name) => SnapshotMetaSchema.parse(await readJson(join(root, name, 'meta.json')))),

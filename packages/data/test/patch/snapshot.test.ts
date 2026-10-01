@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mkdtemp, readFile } from 'node:fs/promises'
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { stableStringify } from '../../scripts/patch/stable-json'
@@ -74,5 +74,12 @@ describe('snapshot io', () => {
     await writeSnapshot(join(root, '7.3'), { meta: { patch: '7.3', updated: '2026-09-23 10:19:27' }, ...empty })
     expect((await listSnapshotMetas(root)).map((meta) => meta.patch)).toEqual(['7.3', '7.3a'])
     expect(await listSnapshotMetas(join(root, 'missing'))).toEqual([])
+  })
+
+  it('rejects when root is a file, not a directory', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'snapshot-'))
+    const filePath = join(root, 'file-not-dir')
+    await writeFile(filePath, 'content')
+    await expect(listSnapshotMetas(filePath)).rejects.toThrow()
   })
 })
