@@ -547,7 +547,7 @@ export const STARTER_ITEMS: Item[] = [
   {
     id: 'seryldas-grudge', name: 'Serylda’s Grudge', tier: 'legendary',
     cost: { total: 3100, combine: 700 }, recipe: ['caulfields-warhammer', 'last-whisper'],
-    // wrpocket says 50 AD / 35% pen; the WR wiki says 40 AD / 33%. Unverified until the tooltip check.
+    // 50 AD / 35% pen per the official 7.3 notes (40 AD -> 50, pen added); the WR wiki still shows pre-7.3 values.
     stats: { ad: 50, pctArmorPen: 0.35, abilityHaste: 15 }, tags: ['physical'],
     effects: [{
       kind: 'hitStackProc', id: 'seryldas-grudge-frostbite', name: 'Frostbite',
@@ -614,14 +614,15 @@ export const STARTER_ITEMS: Item[] = [
     id: 'deaths-dance', name: "Death's Dance", tier: 'legendary',
     cost: { total: 3200, combine: 300 }, recipe: ['caulfields-warhammer', 'pickaxe', 'chain-vest'],
     // Cauterize and Defy only protect the holder, so a 1v1 damage calculation doesn't model them.
-    // wrpocket says 50 AD / 45 armor; the WR wiki says 35 AD / 40 armor.
+    // 50 AD / 45 armor per the official 7.3 notes (35 -> 50, 40 -> 45); the WR wiki still shows pre-7.3 values.
     stats: { ad: 50, armor: 45, abilityHaste: 15 }, effects: [], tags: ['physical'],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
   {
     id: 'guardian-angel', name: 'Guardian Angel', tier: 'legendary',
     cost: { total: 3200, combine: 800 }, recipe: ['bf-sword', 'chain-vest'],
-    // The revive only protects the holder. wrpocket says 45 AD; the WR wiki says 40.
+    // The revive only protects the holder. wrpocket says 45 AD; the WR wiki says 40 but its page is
+    // years out of date. No official patch note settles it; check the tooltip.
     stats: { ad: 45, armor: 40 }, effects: [], tags: ['physical'],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },

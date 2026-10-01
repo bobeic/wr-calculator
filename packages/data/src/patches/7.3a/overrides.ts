@@ -9,7 +9,7 @@ export const OVERRIDE_ITEMS: Item[] = [
     // 7.3a official notes: price 3200 -> 3300. Everything else is unchanged from 7.3.
     cost: { total: 3300, combine: 400 }, recipe: ['caulfields-warhammer', 'pickaxe', 'chain-vest'],
     // Cauterize and Defy only protect the holder, so a 1v1 damage calculation doesn't model them.
-    // wrpocket says 50 AD / 45 armor; the WR wiki says 35 AD / 40 armor.
+    // 50 AD / 45 armor per the official 7.3 notes (35 -> 50, 40 -> 45); the WR wiki still shows pre-7.3 values.
     stats: { ad: 50, armor: 45, abilityHaste: 15 }, effects: [], tags: ['physical'],
     provenance: WRPOCKET_7_3A_PROVENANCE,
   },
