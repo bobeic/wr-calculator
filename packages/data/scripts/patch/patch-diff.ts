@@ -62,9 +62,11 @@ const noteKey = (note: NoteRef): string => `${note.subject}\u0000${note.note}`
 /** Builds the full report data for one patch: flags, carried staleness, diffs with goldens, note changes. */
 export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
   const diff = diffSnapshots(input.before, input.after)
+  const flags = flagHandModelled(diff, input.handModelled, input.covered, input.goldens)
   const withGoldens = (entries: EntryDiff[]): ReportedDiff[] =>
     entries.map((entry) => ({ ...entry, goldens: goldensUsing(entry, input.goldens) }))
   const coveredIds = (kind: EntryRef['kind']): Set<string> => new Set(kind === 'item' ? input.covered.items : input.covered.champions)
+  const flagged = new Set(flags.map((flag) => `${flag.kind}\u0000${flag.id}`))
   const beforeKeys = new Set(input.notesBefore.map(noteKey))
   const afterKeys = new Set(input.notesAfter.map(noteKey))
   return {
@@ -72,8 +74,9 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     to: input.after.meta.patch,
     fromUpdated: input.before.meta.updated,
     toUpdated: input.after.meta.updated,
-    needsReview: flagHandModelled(diff, input.handModelled, input.covered, input.goldens),
-    carriedStale: input.previousStale.filter((entry) => !coveredIds(entry.kind).has(entry.id)).sort(compareRefs),
+    needsReview: flags,
+    carriedStale: input.previousStale
+      .filter((entry) => !coveredIds(entry.kind).has(entry.id) && !flagged.has(`${entry.kind}\u0000${entry.id}`)).sort(compareRefs),
     items: withGoldens(diff.items),
     champions: withGoldens(diff.champions),
     added: diff.added,

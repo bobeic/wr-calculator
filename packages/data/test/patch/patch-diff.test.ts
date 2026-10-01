@@ -92,6 +92,16 @@ describe('buildPatchDiff', () => {
     expect(covered.carriedStale).toEqual([])
   })
 
+  it('does not carry a stale entry that is flagged again in the same patch', () => {
+    const again = buildPatchDiff({
+      before, after, handModelled: { items: ['trinity-force'], champions: [] },
+      previousStale: [{ kind: 'item', id: 'trinity-force', name: 'Trinity Force', since: '7.2' }],
+      covered: NONE, goldens: [], notesBefore: [], notesAfter: [],
+    })
+    expect(again.needsReview.map((flag) => flag.id)).toEqual(['trinity-force'])
+    expect(again.carriedStale).toEqual([])
+  })
+
   it('reports mapper notes that are new or gone', () => {
     expect(result.mapperNotes).toEqual({
       added: [{ subject: 'item plain', note: 'new note' }],
