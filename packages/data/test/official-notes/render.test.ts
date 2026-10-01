@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { renderNotesSection } from '../../scripts/official-notes/render'
+import { renderNotesReview, renderNotesSection } from '../../scripts/official-notes/render'
 import type { NotesCrossCheck } from '../../scripts/official-notes/types'
 
 const CHECK: NotesCrossCheck = {
@@ -46,5 +46,22 @@ describe('renderNotesSection', () => {
 
   it('renders nothing when no notes stage ran', () => {
     expect(renderNotesSection(null)).toEqual([])
+  })
+})
+
+describe('renderNotesReview', () => {
+  it('renders auto-reviews and notes flags as a module', () => {
+    const source = renderNotesReview(CHECK, '9.9')
+    expect(source).toContain("import type { ChangedIds, ReviewedEntry } from '../../overlay'")
+    expect(source).toContain('export const NOTES_REVIEWED: ReviewedEntry[] = [')
+    expect(source).toContain('"id": "a"')
+    expect(source).toContain('export const NOTES_FLAGGED: ChangedIds = {')
+    expect(source).toContain('"b"')
+  })
+
+  it('renders empty lists when there is no check', () => {
+    const source = renderNotesReview(null, '9.9')
+    expect(source).toContain('export const NOTES_REVIEWED: ReviewedEntry[] = []')
+    expect(source).toContain('export const NOTES_FLAGGED: ChangedIds = {\n  "items": [],\n  "champions": []\n}')
   })
 })

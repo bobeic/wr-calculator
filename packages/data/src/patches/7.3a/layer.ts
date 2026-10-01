@@ -2,6 +2,7 @@ import type { PatchLayer } from '../overlay'
 import { CHANGED_IDS } from './generated/changed-ids'
 import { GENERATED_CHAMPIONS } from './generated/champions'
 import { GENERATED_ITEMS } from './generated/items'
+import { NOTES_FLAGGED, NOTES_REVIEWED } from './generated/notes-review'
 import { OVERRIDE_CHAMPIONS, OVERRIDE_ITEMS } from './overrides'
 import { REVIEWED } from './reviewed'
 
@@ -12,6 +13,9 @@ export const PATCH_LAYER: PatchLayer = {
   generatedChampions: GENERATED_CHAMPIONS,
   overrideItems: OVERRIDE_ITEMS,
   overrideChampions: OVERRIDE_CHAMPIONS,
-  reviewed: REVIEWED,
-  changedIds: CHANGED_IDS,
+  reviewed: [...REVIEWED, ...NOTES_REVIEWED],
+  changedIds: {
+    items: [...CHANGED_IDS.items, ...NOTES_FLAGGED.items],
+    champions: [...CHANGED_IDS.champions, ...NOTES_FLAGGED.champions],
+  },
 }

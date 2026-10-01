@@ -59,3 +59,12 @@ describe('writeMissingFiles', () => {
     expect(await readFile(join(dir, 'reviewed.ts'), 'utf-8')).toBe('user edits')
   })
 })
+
+describe('layer.ts template', () => {
+  it('merges the generated notes review into reviewed and changedIds', () => {
+    const layer = scaffoldFiles('9.9')['layer.ts']
+    expect(layer).toContain("import { NOTES_FLAGGED, NOTES_REVIEWED } from './generated/notes-review'")
+    expect(layer).toContain('  reviewed: [...REVIEWED, ...NOTES_REVIEWED],')
+    expect(layer).toContain('    items: [...CHANGED_IDS.items, ...NOTES_FLAGGED.items],')
+  })
+})
