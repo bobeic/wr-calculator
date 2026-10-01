@@ -54,6 +54,16 @@ function diffChampionStats(before: SnapshotChampion, after: SnapshotChampion): F
   })
 }
 
+/** Keys scaling rows by type; a repeated type gets '#2', '#3', ... so the first row keeps the plain name the mapper reads. */
+function scalingByOccurrence(rows: Array<{ type: string; value: string }>): Record<string, string> {
+  const seen = new Map<string, number>()
+  return Object.fromEntries(rows.map((row): [string, string] => {
+    const count = (seen.get(row.type) ?? 0) + 1
+    seen.set(row.type, count)
+    return [count === 1 ? row.type : `${row.type}#${count}`, row.value]
+  }))
+}
+
 function diffChampion(before: SnapshotChampion, after: SnapshotChampion): FieldChange[] {
   const abilityChanges = unionKeys(before.abilities, after.abilities).flatMap((key) => {
     const label = SLOT_BY_KEY.get(key) ?? key
@@ -62,8 +72,8 @@ function diffChampion(before: SnapshotChampion, after: SnapshotChampion): FieldC
     if (a === undefined || b === undefined) {
       return valueChange(label, a?.name.en, b?.name.en)
     }
-    const scalingA = Object.fromEntries(a.scaling.map((row) => [row.type, row.value]))
-    const scalingB = Object.fromEntries(b.scaling.map((row) => [row.type, row.value]))
+    const scalingA = scalingByOccurrence(a.scaling)
+    const scalingB = scalingByOccurrence(b.scaling)
     return [
       ...textChange(`${label}.name`, a.name.en, b.name.en),
       ...textChange(`${label}.description`, a.description.en, b.description.en),

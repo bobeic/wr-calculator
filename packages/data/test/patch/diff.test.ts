@@ -62,6 +62,24 @@ describe('diffSnapshots', () => {
     ])
   })
 
+  it('keys repeated scaling types by occurrence so a change to the first row is reported', () => {
+    const withRows = (rows: Array<{ type: string; value: string }>) => {
+      const champion = makeRawChampion()
+      champion.abilities['スキル1'] = { ...champion.abilities['スキル1'], scaling: rows }
+      return champion
+    }
+    const diff = diffSnapshots(
+      before(undefined, [withRows([{ type: '基础伤害', value: '10' }, { type: '基础伤害', value: '20' }])]),
+      after(undefined, [withRows([{ type: '基础伤害', value: '11' }, { type: '基础伤害', value: '20' }])]),
+    )
+    expect(diff.champions[0].changes).toEqual([{ field: 'q.scaling.基础伤害', before: '10', after: '11' }])
+    const second = diffSnapshots(
+      before(undefined, [withRows([{ type: '基础伤害', value: '10' }, { type: '基础伤害', value: '20' }])]),
+      after(undefined, [withRows([{ type: '基础伤害', value: '10' }, { type: '基础伤害', value: '21' }])]),
+    )
+    expect(second.champions[0].changes).toEqual([{ field: 'q.scaling.基础伤害#2', before: '20', after: '21' }])
+  })
+
   it('reports added and removed entries', () => {
     const diff = diffSnapshots(
       before([makeRawItem(), makeRawItem({ id: 'old-item', name: { en: 'Old Item' } })]),
