@@ -12,14 +12,14 @@ import type { Mapped } from './map-item'
 type AbilitySlot = keyof Champion['abilities']
 type BaseStatKey = keyof Champion['baseStats']
 
-const SLOTS: Array<[AbilitySlot, string]> = [
+export const SLOTS: Array<[AbilitySlot, string]> = [
   ['passive', 'パッシブ'], ['q', 'スキル1'], ['w', 'スキル2'], ['e', 'スキル3'], ['r', 'アルティメット'],
 ]
-const STAT_COLUMNS: Array<[BaseStatKey, string]> = [
+export const STAT_COLUMNS: Array<[BaseStatKey, string]> = [
   ['hp', '体力'], ['hpRegen', '体力自動回復'], ['mana', 'マナ'], ['manaRegen', 'マナ自動回復'],
   ['armor', '物理防御'], ['mr', '魔法防御'], ['ad', '攻撃力'], ['moveSpeed', '移動速度'],
 ]
-const ATTACK_SPEED_COLUMN = '攻撃速度'
+export const ATTACK_SPEED_COLUMN = '攻撃速度'
 const MANA_KEYS: ReadonlySet<BaseStatKey> = new Set<BaseStatKey>(['mana', 'manaRegen'])
 // Deviation from a straight line (in stat points) beyond which the site's table is reported as non-linear.
 const LINEARITY_TOLERANCE = 1
