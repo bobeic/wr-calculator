@@ -584,6 +584,7 @@ export const STARTER_ITEMS: Item[] = [
   },
   {
     id: 'sundered-sky', name: 'Sundered Sky', tier: 'legendary',
+    // Stats from wrpocket 7.3; Lightshield Strike's text and values from the WR wiki.
     cost: { total: 2900, combine: 500 }, recipe: ['caulfields-warhammer', 'jaurims-fist'],
     stats: { ad: 40, hp: 350, abilityHaste: 15 }, tags: ['physical'],
     effects: [{
@@ -597,6 +598,7 @@ export const STARTER_ITEMS: Item[] = [
   },
   {
     id: 'steraks-gage', name: "Sterak's Gage", tier: 'legendary',
+    // Stats from wrpocket 7.3; Heavy Handed's text and values from the WR wiki.
     cost: { total: 3200, combine: 500 }, recipe: ['bf-sword', 'jaurims-fist'],
     stats: { hp: 400, tenacity: 0.2 }, tags: ['physical'],
     effects: [{

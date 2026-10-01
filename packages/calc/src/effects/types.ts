@@ -48,6 +48,7 @@ export interface DamageSource {
   name: string
 }
 
+/** One source's share of a merged damage instance. */
 export interface DamagePart { source: DamageSource; amount: number }
 
 export interface RawDamageInstanceInput {
@@ -80,6 +81,7 @@ export interface AttackModifier {
   empowered?: boolean
 }
 
+/** A basic attack or ability stage cast that dealt damage, as passed to `onHitLanded`. */
 export interface HitInfo {
   id: number
   kind: 'basicAttack' | 'ability'
