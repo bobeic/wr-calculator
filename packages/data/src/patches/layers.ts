@@ -2,5 +2,6 @@
 // packages/data/snapshots/wrpocket, oldest first. Do not edit by hand.
 import type { PatchLayer } from './overlay'
 import { PATCH_LAYER as PATCH_7_3 } from './7.3/layer'
+import { PATCH_LAYER as PATCH_7_3A } from './7.3a/layer'
 
-export const PATCH_LAYERS: PatchLayer[] = [PATCH_7_3]
+export const PATCH_LAYERS: PatchLayer[] = [PATCH_7_3, PATCH_7_3A]
