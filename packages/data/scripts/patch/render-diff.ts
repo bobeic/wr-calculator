@@ -24,12 +24,15 @@ function renderChange(change: FieldChange): string[] {
   ]
 }
 
-function renderEntry(heading: string, goldens: string[], changes: FieldChange[], inNotes: boolean | null = null): string[] {
+function renderEntry(
+  heading: string, goldens: string[], changes: FieldChange[], inNotes: boolean | null = null, notesLines: string[] = [],
+): string[] {
   return [
     `### ${heading}`, '',
     `Goldens: ${goldens.length === 0 ? 'none' : goldens.join(', ')}`, '',
     ...(inNotes === null ? [] : [`In the official notes: ${inNotes ? 'yes' : 'no'}`, '']),
     ...changes.flatMap(renderChange),
+    ...notesLines,
     '',
   ]
 }
@@ -39,6 +42,14 @@ function mentionedInNotes(diff: PatchDiff, flag: Flag): boolean | null {
   const notes = diff.officialNotes
   if (notes === null || !notes.found) return null
   return notes.mentioned.some((entry) => entry.ref.kind === flag.kind && entry.ref.id === flag.id)
+}
+
+/** The notes lines behind a notes-only flag, which has no wrpocket changes of its own to show. */
+function notesLinesFor(diff: PatchDiff, flag: Flag): string[] {
+  if (flag.severity !== 'notes' || diff.officialNotes === null) return []
+  return diff.officialNotes.mentioned
+    .filter((entry) => entry.ref.kind === flag.kind && entry.ref.id === flag.id)
+    .flatMap((entry) => entry.lines.map((line) => `- ${line.group === null ? '' : `${line.group}: `}${line.text} (${line.status})`))
 }
 
 const orNone = (lines: string[]): string[] => (lines.length === 0 ? ['None.', ''] : lines)
@@ -59,7 +70,7 @@ export function renderPatchDiff(diff: PatchDiff): string {
     'Clear a flag by writing an override in `overrides.ts` (values changed) or adding the id to '
       + '`reviewed.ts` with a note (nothing we model changed).', '',
     ...orNone(diff.needsReview.flatMap((flag) => renderEntry(
-      `${label(flag)}: ${SEVERITY_LABEL[flag.severity]}`, flag.goldens, flag.changes, mentionedInNotes(diff, flag),
+      `${label(flag)}: ${SEVERITY_LABEL[flag.severity]}`, flag.goldens, flag.changes, mentionedInNotes(diff, flag), notesLinesFor(diff, flag),
     ))),
     ...renderNotesSection(diff.officialNotes),
     '## Still stale from earlier patches', '',

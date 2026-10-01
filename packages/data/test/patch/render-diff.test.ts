@@ -85,6 +85,19 @@ describe('renderPatchDiff', () => {
       expect(entryBlock(renderPatchDiff({ ...DIFF, officialNotes: FOUND }), 'item gone-item')).toContain('In the official notes: no')
     })
 
+    it('lists the matched notes lines under a notes-only flag', () => {
+      const withLines = {
+        ...FOUND,
+        mentioned: [...FOUND.mentioned, {
+          ref: { kind: 'item' as const, id: 'notes-only', name: 'Notes Only' }, heading: 'Notes Only', status: 'not in wrpocket' as const,
+          lines: [{ group: 'Base Stats', text: 'Price: 1000 → 1100', before: '1000', after: '1100', status: 'not found' as const }],
+        }],
+      }
+      const block = entryBlock(renderPatchDiff({ ...DIFF, officialNotes: withLines }), 'item notes-only')
+      expect(block).toContain('- Base Stats: Price: 1000 → 1100 (not found)')
+      expect(entryBlock(renderPatchDiff({ ...DIFF, officialNotes: withLines }), 'item blade-of-the-ruined-king')).not.toContain('(not found)')
+    })
+
     it('omits the line when there is no notes stage or the notes were not found', () => {
       expect(report).not.toContain('In the official notes:')
       expect(renderPatchDiff({ ...DIFF, officialNotes: { ...FOUND, found: false, mentioned: [] } })).not.toContain('In the official notes:')
