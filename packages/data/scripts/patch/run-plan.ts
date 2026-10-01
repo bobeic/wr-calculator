@@ -9,8 +9,8 @@ export type RunPlan =
 
 // The patch id becomes a folder name and an import path, so it must not be able to escape either.
 function assertSafePatchId(patch: string): void {
-  if (!/^[0-9A-Za-z.]+$/.test(patch) || /^\.+$/.test(patch)) {
-    throw new Error(`invalid patch id '${patch}': expected letters, digits and dots only`)
+  if (!/^[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*$/.test(patch)) {
+    throw new Error(`invalid patch id '${patch}': expected letters and digits separated by single dots`)
   }
 }
 

@@ -38,4 +38,10 @@ describe('renderWordDiff', () => {
   it('strikes deletions and bolds additions, keeping spaces outside the markers', () => {
     expect(renderWordDiff(diffWords('deals 7% damage', 'deals 6% damage'))).toBe('deals ~~7%~~**6%** damage')
   })
+
+  it('escapes markdown in the source text so it cannot collide with the diff markers', () => {
+    expect(renderWordDiff(diffWords('**Awe**: gain AP', 'Awe: gain AP')))
+      .toBe('~~\\*\\*~~Awe~~\\*\\*~~: gain AP')
+    expect(renderWordDiff(diffWords('a_b ~c~ <d>', 'a_b ~c~ <d>'))).toBe('a\\_b \\~c\\~ \\<d\\>')
+  })
 })
