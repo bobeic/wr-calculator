@@ -51,8 +51,9 @@ from R's passive), a rune page with no AD or pen. "bf-sword" adds a B.F. Sword (
 `e-then-feint` is Lacerate and its dash recast. In `e-feint-empowered-aa` the empowered attack
 showed as one number (95, or 125 with the sword) holding the attack and Drakehound's Step's bonus.
 `no-items-aa` uses a 2% tolerance: the engine's 71.18 shows as 72, which is outside 1% of such a
-small number. R is left out until its full-HP reading (270, versus 236 from 400 base damage) is
-explained; the rank-3 tooltip reads "400 + 25% of their missing health".
+small number. R is left out: the rank-3 tooltip reads "400 + 25% of their missing health", but R deals ~57 more
+before mitigation than that on both the full-HP dummy (270, not 236) and a full-HP Garen with 114
+armor (254, not 223), with no damaging runes. The cause is unknown and parked.
 
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%

@@ -92,7 +92,9 @@ const AMBESSA: Champion = {
       castTime: 1.55, flags: {},
       // 10/17.5/25% (+5% per 100 bonus AD) missing HP since patch 7.2b (WR wiki patch history); the
       // in-game tooltip at rank 3 with no bonus AD reads "400 + 25% of their missing health".
-      // Unexplained: a full-HP dummy took 270, not the 236 that 400 alone gives (2026-09-30).
+      // Unexplained extra (parked 2026-10-01): R deals ~57 more pre-mitigation damage than the
+      // tooltip on both a full-HP dummy (270, not 236) and a full-HP Garen with 114 armor (254, not
+      // 223), with no damaging runes. A fixed bonus or a hidden ~14% amp would fit; not modeled.
       damage: [{
         type: 'physical', base: { byRank: [200, 300, 400] },
         ratios: [{
