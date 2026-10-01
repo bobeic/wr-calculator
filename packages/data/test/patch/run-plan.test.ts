@@ -31,7 +31,7 @@ describe('planRun', () => {
 })
 
 describe('planRun patch id validation', () => {
-  it.each(['..', '../x', '7.3/a', '7 3', '', '7.3a\n'])('rejects the patch id %j', (patch) => {
+  it.each(['..', '../x', '7.3/a', '7 3', '', '7.3a\n', '7..3', '.7', '7.'])('rejects the patch id %j', (patch) => {
     expect(() => planRun({ patch, updated: '2026-09-23 10:19:27' }, [], false)).toThrow(/invalid patch id/)
   })
 

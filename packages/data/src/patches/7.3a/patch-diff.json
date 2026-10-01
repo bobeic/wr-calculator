@@ -2285,9 +2285,14 @@
           "wordDiff": "Summons the moon, illuminating an area that expands. Enemies in this area are slowed by 20%. During this time, Diana charges for up to 1 second, triggering Moonfall Glow when the charge is complete. Diana can move and cast abilities and spells while charging up. \nDiana cannot cast this ability if there are no enemy champions nearby. \nMoonfall Glow: Slams the moon down, marking enemies with Moonlight and dealing 100 ~~/ 160 / 220~~ (+~~80%~~**40%** AP) ~~magic damage to~~ **–**200 ~~/ 320 / 440~~ (+80% AP) magic damage based on charge time. Targets are slowed by 20% for 2 seconds."
         },
         {
+          "after": "100/160/220",
+          "before": "150/200/250",
+          "field": "r.scaling.基础伤害"
+        },
+        {
           "after": "200/320/440",
           "before": "300/400/500",
-          "field": "r.scaling.基础伤害"
+          "field": "r.scaling.基础伤害#2"
         },
         {
           "after": "Unleashes an arcing bolt of energy that deals 60 (+70% AP) magic damage and applies Moonlight for 3 seconds.",
@@ -4071,7 +4076,7 @@
         {
           "after": "200/300/400",
           "before": "250/350/450",
-          "field": "r.scaling.基础伤害"
+          "field": "r.scaling.基础伤害#2"
         },
         {
           "after": "Paints visions of disaster that deal large damage to enemies.\nDevastating Fire:\nPaints a blazing fireball that flies out in the target direction. It explodes on the first enemy hit, dealing 50 (+70% AP) plus 4% of the target's max Health as magic damage to all enemies in an area.\nSevering Bolt:\nPaints a long-range, delayed lightning bolt at the target location, dealing 80 (+30% AP) magic damage.\nIf the target is immobilized or only one target is struck, they take increased damage based on their missing Health, up to 200 (+75% AP) magic damage.\nMolten Fissure:\nPaints a field of exploding volcanic eruptions, creating lingering lava in its path. Every eruption deals 20 (+30% AP) magic damage to enemies hit. Enemies in the lava area are dealt 20 (+30% AP) magic damage per second and slowed by 30%. Each lava pool lasts 2.5 seconds.",
@@ -4587,19 +4592,34 @@
           "wordDiff": "Passive: Deals an additional 75 ~~/ 130 / 185~~ (+70% AP) magic damage with every 3 consecutive attacks he ~~haunches~~**launches** within 3 seconds. \nActive: Swings his stave, dealing 100 ~~/ 200 / 300~~ (+100% AP) magic damage to nearby enemies and gaining Armor and Magic Resist based on the number of champions hit. \nIf he hits ~~a~~**1** champion, he gains 30 ~~/ 50 / 70~~ (+50% bonus AD) Armor and 18 ~~/ 30 / 42~~ (+30% bonus AD) Magic Resist. \nIf he hits more than one champion, he gains ~~15 / 20~~**an** ~~/~~**additional** ~~25~~**15** (+10% bonus AD) Armor and 9 ~~/ 12 / 15~~ (+6% bonus AD) Magic Resist for 8 seconds per additional champion hit. During this time, his size increases by 10%, and he deals additional magic damage with every 2 attacks instead. \nDeals 110% damage to monsters."
         },
         {
+          "after": "75/130/185",
+          "before": "60",
+          "field": "r.scaling.基础伤害"
+        },
+        {
           "after": "100/200/300",
           "before": "150",
-          "field": "r.scaling.基础伤害"
+          "field": "r.scaling.基础伤害#2"
+        },
+        {
+          "after": "30/50/70",
+          "before": "30",
+          "field": "r.scaling.护甲提升"
         },
         {
           "after": "15/20/25",
           "before": "15",
-          "field": "r.scaling.护甲提升"
+          "field": "r.scaling.护甲提升#2"
+        },
+        {
+          "after": "18/30/42",
+          "before": "18",
+          "field": "r.scaling.魔法抗性提升"
         },
         {
           "after": "9/12/15",
           "before": "9",
-          "field": "r.scaling.魔法抗性提升"
+          "field": "r.scaling.魔法抗性提升#2"
         },
         {
           "after": "Leaps to a target unit, dealing 70 (+100% bonus AD) physical damage if it is an enemy.",
@@ -8937,7 +8957,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~To~~**Creates** ~~Nowhere~~**a** ~~(High~~**circular** ~~mobility~~**magic portal in a target location**, ~~reveals~~**dealing 65 (+40% AP**)~~:~~ ~~Grant~~**magic** ~~a~~**damage** ~~portal~~**to** ~~effect~~**all** ~~at~~**enemies** ~~the~~**within** ~~target~~**and** ~~location.~~**sending** ~~Portal~~**them** ~~duration:~~**to** **another dimension for** 1.5~~s.~~ ~~[New]~~**seconds.\nEnemies** ~~After~~**in** the ~~portal~~**other** ~~ends~~**dimension:\n- Cannot attack or use abilities**, ~~the~~**but** ~~target~~**can** ~~is~~**move.\n-** **Are** slowed by 80%**.\nEnemies** **are returned to their original location after 1.5 seconds, but the slow lasts** for **another** 0.75~~s~~ **seconds**."
+          "wordDiff": "~~To~~**Creates** ~~Nowhere~~**a** ~~(High~~**circular** ~~mobility~~**magic portal in a target location**, ~~reveals~~**dealing 65 (+40% AP**)~~:~~ ~~Grant~~**magic** ~~a~~**damage** ~~portal~~**to** ~~effect~~**all** ~~at~~**enemies** ~~the~~**within** ~~target~~**and** ~~location.~~**sending** ~~Portal~~**them** ~~duration:~~**to** **another dimension for** 1.5~~s.~~ ~~\\[New\\]~~**seconds.\nEnemies** ~~After~~**in** the ~~portal~~**other** ~~ends~~**dimension:\n- Cannot attack or use abilities**, ~~the~~**but** ~~target~~**can** ~~is~~**move.\n-** **Are** slowed by 80%**.\nEnemies** **are returned to their original location after 1.5 seconds, but the slow lasts** for **another** 0.75~~s~~ **seconds**."
         },
         {
           "after": "Passive: When a Trinket damages its target, it applies a Thread.\nActive: Conjures a portal on each end of a horizontal target area. After a delay, the portals fire interweaving Threads, dealing 70 (+60% AP) magic damage and applying Threads to all enemies caught in between.\nTargets marked with Threads:\n- Are slowed by 20% for 2 seconds.\n- Have their hitbox size increased for 4 seconds.\nDeals 115% damage to monsters.\nDeals 115% damage to minions.",
@@ -16773,7 +16793,7 @@
           "before": "**Unmake**: All enemy champions within 650 units take 12% increased magic damage.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Unmake~~**~~: All enemy champions within 650 units take 12% increased magic damage.\n**(Unmake's damage bonus does not stack.)**"
+          "wordDiff": "~~\\*\\*~~Unmake~~\\*\\*~~: All enemy champions within 650 units take 12% increased magic damage.\n**(Unmake's damage bonus does not stack.)**"
         }
       ],
       "goldens": [],
@@ -16793,7 +16813,7 @@
               "before": "1"
             }
           ],
-          "wordDiff": "~~**~~Endurance~~**~~: While in combat with enemy champions, gain 1 Endurance stack ~~every 1~~**each** second, up to 5 stacks. At max stacks, gain 20% increased size, 20% Tenacity, 30% bonus Armor, and 30% bonus Magic Resistance until leaving **champion** combat."
+          "wordDiff": "~~\\*\\*~~Endurance~~\\*\\*~~: While in combat with enemy champions, gain 1 Endurance stack ~~every 1~~**each** second, up to 5 stacks. At max stacks, gain 20% increased size, 20% Tenacity, 30% bonus Armor, and 30% bonus Magic Resistance until leaving **champion** combat."
         }
       ],
       "goldens": [],
@@ -16808,7 +16828,7 @@
           "before": "**Awe**: Gain Ability Power equal to 1% of your maximum Mana, and refund 25% of the mana you spend.\n**Mana Charge**: Each time you spend Mana, gain +14 Max Mana, up to 700 bonus Mana, at which point this item upgrades into Seraph's Embrace. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess series item at a time.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Awe~~**~~: ~~Gain~~**Grants** **bonus** Ability Power equal to 1% ~~of your~~ maximum Mana~~, and~~**.** ~~refund~~**Refunds** 25% of ~~the mana you~~**Mana** ~~spend~~**spent**.\n~~**~~Mana Charge~~**~~: ~~Each time you~~**Increases** ~~spend~~**max** Mana~~,~~ ~~gain~~**by** ~~+~~14 ~~Max~~**every** **time** Mana~~,~~ ~~up~~**is** ~~to~~**spent.** **Caps at** 700 bonus Mana, ~~at which point this~~**transforming** ~~item~~**Archangel's** ~~upgrades~~**Staff** into Seraph's Embrace. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess ~~series~~ item at a time."
+          "wordDiff": "~~\\*\\*~~Awe~~\\*\\*~~: ~~Gain~~**Grants** **bonus** Ability Power equal to 1% ~~of your~~ maximum Mana~~, and~~**.** ~~refund~~**Refunds** 25% of ~~the mana you~~**Mana** ~~spend~~**spent**.\n~~\\*\\*~~Mana Charge~~\\*\\*~~: ~~Each time you~~**Increases** ~~spend~~**max** Mana~~,~~ ~~gain~~**by** ~~+~~14 ~~Max~~**every** **time** Mana~~,~~ ~~up~~**is** ~~to~~**spent.** **Caps at** 700 bonus Mana, ~~at which point this~~**transforming** ~~item~~**Archangel's** ~~upgrades~~**Staff** into Seraph's Embrace. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess ~~series~~ item at a time."
         }
       ],
       "goldens": [],
@@ -16823,7 +16843,7 @@
           "before": "**Censer**: Shielding or healing an allied champion other than yourself empowers both you and that champion for 6 seconds, granting 30% bonus Attack Speed and 25 bonus magic damage on basic attacks.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Censer~~**~~: Shielding or healing an allied champion other than yourself empowers both you and that champion for 6 seconds, granting 30% bonus Attack Speed and 25 bonus magic damage on basic attacks."
+          "wordDiff": "~~\\*\\*~~Censer~~\\*\\*~~: Shielding or healing an allied champion other than yourself empowers both you and that champion for 6 seconds, granting 30% bonus Attack Speed and 25 bonus magic damage on basic attacks."
         }
       ],
       "goldens": [],
@@ -16886,7 +16906,7 @@
               "before": "115%"
             }
           ],
-          "wordDiff": "~~**~~Cinders~~**~~: ~~Deal~~**Deals** 10~~-~~**–**20 magic damage per second to nearby enemies. ~~Minions and~~**(Deals** ~~monsters~~**115%** ~~take~~**damage** ~~115%~~**against** ~~of~~**minions** ~~that~~**and** ~~damage~~**monsters** instead.**)**"
+          "wordDiff": "~~\\*\\*~~Cinders~~\\*\\*~~: ~~Deal~~**Deals** 10~~-~~**–**20 magic damage per second to nearby enemies. ~~Minions and~~**(Deals** ~~monsters~~**115%** ~~take~~**damage** ~~115%~~**against** ~~of~~**minions** ~~that~~**and** ~~damage~~**monsters** instead.**)**"
         }
       ],
       "goldens": [],
@@ -16991,7 +17011,7 @@
           "before": "**Ichorshield**: Convert overhealing from your Lifesteal into a shield, up to 165 - 345 (based on level).",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Ichorshield~~**~~: Convert overhealing from your Lifesteal into a shield~~,~~ **that absorbs** up to 165 ~~-~~ **–**345 **damage** (based on level)."
+          "wordDiff": "~~\\*\\*~~Ichorshield~~\\*\\*~~: Convert overhealing from your Lifesteal into a shield~~,~~ **that absorbs** up to 165 ~~-~~ **–**345 **damage** (based on level)."
         }
       ],
       "goldens": [],
@@ -17075,7 +17095,7 @@
           "before": "**Spellweaver**: Dealing magic damage or true damage to champions grants 30 bonus Movement Speed for 4 seconds.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Spellweaver~~**~~: Dealing magic damage or true damage to champions grants 30 bonus Movement Speed for 4 seconds."
+          "wordDiff": "~~\\*\\*~~Spellweaver~~\\*\\*~~: Dealing magic damage or true damage to champions grants 30 bonus Movement Speed for 4 seconds."
         }
       ],
       "goldens": [],
@@ -17138,7 +17158,7 @@
               "before": "400"
             }
           ],
-          "wordDiff": "~~**Daybreak**~~**Dawnbringer**: When you immobilize ~~an enemy~~**a** champion~~,~~ or are immobilized ~~while an~~**within** ~~enemy~~**400** ~~champion~~**units** ~~is~~**of** ~~within~~**an** ~~400~~**enemy** ~~units~~**champion**, reveal ~~every~~**all** nearby enemy ~~champion~~**champions** for 3 seconds, deal **magic damage equal to** 40 + 2.5% bonus Health ~~as magic damage~~, and gain 20% Armor and Magic Resist~~.~~ (3~~s~~ ~~cooldown~~**second Cooldown**)**.**"
+          "wordDiff": "~~\\*\\*Daybreak\\*\\*~~**Dawnbringer**: When you immobilize ~~an enemy~~**a** champion~~,~~ or are immobilized ~~while an~~**within** ~~enemy~~**400** ~~champion~~**units** ~~is~~**of** ~~within~~**an** ~~400~~**enemy** ~~units~~**champion**, reveal ~~every~~**all** nearby enemy ~~champion~~**champions** for 3 seconds, deal **magic damage equal to** 40 + 2.5% bonus Health ~~as magic damage~~, and gain 20% Armor and Magic Resist~~.~~ (3~~s~~ ~~cooldown~~**second Cooldown**)**.**"
         }
       ],
       "goldens": [],
@@ -17153,7 +17173,7 @@
           "before": "**Momentum**: Moving builds Momentum, granting up to 40 Move Speed at 100 stacks. Attacking removes all Momentum. Stacks decay when movement is impaired.\n**Crushing Blow**: Attacks deal up to 100 bonus magic damage based on Momentum removed. Melee attacks with max Momentum slow by 75% for 1 second.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Momentum~~**~~: Moving builds Momentum, granting up to 40 Move Speed at 100 stacks. Attacking removes all Momentum. Stacks decay when movement is impaired.\n~~**~~Crushing Blow~~**~~: Attacks deal up to 100 bonus magic damage based on Momentum removed. Melee attacks with max Momentum slow by 75% for 1 second."
+          "wordDiff": "~~\\*\\*~~Momentum~~\\*\\*~~: Moving builds Momentum, granting up to 40 Move Speed at 100 stacks. Attacking removes all Momentum. Stacks decay when movement is impaired.\n~~\\*\\*~~Crushing Blow~~\\*\\*~~: Attacks deal up to 100 bonus magic damage based on Momentum removed. Melee attacks with max Momentum slow by 75% for 1 second."
         }
       ],
       "goldens": [],
@@ -17193,7 +17213,7 @@
               "before": "3"
             }
           ],
-          "wordDiff": "~~**~~**Cauterize: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.**\nDefy~~**~~: If a champion you damaged within the last 3 seconds dies, the remaining ~~Ignore Pain~~**Cauterize** damage is cleansed, and you heal over 2 seconds for an amount equal to 90% bonus Attack Damage.\n~~**Cauterize**: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.~~"
+          "wordDiff": "~~\\*\\*~~**Cauterize: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.**\nDefy~~\\*\\*~~: If a champion you damaged within the last 3 seconds dies, the remaining ~~Ignore Pain~~**Cauterize** damage is cleansed, and you heal over 2 seconds for an amount equal to 90% bonus Attack Damage.\n~~\\*\\*Cauterize\\*\\*: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.~~"
         },
         {
           "after": "3300",
@@ -17249,7 +17269,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Giant Slayer~~**~~: Deal ~~up to 12%~~ bonus damage based on the enemy champion's bonus Health, ~~reaching~~**up** ~~maximum~~**to** ~~at~~**12%** ~~1200~~**bonus** **damage when the enemy champion has 1,200** bonus Health."
+          "wordDiff": "~~\\*\\*~~Giant Slayer~~\\*\\*~~: Deal ~~up to 12%~~ bonus damage based on the enemy champion's bonus Health, ~~reaching~~**up** ~~maximum~~**to** ~~at~~**12%** ~~1200~~**bonus** **damage when the enemy champion has 1,200** bonus Health."
         }
       ],
       "goldens": [],
@@ -17277,7 +17297,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Spellblade~~**~~: After casting an ability, your next attack deals bonus magic damage equal to 75% base Attack Damage + 10% Ability Power and heals you for ~~10%~~**3%** ~~Ability~~**bonus** ~~Power~~**Health** + ~~3%~~**10%** ~~bonus~~**Ability** ~~Health~~**Power**. Shortly afterward, it applies ~~one additional~~ on-hit ~~effect~~**effects** to the target **1 additional time**. (1.5 second ~~cooldown~~**Cooldown**) \nDeals reduced damage to structures."
+          "wordDiff": "~~\\*\\*~~Spellblade~~\\*\\*~~: After casting an ability, your next attack deals bonus magic damage equal to 75% base Attack Damage + 10% Ability Power and heals you for ~~10%~~**3%** ~~Ability~~**bonus** ~~Power~~**Health** + ~~3%~~**10%** ~~bonus~~**Ability** ~~Health~~**Power**. Shortly afterward, it applies ~~one additional~~ on-hit ~~effect~~**effects** to the target **1 additional time**. (1.5 second ~~cooldown~~**Cooldown**) \nDeals reduced damage to structures."
         }
       ],
       "goldens": [],
@@ -17297,7 +17317,7 @@
               "before": "18"
             }
           ],
-          "wordDiff": "~~**Razor**: +18 Armor Penetration.\n**~~Nightstalker~~**~~: Your first basic attack against an enemy champion deals 60~~-~~**–**160 bonus physical damage and slows ~~the target~~**them** by 99% for 0.35 seconds~~.~~ (10~~s~~ ~~cooldown~~**second Cooldown**)**.**\n~~Taking~~**Cooldown** ~~down~~**is** **refreshed when** an enemy champion ~~refreshes~~**has** ~~the~~**been** ~~cooldown~~**taken down**."
+          "wordDiff": "~~\\*\\*Razor\\*\\*: +18 Armor Penetration.\n\\*\\*~~Nightstalker~~\\*\\*~~: Your first basic attack against an enemy champion deals 60~~-~~**–**160 bonus physical damage and slows ~~the target~~**them** by 99% for 0.35 seconds~~.~~ (10~~s~~ ~~cooldown~~**second Cooldown**)**.**\n~~Taking~~**Cooldown** ~~down~~**is** **refreshed when** an enemy champion ~~refreshes~~**has** ~~the~~**been** ~~cooldown~~**taken down**."
         }
       ],
       "goldens": [],
@@ -17327,7 +17347,7 @@
           "before": "**Ever Rising Moon**: Hitting the same enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's maximum Health (3.5% for ranged champions), and grants you a shield equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds. (6s cooldown)",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Ever Rising Moon~~**~~: Hitting ~~the same~~**an** enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's ~~maximum~~**Max** Health (3.5% for ranged champions), and grants you a shield **that absorbs damage** equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds~~.~~ (6~~s~~ ~~cooldown~~**second Cooldown**)**.**"
+          "wordDiff": "~~\\*\\*~~Ever Rising Moon~~\\*\\*~~: Hitting ~~the same~~**an** enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's ~~maximum~~**Max** Health (3.5% for ranged champions), and grants you a shield **that absorbs damage** equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds~~.~~ (6~~s~~ ~~cooldown~~**second Cooldown**)**.**"
         }
       ],
       "goldens": [],
@@ -17362,7 +17382,7 @@
           "before": "**Spellblade**: After casting an ability, your next basic attack within 10 seconds deals bonus physical damage equal to 135% × base Attack Damage + 0 - 80 (0.8 per 1% Critical Rate) and restores Mana equal to 50% of the damage dealt. (1.5 second cooldown)",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Spellblade~~**~~: After casting an ability, your next basic attack within 10 seconds deals bonus physical damage equal to 135% ~~×~~ base Attack Damage + 0 ~~-~~ **–**80 (**increased by** 0.8 per 1% Critical Rate) and restores Mana equal to 50% of the damage dealt. (1.5 second ~~cooldown~~**Cooldown**)"
+          "wordDiff": "~~\\*\\*~~Spellblade~~\\*\\*~~: After casting an ability, your next basic attack within 10 seconds deals bonus physical damage equal to 135% ~~×~~ base Attack Damage + 0 ~~-~~ **–**80 (**increased by** 0.8 per 1% Critical Rate) and restores Mana equal to 50% of the damage dealt. (1.5 second ~~cooldown~~**Cooldown**)"
         }
       ],
       "goldens": [],
@@ -17416,7 +17436,7 @@
           "before": "**Ignite**: Damaging abilities deal 5 bonus magic damage over 3 seconds. Against monsters, deal an additional 15 magic damage.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**Ignite**~~**Kindle**: Damaging abilities deal 5 bonus magic damage over 3 seconds. ~~Against monsters, deal~~\n**Deals** an additional 15 magic damage **to monsters**."
+          "wordDiff": "~~\\*\\*Ignite\\*\\*~~**Kindle**: Damaging abilities deal 5 bonus magic damage over 3 seconds. ~~Against monsters, deal~~\n**Deals** an additional 15 magic damage **to monsters**."
         }
       ],
       "goldens": [],
@@ -17464,7 +17484,7 @@
               "before": "7"
             }
           ],
-          "wordDiff": "~~**~~Absorb~~**~~: Taking ~~magic~~**ability** damage from enemy champions grants 1 Steadfast stack **for 7 seconds**, up to 4~~,~~ ~~for 7 seconds~~**stacks**. Dealing damage to enemy champions refreshes the duration. At max stacks, gain 6% Movement Speed and 70 bonus Magic Resist."
+          "wordDiff": "~~\\*\\*~~Absorb~~\\*\\*~~: Taking ~~magic~~**ability** damage from enemy champions grants 1 Steadfast stack **for 7 seconds**, up to 4~~,~~ ~~for 7 seconds~~**stacks**. Dealing damage to enemy champions refreshes the duration. At max stacks, gain 6% Movement Speed and 70 bonus Magic Resist."
         }
       ],
       "goldens": [],
@@ -17479,7 +17499,7 @@
           "before": "**Winter's Caress**: All enemy champions within 650 units lose 25% Attack Speed.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Winter's Caress~~**~~: All enemy champions within 650 units lose 25% Attack Speed."
+          "wordDiff": "~~\\*\\*~~Winter's Caress~~\\*\\*~~: All enemy champions within 650 units lose 25% Attack Speed."
         }
       ],
       "goldens": [],
@@ -17612,7 +17632,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Wrath~~**~~: Attacks deal 30 bonus magic damage **on hit**.\n~~**~~Seething Strike~~**~~: Basic attacks grant 8% Attack Speed, stacking up to 4 times ~~(up~~**for** ~~to~~**a** **maximum of** 32%~~)~~ **Attack Speed**. At max stacks, every 3rd basic attack ~~triggers 1 additional~~**applies** on-hit ~~effect~~**effects 1 additional time**."
+          "wordDiff": "~~\\*\\*~~Wrath~~\\*\\*~~: Attacks deal 30 bonus magic damage **on hit**.\n~~\\*\\*~~Seething Strike~~\\*\\*~~: Basic attacks grant 8% Attack Speed, stacking up to 4 times ~~(up~~**for** ~~to~~**a** **maximum of** 32%~~)~~ **Attack Speed**. At max stacks, every 3rd basic attack ~~triggers 1 additional~~**applies** on-hit ~~effect~~**effects 1 additional time**."
         }
       ],
       "goldens": [],
@@ -17642,7 +17662,7 @@
           "before": "**Harmonic Echo**: When you heal or shield an allied champion, the effect links to the nearest allied champion within 800 units with the lowest percentage Health, excluding yourself, and grants them 30% of that heal or 35% of that shield. If no other allied champion is in range, the original target instead receives that same extra heal or shield.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Harmonic Echo~~**~~: When you heal or shield an allied champion, the effect links to the ~~nearest~~ allied champion within 800 units with the lowest percentage Health, ~~excluding yourself,~~ and grants them 30% of that heal or 35% of that shield. \nIf no other allied champion is in range, the original target instead receives that ~~same extra~~ heal or shield."
+          "wordDiff": "~~\\*\\*~~Harmonic Echo~~\\*\\*~~: When you heal or shield an allied champion, the effect links to the ~~nearest~~ allied champion within 800 units with the lowest percentage Health, ~~excluding yourself,~~ and grants them 30% of that heal or 35% of that shield. \nIf no other allied champion is in range, the original target instead receives that ~~same extra~~ heal or shield."
         }
       ],
       "goldens": [],
@@ -17764,7 +17784,7 @@
           "before": "IMMOLATE: While in combat, deal Magic Damage equal to (20 ~ 30 + 1% Bonus Health) per second for 5s. Deals 125% Damage against monsters and 200% Damage against minions. DESOLATE: Killing a neutral monster or an enemy deals Magic Damage equal to (30 + 2% Bonus Health) in an area around them.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~IMMOLATE~~**Immolate**: While in combat, deal ~~Magic~~**magic** ~~Damage~~**damage** equal to (20 ~~~~~ **–**30 + 1% ~~Bonus~~**bonus** Health) per second **to nearby enemies** for 5~~s~~ **seconds**. Deals 125% ~~Damage~~**damage** against ~~monsters~~**minions** and 200% ~~Damage~~**damage** against ~~minions~~**monsters**. ~~DESOLATE~~\n**Desolate**: Killing a neutral monster or an enemy deals ~~Magic~~**magic** ~~Damage~~**damage** equal to (30 + 2% ~~Bonus~~**bonus** Health) in an area around them."
+          "wordDiff": "~~IMMOLATE~~**Immolate**: While in combat, deal ~~Magic~~**magic** ~~Damage~~**damage** equal to (20 ~~\\~~~ **–**30 + 1% ~~Bonus~~**bonus** Health) per second **to nearby enemies** for 5~~s~~ **seconds**. Deals 125% ~~Damage~~**damage** against ~~monsters~~**minions** and 200% ~~Damage~~**damage** against ~~minions~~**monsters**. ~~DESOLATE~~\n**Desolate**: Killing a neutral monster or an enemy deals ~~Magic~~**magic** ~~Damage~~**damage** equal to (30 + 2% ~~Bonus~~**bonus** Health) in an area around them."
         }
       ],
       "goldens": [],
@@ -17788,7 +17808,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Hypershot~~**~~: Damaging an enemy champion with an ability from at least 600 units away reveals them for 8 seconds and increases ~~the~~ damage ~~you deal~~**dealt** to them by 10%.\n~~**~~Focus~~**~~: When Hypershot ~~triggers~~**is triggered**, ~~every~~**reveals** ~~other~~**all** enemy ~~champion~~**champions** within ~~1200~~**1,200** units of the target ~~is revealed~~ for 3 seconds~~.~~ (12~~s~~ ~~cooldown~~**second Cooldown**)**.**"
+          "wordDiff": "~~\\*\\*~~Hypershot~~\\*\\*~~: Damaging an enemy champion with an ability from at least 600 units away reveals them for 8 seconds and increases ~~the~~ damage ~~you deal~~**dealt** to them by 10%.\n~~\\*\\*~~Focus~~\\*\\*~~: When Hypershot ~~triggers~~**is triggered**, ~~every~~**reveals** ~~other~~**all** enemy ~~champion~~**champions** within ~~1200~~**1,200** units of the target ~~is revealed~~ for 3 seconds~~.~~ (12~~s~~ ~~cooldown~~**second Cooldown**)**.**"
         }
       ],
       "goldens": [
@@ -17827,7 +17847,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**Set Sail**: +5% Movement Speed.\n**~~Skipper~~**~~: Every 4th attack against champions and epic monsters deals bonus physical damage equal to 160% base Attack Damage + 5% ~~bonus~~**max** Health (ranged champions deal 40% of ~~this~~**the** damage), increased to 240% base Attack Damage + 9% ~~bonus~~**max** Health against structures (ranged champions deal 40% of ~~this~~**the** damage).\n~~**~~Boarding Party~~**~~: Nearby allied siege and super minions gain 20~~-~~**–**130 Armor ~~(25% for ranged champions)~~ and 10~~-~~**–**120 Magic Resist (~~25% for~~**based** ~~ranged~~**on** ~~champions~~**level**), ~~scaling~~**increased** ~~with~~**by** ~~level~~**25% if you are a ranged champion**."
+          "wordDiff": "~~\\*\\*Set Sail\\*\\*: +5% Movement Speed.\n\\*\\*~~Skipper~~\\*\\*~~: Every 4th attack against champions and epic monsters deals bonus physical damage equal to 160% base Attack Damage + 5% ~~bonus~~**max** Health (ranged champions deal 40% of ~~this~~**the** damage), increased to 240% base Attack Damage + 9% ~~bonus~~**max** Health against structures (ranged champions deal 40% of ~~this~~**the** damage).\n~~\\*\\*~~Boarding Party~~\\*\\*~~: Nearby allied siege and super minions gain 20~~-~~**–**130 Armor ~~(25% for ranged champions)~~ and 10~~-~~**–**120 Magic Resist (~~25% for~~**based** ~~ranged~~**on** ~~champions~~**level**), ~~scaling~~**increased** ~~with~~**by** ~~level~~**25% if you are a ranged champion**."
         }
       ],
       "goldens": [],
@@ -17942,7 +17962,7 @@
           "before": "**Control**: Crowd Control abilities gain 20 Ability Haste.\n**Command**: Crowd-controlling an enemy champion marks them for 4 seconds, causing them to take 7% increased damage during that time.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Control~~**~~: Crowd Control abilities gain 20 Ability Haste.\n~~**~~Command~~**~~: Crowd-controlling an enemy champion marks them for 4 seconds, causing them to take 7% increased damage during that time."
+          "wordDiff": "~~\\*\\*~~Control~~\\*\\*~~: Crowd Control abilities gain 20 Ability Haste.\n~~\\*\\*~~Command~~\\*\\*~~: Crowd-controlling an enemy champion marks them for 4 seconds, causing them to take 7% increased damage during that time."
         }
       ],
       "goldens": [],
@@ -17957,7 +17977,7 @@
           "before": "**Infinity**: Critical strike damage increased from 200% to 230%.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Infinity~~**~~: Critical strike damage increased from 200% to 230%."
+          "wordDiff": "~~\\*\\*~~Infinity~~\\*\\*~~: Critical strike damage increased from 200% to 230%."
         }
       ],
       "goldens": [],
@@ -17977,7 +17997,7 @@
               "before": "15"
             }
           ],
-          "wordDiff": "~~**Balance**: +15 Magic Penetration.\n**~~Inevitable Demise~~**~~: Abilities and empowered attacks Critically Strike for 20% bonus damage against enemies below 40% Health."
+          "wordDiff": "~~\\*\\*Balance\\*\\*: +15 Magic Penetration.\n\\*\\*~~Inevitable Demise~~\\*\\*~~: Abilities and empowered attacks Critically Strike for 20% bonus damage against enemies below 40% Health."
         }
       ],
       "goldens": [
@@ -18046,7 +18066,7 @@
           "before": "**Shock**: Dealing damage to an enemy champion deals 40 bonus magic damage (25 second cooldown). Attacks reduce this cooldown by 1 second.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Shock~~**~~: ~~Dealing damage to~~**Damaging** an enemy champion ~~deals~~**adds** 40 ~~bonus~~ magic damage **.**\n(25 second ~~cooldown)~~**Cooldown**. ~~Attacks~~**Each** ~~reduce~~**basic** ~~this~~**attack** **reduces the remaining** cooldown by 1 second.**)**"
+          "wordDiff": "~~\\*\\*~~Shock~~\\*\\*~~: ~~Dealing damage to~~**Damaging** an enemy champion ~~deals~~**adds** 40 ~~bonus~~ magic damage **.**\n(25 second ~~cooldown)~~**Cooldown**. ~~Attacks~~**Each** ~~reduce~~**basic** ~~this~~**attack** **reduces the remaining** cooldown by 1 second.**)**"
         }
       ],
       "goldens": [],
@@ -18076,7 +18096,7 @@
           "before": "**Bring It Down**: Every third attack deals 150 - 210 bonus physical damage, or 120 - 168 for ranged champions. This damage is increased based on the target's missing Health. For every 1% Health the target is missing, damage increases by 0.75%, up to 75%.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Bring It Down~~**~~: Every third attack deals 150 ~~-~~ **–**210 bonus physical damage~~,~~ ~~or~~ **(**120 ~~-~~ **–**168 for ranged champions~~. This damage is increased based on the target's missing Health~~**)**. For every 1% Health the target is missing, **this** damage increases by 0.75%~~,~~**.\nThe** ~~up~~**increase** ~~to~~**is** **capped at** 75%."
+          "wordDiff": "~~\\*\\*~~Bring It Down~~\\*\\*~~: Every third attack deals 150 ~~-~~ **–**210 bonus physical damage~~,~~ ~~or~~ **(**120 ~~-~~ **–**168 for ranged champions~~. This damage is increased based on the target's missing Health~~**)**. For every 1% Health the target is missing, **this** damage increases by 0.75%~~,~~**.\nThe** ~~up~~**increase** ~~to~~**is** **capped at** 75%."
         }
       ],
       "goldens": [],
@@ -18116,7 +18136,7 @@
               "before": "2%"
             }
           ],
-          "wordDiff": "~~**~~Torment~~**~~: Damaging abilities ~~and~~**or** empowered attacks ~~burn~~**deal** **2% of** the ~~enemy~~**target's** ~~for~~**max** ~~3~~**Health** ~~seconds,~~**as** ~~dealing~~**bonus** magic damage ~~equal to 2% of their~~**each** ~~maximum~~**second,** ~~Health~~**over** ~~per~~**3** ~~second~~**seconds**.\n~~**~~Madness~~**~~: While ~~in combat with~~**fighting** enemy champions, ~~the damage you~~ deal ~~increases~~**2%** ~~by~~**additional** ~~2%~~**damage** each second, ~~reaching a maximum~~**up** ~~of~~**to** 6% after 3 seconds."
+          "wordDiff": "~~\\*\\*~~Torment~~\\*\\*~~: Damaging abilities ~~and~~**or** empowered attacks ~~burn~~**deal** **2% of** the ~~enemy~~**target's** ~~for~~**max** ~~3~~**Health** ~~seconds,~~**as** ~~dealing~~**bonus** magic damage ~~equal to 2% of their~~**each** ~~maximum~~**second,** ~~Health~~**over** ~~per~~**3** ~~second~~**seconds**.\n~~\\*\\*~~Madness~~\\*\\*~~: While ~~in combat with~~**fighting** enemy champions, ~~the damage you~~ deal ~~increases~~**2%** ~~by~~**additional** ~~2%~~**damage** each second, ~~reaching a maximum~~**up** ~~of~~**to** 6% after 3 seconds."
         }
       ],
       "goldens": [
@@ -18259,7 +18279,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Awe~~**~~: Gain Attack Damage equal to 2% of max Mana and refund 15% of total Mana spent.\n~~**~~Mana Charge~~**~~: Basic attacks and Mana expenditure grant 14 max Mana~~,~~**.** ~~up~~**Transforms** ~~to~~**into** ~~700,~~**Muramana** at ~~which point this item upgrades~~**700** ~~into~~**max** ~~Muramana~~**Mana**. Triggers at most 3 times every 10 seconds. ~~Limited~~**You** ~~to~~**may** **only carry** one Tear of the Goddess item **at a time**."
+          "wordDiff": "~~\\*\\*~~Awe~~\\*\\*~~: Gain Attack Damage equal to 2% of max Mana and refund 15% of total Mana spent.\n~~\\*\\*~~Mana Charge~~\\*\\*~~: Basic attacks and Mana expenditure grant 14 max Mana~~,~~**.** ~~up~~**Transforms** ~~to~~**into** ~~700,~~**Muramana** at ~~which point this item upgrades~~**700** ~~into~~**max** ~~Muramana~~**Mana**. Triggers at most 3 times every 10 seconds. ~~Limited~~**You** ~~to~~**may** **only carry** one Tear of the Goddess item **at a time**."
         }
       ],
       "goldens": [],
@@ -18307,7 +18327,7 @@
               "before": "20%"
             }
           ],
-          "wordDiff": "~~**~~Lifeline~~**~~: When you ~~drop~~**take** **damage that drops you** below 30% ~~max~~ Health, ~~immediately~~ gain 200 ~~-~~ **–**300 bonus Health for 5 seconds**. Also gain 10% bonus Movement Speed**, **20% Tenacity,** and ~~heal~~**10%** ~~over~~**size** **for** 5 seconds**.** **During this time, heal** for 200**–400** ~~-~~**(based** ~~400~~**on** **level)** + 120% bonus Armor + 120% bonus Magic Resistance + 15% ~~bonus~~ Health~~.~~ ~~During this time, gain 10% size, 10% bonus Movement Speed, and 20% Tenacity.~~ (70 second ~~cooldown~~**Cooldown**)**.**"
+          "wordDiff": "~~\\*\\*~~Lifeline~~\\*\\*~~: When you ~~drop~~**take** **damage that drops you** below 30% ~~max~~ Health, ~~immediately~~ gain 200 ~~-~~ **–**300 bonus Health for 5 seconds**. Also gain 10% bonus Movement Speed**, **20% Tenacity,** and ~~heal~~**10%** ~~over~~**size** **for** 5 seconds**.** **During this time, heal** for 200**–400** ~~-~~**(based** ~~400~~**on** **level)** + 120% bonus Armor + 120% bonus Magic Resistance + 15% ~~bonus~~ Health~~.~~ ~~During this time, gain 10% size, 10% bonus Movement Speed, and 20% Tenacity.~~ (70 second ~~cooldown~~**Cooldown**)**.**"
         }
       ],
       "goldens": [],
@@ -18423,7 +18443,7 @@
           "before": "**Sepsis**: Physical damage dealt to enemy champions applies 50% Grievous Wounds for 3 seconds.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Sepsis~~**~~: Physical damage dealt to enemy champions applies 50% Grievous Wounds for 3 seconds."
+          "wordDiff": "~~\\*\\*~~Sepsis~~\\*\\*~~: Physical damage dealt to enemy champions applies 50% Grievous Wounds for 3 seconds."
         }
       ],
       "goldens": [],
@@ -18438,7 +18458,7 @@
           "before": "**Gnaw**: Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Gnaw~~**~~: Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit."
+          "wordDiff": "~~\\*\\*~~Gnaw~~\\*\\*~~: Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit."
         },
         {
           "after": "Physical",
@@ -18493,7 +18513,7 @@
           "before": "**Lethal Weapon**: Dealing ability damage to an enemy champion reduces any shields they gain for 3 seconds. Area of effect abilities reduce shield value by (5% Ability Power + 25)%, capped at 45%; single target abilities reduce it by (5% Ability Power + 40)%, capped at 60%. When you damage an enemy not yet affected by Lethal Weapon, all shields on them are reduced by the same amount.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Lethal Weapon~~**~~: Dealing ability damage to an enemy champion reduces any shields they gain for 3 seconds. Area of effect abilities ~~reduce shield value by~~**apply** (5% Ability Power + 25)% **shield reduction**, capped at 45%; single target abilities ~~reduce it by~~**apply** (5% Ability Power + 40)% **shield reduction**, capped at 60%. When you damage an enemy ~~not~~**who** ~~yet~~**is** ~~affected~~**unaffected** by Lethal Weapon, all shields on them are reduced by the same ~~amount~~**values**."
+          "wordDiff": "~~\\*\\*~~Lethal Weapon~~\\*\\*~~: Dealing ability damage to an enemy champion reduces any shields they gain for 3 seconds. Area of effect abilities ~~reduce shield value by~~**apply** (5% Ability Power + 25)% **shield reduction**, capped at 45%; single target abilities ~~reduce it by~~**apply** (5% Ability Power + 40)% **shield reduction**, capped at 60%. When you damage an enemy ~~not~~**who** ~~yet~~**is** ~~affected~~**unaffected** by Lethal Weapon, all shields on them are reduced by the same ~~amount~~**values**."
         }
       ],
       "goldens": [],
@@ -18523,7 +18543,7 @@
           "before": "**Rage**: Each time a basic attack hits a unit, gain 20 Movement Speed for 2 seconds. This Movement Speed bonus does not stack, and the effect is halved for ranged champions.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Rage~~**~~: ~~Each time a~~**A** basic attack ~~hits a unit, gain~~**grants** 20 Movement Speed for 2 seconds. ~~This Movement Speed~~**Repeated** ~~bonus~~**hits** ~~does~~**do** not stack~~,~~ ~~and~~ the ~~effect~~**speed** ~~is~~**bonus.** ~~halved~~**Halved** for ranged champions."
+          "wordDiff": "~~\\*\\*~~Rage~~\\*\\*~~: ~~Each time a~~**A** basic attack ~~hits a unit, gain~~**grants** 20 Movement Speed for 2 seconds. ~~This Movement Speed~~**Repeated** ~~bonus~~**hits** ~~does~~**do** not stack~~,~~ ~~and~~ the ~~effect~~**speed** ~~is~~**bonus.** ~~halved~~**Halved** for ranged champions."
         }
       ],
       "goldens": [],
@@ -18538,7 +18558,7 @@
           "before": "**Spectral Waltz**: Landing a basic attack on a champion grants 6% Attack Speed and 1% Movement Speed for 6 seconds, stacking up to 5 times.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Spectral Waltz~~**~~: Landing a basic attack on a champion grants 6% Attack Speed and 1% Movement Speed for 6 seconds, stacking up to 5 times."
+          "wordDiff": "~~\\*\\*~~Spectral Waltz~~\\*\\*~~: Landing a basic attack on a champion grants 6% Attack Speed and 1% Movement Speed for 6 seconds, stacking up to 5 times."
         }
       ],
       "goldens": [],
@@ -18710,7 +18730,7 @@
               "before": "30%"
             }
           ],
-          "wordDiff": "~~**~~Countercurrent~~**~~: ~~Taking~~**Gain** ~~physical~~**1** ~~critical~~**stack** ~~strike~~**of** ~~damage~~**Countercurrent** ~~grants~~**when** ~~1~~**Critically** ~~stack~~**Struck** ~~of~~**by** ~~Countercurrent~~**physical damage**. Each stack grants 5% Movement Speed and 5% Slow Resist~~, up~~**.** ~~to~~**Max** 4 stacks.\n~~**~~Resilience~~**~~: ~~Physical critical strike~~**Critical** ~~damage~~**Strikes** ~~dealt~~**deal** ~~to~~**30%** ~~you~~**less** ~~is~~**physical** ~~reduced~~**damage** ~~by~~**to** ~~30%~~**you**."
+          "wordDiff": "~~\\*\\*~~Countercurrent~~\\*\\*~~: ~~Taking~~**Gain** ~~physical~~**1** ~~critical~~**stack** ~~strike~~**of** ~~damage~~**Countercurrent** ~~grants~~**when** ~~1~~**Critically** ~~stack~~**Struck** ~~of~~**by** ~~Countercurrent~~**physical damage**. Each stack grants 5% Movement Speed and 5% Slow Resist~~, up~~**.** ~~to~~**Max** 4 stacks.\n~~\\*\\*~~Resilience~~\\*\\*~~: ~~Physical critical strike~~**Critical** ~~damage~~**Strikes** ~~dealt~~**deal** ~~to~~**30%** ~~you~~**less** ~~is~~**physical** ~~reduced~~**damage** ~~by~~**to** ~~30%~~**you**."
         }
       ],
       "goldens": [],
@@ -18796,7 +18816,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "Support item. ~~Gold~~**When** ~~earned~~**equipped,** **it reduces the gold you receive** from killing minions and monsters**.** ~~is~~**If** ~~reduced.~~**there** ~~Only~~**are** ~~one~~**multiples** ~~support~~**of** **this** item **within the team, only one of them** can ~~be~~**take** ~~active~~**effect** ~~per~~**at** ~~team~~**any given time**.\n~~**~~Tribute~~**~~: Gain ~~an~~**1** ~~orbiting~~**encircling** energy orb every 30 seconds (~~up to~~**max** 3 **orbs**). While near an ally, the ~~following~~**actions** ~~consume~~**below** **trigger Tribute, consuming** 1 **energy** orb to grant **you** 65 gold and restore 20~~-~~**–**80 Health~~:~~ **.**\n1. ~~Damaging an enemy~~**Using** ~~champion~~**abilities** or ~~structure~~**attacks** ~~with~~**to** ~~an~~**damage** ~~ability~~**enemy** ~~or~~**champions** ~~basic~~**or** ~~attack~~**structures**. \n2. Attacking ~~a minion~~**minions** below 65% Health~~,~~**.** ~~which~~**This** **also** executes ~~it~~**them,** and ~~gives~~ the ~~full~~**gold** **generated from the** minion ~~gold~~**kill** **is given** to ~~your~~**the** **ally** nearest ~~ally.~~**to** **you.**\n3. A nearby minion ~~dying~~**is** **killed** while you ~~hold~~**have** 3 orbs.\n**Upon** ~~When~~**triggering** Tribute ~~triggers~~, ~~your~~**the** **ally** nearest ~~ally~~**to** **you** gains a ~~stack of~~ Tribute **stack**.\n~~**Sentinel**~~**Sentry**: Deal 1 ~~bonus~~**more** damage to ~~Scryer's~~**Sight** ~~Bloom,~~**Wards** **revealed by** Sweeping Lens ~~and~~**,** Control Ward**,** ~~revealed~~**and** ~~wards~~**Scryer's Bloom**.\n~~**Suppression**~~**Restraint**: You do not ~~collect~~**earn** ~~minion~~**gold** ~~kill~~**generated** ~~gold~~**from minion kills**, but you earn **gold equal to** 50% of the bounty**.** ~~on~~**The** ~~your~~**gold** ~~own;~~**generated** ~~the~~**from** **your** minion ~~gold~~**kills** ~~goes~~**is** **given** to ~~your~~**the** **ally** nearest ~~ally~~**to** ~~instead~~**you**. ~~Monster~~**Gold** ~~gold~~**earned** **from monster kills** is reduced by 50%.\n~~**~~Quest~~**~~: After earning 750 gold**,** this item upgrades into Bulwark of the Mountain~~,~~ and **binds you and** the ally with the most Tribute stacks ~~becomes your~~**as** Perfect ~~Partner~~**Partners**."
+          "wordDiff": "Support item. ~~Gold~~**When** ~~earned~~**equipped,** **it reduces the gold you receive** from killing minions and monsters**.** ~~is~~**If** ~~reduced.~~**there** ~~Only~~**are** ~~one~~**multiples** ~~support~~**of** **this** item **within the team, only one of them** can ~~be~~**take** ~~active~~**effect** ~~per~~**at** ~~team~~**any given time**.\n~~\\*\\*~~Tribute~~\\*\\*~~: Gain ~~an~~**1** ~~orbiting~~**encircling** energy orb every 30 seconds (~~up to~~**max** 3 **orbs**). While near an ally, the ~~following~~**actions** ~~consume~~**below** **trigger Tribute, consuming** 1 **energy** orb to grant **you** 65 gold and restore 20~~-~~**–**80 Health~~:~~ **.**\n1. ~~Damaging an enemy~~**Using** ~~champion~~**abilities** or ~~structure~~**attacks** ~~with~~**to** ~~an~~**damage** ~~ability~~**enemy** ~~or~~**champions** ~~basic~~**or** ~~attack~~**structures**. \n2. Attacking ~~a minion~~**minions** below 65% Health~~,~~**.** ~~which~~**This** **also** executes ~~it~~**them,** and ~~gives~~ the ~~full~~**gold** **generated from the** minion ~~gold~~**kill** **is given** to ~~your~~**the** **ally** nearest ~~ally.~~**to** **you.**\n3. A nearby minion ~~dying~~**is** **killed** while you ~~hold~~**have** 3 orbs.\n**Upon** ~~When~~**triggering** Tribute ~~triggers~~, ~~your~~**the** **ally** nearest ~~ally~~**to** **you** gains a ~~stack of~~ Tribute **stack**.\n~~\\*\\*Sentinel\\*\\*~~**Sentry**: Deal 1 ~~bonus~~**more** damage to ~~Scryer's~~**Sight** ~~Bloom,~~**Wards** **revealed by** Sweeping Lens ~~and~~**,** Control Ward**,** ~~revealed~~**and** ~~wards~~**Scryer's Bloom**.\n~~\\*\\*Suppression\\*\\*~~**Restraint**: You do not ~~collect~~**earn** ~~minion~~**gold** ~~kill~~**generated** ~~gold~~**from minion kills**, but you earn **gold equal to** 50% of the bounty**.** ~~on~~**The** ~~your~~**gold** ~~own;~~**generated** ~~the~~**from** **your** minion ~~gold~~**kills** ~~goes~~**is** **given** to ~~your~~**the** **ally** nearest ~~ally~~**to** ~~instead~~**you**. ~~Monster~~**Gold** ~~gold~~**earned** **from monster kills** is reduced by 50%.\n~~\\*\\*~~Quest~~\\*\\*~~: After earning 750 gold**,** this item upgrades into Bulwark of the Mountain~~,~~ and **binds you and** the ally with the most Tribute stacks ~~becomes your~~**as** Perfect ~~Partner~~**Partners**."
         }
       ],
       "goldens": [],
@@ -18824,7 +18844,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Void Corruption~~**~~: While ~~in combat with~~**fighting** enemy champions, ~~the damage you~~ deal ~~increases by~~ 2% ~~every~~**additional** ~~1~~**damage** **each** second, up to 8%. ~~While at~~**At** maximum **strength**, gain Omnivamp ~~(10%~~**equal** ~~for~~**to** ~~melee~~**10%** ~~champions~~**(melee)** / 6% ~~for~~ **(**ranged ~~champions~~).\n~~**~~Void Infusion~~**~~: Gain Ability Power equal to 2% of your bonus Health."
+          "wordDiff": "~~\\*\\*~~Void Corruption~~\\*\\*~~: While ~~in combat with~~**fighting** enemy champions, ~~the damage you~~ deal ~~increases by~~ 2% ~~every~~**additional** ~~1~~**damage** **each** second, up to 8%. ~~While at~~**At** maximum **strength**, gain Omnivamp ~~(10%~~**equal** ~~for~~**to** ~~melee~~**10%** ~~champions~~**(melee)** / 6% ~~for~~ **(**ranged ~~champions~~).\n~~\\*\\*~~Void Infusion~~\\*\\*~~: Gain Ability Power equal to 2% of your bonus Health."
         }
       ],
       "goldens": [
@@ -18859,7 +18879,7 @@
           "before": "**Wind's Fury**: Basic attacks fire mini bolts at 2 nearby targets on hit, each dealing 55% physical damage. These bolts can crit and apply on-hit effects.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Wind's Fury~~**~~: Basic attacks fire mini bolts at 2 nearby ~~targets~~**enemies** on hit, each dealing 55% **Attack Damage as** physical damage. These bolts can crit and apply on-hit effects."
+          "wordDiff": "~~\\*\\*~~Wind's Fury~~\\*\\*~~: Basic attacks fire mini bolts at 2 nearby ~~targets~~**enemies** on hit, each dealing 55% **Attack Damage as** physical damage. These bolts can crit and apply on-hit effects."
         }
       ],
       "goldens": [],
@@ -18919,7 +18939,7 @@
           "before": "**Icy**: Damaging active abilities and empowered attacks slow enemies below 60% current Health by 30% Movement Speed for 1 second.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Icy~~**~~: Damaging active abilities and empowered attacks slow enemies below 60% ~~current~~ Health by 30% ~~Movement Speed~~ for 1 second."
+          "wordDiff": "~~\\*\\*~~Icy~~\\*\\*~~: Damaging active abilities and empowered attacks slow enemies below 60% ~~current~~ Health by 30% ~~Movement Speed~~ for 1 second."
         }
       ],
       "goldens": [],
@@ -19105,7 +19125,7 @@
           "before": "**Rapids**: Shielding or healing an allied champion other than yourself empowers both you and that champion for 6 seconds, granting 40 Ability Power and 15 Ability Haste.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Rapids~~**~~: Shielding or healing an allied champion other than yourself empowers both you and that champion for 6 seconds, granting 40 Ability Power and 15 Ability Haste."
+          "wordDiff": "~~\\*\\*~~Rapids~~\\*\\*~~: Shielding or healing an allied champion other than yourself empowers both you and that champion for 6 seconds, granting 40 Ability Power and 15 Ability Haste."
         }
       ],
       "goldens": [],
@@ -19177,7 +19197,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Heavy Handed~~**~~: ~~+~~**Gain** 50% base Attack Damage as bonus Attack Damage.\n~~**~~Lifeline~~**~~: Damage that puts you under 35% Health grants a shield equal to 75% bonus Health that decays over 5 seconds. \n(70 second ~~cooldown~~**Cooldown**)\n~~**~~Sterak's Fury~~**~~: Triggering Lifeline increases size and ~~strength~~**grants** **30% Tenacity** for 8 seconds."
+          "wordDiff": "~~\\*\\*~~Heavy Handed~~\\*\\*~~: ~~+~~**Gain** 50% base Attack Damage as bonus Attack Damage.\n~~\\*\\*~~Lifeline~~\\*\\*~~: Damage that puts you under 35% Health grants a shield equal to 75% bonus Health that decays over 5 seconds. \n(70 second ~~cooldown~~**Cooldown**)\n~~\\*\\*~~Sterak's Fury~~\\*\\*~~: Triggering Lifeline increases size and ~~strength~~**grants** **30% Tenacity** for 8 seconds."
         }
       ],
       "goldens": [],
@@ -19286,7 +19306,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Immolate~~**~~: ~~Upon~~**While** ~~entering~~**in** combat, deals 20 + 1.5% bonus Health ~~Magic~~**magic** ~~Damage~~**damage** to nearby enemies every second. \nImmolate deals ~~175%–250%~~**130%** damage to ~~minions~~**monsters** and ~~130%~~**175–250%** damage to ~~monsters~~**minions (based on level)**."
+          "wordDiff": "~~\\*\\*~~Immolate~~\\*\\*~~: ~~Upon~~**While** ~~entering~~**in** combat, deals 20 + 1.5% bonus Health ~~Magic~~**magic** ~~Damage~~**damage** to nearby enemies every second. \nImmolate deals ~~175%–250%~~**130%** damage to ~~minions~~**monsters** and ~~130%~~**175–250%** damage to ~~monsters~~**minions (based on level)**."
         }
       ],
       "goldens": [],
@@ -19301,7 +19321,7 @@
           "before": "**Awe**: Refunds 10% of the mana you spend.\n**Mana Charge**: Each time you spend Mana, gain +5 Max Mana, up to 700 bonus Mana. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess series item at a time.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Awe~~**~~: ~~Refunds~~ 10% of ~~the~~**Mana** ~~mana~~**spent** ~~you~~**is** ~~spend~~**refunded**.\n~~**~~Mana Charge~~**~~: ~~Each time you~~**Increases** ~~spend~~**max** Mana~~,~~ ~~gain~~**by** ~~+~~5 ~~Max~~**every** **time** Mana~~,~~ ~~up~~**is** ~~to~~**spent.** **Caps at** 700 bonus Mana. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess ~~series~~ item at a time."
+          "wordDiff": "~~\\*\\*~~Awe~~\\*\\*~~: ~~Refunds~~ 10% of ~~the~~**Mana** ~~mana~~**spent** ~~you~~**is** ~~spend~~**refunded**.\n~~\\*\\*~~Mana Charge~~\\*\\*~~: ~~Each time you~~**Increases** ~~spend~~**max** Mana~~,~~ ~~gain~~**by** ~~+~~5 ~~Max~~**every** **time** Mana~~,~~ ~~up~~**is** ~~to~~**spent.** **Caps at** 700 bonus Mana. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess ~~series~~ item at a time."
         }
       ],
       "goldens": [],
@@ -19345,7 +19365,7 @@
               "before": "10"
             }
           ],
-          "wordDiff": "~~**Killer**: +10 Armor Penetration.\n**~~Death and Taxes~~**~~: If you deal damage to an enemy champion and leave them below 5% of their max Health, they are executed, permanently increasing the execute threshold by 0.1% of max Health and granting an additional 25 gold."
+          "wordDiff": "~~\\*\\*Killer\\*\\*: +10 Armor Penetration.\n\\*\\*~~Death and Taxes~~\\*\\*~~: If you deal damage to an enemy champion and leave them below 5% of their max Health, they are executed, permanently increasing the execute threshold by 0.1% of max Health and granting an additional 25 gold."
         }
       ],
       "goldens": [],
@@ -19377,7 +19397,7 @@
               "before": "3"
             }
           ],
-          "wordDiff": "~~**~~Thorns~~**~~: When ~~hit~~**struck** by a basic attack, ~~reflect~~**deal** ~~(~~20 + 6% bonus Armor + 1% bonus Health~~)~~ magic damage ~~back~~ to the attacker.\n~~**Entangle**~~**Entwine**: ~~When an~~**Apply** ~~enemy~~**50%** ~~champion~~**Grievous** ~~strikes~~**Wounds** ~~you~~**to** ~~with~~**enemy** ~~a~~**champions** ~~basic~~**for** ~~attack,~~**3** ~~or~~**seconds** when ~~you deal~~**struck** ~~damage~~**by** ~~to~~**their** ~~one,~~**attacks** ~~apply~~**or** ~~50%~~**when** ~~Grievous~~**dealing** ~~Wounds~~**damage** to them ~~for 3 seconds~~."
+          "wordDiff": "~~\\*\\*~~Thorns~~\\*\\*~~: When ~~hit~~**struck** by a basic attack, ~~reflect~~**deal** ~~(~~20 + 6% bonus Armor + 1% bonus Health~~)~~ magic damage ~~back~~ to the attacker.\n~~\\*\\*Entangle\\*\\*~~**Entwine**: ~~When an~~**Apply** ~~enemy~~**50%** ~~champion~~**Grievous** ~~strikes~~**Wounds** ~~you~~**to** ~~with~~**enemy** ~~a~~**champions** ~~basic~~**for** ~~attack,~~**3** ~~or~~**seconds** when ~~you deal~~**struck** ~~damage~~**by** ~~to~~**their** ~~one,~~**attacks** ~~apply~~**or** ~~50%~~**when** ~~Grievous~~**dealing** ~~Wounds~~**damage** to them ~~for 3 seconds~~."
         }
       ],
       "goldens": [],
@@ -19433,7 +19453,7 @@
               "before": "2"
             }
           ],
-          "wordDiff": "~~**~~**Valor: Basic attacks (on-hit) grant 20 flat Movement Speed for 2 seconds. Bonuses do not stack. Ranged champions gain halved values.**\nSpellblade~~**~~: After using an ability, your next basic attack within 10 seconds deals 200% base ~~Attack Damage as~~**AD** bonus physical damage **on-hit.** (1.5 second ~~cooldown~~**Cooldown**)~~.~~\n**Damage** ~~Deals~~**is** reduced ~~damage to~~**vs** structures.\n~~**Valor**: Basic attacks grant 20 (melee) / 10 (ranged) Movement Speed for 2 seconds. Bonuses do not stack.~~"
+          "wordDiff": "~~\\*\\*~~**Valor: Basic attacks (on-hit) grant 20 flat Movement Speed for 2 seconds. Bonuses do not stack. Ranged champions gain halved values.**\nSpellblade~~\\*\\*~~: After using an ability, your next basic attack within 10 seconds deals 200% base ~~Attack Damage as~~**AD** bonus physical damage **on-hit.** (1.5 second ~~cooldown~~**Cooldown**)~~.~~\n**Damage** ~~Deals~~**is** reduced ~~damage to~~**vs** structures.\n~~\\*\\*Valor\\*\\*: Basic attacks grant 20 (melee) / 10 (ranged) Movement Speed for 2 seconds. Bonuses do not stack.~~"
         }
       ],
       "goldens": [
@@ -19552,7 +19572,7 @@
           "before": "**Awe**: Gain bonus Health equal to 15% of max Mana and refund 15% of total Mana spent.\n**Mana Charge**: Basic attacks, Mana expenditure, and taking damage from champions, structures, and epic monsters grant 14 max Mana. This effect grants up to 700 max Mana, at which point this item upgrades into Fimbulwinter, and can trigger at most 3 times every 10 seconds. Limited to one Tear of the Goddess item.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~Awe~~**~~: Gain bonus Health equal to 15% of max Mana and refund 15% of total Mana spent.\n~~**~~Mana Charge~~**~~: Basic attacks, Mana expenditure, and taking damage from champions, structures, and epic monsters grant 14 max Mana. ~~This effect~~**Transforms** ~~grants~~**into** ~~up~~**Fimbulwinter** ~~to~~**at** 700 max Mana~~, at which point this item upgrades into Fimbulwinter, and can~~**.** ~~trigger~~**Triggers** at most 3 times every 10 seconds. ~~Limited~~**You** ~~to~~**may** **only carry** one Tear of the Goddess item **at a time**."
+          "wordDiff": "~~\\*\\*~~Awe~~\\*\\*~~: Gain bonus Health equal to 15% of max Mana and refund 15% of total Mana spent.\n~~\\*\\*~~Mana Charge~~\\*\\*~~: Basic attacks, Mana expenditure, and taking damage from champions, structures, and epic monsters grant 14 max Mana. ~~This effect~~**Transforms** ~~grants~~**into** ~~up~~**Fimbulwinter** ~~to~~**at** 700 max Mana~~, at which point this item upgrades into Fimbulwinter, and can~~**.** ~~trigger~~**Triggers** at most 3 times every 10 seconds. ~~Limited~~**You** ~~to~~**may** **only carry** one Tear of the Goddess item **at a time**."
         }
       ],
       "goldens": [],
@@ -19567,7 +19587,7 @@
           "before": "**Wit's End**: Basic attacks deal 40 bonus magic damage on hit.",
           "field": "description",
           "numbers": [],
-          "wordDiff": "~~**~~**At** Wit's End~~**~~: Basic attacks deal 40 bonus magic damage on hit."
+          "wordDiff": "~~\\*\\*~~**At** Wit's End~~\\*\\*~~: Basic attacks deal 40 bonus magic damage on hit."
         }
       ],
       "goldens": [],
@@ -19607,7 +19627,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Catcher~~**~~: Slowing or immobilizing an enemy champion ~~empowers~~**inspires** you **and nearby allied champions** for 8 ~~/~~**seconds** **(**4~~s,~~ ~~melee~~**seconds** ~~/~~**for** ranged **champions).\nWhile Inspired**, ~~granting~~**gain** 20 Movement Speed~~.~~ ~~During~~**and** ~~this~~**30%** ~~time,~~**bonus** ~~you~~**Attack** ~~and~~**Speed** ~~nearby~~**(20%** ~~allies~~**for** ~~gain~~**ranged** ~~30%~~**champions),** ~~/~~**and** ~~20%~~**allies** **gain** bonus Attack Speed~~,~~ **(30% for** melee ~~/~~**champions,** **20% for** ranged~~.~~ **champions).**\nIf ~~an~~**you** ~~ally,~~**or** ~~including~~**an** ~~you,~~**ally** gets a kill while ~~inspired~~**Inspired**, ~~you~~ gain 20 **bonus** gold."
+          "wordDiff": "~~\\*\\*~~Catcher~~\\*\\*~~: Slowing or immobilizing an enemy champion ~~empowers~~**inspires** you **and nearby allied champions** for 8 ~~/~~**seconds** **(**4~~s,~~ ~~melee~~**seconds** ~~/~~**for** ranged **champions).\nWhile Inspired**, ~~granting~~**gain** 20 Movement Speed~~.~~ ~~During~~**and** ~~this~~**30%** ~~time,~~**bonus** ~~you~~**Attack** ~~and~~**Speed** ~~nearby~~**(20%** ~~allies~~**for** ~~gain~~**ranged** ~~30%~~**champions),** ~~/~~**and** ~~20%~~**allies** **gain** bonus Attack Speed~~,~~ **(30% for** melee ~~/~~**champions,** **20% for** ranged~~.~~ **champions).**\nIf ~~an~~**you** ~~ally,~~**or** ~~including~~**an** ~~you,~~**ally** gets a kill while ~~inspired~~**Inspired**, ~~you~~ gain 20 **bonus** gold."
         }
       ],
       "goldens": [],
@@ -19627,7 +19647,7 @@
               "before": "15"
             }
           ],
-          "wordDiff": "~~**Slice**: +15 Armor Penetration.\n**~~Momentum~~**~~: 3 seconds after combat with enemy champions ends, gain 30 bonus Movement Speed, or 20 for ranged champions."
+          "wordDiff": "~~\\*\\*Slice\\*\\*: +15 Armor Penetration.\n\\*\\*~~Momentum~~\\*\\*~~: 3 seconds after combat with enemy champions ends, gain 30 bonus Movement Speed, or 20 for ranged champions."
         }
       ],
       "goldens": [],
@@ -19712,7 +19732,7 @@
               "before": ""
             }
           ],
-          "wordDiff": "~~**~~Converge~~**~~: Gain 10 ~~ultimate~~**Ultimate** ~~ability~~**Ability** ~~haste~~**Haste**.\n~~**~~Frostfire Tempest~~**~~: Casting your ultimate ability **summons a storm around you for 5 seconds. The storm** deals 150 **total** magic damage ~~and~~**to** ~~slows~~**enemy** ~~enemies~~**champions** within 350 units ~~by~~**and** ~~30%~~**slows** ~~over~~**them** ~~5~~**by** ~~seconds~~**30%**. If no enemy champion is in range when the ultimate is cast, the ~~effect~~**storm** is delayed until ~~up~~**an** ~~to~~**enemy** ~~5~~**champion** ~~seconds~~**enters** ~~later~~**range** or ~~until an~~**up** ~~enemy~~**to** ~~champion~~**5** ~~enters~~**seconds** ~~range.~~**later** (30 second ~~cooldown~~**Cooldown**)**.**"
+          "wordDiff": "~~\\*\\*~~Converge~~\\*\\*~~: Gain 10 ~~ultimate~~**Ultimate** ~~ability~~**Ability** ~~haste~~**Haste**.\n~~\\*\\*~~Frostfire Tempest~~\\*\\*~~: Casting your ultimate ability **summons a storm around you for 5 seconds. The storm** deals 150 **total** magic damage ~~and~~**to** ~~slows~~**enemy** ~~enemies~~**champions** within 350 units ~~by~~**and** ~~30%~~**slows** ~~over~~**them** ~~5~~**by** ~~seconds~~**30%**. If no enemy champion is in range when the ultimate is cast, the ~~effect~~**storm** is delayed until ~~up~~**an** ~~to~~**enemy** ~~5~~**champion** ~~seconds~~**enters** ~~later~~**range** or ~~until an~~**up** ~~enemy~~**to** ~~champion~~**5** ~~enters~~**seconds** ~~range.~~**later** (30 second ~~cooldown~~**Cooldown**)**.**"
         }
       ],
       "goldens": [],
@@ -20244,871 +20264,7 @@
       }
     ]
   },
-  "needsReview": [
-    {
-      "changes": [
-        {
-          "after": "Passive: Gains 10% Armor Pen. Her active abilities heal her for 12.5% of the damage she deals.\nDamaging minions heals her for 25% of the original heal, and damaging monsters heals her for 40% of the original heal.\nThe empowered attacks of Drakehound's Step grant the same healing bonus.\nActive: Seizes the farthest enemy champion in a line in front of her and blinks to them, suppressing the target for 1 second. During this time, she gains 10% damage reduction and is Unstoppable. Ambessa then slams the target into the ground, dealing physical damage equal to 200 plus 10% of their missing Health (10% +0.05% bonus AD +0.05% AP) and stunning them for 0.4 seconds.\nIf Public Execution does not hit an enemy champion, 35% of its cooldown will be refunded.",
-          "before": "Passive: Gains 10% Armor Penetration. Her active abilities heal her for 12.5% of the damage dealt.\nDamaging minions heals her for 25% of the original heal, and damaging monsters heals her for 40% of the original heal.\nThe empowered attacks of Drakehound's Step grant the same healing bonus.\nActive: Seizes the farthest enemy champion in a line and blinks to them, suppressing the target for 1 second. During this time, she gains 10% damage reduction and is Unstoppable. She then slams the target into the ground, dealing physical damage equal to 200 plus 10% of their missing Health (10% +0.05% bonus AD +0.05% AP) and stunning them for 0.4 seconds.\nIf Public Execution does not hit an enemy champion, 35% of its cooldown is refunded.",
-          "field": "r.description",
-          "numbers": [],
-          "wordDiff": "Passive: Gains 10% Armor ~~Penetration~~**Pen**. Her active abilities heal her for 12.5% of the damage ~~dealt~~**she deals**.\nDamaging minions heals her for 25% of the original heal, and damaging monsters heals her for 40% of the original heal.\nThe empowered attacks of Drakehound's Step grant the same healing bonus.\nActive: Seizes the farthest enemy champion in a line **in front of her** and blinks to them, suppressing the target for 1 second. During this time, she gains 10% damage reduction and is Unstoppable. ~~She~~**Ambessa** then slams the target into the ground, dealing physical damage equal to 200 plus 10% of their missing Health (10% +0.05% bonus AD +0.05% AP) and stunning them for 0.4 seconds.\nIf Public Execution does not hit an enemy champion, 35% of its cooldown ~~is~~**will** **be** refunded."
-        },
-        {
-          "after": "Cunning Sweep: Swings her Twin Drakehounds around herself, dealing 30 (+30% bonus AD) physical damage + 2% (+0.02% bonus AD) of the target's max Health. Damage is increased to 60 (+60% bonus AD) physical damage + 4% (+0.04% bonus AD) of the target's max Health for enemies at the edge of the strike.\nIf Cunning Sweep hits an enemy, after a brief delay, it transforms into Sundering Slam for 3.5 seconds.\nSundering Slam: Ruthlessly cleaves enemies in a line, dealing 70 (+90% bonus AD) physical damage + 4% (+0.04% bonus AD) of the target's max Health against the first enemy hit.\nAll other targets take 35 (+45% bonus AD) physical damage + 2% (+0.02% bonus AD) of their max Health.\nThe percent of max Health damage against monsters is capped at 55 (based on level).",
-          "before": "Cunning Sweep: Swings her Twin Drakehounds around herself, dealing 30 (+30% bonus AD) physical damage + 2% (+0.02% bonus AD) of the target's max Health. Against enemies at the edge of the strike, this damage is increased to 60 (+60% bonus AD) + 4% (+0.04% bonus AD) of the target's max Health.\nIf Cunning Sweep hits an enemy, after a brief delay, it transforms into Sundering Slam for 3.5 seconds.\nSundering Slam: Ruthlessly cleaves enemies in a line, dealing 70 (+90% bonus AD) physical damage + 4% (+0.04% bonus AD) of the target's max Health to the first enemy hit.\nAll other targets take 35 (+45% bonus AD) physical damage + 2% (+0.02% bonus AD) of their max Health.\nThe percent max Health damage against monsters is capped at 55 (based on level).",
-          "field": "q.description",
-          "numbers": [],
-          "wordDiff": "Cunning Sweep: Swings her Twin Drakehounds around herself, dealing 30 (+30% bonus AD) physical damage + 2% (+0.02% bonus AD) of the target's max Health. ~~Against enemies at the edge of the strike, this damage~~**Damage** is increased to 60 (+60% bonus AD) **physical damage** + 4% (+0.04% bonus AD) of the target's max Health **for enemies at the edge of the strike**.\nIf Cunning Sweep hits an enemy, after a brief delay, it transforms into Sundering Slam for 3.5 seconds.\nSundering Slam: Ruthlessly cleaves enemies in a line, dealing 70 (+90% bonus AD) physical damage + 4% (+0.04% bonus AD) of the target's max Health ~~to~~**against** the first enemy hit.\nAll other targets take 35 (+45% bonus AD) physical damage + 2% (+0.02% bonus AD) of their max Health.\nThe percent **of** max Health damage against monsters is capped at 55 (based on level)."
-        },
-        {
-          "after": "Braces herself for a showdown, gaining a shield that absorbs 50 (based on level) (+120% bonus AD) damage for 1.5 seconds and blocking all crowd control effects for 0.5 seconds. She then unleashes a shockwave, dealing 70 (+80% bonus AD) physical damage to nearby enemies.\nIf she braced herself from an immobilizing effect, the shockwave deals 105 (+120% bonus AD) physical damage.",
-          "before": "Braces herself for a showdown, gaining a shield that absorbs 50 (based on level) (+120% bonus AD) damage for 1.5 seconds and blocking all crowd control effects for 0.5 seconds. She then unleashes a shockwave, dealing 70 (+80% bonus AD) physical damage to nearby enemies.\nIf she blocked an immobilizing effect, the shockwave's damage is increased to 105 (+120% bonus AD).",
-          "field": "w.description",
-          "numbers": [],
-          "wordDiff": "Braces herself for a showdown, gaining a shield that absorbs 50 (based on level) (+120% bonus AD) damage for 1.5 seconds and blocking all crowd control effects for 0.5 seconds. She then unleashes a shockwave, dealing 70 (+80% bonus AD) physical damage to nearby enemies.\nIf she ~~blocked~~**braced** **herself from** an immobilizing effect, the ~~shockwave's damage is increased~~**shockwave** ~~to~~**deals** 105 (+120% bonus AD) **physical damage**."
-        },
-        {
-          "after": "Swings her Twin Drakehounds around herself, dealing 40 (+50% bonus AD) physical damage and slowing enemies hit by 99%. The slow effect decays over 1 second.\nRecast: When Drakehound's Step is triggered after casting Lacerate, Ambessa will cast Lacerate again at the end of the dash.",
-          "before": "Swings her Twin Drakehounds around herself, dealing 40 (+50% bonus AD) physical damage to enemies hit and slowing them by 99%. The slow decays over 1 second.\nRecast: If Drakehound's Step is triggered after casting Lacerate, Ambessa casts Lacerate again at the end of the dash.",
-          "field": "e.description",
-          "numbers": [],
-          "wordDiff": "Swings her Twin Drakehounds around herself, dealing 40 (+50% bonus AD) physical damage ~~to enemies hit~~ and slowing ~~them~~**enemies** **hit** by 99%. The slow **effect** decays over 1 second.\nRecast: ~~If~~**When** Drakehound's Step is triggered after casting Lacerate, Ambessa ~~casts~~**will** **cast** Lacerate again at the end of the dash."
-        },
-        {
-          "after": "Feint: Pushing the left joystick right after casting an ability causes Ambessa to dash a short distance in that direction.\nDrakehound's Step: Ambessa's next attack within 4 seconds of triggering Feint gains 50% Attack Speed and increased range, deals 5 + 2.5 (based on level) (+25% bonus AD) bonus physical damage, and restores 50 Energy (based on level) (increases at levels 1/6/11). Stacks up to 3 times.",
-          "before": "Feint: Pushing the left joystick right after casting an ability causes Ambessa to dash a short distance in that direction.\nDrakehound's Step: Her next attack within 4 seconds of triggering Feint gains 50% Attack Speed and increased range, deals 5 + 2.5 (based on level) (+25% bonus AD) bonus physical damage, and restores 50 Energy (based on level) (increases at levels 1/6/11). Stacks up to 3 times.",
-          "field": "passive.description",
-          "numbers": [],
-          "wordDiff": "Feint: Pushing the left joystick right after casting an ability causes Ambessa to dash a short distance in that direction.\nDrakehound's Step: ~~Her~~**Ambessa's** next attack within 4 seconds of triggering Feint gains 50% Attack Speed and increased range, deals 5 + 2.5 (based on level) (+25% bonus AD) bonus physical damage, and restores 50 Energy (based on level) (increases at levels 1/6/11). Stacks up to 3 times."
-        }
-      ],
-      "goldens": [
-        "ambessa-l15-bf-sword-aa.json",
-        "ambessa-l15-bf-sword-e-feint-empowered-aa.json",
-        "ambessa-l15-bf-sword-e.json",
-        "ambessa-l15-bf-sword-q-then-slam.json",
-        "ambessa-l15-bf-sword-q.json",
-        "ambessa-l15-bf-sword-w.json",
-        "ambessa-l15-no-items-aa.json",
-        "ambessa-l15-no-items-e-feint-empowered-aa.json",
-        "ambessa-l15-no-items-e-then-feint.json",
-        "ambessa-l15-no-items-e.json",
-        "ambessa-l15-no-items-q-then-slam.json",
-        "ambessa-l15-no-items-q.json",
-        "ambessa-l15-no-items-w.json"
-      ],
-      "id": "ambessa",
-      "kind": "champion",
-      "name": "Ambessa",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Awe: Grants bonus Ability Power equal to 1% maximum Mana. Refunds 25% of Mana spent.\nMana Charge: Increases max Mana by 14 every time Mana is spent. Caps at 700 bonus Mana, transforming Archangel's Staff into Seraph's Embrace. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess item at a time.",
-          "before": "**Awe**: Gain Ability Power equal to 1% of your maximum Mana, and refund 25% of the mana you spend.\n**Mana Charge**: Each time you spend Mana, gain +14 Max Mana, up to 700 bonus Mana, at which point this item upgrades into Seraph's Embrace. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess series item at a time.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~**~~Awe~~**~~: ~~Gain~~**Grants** **bonus** Ability Power equal to 1% ~~of your~~ maximum Mana~~, and~~**.** ~~refund~~**Refunds** 25% of ~~the mana you~~**Mana** ~~spend~~**spent**.\n~~**~~Mana Charge~~**~~: ~~Each time you~~**Increases** ~~spend~~**max** Mana~~,~~ ~~gain~~**by** ~~+~~14 ~~Max~~**every** **time** Mana~~,~~ ~~up~~**is** ~~to~~**spent.** **Caps at** 700 bonus Mana, ~~at which point this~~**transforming** ~~item~~**Archangel's** ~~upgrades~~**Staff** into Seraph's Embrace. Triggers up to 3 times every 10 seconds. You may only carry one Tear of the Goddess ~~series~~ item at a time."
-        }
-      ],
-      "goldens": [],
-      "id": "archangels-staff",
-      "kind": "item",
-      "name": "Archangel's Staff",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Sunder: Dealing physical damage to a champion reduces their Armor by 6% for 6 seconds, stacking up to 5 times for 30% reduction.\nRage: Gain 20 Movement Speed when you deal physical damage, and gain 40 Movement Speed when moving toward enemy champions with 5 Sunder stacks. Ranged champions gain halved values.",
-          "before": "UNIQUE - SUNDER: Dealing physical damage to a champion reduces their Armor by 6% for 6 seconds, stacking up to 5 times for 30% reduction. UNIQUE - RAGE: Gain 20 Movement Speed when you deal physical damage, and gain 40 Movement Speed when moving toward enemy champions with 5 Sunder stacks. Ranged champions gain halved values.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~UNIQUE - SUNDER~~**Sunder**: Dealing physical damage to a champion reduces their Armor by 6% for 6 seconds, stacking up to 5 times for 30% reduction. ~~UNIQUE - RAGE~~\n**Rage**: Gain 20 Movement Speed when you deal physical damage, and gain 40 Movement Speed when moving toward enemy champions with 5 Sunder stacks. Ranged champions gain halved values."
-        }
-      ],
-      "goldens": [],
-      "id": "black-cleaver",
-      "kind": "item",
-      "name": "Black Cleaver",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Baleful Blaze: Damaging abilities burn enemies, dealing an additional 20 + 2% Ability Power magic damage per second for 3 seconds.\nAgainst monsters, they deal 40 + 2% Ability Power magic damage per second.\nBlackfire: Each enemy champion or monster affected by your Baleful Blaze grants you 4% Ability Power.",
-          "before": "BALEFUL BLAZE - Damaging abilities deal an additional 20 + 2% Ability Power magic damage per second for 3 seconds. Against monsters, they deal 40 + 2% Ability Power magic damage per second. BLACKFIRE - Each enemy champion, epic monster, and large monster affected by your Black Flame grants you 4% Ability Power.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~BALEFUL BLAZE~~**Baleful** ~~-~~**Blaze:** Damaging abilities ~~deal~~**burn** **enemies, dealing** an additional 20 + 2% Ability Power magic damage per second for 3 seconds. \nAgainst monsters, they deal 40 + 2% Ability Power magic damage per second. ~~BLACKFIRE -~~\n**Blackfire:** Each enemy champion~~,~~ ~~epic monster, and large~~**or** monster affected by your ~~Black~~**Baleful** ~~Flame~~**Blaze** grants you 4% Ability Power."
-        }
-      ],
-      "goldens": [
-        "annie-l15-blackfire-build-q-after-w.json",
-        "annie-l15-blackfire-build-q-burn.json",
-        "annie-l15-blackfire-build-q.json",
-        "annie-l15-blackfire-build-r.json",
-        "annie-l15-blackfire-build-w.json"
-      ],
-      "id": "blackfire-torch",
-      "kind": "item",
-      "name": "Blackfire Torch",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Ruined Strikes: Basic attacks deal bonus physical damage on hit equal to 6% of the target's current Health (8% for melee), with a minimum of 15 and a maximum of 100 against monsters.\nDrain: Hitting the same enemy champion 3 times with basic attacks or abilities slows them by 30% for 1.5 seconds (30 second Cooldown).",
-          "before": "Ruined Strike: Basic attacks deal bonus physical damage on hit equal to 7% of the target's current Health (8.5% for melee), with a minimum of 15 and a maximum of 100 against monsters.\nDrain: Hitting the same enemy champion 3 times with basic attacks or abilities slows them by 30% for 1.5 seconds (30 second cooldown).",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "6%",
-              "before": "7%"
-            },
-            {
-              "after": "8%",
-              "before": "8.5%"
-            }
-          ],
-          "wordDiff": "Ruined ~~Strike~~**Strikes**: Basic attacks deal bonus physical damage on hit equal to ~~7%~~**6%** of the target's current Health (~~8.5%~~**8%** for melee), with a minimum of 15 and a maximum of 100 against monsters.\nDrain: Hitting the same enemy champion 3 times with basic attacks or abilities slows them by 30% for 1.5 seconds (30 second ~~cooldown~~**Cooldown**)."
-        }
-      ],
-      "goldens": [],
-      "id": "blade-of-the-ruined-king",
-      "kind": "item",
-      "name": "Blade of the Ruined King",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Life from Death: Whenever an enemy champion dies within 3 seconds of taking damage from you, create a nova at their location that heals allied champions for 100 + 20% Ability Power Health. (60 second Cooldown)",
-          "before": "Life from Death (Passive): When a champion that you damaged within 3s dies, a nova spreads from their corpse that restores 100 + 20% AP Health to nearby allies. (60s cooldown)",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "Life from Death ~~(Passive)~~: ~~When a~~**Whenever** ~~champion~~**an** ~~that~~**enemy** ~~you~~**champion** ~~damaged~~**dies** within 3~~s~~ ~~dies~~**seconds of taking damage from you**, **create** a nova ~~spreads from~~**at** their ~~corpse~~**location** that ~~restores~~**heals** **allied champions for** 100 + 20% ~~AP Health to~~**Ability** ~~nearby~~**Power** ~~allies~~**Health**. (60~~s~~ ~~cooldown~~**second Cooldown**)"
-        }
-      ],
-      "goldens": [],
-      "id": "cryptbloom",
-      "kind": "item",
-      "name": "Cryptbloom",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Cauterize: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.\nDefy: If a champion you damaged within the last 3 seconds dies, the remaining Cauterize damage is cleansed, and you heal over 2 seconds for an amount equal to 90% bonus Attack Damage.",
-          "before": "**Defy**: If a champion you damaged within the last 3 seconds dies, the remaining Ignore Pain damage is cleansed, and you heal over 2 seconds for an amount equal to 90% bonus Attack Damage.\n**Cauterize**: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "30%",
-              "before": ""
-            },
-            {
-              "after": "12%",
-              "before": ""
-            },
-            {
-              "after": "3",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "30%"
-            },
-            {
-              "after": "",
-              "before": "12%"
-            },
-            {
-              "after": "",
-              "before": "3"
-            }
-          ],
-          "wordDiff": "~~**~~**Cauterize: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.**\nDefy~~**~~: If a champion you damaged within the last 3 seconds dies, the remaining ~~Ignore Pain~~**Cauterize** damage is cleansed, and you heal over 2 seconds for an amount equal to 90% bonus Attack Damage.\n~~**Cauterize**: Store 30% of physical and magic damage taken, or 12% for ranged champions, and take the stored amount as true damage over 3 seconds.~~"
-        },
-        {
-          "after": "3300",
-          "before": "3200",
-          "field": "price"
-        }
-      ],
-      "goldens": [],
-      "id": "deaths-dance",
-      "kind": "item",
-      "name": "Death's Dance",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Ever Rising Moon: Hitting an enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's Max Health (3.5% for ranged champions), and grants you a shield that absorbs damage equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds (6 second Cooldown).",
-          "before": "**Ever Rising Moon**: Hitting the same enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's maximum Health (3.5% for ranged champions), and grants you a shield equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds. (6s cooldown)",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~**~~Ever Rising Moon~~**~~: Hitting ~~the same~~**an** enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's ~~maximum~~**Max** Health (3.5% for ranged champions), and grants you a shield **that absorbs damage** equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds~~.~~ (6~~s~~ ~~cooldown~~**second Cooldown**)**.**"
-        }
-      ],
-      "goldens": [],
-      "id": "eclipse",
-      "kind": "item",
-      "name": "Eclipse",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Absorb: Taking ability damage from enemy champions grants 1 Steadfast stack for 7 seconds, up to 4 stacks. Dealing damage to enemy champions refreshes the duration. At max stacks, gain 6% Movement Speed and 70 bonus Magic Resist.",
-          "before": "**Absorb**: Taking magic damage from enemy champions grants 1 Steadfast stack, up to 4, for 7 seconds. Dealing damage to enemy champions refreshes the duration. At max stacks, gain 6% Movement Speed and 70 bonus Magic Resist.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "7",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "7"
-            }
-          ],
-          "wordDiff": "~~**~~Absorb~~**~~: Taking ~~magic~~**ability** damage from enemy champions grants 1 Steadfast stack **for 7 seconds**, up to 4~~,~~ ~~for 7 seconds~~**stacks**. Dealing damage to enemy champions refreshes the duration. At max stacks, gain 6% Movement Speed and 70 bonus Magic Resist."
-        }
-      ],
-      "goldens": [],
-      "id": "force-of-nature",
-      "kind": "item",
-      "name": "Force of Nature",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Resurrect: Upon taking lethal damage, you fall in place, untargetable, and enter stasis for 4 seconds, then resurrect and restore 50% of base Health and 100% of maximum Mana. (180 second Cooldown)",
-          "before": "UNIQUE - RESURRECT: Upon taking lethal damage, resurrects and restores 50% of base health and 100% of maximum mana after 4 seconds of stasis. (180 second cooldown)",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "",
-              "before": "50%"
-            },
-            {
-              "after": "4",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "100%"
-            },
-            {
-              "after": "50%",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "4"
-            },
-            {
-              "after": "100%",
-              "before": ""
-            }
-          ],
-          "wordDiff": "~~UNIQUE - RESURRECT~~**Resurrect**: Upon taking lethal damage, ~~resurrects~~**you** **fall in place, untargetable,** and ~~restores~~**enter** ~~50%~~**stasis** ~~of~~**for** ~~base~~**4** ~~health~~**seconds,** **then resurrect** and ~~100%~~**restore** ~~of~~**50%** ~~maximum~~**of** ~~mana~~**base** ~~after~~**Health** ~~4~~**and** ~~seconds~~**100%** of ~~stasis~~**maximum Mana**. (180 second ~~cooldown~~**Cooldown**)"
-        }
-      ],
-      "goldens": [],
-      "id": "guardian-angel",
-      "kind": "item",
-      "name": "Guardian Angel",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Colossal Consumption: While within 700 units of an enemy champion, charges for 2.5 seconds before dealing a huge strike against the enemy champion. This charged attack deals bonus physical damage equal to 140 + 3.5% of maximum Health, and grants maximum Health equal to 15% of the damage dealt. The charge for each target has a 20 second cooldown.",
-          "before": "UNIQUE - Colossal Consumption: While within 700 units of an enemy champion, charges for 2.5 seconds before dealing a huge strike against the enemy champion. This charged attack deals bonus physical damage equal to 140 + 3.5% of maximum Health, and grants maximum Health equal to 15% of the damage dealt. The charge for each target has a 20-second cooldown.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~UNIQUE -~~ Colossal Consumption: While within 700 units of an enemy champion, charges for 2.5 seconds before dealing a huge strike against the enemy champion. This charged attack deals bonus physical damage equal to 140 + 3.5% of maximum Health, and grants maximum Health equal to 15% of the damage dealt. The charge for each target has a 20~~-~~ second cooldown."
-        }
-      ],
-      "goldens": [],
-      "id": "heartsteel",
-      "kind": "item",
-      "name": "Heartsteel",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Protobelt (Active): Dash forward and unleash a cone of magic bolts, dealing 100 + 10% Ability Power magic damage to enemies hit. (30 second Cooldown)\nIf a champion or monster is hit by more than one missile, each additional missile only deals 10% damage.",
-          "before": "Protobelt (Active): Dash toward the target direction and unleash 7 magic bolts, dealing 100 + 10% Ability Power magic damage to enemies hit. (30s cooldown) If a champion or monster is hit by more than one missile, each additional missile only deals 10% damage.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "",
-              "before": "7"
-            }
-          ],
-          "wordDiff": "Protobelt (Active): Dash ~~toward the target direction~~**forward** and unleash ~~7~~**a** **cone of** magic bolts, dealing 100 + 10% Ability Power magic damage to enemies hit. (30~~s~~ ~~cooldown)~~**second** **Cooldown)**\nIf a champion or monster is hit by more than one missile, each additional missile only deals 10% damage."
-        }
-      ],
-      "goldens": [
-        "annie-l15-rocketbelt-build-protobelt.json",
-        "annie-l15-rocketbelt-build-q.json",
-        "annie-l15-rocketbelt-build-r.json",
-        "annie-l15-rocketbelt-build-w.json"
-      ],
-      "id": "hextech-rocketbelt",
-      "kind": "item",
-      "name": "Hextech Rocketbelt",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Hypershot: Damaging an enemy champion with an ability from at least 600 units away reveals them for 8 seconds and increases damage dealt to them by 10%.\nFocus: When Hypershot is triggered, reveals all enemy champions within 1,200 units of the target for 3 seconds (12 second Cooldown).",
-          "before": "**Hypershot**: Damaging an enemy champion with an ability from at least 600 units away reveals them for 8 seconds and increases the damage you deal to them by 10%.\n**Focus**: When Hypershot triggers, every other enemy champion within 1200 units of the target is revealed for 3 seconds. (12s cooldown)",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "1",
-              "before": "1200"
-            },
-            {
-              "after": "200",
-              "before": ""
-            }
-          ],
-          "wordDiff": "~~**~~Hypershot~~**~~: Damaging an enemy champion with an ability from at least 600 units away reveals them for 8 seconds and increases ~~the~~ damage ~~you deal~~**dealt** to them by 10%.\n~~**~~Focus~~**~~: When Hypershot ~~triggers~~**is triggered**, ~~every~~**reveals** ~~other~~**all** enemy ~~champion~~**champions** within ~~1200~~**1,200** units of the target ~~is revealed~~ for 3 seconds~~.~~ (12~~s~~ ~~cooldown~~**second Cooldown**)**.**"
-        }
-      ],
-      "goldens": [
-        "annie-l15-horizon-build-hypershot-q.json",
-        "annie-l15-horizon-build-hypershot-r.json",
-        "annie-l15-horizon-build-hypershot-w.json",
-        "annie-l15-horizon-build-q.json",
-        "annie-l15-horizon-build-r.json",
-        "annie-l15-horizon-build-w.json"
-      ],
-      "id": "horizon-focus",
-      "kind": "item",
-      "name": "Horizon Focus",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Infinity: Critical strike damage increased from 200% to 230%.",
-          "before": "**Infinity**: Critical strike damage increased from 200% to 230%.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~**~~Infinity~~**~~: Critical strike damage increased from 200% to 230%."
-        }
-      ],
-      "goldens": [],
-      "id": "infinity-edge",
-      "kind": "item",
-      "name": "Infinity Edge",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Inevitable Demise: Abilities and empowered attacks Critically Strike for 20% bonus damage against enemies below 40% Health.",
-          "before": "**Balance**: +15 Magic Penetration.\n**Inevitable Demise**: Abilities and empowered attacks Critically Strike for 20% bonus damage against enemies below 40% Health.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "",
-              "before": "15"
-            }
-          ],
-          "wordDiff": "~~**Balance**: +15 Magic Penetration.\n**~~Inevitable Demise~~**~~: Abilities and empowered attacks Critically Strike for 20% bonus damage against enemies below 40% Health."
-        }
-      ],
-      "goldens": [
-        "annie-l15-full-build-low-hp-ludens-on-cooldown-q.json",
-        "annie-l15-full-build-low-hp-q-with-echo.json",
-        "annie-l15-full-build-ludens-on-cooldown-q.json",
-        "annie-l15-full-build-ludens-on-cooldown-r.json",
-        "annie-l15-full-build-ludens-on-cooldown-w.json",
-        "annie-l15-full-build-q-with-echo.json",
-        "annie-l15-orb-build-low-hp-q.json",
-        "annie-l15-orb-build-low-hp-r.json",
-        "annie-l15-orb-build-low-hp-w.json",
-        "annie-l15-orb-build-q.json",
-        "annie-l15-orb-build-r.json",
-        "annie-l15-orb-build-w.json"
-      ],
-      "id": "infinity-orb",
-      "kind": "item",
-      "name": "Infinity Orb",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Torment: Damaging abilities or empowered attacks deal 2% of the target's max Health as bonus magic damage each second, over 3 seconds.\nMadness: While fighting enemy champions, deal 2% additional damage each second, up to 6% after 3 seconds.",
-          "before": "**Torment**: Damaging abilities and empowered attacks burn the enemy for 3 seconds, dealing magic damage equal to 2% of their maximum Health per second.\n**Madness**: While in combat with enemy champions, the damage you deal increases by 2% each second, reaching a maximum of 6% after 3 seconds.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "2%",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "3"
-            },
-            {
-              "after": "",
-              "before": "2%"
-            },
-            {
-              "after": "3",
-              "before": ""
-            },
-            {
-              "after": "2%",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "2%"
-            }
-          ],
-          "wordDiff": "~~**~~Torment~~**~~: Damaging abilities ~~and~~**or** empowered attacks ~~burn~~**deal** **2% of** the ~~enemy~~**target's** ~~for~~**max** ~~3~~**Health** ~~seconds,~~**as** ~~dealing~~**bonus** magic damage ~~equal to 2% of their~~**each** ~~maximum~~**second,** ~~Health~~**over** ~~per~~**3** ~~second~~**seconds**.\n~~**~~Madness~~**~~: While ~~in combat with~~**fighting** enemy champions, ~~the damage you~~ deal ~~increases~~**2%** ~~by~~**additional** ~~2%~~**damage** each second, ~~reaching a maximum~~**up** ~~of~~**to** 6% after 3 seconds."
-        }
-      ],
-      "goldens": [
-        "annie-l15-liandrys-build-madness-q.json",
-        "annie-l15-liandrys-build-q-burn.json",
-        "annie-l15-liandrys-build-q.json",
-        "annie-l15-liandrys-build-r.json",
-        "annie-l15-liandrys-build-w.json"
-      ],
-      "id": "liandrys-torment",
-      "kind": "item",
-      "name": "Liandry's Torment",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Spellblade: After using an ability, your next basic attack within 10 seconds deals 75% base AD + 45% AP bonus magic damage on-hit. (1.5 second Cooldown)\nDamage is reduced vs structures.",
-          "before": "UNIQUE - SPELLBLADE: After using an ability, your next basic attack within 10 seconds deals 75% base AD (+ 45% AP) bonus magic damage on-hit. (1.5 second cooldown which begins after using the empowered attack) UNIQUE - BANE: +5% movement speed",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "",
-              "before": "5%"
-            }
-          ],
-          "wordDiff": "~~UNIQUE - SPELLBLADE~~**Spellblade**: After using an ability, your next basic attack within 10 seconds deals 75% base AD ~~(~~+ 45% AP~~)~~ bonus magic damage on-hit. (1.5 second ~~cooldown which begins after using the empowered attack~~**Cooldown**) ~~UNIQUE -~~\n**Damage** ~~BANE:~~**is** ~~+5%~~**reduced** ~~movement~~**vs** ~~speed~~**structures.**"
-        }
-      ],
-      "goldens": [
-        "annie-l15-lich-bane-build-q-then-aa.json",
-        "annie-l15-lich-bane-build-q.json",
-        "annie-l15-lich-bane-build-r.json",
-        "annie-l15-lich-bane-build-w.json"
-      ],
-      "id": "lich-bane",
-      "kind": "item",
-      "name": "Lich Bane",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Echo: Your next damaging ability or empowered basic attack deals 75 + 8% Ability Power magic damage to the primary target and up to 4 other nearby enemies (9 second Cooldown).\nFor each fewer target hit by Echo, the primary target takes an additional 20 + 1.2% Ability Power magic damage.",
-          "before": "Echo: Your next damaging ability or empowered basic attack deals 75 + 8% Ability Power magic damage to the primary target and up to 5 nearby enemies. For each fewer target hit by Echo, the primary target takes an additional 20 + 1.2% Ability Power magic damage. (9 second cooldown)",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "4",
-              "before": "5"
-            },
-            {
-              "after": "9",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "9"
-            }
-          ],
-          "wordDiff": "Echo: Your next damaging ability or empowered basic attack deals 75 + 8% Ability Power magic damage to the primary target and up to ~~5~~**4** **other** nearby enemies~~.~~ **(9 second Cooldown).**\nFor each fewer target hit by Echo, the primary target takes an additional 20 + 1.2% Ability Power magic damage. ~~(9 second cooldown)~~"
-        }
-      ],
-      "goldens": [
-        "annie-l15-full-build-low-hp-ludens-on-cooldown-q.json",
-        "annie-l15-full-build-low-hp-q-with-echo.json",
-        "annie-l15-full-build-ludens-on-cooldown-q.json",
-        "annie-l15-full-build-ludens-on-cooldown-r.json",
-        "annie-l15-full-build-ludens-on-cooldown-w.json",
-        "annie-l15-full-build-q-with-echo.json",
-        "annie-l15-ludens-only-ludens-on-cooldown-q.json",
-        "annie-l15-ludens-only-q-with-echo.json"
-      ],
-      "id": "ludens-echo",
-      "kind": "item",
-      "name": "Luden's Echo",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Scorn: Your ultimate abilities gain 20 Ability Haste.\nHatefog: Damaging a champion with your ultimate burns the ground beneath them for 3 seconds, dealing magic damage equal to 60 plus 5% Ability Power per second and reducing their Magic Resist by 10. Burn radius increases with damage, reaching maximum radius at 800 damage.",
-          "before": "SCORN: Your ultimate abilities gain 20 Ability Haste. HATEFOG: Damaging a champion with your ultimate burns the ground beneath them for 3s, dealing magic damage equal to 60 plus 5% Ability Power per second and reducing their Magic Resist by 10. Burn radius increases with damage, reaching maximum radius at 800 damage.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~SCORN~~**Scorn**: Your ultimate abilities gain 20 Ability Haste. ~~HATEFOG~~\n**Hatefog**: Damaging a champion with your ultimate burns the ground beneath them for 3~~s~~ **seconds**, dealing magic damage equal to 60 plus 5% Ability Power per second and reducing their Magic Resist by 10. Burn radius increases with damage, reaching maximum radius at 800 damage."
-        }
-      ],
-      "goldens": [
-        "annie-l15-malignance-build-q-during-burn.json",
-        "annie-l15-malignance-build-q.json",
-        "annie-l15-malignance-build-r-with-burn.json",
-        "annie-l15-malignance-build-r.json",
-        "annie-l15-malignance-build-w.json"
-      ],
-      "id": "malignance",
-      "kind": "item",
-      "name": "Malignance",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Lifeline: Upon taking magic damage that would reduce your Health below 35%, gain 10% Omnivamp until the end of combat and a magic shield that absorbs 220–530 magic damage for 3 seconds. (70 second Cooldown)",
-          "before": "UNIQUE - Lifeline: Upon taking Magic Damage that would reduce your health below 35%, gain 10% Omnivamp until the end of combat and a magic shield that absorbs (220 -530 Magic Damage) for 3s. (70 second cooldown)",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~UNIQUE -~~ Lifeline: Upon taking ~~Magic~~**magic** ~~Damage~~**damage** that would reduce your ~~health~~**Health** below 35%, gain 10% Omnivamp until the end of combat and a magic shield that absorbs ~~(~~220 ~~-~~**–**530 ~~Magic~~**magic** ~~Damage)~~**damage** for 3~~s~~ **seconds**. (70 second ~~cooldown~~**Cooldown**)"
-        }
-      ],
-      "goldens": [],
-      "id": "maw-of-malmortius",
-      "kind": "item",
-      "name": "Maw of Malmortius",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Gnaw: Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit.",
-          "before": "**Gnaw**: Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~**~~Gnaw~~**~~: Basic attacks deal 15 + 20% bonus Ability Power magic damage on hit."
-        },
-        {
-          "after": "Physical",
-          "before": "Magic",
-          "field": "category"
-        }
-      ],
-      "goldens": [
-        "annie-l15-nashors-build-aa.json",
-        "annie-l15-nashors-build-q.json",
-        "annie-l15-nashors-build-r.json",
-        "annie-l15-nashors-build-w.json"
-      ],
-      "id": "nashors-tooth",
-      "kind": "item",
-      "name": "Nashor's Tooth",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Deft Strikes: Attacks reduce the remaining cooldowns of your basic abilities by 15%.",
-          "before": "UNIQUE - Deft Strikes: Attacks reduce the remaining cooldowns of your basic abilities by 15%.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~UNIQUE -~~ Deft Strikes: Attacks reduce the remaining cooldowns of your basic abilities by 15%."
-        }
-      ],
-      "goldens": [],
-      "id": "navori-quickblades",
-      "kind": "item",
-      "name": "Navori Quickblades",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Block: Basic attacks from champions deal 10% reduced damage to you.",
-          "before": "Block: Reduces damage taken from champion basic attacks by 10%.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "10%",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "10%"
-            }
-          ],
-          "wordDiff": "Block: ~~Reduces damage~~**Basic** ~~taken~~**attacks** from ~~champion~~**champions** ~~basic~~**deal** ~~attacks~~**10%** ~~by~~**reduced** ~~10%~~**damage to you**."
-        }
-      ],
-      "goldens": [],
-      "id": "plated-steelcaps",
-      "kind": "item",
-      "name": "Plated Steelcaps",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Overkill: Increases Ability Power by 30%.",
-          "before": "UNIQUE - OVERKILL: Increases ability power by 30%.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~UNIQUE - OVERKILL~~**Overkill**: Increases ~~ability~~**Ability** ~~power~~**Power** by 30%."
-        }
-      ],
-      "goldens": [
-        "annie-l15-blackfire-build-q-after-w.json",
-        "annie-l15-blackfire-build-q-burn.json",
-        "annie-l15-blackfire-build-q.json",
-        "annie-l15-blackfire-build-r.json",
-        "annie-l15-blackfire-build-w.json",
-        "annie-l15-bloodletters-build-q-stacks.json",
-        "annie-l15-bloodletters-build-q.json",
-        "annie-l15-bloodletters-build-r.json",
-        "annie-l15-bloodletters-build-w.json",
-        "annie-l15-clean-build-q.json",
-        "annie-l15-clean-build-r.json",
-        "annie-l15-clean-build-w.json",
-        "annie-l15-full-build-low-hp-ludens-on-cooldown-q.json",
-        "annie-l15-full-build-low-hp-q-with-echo.json",
-        "annie-l15-full-build-ludens-on-cooldown-q.json",
-        "annie-l15-full-build-ludens-on-cooldown-r.json",
-        "annie-l15-full-build-ludens-on-cooldown-w.json",
-        "annie-l15-full-build-q-with-echo.json",
-        "annie-l15-horizon-build-hypershot-q.json",
-        "annie-l15-horizon-build-hypershot-r.json",
-        "annie-l15-horizon-build-hypershot-w.json",
-        "annie-l15-horizon-build-q.json",
-        "annie-l15-horizon-build-r.json",
-        "annie-l15-horizon-build-w.json",
-        "annie-l15-liandrys-build-madness-q.json",
-        "annie-l15-liandrys-build-q-burn.json",
-        "annie-l15-liandrys-build-q.json",
-        "annie-l15-liandrys-build-r.json",
-        "annie-l15-liandrys-build-w.json",
-        "annie-l15-lich-bane-build-q-then-aa.json",
-        "annie-l15-lich-bane-build-q.json",
-        "annie-l15-lich-bane-build-r.json",
-        "annie-l15-lich-bane-build-w.json",
-        "annie-l15-malignance-build-q-during-burn.json",
-        "annie-l15-malignance-build-q.json",
-        "annie-l15-malignance-build-r-with-burn.json",
-        "annie-l15-malignance-build-r.json",
-        "annie-l15-malignance-build-w.json",
-        "annie-l15-morellonomicon-build-q.json",
-        "annie-l15-morellonomicon-build-r.json",
-        "annie-l15-morellonomicon-build-w.json",
-        "annie-l15-nashors-build-aa.json",
-        "annie-l15-nashors-build-q.json",
-        "annie-l15-nashors-build-r.json",
-        "annie-l15-nashors-build-w.json",
-        "annie-l15-orb-build-low-hp-q.json",
-        "annie-l15-orb-build-low-hp-r.json",
-        "annie-l15-orb-build-low-hp-w.json",
-        "annie-l15-orb-build-q.json",
-        "annie-l15-orb-build-r.json",
-        "annie-l15-orb-build-w.json",
-        "annie-l15-riftmaker-build-q.json",
-        "annie-l15-riftmaker-build-r.json",
-        "annie-l15-riftmaker-build-void-corruption-q.json",
-        "annie-l15-riftmaker-build-w.json",
-        "annie-l15-rocketbelt-build-protobelt.json",
-        "annie-l15-rocketbelt-build-q.json",
-        "annie-l15-rocketbelt-build-r.json",
-        "annie-l15-rocketbelt-build-w.json",
-        "annie-l15-trinity-build-aa.json",
-        "annie-l15-trinity-build-q-then-aa.json"
-      ],
-      "id": "rabadons-deathcap",
-      "kind": "item",
-      "name": "Rabadon's Deathcap",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Void Corruption: While fighting enemy champions, deal 2% additional damage each second, up to 8%. At maximum strength, gain Omnivamp equal to 10% (melee) / 6% (ranged).\nVoid Infusion: Gain Ability Power equal to 2% of your bonus Health.",
-          "before": "**Void Corruption**: While in combat with enemy champions, the damage you deal increases by 2% every 1 second, up to 8%. While at maximum, gain Omnivamp (10% for melee champions / 6% for ranged champions).\n**Void Infusion**: Gain Ability Power equal to 2% of your bonus Health.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "",
-              "before": "1"
-            },
-            {
-              "after": "",
-              "before": "10%"
-            },
-            {
-              "after": "10%",
-              "before": ""
-            }
-          ],
-          "wordDiff": "~~**~~Void Corruption~~**~~: While ~~in combat with~~**fighting** enemy champions, ~~the damage you~~ deal ~~increases by~~ 2% ~~every~~**additional** ~~1~~**damage** **each** second, up to 8%. ~~While at~~**At** maximum **strength**, gain Omnivamp ~~(10%~~**equal** ~~for~~**to** ~~melee~~**10%** ~~champions~~**(melee)** / 6% ~~for~~ **(**ranged ~~champions~~).\n~~**~~Void Infusion~~**~~: Gain Ability Power equal to 2% of your bonus Health."
-        }
-      ],
-      "goldens": [
-        "annie-l15-riftmaker-build-q.json",
-        "annie-l15-riftmaker-build-r.json",
-        "annie-l15-riftmaker-build-void-corruption-q.json",
-        "annie-l15-riftmaker-build-w.json"
-      ],
-      "id": "riftmaker",
-      "kind": "item",
-      "name": "Riftmaker",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Icy: Damaging active abilities and empowered attacks slow enemies below 60% Health by 30% for 1 second.",
-          "before": "**Icy**: Damaging active abilities and empowered attacks slow enemies below 60% current Health by 30% Movement Speed for 1 second.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~**~~Icy~~**~~: Damaging active abilities and empowered attacks slow enemies below 60% ~~current~~ Health by 30% ~~Movement Speed~~ for 1 second."
-        }
-      ],
-      "goldens": [],
-      "id": "seryldas-grudge",
-      "kind": "item",
-      "name": "Serylda’s Grudge",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Dragonforce: Gain 20 Basic Ability Haste.\nFocused Will: Dealing damage to monsters or enemies with abilities increases your champion's ability and passive damage by 3% for 6 seconds (stacks 4 times)\nFocused Will stacks have a 1 second cooldown per ability cast.",
-          "before": "Unique - Dragonforce: Gain 20 Basic Ability Haste. Unique - Focused Will: Dealing damage to monsters or enemies with abilities increases your champion’s ability and passive damage by 3% for 6s. (Stacks 4 times)",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "1",
-              "before": ""
-            }
-          ],
-          "wordDiff": "~~Unique -~~ Dragonforce: Gain 20 Basic Ability Haste. ~~Unique -~~ \nFocused Will: Dealing damage to monsters or enemies with abilities increases your ~~champion’s~~**champion's** ability and passive damage by 3% for 6~~s.~~ **seconds** (~~Stacks~~**stacks** 4 times)\n**Focused Will stacks have a 1 second cooldown per ability cast.**"
-        }
-      ],
-      "goldens": [],
-      "id": "spear-of-shojin",
-      "kind": "item",
-      "name": "Spear of Shojin",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Heavy Handed: Gain 50% base Attack Damage as bonus Attack Damage.\nLifeline: Damage that puts you under 35% Health grants a shield equal to 75% bonus Health that decays over 5 seconds.\n(70 second Cooldown)\nSterak's Fury: Triggering Lifeline increases size and grants 30% Tenacity for 8 seconds.",
-          "before": "**Heavy Handed**: +50% base Attack Damage as bonus Attack Damage.\n**Lifeline**: Damage that puts you under 35% Health grants a shield equal to 75% bonus Health that decays over 5 seconds. (70 second cooldown)\n**Sterak's Fury**: Triggering Lifeline increases size and strength for 8 seconds.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "30%",
-              "before": ""
-            }
-          ],
-          "wordDiff": "~~**~~Heavy Handed~~**~~: ~~+~~**Gain** 50% base Attack Damage as bonus Attack Damage.\n~~**~~Lifeline~~**~~: Damage that puts you under 35% Health grants a shield equal to 75% bonus Health that decays over 5 seconds. \n(70 second ~~cooldown~~**Cooldown**)\n~~**~~Sterak's Fury~~**~~: Triggering Lifeline increases size and ~~strength~~**grants** **30% Tenacity** for 8 seconds."
-        }
-      ],
-      "goldens": [],
-      "id": "steraks-gage",
-      "kind": "item",
-      "name": "Sterak's Gage",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Stormraider: When you deal damage equal to 25% of a champion's max Health within 2.5 seconds, inflict Squall on them and gain 25% Movement Speed for 2.5 seconds (25 second Cooldown).\nSquall: After 2 seconds, deal 125 + 10% Ability Power magic damage to the target. If the target dies before Squall triggers, it instead instantly deals the same amount of damage to enemies in a large area and grants 25 gold.",
-          "before": "STORMRAIDER - When you deal damage equal to 25% of a champion's max Health within 2.5 seconds, inflict Squall on them and gain 25% Movement Speed for 2.5 seconds. (25-second cooldown) SQUALL - After 2 seconds, deal 125 + 10% Ability Power magic damage. If the target dies before Squall triggers, it instead deals the same amount of damage to nearby enemies and grants 25 gold.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "~~STORMRAIDER -~~**Stormraider:** When you deal damage equal to 25% of a champion's max Health within 2.5 seconds, inflict Squall on them and gain 25% Movement Speed for 2.5 seconds~~.~~ (25~~-~~ second ~~cooldown~~**Cooldown**) ~~SQUALL -~~**.\nSquall:** After 2 seconds, deal 125 + 10% Ability Power magic damage **to the target**. If the target dies before Squall triggers, it instead **instantly** deals the same amount of damage to ~~nearby~~ enemies **in a large area** and grants 25 gold."
-        }
-      ],
-      "goldens": [],
-      "id": "stormsurge",
-      "kind": "item",
-      "name": "Stormsurge",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Lightshield Strike: The first attack against an enemy champion Critically Strikes (6 second Cooldown per target), dealing 160% damage and restoring Health equal to 125% of base Attack Damage + 6% of missing Health to you.",
-          "before": "Lightshield Strike - The first attack against an enemy champion Critically Strikes (6s cooldown per target), dealing 160% damage and restoring Health (equal to 125% of base Attack Damage + 6% of missing Health) to you.",
-          "field": "description",
-          "numbers": [],
-          "wordDiff": "Lightshield Strike ~~-~~**:** The first attack against an enemy champion Critically Strikes (6~~s~~ ~~cooldown~~**second** **Cooldown** per target), dealing 160% damage and restoring Health ~~(~~equal to 125% of base Attack Damage + 6% of missing Health~~)~~ to you."
-        }
-      ],
-      "goldens": [],
-      "id": "sundered-sky",
-      "kind": "item",
-      "name": "Sundered Sky",
-      "severity": "changed"
-    },
-    {
-      "changes": [
-        {
-          "after": "Valor: Basic attacks (on-hit) grant 20 flat Movement Speed for 2 seconds. Bonuses do not stack. Ranged champions gain halved values.\nSpellblade: After using an ability, your next basic attack within 10 seconds deals 200% base AD bonus physical damage on-hit. (1.5 second Cooldown)\nDamage is reduced vs structures.",
-          "before": "**Spellblade**: After using an ability, your next basic attack within 10 seconds deals 200% base Attack Damage as bonus physical damage (1.5 second cooldown). Deals reduced damage to structures.\n**Valor**: Basic attacks grant 20 (melee) / 10 (ranged) Movement Speed for 2 seconds. Bonuses do not stack.",
-          "field": "description",
-          "numbers": [
-            {
-              "after": "20",
-              "before": ""
-            },
-            {
-              "after": "2",
-              "before": ""
-            },
-            {
-              "after": "",
-              "before": "20"
-            },
-            {
-              "after": "",
-              "before": "10"
-            },
-            {
-              "after": "",
-              "before": "2"
-            }
-          ],
-          "wordDiff": "~~**~~**Valor: Basic attacks (on-hit) grant 20 flat Movement Speed for 2 seconds. Bonuses do not stack. Ranged champions gain halved values.**\nSpellblade~~**~~: After using an ability, your next basic attack within 10 seconds deals 200% base ~~Attack Damage as~~**AD** bonus physical damage **on-hit.** (1.5 second ~~cooldown~~**Cooldown**)~~.~~\n**Damage** ~~Deals~~**is** reduced ~~damage to~~**vs** structures.\n~~**Valor**: Basic attacks grant 20 (melee) / 10 (ranged) Movement Speed for 2 seconds. Bonuses do not stack.~~"
-        }
-      ],
-      "goldens": [
-        "annie-l15-trinity-build-aa.json",
-        "annie-l15-trinity-build-q-then-aa.json"
-      ],
-      "id": "trinity-force",
-      "kind": "item",
-      "name": "Trinity Force",
-      "severity": "changed"
-    }
-  ],
+  "needsReview": [],
   "removed": [],
   "to": "7.3a",
   "toUpdated": "2026-09-29 16:09:43"

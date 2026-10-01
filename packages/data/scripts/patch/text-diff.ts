@@ -66,6 +66,11 @@ export function numberChanges(ops: WordOp[]): NumberChange[] {
   return changes
 }
 
+// wrpocket text carries its own markdown (e.g. **Awe**), which would otherwise merge with the diff markers.
+function escapeMarkdown(text: string): string {
+  return text.replace(/[\\*_~<>`[\]]/g, '\\$&')
+}
+
 /** Renders ops as markdown: deletions ~~struck~~, additions **bold**, whitespace kept outside markers. */
 export function renderWordDiff(ops: WordOp[]): string {
   const merged: WordOp[] = []
@@ -74,7 +79,8 @@ export function renderWordDiff(ops: WordOp[]): string {
     if (last && last.op === op.op) last.text += op.text
     else merged.push({ ...op })
   }
-  return merged.map(({ op, text }) => {
+  return merged.map(({ op, text: raw }) => {
+    const text = escapeMarkdown(raw)
     if (op === 'same') return text
     const marker = op === 'del' ? '~~' : '**'
     const match = /^(\s*)(.*?)(\s*)$/s.exec(text) as RegExpExecArray

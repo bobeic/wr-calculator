@@ -51,6 +51,18 @@ describe('cooldownRefundHandler.onAbilityHit', () => {
     expect(self.cooldowns.q).toBe(10)
   })
 
+  it('leaves a recast chain\'s pending cooldown alone, even at a 100% refund', () => {
+    // A lastStage ability waiting for its recast holds an Infinity cooldown until the chain ends.
+    const self = runtime({ cooldowns: { q: Infinity, w: 20 } })
+    const c = ctx({ self })
+    const effect = {
+      id: 'e1', name: 'Test Refund', description: '', support: 'full' as const,
+      kind: 'cooldownRefund' as const, mode: 'percent' as const, amount: 1, excludesUltimate: true,
+    }
+    cooldownRefundHandler.hooks!.onAbilityHit!(effect, c, 'w', [])
+    expect(self.cooldowns).toEqual({ q: Infinity, w: 10 })
+  })
+
   it('reduces remaining cooldown by a percentage', () => {
     const self = runtime({ cooldowns: { q: 20 } }) // 10s remaining at time 10
     const c = ctx({ self })
