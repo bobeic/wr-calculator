@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
-import { matchNotes, normaliseName } from '../../scripts/official-notes/match'
+import { matchNotes, normaliseName, notesNames } from '../../scripts/official-notes/match'
 import { parseNotesPage } from '../../scripts/official-notes/parse'
 import type { OfficialNotes } from '../../scripts/official-notes/types'
 import { readSnapshot } from '../../scripts/patch/snapshot-io'
@@ -33,6 +33,13 @@ describe('normaliseName', () => {
     expect(normaliseName("Serylda's  Grudge&nbsp;")).toBe('seryldas grudge')
     expect(normaliseName('Nunu & Willump')).toBe('nunu willump')
     expect(normaliseName('HWEI')).toBe('hwei')
+  })
+})
+
+describe('notesNames', () => {
+  it('returns the normalised name and every notes alias that maps to it', () => {
+    expect(notesNames('Dominik’s Regards')).toEqual(['dominiks regards', 'lord dominiks regards'])
+    expect(notesNames('Hwei')).toEqual(['hwei'])
   })
 })
 

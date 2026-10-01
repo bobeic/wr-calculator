@@ -84,6 +84,22 @@ describe('crossCheckNotes', () => {
     expect(check.excludedCount).toBe(1)
   })
 
+  it('never auto-clears an entry whose name sits inside an unmatched heading', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const check = run(before, after, notes([{ heading: 'Alpha Reforged' }, { heading: 'Gone' }]), ['a', 'b'])
+    expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
+    expect(check.unmatched).toEqual([{ section: 'ITEMS', heading: 'Alpha Reforged' }])
+  })
+
+  it('never auto-clears an entry named in a line of another entry', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const check = run(before, after, notes([
+      { heading: 'Items Removed', lines: [{ text: 'Alpha’s recipe now uses Gone', after: null }] },
+      { heading: 'Gone' },
+    ]), ['a', 'b'])
+    expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
+  })
+
   it('never auto-clears a removed entry or a mentioned one', () => {
     const after = snap([item('a', 'Alpha', '3300', 'Deals 7%'), item('b', 'Beta', '1000')])
     const check = run(before, after, notes([{ heading: 'Alpha', lines: [{ text: 'Price: 3200 → 3,300', after: '3,300' }] }]), ['a', 'gone'])

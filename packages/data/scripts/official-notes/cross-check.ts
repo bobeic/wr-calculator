@@ -3,7 +3,7 @@ import { goldensUsing } from '../patch/patch-diff'
 import type { GoldenRef } from '../patch/patch-diff'
 import type { Snapshot } from '../patch/snapshot'
 import type { EntryRef, Flag, IdLists, SnapshotDiff, StaleRef } from '../patch/types'
-import { matchNotes } from './match'
+import { matchNotes, normaliseName, notesNames } from './match'
 import type { CheckedEntry, CheckedLine, EntryStatus, NotesCrossCheck, OfficialNotes } from './types'
 
 export interface CrossCheckInput {
@@ -75,12 +75,19 @@ export function crossCheckNotes(input: CrossCheckInput): NotesCrossCheck {
   // An excluded section (game mode, system...) may still describe a real change, so naming an id there blocks its auto-clear.
   const excludedKeys = matched.flatMap((entry) => (entry.excluded && entry.ref !== null ? [refKey(entry.ref)] : []))
   const blocking = new Set([...mentioned.map((entry) => refKey(entry.ref)), ...excludedKeys])
+  // A renamed heading or an entry named inside another entry's line ('Items Removed') is a mention the name match
+  // misses; a flag whose name appears in that text stays.
+  const looseTexts = [
+    ...included.filter((entry) => entry.ref === null).map((entry) => entry.heading),
+    ...included.flatMap((entry) => entry.lines.map((line) => line.text)),
+  ].map(normaliseName)
+  const namedLoosely = (flag: Flag): boolean => notesNames(flag.name).some((name) => looseTexts.some((text) => text.includes(name)))
   const changedKeys = new Set([...input.diff.items, ...input.diff.champions, ...input.diff.removed].map(refKey))
   const isCovered = (ref: EntryRef): boolean => listFor(input.covered, ref.kind).includes(ref.id)
   const staleKeys = new Set(input.previousStale.map(refKey))
 
   const autoReviewed: ReviewedEntry[] = input.flags
-    .filter((flag) => flag.severity === 'changed' && !blocking.has(refKey(flag)) && !staleKeys.has(refKey(flag)))
+    .filter((flag) => flag.severity === 'changed' && !blocking.has(refKey(flag)) && !staleKeys.has(refKey(flag)) && !namedLoosely(flag))
     .map((flag) => ({
       kind: flag.kind, id: flag.id,
       note: `Not in the official ${input.patch} notes (${input.url}); wrpocket-only change to ${[...new Set(flag.changes.map((change) => change.field))].join(', ')}`,

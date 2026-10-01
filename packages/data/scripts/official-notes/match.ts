@@ -15,6 +15,12 @@ export function normaliseName(name: string): string {
   return htmlToText(name).toLowerCase().replace(/['']/g, "'").replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim()
 }
 
+/** The normalised names the notes may use for an entry: its own, plus every alias that maps to it. */
+export function notesNames(name: string): string[] {
+  const own = normaliseName(name)
+  return [own, ...Object.keys(ALIASES).filter((alias) => ALIASES[alias] === own)]
+}
+
 function index(kind: EntryRef['kind'], entries: Array<{ id: string; name: { en: string } }>): Map<string, EntryRef> {
   return new Map(entries.map((entry) => [normaliseName(entry.name.en), { kind, id: entry.id, name: entry.name.en }]))
 }
