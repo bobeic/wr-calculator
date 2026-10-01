@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -47,33 +47,45 @@ function parseArgs(argv: string[]): Options {
   return { refresh: argv.includes('--refresh'), fromCache: index === -1 ? null : argv[index + 1] }
 }
 
-/** Reads one site_data file from the cache, fetching it first unless offline. */
-async function getJson(path: string, cacheDir: string, offline: boolean): Promise<unknown> {
+/** Parses raw site_data, naming the URL (and cache file, if any) in the error so one drifted file is findable. */
+function parseRaw<T>(path: string, cacheFile: string | null, parse: () => T): T {
+  try {
+    return parse()
+  } catch (error) {
+    const where = cacheFile === null ? `${BASE_URL}/${path}` : `${BASE_URL}/${path} (cache file ${cacheFile})`
+    throw new Error(`${where} did not match the expected shape: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
+  }
+}
+
+/** Reads one site_data file from the cache, fetching it first unless offline, and validates it with the schema. */
+async function getJson<T>(path: string, cacheDir: string, offline: boolean, parse: (raw: unknown) => T): Promise<T> {
   const cacheFile = join(cacheDir, path)
-  if (existsSync(cacheFile)) return JSON.parse(await readFile(cacheFile, 'utf-8'))
+  if (existsSync(cacheFile)) return parseRaw(path, cacheFile, () => parse(JSON.parse(readFileSync(cacheFile, 'utf-8'))))
   if (offline) throw new Error(`${cacheFile} is missing from the cache`)
   const response = await fetch(`${BASE_URL}/${path}`)
   if (!response.ok) throw new Error(`GET ${BASE_URL}/${path} failed: HTTP ${response.status}`)
   const text = await response.text()
+  const parsed = parseRaw(path, null, () => parse(JSON.parse(text)))
   await mkdir(dirname(cacheFile), { recursive: true })
   await writeFile(cacheFile, text)
   await new Promise((resolve) => setTimeout(resolve, REQUEST_DELAY_MS))
-  return JSON.parse(text)
+  return parsed
 }
 
 /** Fetches meta.json fresh every run: it decides which cache folder is valid. */
 async function fetchMeta(): Promise<SnapshotMeta> {
   const response = await fetch(`${BASE_URL}/meta.json`)
   if (!response.ok) throw new Error(`GET ${BASE_URL}/meta.json failed: HTTP ${response.status}`)
-  return trimMeta(RawMetaSchema.parse(await response.json()))
+  const text = await response.text()
+  return trimMeta(parseRaw('meta.json', null, () => RawMetaSchema.parse(JSON.parse(text))))
 }
 
 async function fetchSnapshot(meta: SnapshotMeta, cacheDir: string, offline: boolean): Promise<Snapshot> {
-  const items = RawItemSchema.array().parse(await getJson('items.json', cacheDir, offline))
-  const summary = RawChampionSummarySchema.parse(await getJson('champions_summary.json', cacheDir, offline))
+  const items = await getJson('items.json', cacheDir, offline, (raw) => RawItemSchema.array().parse(raw))
+  const summary = await getJson('champions_summary.json', cacheDir, offline, (raw) => RawChampionSummarySchema.parse(raw))
   const champions: RawChampion[] = []
   for (const { id } of summary) {
-    champions.push(RawChampionSchema.parse(await getJson(`champions/${id}.json`, cacheDir, offline)))
+    champions.push(await getJson(`champions/${id}.json`, cacheDir, offline, (raw) => RawChampionSchema.parse(raw)))
   }
   return buildSnapshot(meta, items, champions)
 }
@@ -181,8 +193,8 @@ async function run(options: Options): Promise<void> {
     await checkDeterminism(staged.generated, patchDir)
   }
 
-  // Every stage succeeded: move the staged output into place.
-  await replaceWith(staged.snapshot, join(SNAPSHOT_ROOT, plan.patch))
+  // Every stage succeeded: move the staged output into place. The snapshot goes last because planRun
+  // reads it as the "this patch is done" marker; a failure before it must leave the next run free to retry.
   await replaceWith(staged.generated, join(patchDir, 'generated'))
   if (previous !== null) {
     await rename(join(staged.reports, 'patch-diff.json'), join(patchDir, 'patch-diff.json'))
@@ -190,8 +202,9 @@ async function run(options: Options): Promise<void> {
     const created = await writeMissingFiles(patchDir, scaffoldFiles(plan.patch))
     if (created.length > 0) console.log(`Created ${created.join(', ')} in ${patchDir}`)
   }
-  const ids = (await listSnapshotMetas(SNAPSHOT_ROOT)).map((entry) => entry.patch)
-  await writeFile(join(PATCHES_DIR, 'layers.ts'), renderLayersModule(ids))
+  const registered = [...known.filter((entry) => entry.patch !== plan.patch), meta].sort((a, b) => (a.updated < b.updated ? -1 : a.updated > b.updated ? 1 : 0))
+  await writeFile(join(PATCHES_DIR, 'layers.ts'), renderLayersModule(registered.map((entry) => entry.patch)))
+  await replaceWith(staged.snapshot, join(SNAPSHOT_ROOT, plan.patch))
   await rm(STAGING_DIR, { recursive: true, force: true })
 
   console.log(`${plan.kind} ${plan.patch}: ${mapped.champions.length} champions, ${mapped.items.length} items, ${mapped.notes.length} mapper notes.`)
