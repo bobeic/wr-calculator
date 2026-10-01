@@ -31,7 +31,7 @@ Out of scope:
 - Game modes (ARAM augments), runes, summoner spells and map systems. They are listed as unmatched
   and nothing else is done with them.
 
-## 3. Source format (checked on the 7.3a page; the 7.3 fixture is checked during implementation)
+## 3. Source format (checked on the 7.3 and 7.3a pages)
 
 - **URL:** `https://wildrift.leagueoflegends.com/en-us/news/game-updates/wild-rift-patch-notes-<id>/`,
   where `<id>` is the patch id with dots replaced by dashes (`7.3a` → `7-3a`). A `--notes-url <url>`
@@ -41,9 +41,19 @@ Out of scope:
   - `articleMasthead` gives the title and `publishDate`.
   - `characterChanges` has one record per champion: `character.name` in upper case (`HWEI`), then
     `changes[]`, each with a `title` (the ability name) and `description.body` (HTML `<ul><li>` lines).
-  - `articleRichText` has one HTML body. `<h2>` headings start sections (`ITEMS`, `Other Battlefield
-    Content`, `GAME MODE CHANGES`, …), `<h4>` starts an entry (`Death's Dance`), a `<p>` ending in `:`
-    starts a sub-group (`Base Stats:`, `Flurry:`) and `<li>` is one change line.
+  - `characterChanges` can appear several times (7.3 has three: marksmen, crit champions, stats).
+  - `articleRichText` blades come in page order. A page can have several of them (7.3 has nine). They
+    are read as one HTML stream:
+    - `<h2>` and `<h3>` headings name sections. Examples: `ITEMS`, `Item Adjustments`, `Marksman Item
+      Adjustments`, `GAME MODE CHANGES`, `AAA ARAM`, `Appendix`.
+    - `<h4>` starts an entry (`Death's Dance`).
+    - A `<p>` that ends in `:` (`Base Stats:`) starts a sub-group, and so does a `<p>` whose whole content
+      is italic or bold (`<p><i>Base Stats</i></p>`). Any other `<p>` is designer commentary and is
+      skipped.
+    - `<li>` is one change line.
+    - Stray `<meta>` tags appear inside headings and lines.
+  - 7.3's appendix lists 51 champions as `<h4>` entries (champion durability). Game-mode sections can
+    name items and champions in mode-only changes.
 - **Change lines:**
   - Most read `Label: before → after`, sometimes with `->` instead of the arrow, and without spaces
     (`30→20`).
@@ -75,7 +85,9 @@ interface NotesLine {
   after: string | null
 }
 interface NotesEntry {
-  section: 'champion' | 'item' | 'other'  // from the blade type or the <h2> heading
+  source: 'champion-blade' | 'rich-text'  // where the entry came from
+  section: string                         // nearest <h2>/<h3> heading text, '' for champion blades
+  excluded: boolean                       // true inside a game-mode / system / bug-fix section
   heading: string                         // 'HWEI', "Death's Dance"
   lines: NotesLine[]
 }
@@ -88,17 +100,27 @@ interface OfficialNotes {
 }
 ```
 
-An `<h2>` heading maps to a section like this: `ITEMS` → item. `CHAMPIONS` → champion, in case a page
-puts champions in rich text. Anything else → other. Champion blades are always champion entries.
+**Excluded sections.** An entry is excluded when its nearest `<h2>` or `<h3>` heading matches, case-folded,
+any of: `game mode`, `adventure`, `aram`, `bug fix`, `system`, `training`, `custom mode`, `battlefest`,
+`recommendation`, `season theme`, `wild pass`. A new `<h2>` resets the `<h3>`. Excluded entries never
+count as mentions, because they describe mode-only changes. Section names don't decide whether an entry
+is an item or a champion; the name match does (§4.2).
 
 ### 4.2 Matching
 
 Names are normalised before comparing: case-folded, curly quotes made straight, `&nbsp;` and trailing
-spaces removed, and punctuation other than letters, digits and spaces dropped. Item headings are
-compared against item names in the wrpocket snapshot, and champion headings against champion names.
+spaces removed, and punctuation other than letters, digits and spaces dropped.
 
-An entry whose heading has no match is reported as unmatched, with its section. Unmatched item or
-champion entries are a warning sign that the names have drifted. Unmatched "other" entries are expected.
+- A champion-blade entry is matched against champion names only.
+- A rich-text entry that isn't excluded is matched against item names first, then champion names.
+- An entry with no match is reported as unmatched, with its section. Examples: `Attack Speed Growth`,
+  `Nexus` and `Augment Adjustments`.
+- Excluded entries are only counted in the report.
+- A small alias table maps known naming differences between the notes and wrpocket. On 7.3 these are
+  `Lord Dominik's Regards` → `Dominik’s Regards`, `At Wit's End` → `Wit's End` and `Staff of Flowing
+  Waters` → `Staff of Flowing Water`.
+- Notes entries for items wrpocket doesn't list (on 7.3: Muramana, Salvation, Fimbulwinter, Diadem of
+  Songs) stay unmatched.
 
 ### 4.3 Cross-check
 
@@ -126,7 +148,9 @@ the hand-modelled ids and the new snapshot.
 ### 4.4 Where the results go
 
 - **Committed notes snapshot:** `packages/data/snapshots/official-notes/<patch>.json`, written as stable
-  JSON like the wrpocket snapshots. A `--from-cache` run reads this file instead of fetching.
+  JSON like the wrpocket snapshots. A `--from-cache` run looks for the notes in this order: the cached
+  page, then this file, then a fetch if `--notes-url` is given. If none of those works, it carries on
+  with no notes.
 - **Raw page cache:** `.cache/official-notes/<patch>.html`. It is git-ignored, the same as the wrpocket
   cache.
 - **Generated module:** `src/patches/<patch>/generated/notes-review.ts`. It exports
@@ -152,8 +176,7 @@ the hand-modelled ids and the new snapshot.
   failures already do.
 - **Page found but no `__NEXT_DATA__`, or no change blades:** the run fails, naming the URL. The page
   layout has drifted and the parser needs updating. A silent empty result would auto-clear everything.
-- **Zero matched item or champion entries on a page that has a champion blade or an `ITEMS`
-  section:** the run fails. This guards against names drifting so far that nothing is "mentioned", which
+- **Zero matched entries on a page that has at least one entry that isn't excluded:** the run fails. This guards against names drifting so far that nothing is "mentioned", which
   would auto-clear every flag.
 - **`--from-cache` with no committed notes snapshot for that patch:** the run carries on as if the page
   returned 404.
@@ -183,7 +206,9 @@ hand, made executable.
 
 - `parse.ts`: the fixtures are trimmed `__NEXT_DATA__` extracts of the 7.3 and 7.3a pages, committed under
   `packages/data/test/fixtures/official-notes/`. The tests cover:
-  - Sections, headings and groups.
+  - Sections, headings and groups, including italic group headers.
+  - Several rich-text and champion blades on one page.
+  - Excluded sections (7.3a's `GAME MODE CHANGES`).
   - Arrow variants (`→`, `->`, no spaces).
   - Lines with no arrow.
   - Entity decoding.
