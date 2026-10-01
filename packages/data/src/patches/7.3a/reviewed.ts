@@ -13,12 +13,17 @@ export const REVIEWED: ReviewedEntry[] = [
   { kind: 'item', id: 'blackfire-torch', note: WORDING },
   {
     kind: 'item', id: 'blade-of-the-ruined-king',
-    note: 'wrpocket text went 7% -> 6% (8.5% -> 8% melee) but the 7.3a notes list no BotRK change; '
-      + 'treated as a wrpocket correction of stale text. Not hand-modelled beyond stats; verify in game',
+    note: 'wrpocket text went 7% -> 6% (8.5% -> 8% melee), which matches its Chinese text, but the '
+      + 'official 7.3 notes say 7% / 8.5% and the 7.3a notes list no BotRK change; Ruined Strike stays at 7%. '
+      + 'Verify the tooltip in game',
   },
   { kind: 'item', id: 'cryptbloom', note: WORDING },
   { kind: 'item', id: 'eclipse', note: WORDING },
-  { kind: 'item', id: 'force-of-nature', note: `${REORDER}; "magic damage" now reads "ability damage"` },
+  {
+    kind: 'item', id: 'force-of-nature',
+    note: `${REORDER}; "magic damage" now reads "ability damage", against the official 7.3 wording `
+      + '"magic damage"; Steadfast is a stack-count input, so the model is unaffected',
+  },
   { kind: 'item', id: 'guardian-angel', note: REORDER },
   { kind: 'item', id: 'heartsteel', note: WORDING },
   {
@@ -31,7 +36,7 @@ export const REVIEWED: ReviewedEntry[] = [
   {
     kind: 'item', id: 'infinity-orb',
     note: 'wrpocket dropped "+15 Magic Penetration" from the text, but its 7.3a stats still have '
-      + 'flatMagicPen 15 and 7.3a notes list no change',
+      + 'flatMagicPen 15; 7.3 notes changed only the threshold (35% -> 40%) and 7.3a notes list no change',
   },
   { kind: 'item', id: 'liandrys-torment', note: REORDER },
   {
@@ -41,7 +46,8 @@ export const REVIEWED: ReviewedEntry[] = [
   },
   {
     kind: 'item', id: 'ludens-echo',
-    note: 'wrpocket says up to 4 other enemies instead of 5; irrelevant in 1v1 and 7.3a notes list no change',
+    note: 'wrpocket says up to 4 other enemies instead of 5 nearby (official 7.3 wording); the same 5 targets '
+      + 'counted with the primary, as measured in game; 7.3a notes list no change',
   },
   { kind: 'item', id: 'malignance', note: WORDING },
   { kind: 'item', id: 'maw-of-malmortius', note: WORDING },
@@ -61,7 +67,8 @@ export const REVIEWED: ReviewedEntry[] = [
   },
   {
     kind: 'item', id: 'steraks-gage',
-    note: 'wrpocket now names Sterak\'s Fury\'s 30% tenacity (not modelled); 7.3a notes list no change',
+    note: 'wrpocket now gives Sterak\'s Fury 30% tenacity, but the official 7.3 notes removed Fury\'s tenacity '
+      + 'and added a flat 20% stat, which the model uses; 7.3a notes list no change',
   },
   { kind: 'item', id: 'stormsurge', note: WORDING },
   { kind: 'item', id: 'sundered-sky', note: WORDING },
