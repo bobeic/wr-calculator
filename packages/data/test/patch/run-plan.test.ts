@@ -30,6 +30,16 @@ describe('planRun', () => {
   })
 })
 
+describe('planRun patch id validation', () => {
+  it.each(['..', '../x', '7.3/a', '7 3', '', '7.3a\n'])('rejects the patch id %j', (patch) => {
+    expect(() => planRun({ patch, updated: '2026-09-23 10:19:27' }, [], false)).toThrow(/invalid patch id/)
+  })
+
+  it('accepts letters, digits and dots', () => {
+    expect(planRun({ patch: '7.3b', updated: '2026-09-23 10:19:27' }, [], false)).toEqual({ kind: 'bootstrap', patch: '7.3b' })
+  })
+})
+
 describe('metaFromCacheDir', () => {
   it('reads the patch and timestamp from the cache folder name', () => {
     expect(metaFromCacheDir('/x/.cache/wrpocket/7.3-20260923101927')).toEqual(V73)

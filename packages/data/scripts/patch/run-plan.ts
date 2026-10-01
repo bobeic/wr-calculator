@@ -7,8 +7,16 @@ export type RunPlan =
   | { kind: 'refresh'; patch: string; previous: string | null }
   | { kind: 'up-to-date'; patch: string }
 
+// The patch id becomes a folder name and an import path, so it must not be able to escape either.
+function assertSafePatchId(patch: string): void {
+  if (!/^[0-9A-Za-z.]+$/.test(patch) || /^\.+$/.test(patch)) {
+    throw new Error(`invalid patch id '${patch}': expected letters, digits and dots only`)
+  }
+}
+
 /** Decides what a run does given wrpocket's meta and the existing snapshots (oldest first). */
 export function planRun(meta: SnapshotMeta, known: SnapshotMeta[], force: boolean): RunPlan {
+  assertSafePatchId(meta.patch)
   const current = known[known.length - 1]
   if (current === undefined) return { kind: 'bootstrap', patch: meta.patch }
   if (meta.patch === current.patch) {
