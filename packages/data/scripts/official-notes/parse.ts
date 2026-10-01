@@ -103,26 +103,32 @@ export function parseNotesPage(html: string, patch: string, url: string): Offici
     } else if (blade.type === 'articleRichText') {
       let current: NotesEntry | null = null
       let group: string | null = null
-      for (const match of RichTextSchema.parse(blade).richText.body.matchAll(/<(h2|h3|h4|p|li)[^>]*>([\s\S]*?)<\/\1>/g)) {
+      // The lookahead keeps <link>, <pre> and <param> from matching as <li> or <p>.
+      for (const match of RichTextSchema.parse(blade).richText.body.matchAll(/<(h2|h3|h4|p|li)(?=[\s>])[^>]*>([\s\S]*?)<\/\1>/g)) {
         const [, tag, inner] = match
+        const excluded = isExcluded(h2) || isExcluded(h3)
         if (tag === 'h2') {
           h2 = htmlToText(inner)
           h3 = ''
           current = null
+          group = null
         } else if (tag === 'h3') {
           h3 = htmlToText(inner)
           current = null
+          group = null
         } else if (tag === 'h4') {
-          current = {
-            source: 'rich-text', section: h3 || h2, excluded: isExcluded(h2) || isExcluded(h3),
-            heading: htmlToText(inner), lines: [],
-          }
+          current = { source: 'rich-text', section: h3 || h2, excluded, heading: htmlToText(inner), lines: [] }
           entries.push(current)
           group = null
         } else if (tag === 'p') {
           group = groupHeader(inner) ?? group
-        } else if (current !== null) {
-          current.lines.push(line(group, inner))
+        } else {
+          // Lines with no <h4> above them (e.g. an 'Items Removed' list) form an entry named after their section.
+          if (current === null && !excluded) {
+            current = { source: 'rich-text', section: h3 || h2, excluded, heading: h3 || h2, lines: [] }
+            entries.push(current)
+          }
+          current?.lines.push(line(group, inner))
         }
       }
     }

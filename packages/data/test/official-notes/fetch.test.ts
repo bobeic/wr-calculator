@@ -21,7 +21,7 @@ describe('loadNotes', () => {
   it('fetches, parses and caches the page', async () => {
     const opts = options()
     const notes = await loadNotes(opts)
-    expect(notes?.entries).toHaveLength(18)
+    expect(notes?.entries).toHaveLength(20)
     expect(existsSync(opts.cacheFile)).toBe(true)
   })
 
@@ -49,6 +49,6 @@ describe('loadNotes', () => {
   })
 
   it('offline with --notes-url: fetches', async () => {
-    expect((await loadNotes(options({ offline: true, allowFetch: true })))?.entries).toHaveLength(18)
+    expect((await loadNotes(options({ offline: true, allowFetch: true })))?.entries).toHaveLength(20)
   })
 })

@@ -81,7 +81,7 @@ describe('matchNotes', () => {
     const real = await readSnapshot(`${SNAPSHOTS}7.3a`)
     const matched = matchNotes(parseNotesPage(fixture('7.3a'), '7.3a', 'u'), real)
     expect(matched.filter((entry) => entry.ref !== null)).toHaveLength(15)
-    expect(matched.filter((entry) => entry.ref === null && !entry.excluded).map((entry) => entry.heading)).toEqual(['Diadem of Songs'])
+    expect(matched.filter((entry) => entry.ref === null && !entry.excluded).map((entry) => entry.heading)).toEqual(['Diadem of Songs', 'Other Battlefield Content', 'Nexus'])
     expect(matched.find((entry) => entry.heading === "Death's Dance")?.ref?.id).toBe('deaths-dance')
   })
 })
