@@ -9,6 +9,9 @@ Patch 7.3a is live.
 
 - Eclipse: in a Q then Q2 sequence, does Ever Rising Moon proc on Q2 (two hits within 1.8s)? The engine
   says yes. The recorded Q2 reading (693) didn't say whether it was on cooldown.
+- Percent armor pen stacking (most valuable): with Serylda's Grudge (35% armor pen) on Ambessa (R passive 30%),
+  what does a basic attack on the 100-armor dummy read? 127 means the sources add (65%, what the engine does);
+  118 means they multiply (54.5%). If they multiply, Q edge should read about 717 rather than 778.
 - Shop rules (no combat needed): how many item slots does the inventory have, with boots in or out of them?
   The engine allows 6 items plus a separate boots slot (`ITEM_SLOTS` / `HAS_SEPARATE_BOOTS_SLOT` in
   `packages/calc/src/rules.ts`); if it's 5 + boots, that's a one-line change. Also: can the same legendary
