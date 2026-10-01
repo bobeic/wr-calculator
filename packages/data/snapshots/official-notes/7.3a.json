@@ -393,6 +393,46 @@
       "source": "rich-text"
     },
     {
+      "excluded": false,
+      "heading": "Other Battlefield Content",
+      "lines": [
+        {
+          "after": "22 - 162 (Based on level)",
+          "before": "30 - 198 (Based on level)",
+          "group": null,
+          "text": "Smite’s Damage to Jungle monsters per second: 30 - 198 (Based on level) → 22 - 162 (Based on level)"
+        }
+      ],
+      "section": "Other Battlefield Content",
+      "source": "rich-text"
+    },
+    {
+      "excluded": false,
+      "heading": "Nexus",
+      "lines": [
+        {
+          "after": "4000",
+          "before": "5500",
+          "group": null,
+          "text": "Maximum Health：5500→4000"
+        },
+        {
+          "after": "20",
+          "before": "30",
+          "group": null,
+          "text": "Armor and Magic Resistance gained after a plate falls: 30→20"
+        },
+        {
+          "after": "10s",
+          "before": "20s",
+          "group": null,
+          "text": "Duration of Armor and Magic Resistance after a plate falls: 20s→10s"
+        }
+      ],
+      "section": "Nexus",
+      "source": "rich-text"
+    },
+    {
       "excluded": true,
       "heading": "Augment Adjustments",
       "lines": [

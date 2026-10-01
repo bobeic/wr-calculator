@@ -18,7 +18,7 @@ From the [official notes](https://wildrift.leagueoflegends.com/en-us/news/game-u
 
 - 0 flags auto-cleared as wrpocket-only
 - 0 hand-modelled entries changed in the notes but not in wrpocket
-- 15 notes entries matched, 1 unmatched, 2 game-mode / system entries skipped
+- 15 notes entries matched, 3 unmatched, 2 game-mode / system entries skipped
 
 "Reflected" means every number in a line's new value appears somewhere in wrpocket's record for that entry. It is a heuristic for spotting wrpocket lagging behind the notes; it never clears a flag.
 
@@ -90,6 +90,8 @@ None.
 ### Unmatched notes entries
 
 - ITEMS: Diadem of Songs
+- Other Battlefield Content: Other Battlefield Content
+- Nexus: Nexus
 
 ## Still stale from earlier patches
 
