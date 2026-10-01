@@ -230,3 +230,13 @@ TDD, no network in tests. Small fixtures in `packages/data/test/patch/fixtures/`
   the `import:wrpocket` mention is replaced by `patch:update`.
 - `packages/data/golden/README.md`: one line saying goldens run against the patch they were
   recorded on.
+
+## Update (2026-10-01): step 5 groundwork
+
+- `.github/workflows/ci.yml` runs typecheck and tests on pushes to `main` and on pull requests.
+- `.github/workflows/patch-update.yml` runs `patch:update`, then the checks, and opens a pull request
+  (`patch-update/auto`) whenever anything changed. The PR body holds the run's summary and any check
+  failures. It is manual (`workflow_dispatch`) until the user turns on the commented daily `schedule`. The
+  repository must allow GitHub Actions to create pull requests.
+- The link guard tests skip stale entries, which keep their last values on purpose until reviewed, so a
+  new patch with flagged changes doesn't fail the checks.

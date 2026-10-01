@@ -18,6 +18,8 @@ describe(`champion links against patch ${CURRENT_PATCH}`, async () => {
   it.each(cases)('%s matches its row and the model', (_, id, link) => {
     const rows = championRows(snapshot.champions.find((champion) => champion.id === id)!)
     expect(rows[link.row], link.row).toBeDefined()
+    // A stale champion keeps its last values until reviewed, so its new rows may disagree with the model on purpose.
+    if (dataset.stale.champions.has(id)) return
     const model = championValue(dataset.champions.find((champion) => champion.id === id) as Champion, link.path)
     const fromRow = (link.value ?? ((ranks: number[]) => ({ byRank: ranks })))(parseRanks(rows[link.row]))
     expect(sameValue(model, fromRow), `${JSON.stringify(model)} vs ${JSON.stringify(fromRow)}`).toBe(true)

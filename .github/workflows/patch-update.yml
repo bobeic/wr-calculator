@@ -1,0 +1,50 @@
+name: Patch update
+
+# Fetches wrpocket's latest data (and the official notes), regenerates the patch folder, the reports and the
+# build impact, and opens a pull request when anything changed. Manual for now: uncomment `schedule` to run it
+# daily. The PR needs "Allow GitHub Actions to create and approve pull requests" in the repository settings.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '17 6 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Import the latest patch data
+        run: pnpm --filter @wr-calc/data patch:update | tee patch-update.log
+      # The PR opens even when checks fail: a new patch needs a human either way, and the failures belong in the PR.
+      - name: Check the result
+        run: |
+          set +e
+          pnpm typecheck > checks.log 2>&1 && pnpm test >> checks.log 2>&1
+          status=$?
+          {
+            echo
+            if [ "$status" -eq 0 ]; then echo 'Typecheck and tests pass.'; else echo '**Typecheck or tests fail:**'; echo '```'; tail -n 40 checks.log; echo '```'; fi
+            echo
+            echo 'See `PATCH_DIFF.md` (Needs review) and `BUILD_IMPACT.md` in the new patch folder.'
+          } >> patch-update.log
+      - name: Open a pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: patch-update/auto
+          commit-message: 'chore: import the latest wrpocket patch data'
+          title: 'Patch update from wrpocket'
+          body-path: patch-update.log
+          add-paths: packages/data
+          delete-branch: true

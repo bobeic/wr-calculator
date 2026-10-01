@@ -34,6 +34,8 @@ describe(`text links against patch ${CURRENT_PATCH}`, async () => {
       expect(resolved, key).not.toHaveProperty('error')
       const model = modelValue(dataset.items.find((item) => item.id === itemId) as Item, link)
       expect(model, `${key} path`).toBeTypeOf('number')
+      // A stale item keeps its last values until reviewed, so its new text may disagree with the model on purpose.
+      if (dataset.stale.items.has(itemId)) return
       if (key in KNOWN_DIVERGENCES) {
         expect((resolved as { value: number }).value, `${key} is listed as a divergence but now agrees; remove it`).not.toBeCloseTo(model as number, 9)
       } else {
