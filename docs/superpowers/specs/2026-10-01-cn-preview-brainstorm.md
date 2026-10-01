@@ -126,3 +126,42 @@ nothing below was fetched):
 **To unblock:** either allow `game.gtimg.cn`, `mlol.qt.qq.com`, `wildriftalpha.com` and `wrpocket.app`
 in this environment's network settings, or capture wildriftalpha's network requests in browser
 devtools and commit the request URLs here.
+
+## 9. Tencent feed checked (2026-10-01, after the network allowlist)
+
+**wildriftalpha.com** answers non-browser requests with 403: "WildRift Alpha does not serve automated
+clients. Read it in a browser." It also sends `x-robots-tag: noai`. We don't scrape it.
+
+**Tencent's official CN database**, reachable and unauthenticated. Everything lives under
+`https://game.gtimg.cn/images/lgamem/act/lrlib/js/`:
+
+| File | Content |
+|---|---|
+| `heroList/hero_list.js` | every champion: id, Chinese name, roles, lane |
+| `hero/<heroId>.js` | base stats and per-level growth in fixed point (×10000, e.g. `armor: "440000"` = 44), plus `spells[]` with per-rank `variTypeN` / `variValueN` tables, cooldowns and costs |
+| `equip/equip.js` | 186 items: `equipId`, price, `from` (components), stats in fixed point, Chinese description |
+| `rune/rune.js` | runes |
+| `skins/skins.js` | skins |
+
+Every file is JSON with `version` and `fileTime`. Win rates come from
+`https://mlol.qt.qq.com/go/lgame_battle_info/hero_rank_list_v2`. The CDN sometimes resets connections,
+so fetches need a retry.
+
+**wrpocket is built on this feed.** wrpocket's `meta.sources` timestamps equal Tencent's `fileTime` to the
+second (champions 16:09:34, items 16:09:42, runes 16:09:43). Each wrpocket item has `source_id` = the
+Tencent `equipId`, and its images come from Tencent.
+
+**But Tencent is the CN server, not global.** On 2026-10-01 Tencent says `version: "7.3"`. All 170 of
+wrpocket's items match a Tencent id, and every price agrees except Death's Dance: Tencent 3200, wrpocket
+and the global 7.3a notes 3300. So wrpocket = the Tencent feed plus global changes from somewhere else.
+The CN server runs its own patch schedule. Sometimes it's ahead (BotRK 6% / 8% appeared in the Chinese
+text first) and sometimes behind (Death's Dance).
+
+**What this means:**
+- Importing Tencent directly would make the data CN-live, not global-live. For global-live accuracy,
+  wrpocket plus the official-notes cross-check stays the right base. The gap there is applying
+  number-only changes automatically (§8).
+- Tencent is a natural **preview/early-warning track**: a field-level diff of Tencent against our live
+  data shows changes CN already has and global doesn't yet. It's machine-readable, has per-rank
+  ability tables, and needs no Chinese text parsing for numbers; ids map through wrpocket's `source_id`.
+- Still open: whether a separate CN *test-server* (体验服) feed exists. Nothing found yet.
