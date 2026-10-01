@@ -62,12 +62,12 @@ describe('matchNotes', () => {
     expect(matched.map((entry) => entry.ref?.kind)).toEqual(['champion', 'item'])
   })
 
-  it('leaves excluded and unknown entries unmatched', () => {
+  it('resolves excluded entries too, and leaves unknown ones unmatched', () => {
     const matched = matchNotes(notes([
       { heading: 'Viego', excluded: true },
       { heading: 'Nexus' },
     ]), snap)
-    expect(matched.map((entry) => entry.ref)).toEqual([null, null])
+    expect(matched.map((entry) => [entry.excluded, entry.ref?.id ?? null])).toEqual([[true, 'viego'], [false, null]])
   })
 
   it('matches the 7.3a notes against the 7.3a snapshot', async () => {

@@ -18,11 +18,18 @@ const item = (id: string, name: string, price: string, description = ''): Snapsh
 })
 const snap = (items: Snapshot['items']): Snapshot => ({ meta: { patch: 't', updated: '2026-01-01 00:00:00' }, items, champions: [] })
 
-function notes(entries: Array<{ heading: string; lines?: Array<{ text: string; after: string | null }> }>): OfficialNotes {
+interface EntrySpec {
+  heading: string
+  section?: string
+  excluded?: boolean
+  lines?: Array<{ text: string; after: string | null }>
+}
+
+function notes(entries: EntrySpec[]): OfficialNotes {
   return {
     patch: '9.9', url: 'https://example.test/9-9', title: '', published: '2026-01-01T00:00:00.000Z',
-    entries: entries.map(({ heading, lines = [] }) => ({
-      source: 'rich-text', section: 'ITEMS', excluded: false, heading,
+    entries: entries.map(({ heading, section = 'ITEMS', excluded = false, lines = [] }) => ({
+      source: 'rich-text', section, excluded, heading,
       lines: lines.map(({ text, after }) => ({ group: null, text, before: after === null ? null : 'x', after })),
     })),
   }
@@ -63,6 +70,18 @@ describe('crossCheckNotes', () => {
     const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([{ heading: 'Beta' }]), ['a'], [], ['a'])
     expect(check.autoReviewed).toEqual([])
+  })
+
+  it('never auto-clears an entry named only in an excluded section, but reports nothing else for it', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const check = run(before, after, notes([
+      { heading: 'Alpha', section: 'Item System Adjustments', excluded: true, lines: [{ text: 'Price: 3200 → 3300', after: '3300' }] },
+      { heading: 'Gone' },
+    ]), ['a', 'b'])
+    expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
+    expect(check.mentioned.map((entry) => entry.ref.id)).toEqual(['gone'])
+    expect(check.notesFlags).toEqual([])
+    expect(check.excludedCount).toBe(1)
   })
 
   it('never auto-clears a removed entry or a mentioned one', () => {

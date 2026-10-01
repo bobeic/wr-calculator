@@ -31,7 +31,7 @@ export interface OfficialNotes {
   entries: NotesEntry[]
 }
 
-/** A notes entry with the item or champion it names; ref is null when unmatched or excluded. */
+/** A notes entry with the item or champion it names; ref is null when unmatched. Excluded entries are matched too. */
 export interface MatchedEntry extends NotesEntry {
   ref: EntryRef | null
 }

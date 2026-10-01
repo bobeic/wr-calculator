@@ -72,13 +72,15 @@ export function crossCheckNotes(input: CrossCheckInput): NotesCrossCheck {
     })
     return [{ ref: entry.ref, heading: entry.heading, status: entryStatus(lines), lines }]
   })
-  const mentionedKeys = new Set(mentioned.map((entry) => refKey(entry.ref)))
+  // An excluded section (game mode, system...) may still describe a real change, so naming an id there blocks its auto-clear.
+  const excludedKeys = matched.flatMap((entry) => (entry.excluded && entry.ref !== null ? [refKey(entry.ref)] : []))
+  const blocking = new Set([...mentioned.map((entry) => refKey(entry.ref)), ...excludedKeys])
   const changedKeys = new Set([...input.diff.items, ...input.diff.champions, ...input.diff.removed].map(refKey))
   const isCovered = (ref: EntryRef): boolean => listFor(input.covered, ref.kind).includes(ref.id)
   const staleKeys = new Set(input.previousStale.map(refKey))
 
   const autoReviewed: ReviewedEntry[] = input.flags
-    .filter((flag) => flag.severity === 'changed' && !mentionedKeys.has(refKey(flag)) && !staleKeys.has(refKey(flag)))
+    .filter((flag) => flag.severity === 'changed' && !blocking.has(refKey(flag)) && !staleKeys.has(refKey(flag)))
     .map((flag) => ({
       kind: flag.kind, id: flag.id,
       note: `Not in the official ${input.patch} notes (${input.url}); wrpocket-only change to ${[...new Set(flag.changes.map((change) => change.field))].join(', ')}`,

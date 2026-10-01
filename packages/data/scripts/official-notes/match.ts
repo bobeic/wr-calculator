@@ -19,12 +19,11 @@ function index(kind: EntryRef['kind'], entries: Array<{ id: string; name: { en: 
   return new Map(entries.map((entry) => [normaliseName(entry.name.en), { kind, id: entry.id, name: entry.name.en }]))
 }
 
-/** Pairs each notes entry with the item or champion it names in the snapshot, or null. */
+/** Pairs each notes entry, excluded ones included, with the item or champion it names in the snapshot, or null. */
 export function matchNotes(notes: OfficialNotes, snapshot: Snapshot): MatchedEntry[] {
   const items = index('item', snapshot.items)
   const champions = index('champion', snapshot.champions)
   return notes.entries.map((entry) => {
-    if (entry.excluded) return { ...entry, ref: null }
     const name = normaliseName(entry.heading)
     const key = ALIASES[name] ?? name
     const ref = entry.source === 'champion-blade' ? champions.get(key) : items.get(key) ?? champions.get(key)
