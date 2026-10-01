@@ -88,9 +88,11 @@ const AMBESSA: Champion = {
     },
     r: {
       id: 'ambessa-r', name: 'PUBLIC EXECUTION', maxRank: 3, cooldown: { byRank: [80, 70, 60] },
-      // 0.55s cast plus the 0.75s suppression before the slam (WR wiki; not timed in game).
-      castTime: 1.3, flags: {},
-      // 10/17.5/25% (+5% per 100 bonus AD) missing HP since patch 7.2b (WR wiki patch history).
+      // 0.55s cast (WR wiki) plus the 1s suppression before the slam (in-game tooltip); not timed.
+      castTime: 1.55, flags: {},
+      // 10/17.5/25% (+5% per 100 bonus AD) missing HP since patch 7.2b (WR wiki patch history); the
+      // in-game tooltip at rank 3 with no bonus AD reads "400 + 25% of their missing health".
+      // Unexplained: a full-HP dummy took 270, not the 236 that 400 alone gives (2026-09-30).
       damage: [{
         type: 'physical', base: { byRank: [200, 300, 400] },
         ratios: [{
@@ -103,7 +105,7 @@ const AMBESSA: Champion = {
         kind: 'stat', id: 'ambessa-r-passive-armor-pen', name: 'Public Execution (passive)',
         description: 'Gains 10/20/30% Armor Penetration.',
         // Verified 2026-09-30: a level-15 attack on the 100-armor dummy dealt 72 (121 x 100/170).
-        support: 'partial', supportNotes: 'Spell vamp is not modeled.',
+        support: 'partial', supportNotes: 'Ability healing (17.5% of damage at rank 3) is not modeled.',
         stat: 'pctArmorPen', amount: { byRank: [0.1, 0.2, 0.3] },
       }],
     },
