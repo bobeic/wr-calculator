@@ -3,9 +3,9 @@ import { runDebug, toBuild } from '../src/lib/run-debug'
 import type { Stage } from '../src/lib/run-debug'
 import { defaultState } from '../src/lib/debug-state'
 import type { DebugDataset, DebugState, DebugTarget } from '../src/lib/debug-state'
-import { PATCH_7_3_DATASET } from '../src/lib/dataset'
+import { datasetFor } from '../src/lib/dataset'
 
-const dataset = PATCH_7_3_DATASET
+const dataset = datasetFor('7.3')
 
 // Every 7.3 item is fully entered, so the null-report tests add one item with a missing value.
 const unfinishedItem = {

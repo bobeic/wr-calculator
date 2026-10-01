@@ -69,7 +69,7 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
           {boots.map((item) => <option key={item.id} value={item.id}>{item.name} ({item.cost.total}g)</option>)}
         </select>
       </label>
-      {runes.length === 0 ? <p>Runes: no runes in 7.3 data yet</p> : (
+      {runes.length === 0 ? <p>Runes: no runes in the patch data yet</p> : (
         <p>
           Runes:{' '}
           {runes.map((rune) => (

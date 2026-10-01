@@ -2,15 +2,16 @@ import { describe, it, expect } from 'vitest'
 import { runGoldenCase } from '../src/golden-runner'
 import { loadGoldenCases } from '../src/golden-loader'
 import { buildChampionMap } from '../src/champion-map'
-import { PATCH_7_3_CHAMPIONS, PATCH_7_3_CATALOG } from '../src/patches/7.3'
+import { getPatchDataset } from '../src/patches/registry'
 
 const GOLDEN_DIR = new URL('../golden', import.meta.url).pathname
-const champions = buildChampionMap(PATCH_7_3_CHAMPIONS)
 const cases = loadGoldenCases(GOLDEN_DIR)
 
+// Each case runs against the patch it was recorded on, so a newer patch never silently re-baselines it.
 describe.each(cases)('golden case: $file', ({ file, case: goldenCase }) => {
-  it(`matches simulateCombo within tolerance (${file})`, () => {
-    const result = runGoldenCase(goldenCase, champions, PATCH_7_3_CATALOG)
+  it(`matches simulateCombo within tolerance (${file}, patch ${goldenCase.patch})`, () => {
+    const dataset = getPatchDataset(goldenCase.patch)
+    const result = runGoldenCase(goldenCase, buildChampionMap(dataset.champions), dataset.catalog)
     expect(result.passed, result.failures.join('; ')).toBe(true)
   })
 })

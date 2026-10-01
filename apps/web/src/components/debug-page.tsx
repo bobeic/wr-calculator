@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
-import { PATCH_7_3_DATASET } from '../lib/dataset'
+import { CURRENT_PATCH } from '@wr-calc/data'
+import { CURRENT_DATASET } from '../lib/dataset'
 import { CRIT_MODES, MAX_DURATION_SECONDS } from '../lib/debug-state'
 import type { DebugState } from '../lib/debug-state'
 import { decodeState, encodeState } from '../lib/url-state'
@@ -13,7 +14,7 @@ import { BuildEditor } from './build-editor'
 import { TargetEditor } from './target-editor'
 import { ComboPanel, ComparePanel, NullsPanel, StatSheetsPanel, WarningsPanel } from './result-panels'
 
-const dataset = PATCH_7_3_DATASET
+const dataset = CURRENT_DATASET
 
 /** The debug page: state is decoded from the URL once, mirrored back on every change, and re-run through the engine. */
 export function DebugPage() {
@@ -40,7 +41,7 @@ export function DebugPage() {
 
   return (
     <main>
-      <h1>wr-calc debug (patch 7.3)</h1>
+      <h1>wr-calc debug (patch {CURRENT_PATCH})</h1>
       <p>
         Ability values assume every ability is at max rank (see{' '}
         docs/decisions/2026-09-24-byrank-scalar-ability-rank-context.md); there is no per-ability rank

@@ -1,10 +1,11 @@
-import {
-  PATCH_7_3_CATALOG, PATCH_7_3_CHAMPIONS, PATCH_7_3_TARGETS, buildChampionMap,
-} from '@wr-calc/data'
+import { CURRENT_PATCH, buildChampionMap, getPatchDataset } from '@wr-calc/data'
 import type { DebugDataset } from './debug-state'
 
-export const PATCH_7_3_DATASET: DebugDataset = {
-  champions: buildChampionMap(PATCH_7_3_CHAMPIONS),
-  catalog: PATCH_7_3_CATALOG,
-  targets: PATCH_7_3_TARGETS,
+/** A patch's data in the shape the debug page consumes. */
+export function datasetFor(patch: string): DebugDataset {
+  const dataset = getPatchDataset(patch)
+  return { champions: buildChampionMap(dataset.champions), catalog: dataset.catalog, targets: dataset.targets }
 }
+
+/** The newest imported patch: what the debug page shows. */
+export const CURRENT_DATASET: DebugDataset = datasetFor(CURRENT_PATCH)

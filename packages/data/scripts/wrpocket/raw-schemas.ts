@@ -3,7 +3,12 @@ import { z } from 'zod'
 // Only the fields the importer reads; .passthrough() tolerates everything else the site adds.
 const LocalizedSchema = z.object({ en: z.string() }).passthrough()
 
-export const RawMetaSchema = z.object({ patch: z.string(), updated: z.string() }).passthrough()
+export const RawMetaSchema = z.object({
+  patch: z.string(),
+  updated: z.string(),
+  patch_major: z.string().optional(),
+  sources: z.record(z.string(), z.string()).optional(),
+}).passthrough()
 
 export const RawItemSchema = z.object({
   id: z.string(),
