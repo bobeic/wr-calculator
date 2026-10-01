@@ -76,10 +76,10 @@ export function crossCheckNotes(input: CrossCheckInput): NotesCrossCheck {
   const excludedKeys = matched.flatMap((entry) => (entry.excluded && entry.ref !== null ? [refKey(entry.ref)] : []))
   const blocking = new Set([...mentioned.map((entry) => refKey(entry.ref)), ...excludedKeys])
   // A renamed heading or an entry named inside another entry's line ('Items Removed') is a mention the name match
-  // misses; a flag whose name appears in that text stays.
+  // misses; a flag whose name appears in that text stays. Excluded sections count too, like excludedKeys above.
   const looseTexts = [
-    ...included.filter((entry) => entry.ref === null).map((entry) => entry.heading),
-    ...included.flatMap((entry) => entry.lines.map((line) => line.text)),
+    ...matched.filter((entry) => entry.ref === null).map((entry) => entry.heading),
+    ...matched.flatMap((entry) => entry.lines.map((line) => line.text)),
   ].map(normaliseName)
   const namedLoosely = (flag: Flag): boolean => notesNames(flag.name).some((name) => looseTexts.some((text) => text.includes(name)))
   const changedKeys = new Set([...input.diff.items, ...input.diff.champions, ...input.diff.removed].map(refKey))

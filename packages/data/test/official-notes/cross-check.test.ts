@@ -100,6 +100,15 @@ describe('crossCheckNotes', () => {
     expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
   })
 
+  it('never auto-clears an entry named only in a line of an excluded section', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const check = run(before, after, notes([
+      { heading: 'Augment Adjustments', section: 'AAA ARAM', excluded: true, lines: [{ text: 'Alpha now grants 10% more', after: null }] },
+      { heading: 'Gone' },
+    ]), ['a', 'b'])
+    expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
+  })
+
   it('never auto-clears a removed entry or a mentioned one', () => {
     const after = snap([item('a', 'Alpha', '3300', 'Deals 7%'), item('b', 'Beta', '1000')])
     const check = run(before, after, notes([{ heading: 'Alpha', lines: [{ text: 'Price: 3200 → 3,300', after: '3,300' }] }]), ['a', 'gone'])
@@ -159,7 +168,9 @@ describe('crossCheckNotes', () => {
     expect(() => run(before, before, notes([{ heading: 'Nexus' }, { heading: 'Smite' }]), [])).toThrow(/none of its 2 entries matched/)
   })
 
-  it('reproduces the hand review of 7.3a: 30 auto-cleared, only Death\'s Dance left', async () => {
+  // The hand review cleared 30. Infinity Edge is one of them, but an ARAM augment line names it ('without Infinity Edge'),
+  // and a name in any notes line, excluded sections included, blocks the auto-clear: a false flag costs one review.
+  it('reproduces the hand review of 7.3a: 29 auto-cleared, Death\'s Dance and Infinity Edge left', async () => {
     const before73 = await readSnapshot(`${SNAPSHOTS}7.3`)
     const after73a = await readSnapshot(`${SNAPSHOTS}7.3a`)
     const dataset = getPatchDataset('7.3')
@@ -168,9 +179,9 @@ describe('crossCheckNotes', () => {
     const flags = flagHandModelled(diff, handModelled, NONE, [])
     const notes73a = parseNotesPage(fixture('7.3a'), '7.3a', 'https://example.test/7-3a')
     const check = crossCheckNotes({ patch: '7.3a', url: notes73a.url, notes: notes73a, after: after73a, diff, flags, handModelled, covered: NONE, goldens: [], previousStale: [] })
-    expect(check.autoReviewed).toHaveLength(30)
+    expect(check.autoReviewed).toHaveLength(29)
     const cleared = new Set(check.autoReviewed.map((entry) => entry.id))
-    expect(flags.filter((flag) => !cleared.has(flag.id)).map((flag) => flag.id)).toEqual(['deaths-dance'])
+    expect(flags.filter((flag) => !cleared.has(flag.id)).map((flag) => flag.id).sort()).toEqual(['deaths-dance', 'infinity-edge'])
     expect(check.notesFlags).toEqual([])
     expect(check.mentioned.find((entry) => entry.ref.id === 'deaths-dance')?.status).toBe('reflected')
   })
