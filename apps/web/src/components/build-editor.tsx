@@ -3,6 +3,7 @@
 import type { StatCatalog } from '@wr-calc/calc'
 import type { DebugBuild } from '../lib/debug-state'
 import { collectInputs, inputValue } from '../lib/collect-inputs'
+import { summarizeBuild } from '../lib/build-summary'
 
 interface BuildEditorProps {
   label: string
@@ -18,6 +19,11 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
   const nonBoots = allItems.filter((item) => item.tier !== 'boots')
   const runes = [...catalog.runes.values()]
   const inputs = collectInputs(build, catalog)
+  const summary = summarizeBuild(build, catalog)
+  const efficiency = (index: number): string => {
+    const value = summary.items[index]?.efficiency
+    return value === null || value === undefined ? '' : `, ${Math.round(value * 100)}% stat value`
+  }
 
   const move = (index: number, delta: number) => {
     const items = [...build.items]
@@ -44,7 +50,7 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
       <ol>
         {build.items.map((id, index) => (
           <li key={`${id}-${index}`}>
-            {catalog.items.get(id)?.name ?? id}{' '}
+            {catalog.items.get(id)?.name ?? id} ({catalog.items.get(id)?.cost.total ?? '?'}g{efficiency(index)}){' '}
             <button type="button" disabled={index === 0} onClick={() => move(index, -1)}>↑</button>
             <button type="button" disabled={index === build.items.length - 1} onClick={() => move(index, 1)}>↓</button>
             <button type="button" onClick={() => onChange({ ...build, items: build.items.filter((_, i) => i !== index) })}>
@@ -69,6 +75,12 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
           {boots.map((item) => <option key={item.id} value={item.id}>{item.name} ({item.cost.total}g)</option>)}
         </select>
       </label>
+      <p>Total cost: {summary.totalCost}g (stat value counts stats only, priced from basic items)</p>
+      {summary.issues.length > 0 && (
+        <ul>
+          {summary.issues.map((issue, index) => <li key={`${index}-${issue.code}`} role="alert">{issue.message}</li>)}
+        </ul>
+      )}
       {runes.length === 0 ? <p>Runes: no runes in the patch data yet</p> : (
         <p>
           Runes:{' '}
