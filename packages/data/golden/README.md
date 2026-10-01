@@ -4,6 +4,8 @@ Real, in-game-verified combat scenarios that `packages/data/test/golden.test.ts`
 engine against. `loadGoldenCases` (Node-only, imported from `@wr-calc/data/golden-loader`, not the
 root entry) loads every `*.json` file here.
 
+Each case runs against the patch in its `patch` field, so importing a newer patch never changes what an existing case checks.
+
 Current cases (7.3 practice tool, 2026-09-25): Annie at level 15, one ability per case, against the
 practice dummy (100 armor / 100 MR / 10,000 HP; no `timeToKill` is recorded). "clean build" is Spellslinger's Shoes + Rabadon's Deathcap + Void Staff +
 Zhonya's Hourglass, which have no on-hit damage passives. "full build" adds Luden's Echo and
