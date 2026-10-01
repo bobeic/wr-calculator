@@ -56,10 +56,10 @@ async function main(): Promise<void> {
 
   await mkdir(OUT_DIR, { recursive: true })
   await writeFile(join(OUT_DIR, 'items.ts'), renderModule(
-    'GENERATED_ITEMS', 'Item', items.map(({ mapped }) => mapped.value), meta,
+    'GENERATED_ITEMS', 'Item', items.map(({ mapped }) => mapped.value), meta, 'WRPOCKET_7_3_PROVENANCE',
   ))
   await writeFile(join(OUT_DIR, 'champions.ts'), renderModule(
-    'GENERATED_CHAMPIONS', 'Champion', champions.map(({ mapped }) => mapped.value), meta,
+    'GENERATED_CHAMPIONS', 'Champion', champions.map(({ mapped }) => mapped.value), meta, 'WRPOCKET_7_3_PROVENANCE',
   ))
   const sections = [
     ...champions.map(({ mapped }) => ({ subject: `champion ${mapped.value.id}`, notes: mapped.notes })),
