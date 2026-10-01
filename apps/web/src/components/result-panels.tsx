@@ -3,6 +3,7 @@ import { STAT_KEYS } from '@wr-calc/schema'
 import type { BuildBreakpoint, ComboResult, CompareBuildsResult, StatSheet } from '@wr-calc/calc'
 import type { DebugEnvelope, Stage } from '../lib/run-debug'
 import type { NullEntry } from '../lib/null-report'
+import { sourceLabel } from '../lib/source-label'
 
 function fmt(value: number | undefined): string {
   return value === undefined ? '—' : value.toFixed(1)
@@ -106,7 +107,7 @@ function ComboView({ result }: { result: ComboResult }) {
           {result.instances.map((instance, index) => (
             <tr key={index}>
               <td>{instance.time.toFixed(2)}</td>
-              <td>{instance.source.name}</td>
+              <td>{sourceLabel(instance, fmt)}</td>
               <td>{instance.type}</td>
               <td>{fmt(instance.raw)}</td>
               <td>{fmt(instance.mitigated)}</td>
