@@ -1,6 +1,6 @@
 # Official patch notes cross-check: design
 
-**Status:** Draft for review
+**Status:** Implemented; §4.1–4.3 and §5 updated 2026-10-01 to match the code
 **Date:** 2026-10-01
 **Builds on:** `2026-10-01-patch-update-pipeline-design.md`; ADR `docs/decisions/2026-10-01-data-source-priority.md`
 
@@ -103,8 +103,10 @@ interface OfficialNotes {
 **Excluded sections.** An entry is excluded when its nearest `<h2>` or `<h3>` heading matches, case-folded,
 any of: `game mode`, `adventure`, `aram`, `bug fix`, `system`, `training`, `custom mode`, `battlefest`,
 `recommendation`, `season theme`, `wild pass`. A new `<h2>` resets the `<h3>`. Excluded entries never
-count as mentions, because they describe mode-only changes. Section names don't decide whether an entry
-is an item or a champion; the name match does (§4.2).
+count as mentions, because they describe mode-only changes: they get no reflected status and never raise
+a notes-only flag. They still block auto-clears, though (§4.3): a section name is a weak signal, and an
+excluded section can describe a real change. Section names don't decide whether an entry is an item or a
+champion; the name match does (§4.2).
 
 ### 4.2 Matching
 
@@ -115,7 +117,12 @@ spaces removed, and punctuation other than letters, digits and spaces dropped.
 - A rich-text entry that isn't excluded is matched against item names first, then champion names.
 - An entry with no match is reported as unmatched, with its section. Examples: `Attack Speed Growth`,
   `Nexus` and `Augment Adjustments`.
-- Excluded entries are only counted in the report.
+- Excluded entries are matched too, but the report only counts them. A match there still blocks that id's
+  auto-clear (§4.3).
+- Unmatched headings, excluded or not, and every change line are kept as loose text. A flagged entry whose
+  name (or an alias of it) appears inside that text keeps its flag. This catches a renamed heading
+  (`Alpha Reforged`) and an entry named inside another entry's line (`Items Removed`, or an ARAM augment
+  line such as "...without Infinity Edge").
 - A small alias table maps known naming differences between the notes and wrpocket. On 7.3 these are
   `Lord Dominik's Regards` → `Dominik’s Regards`, `At Wit's End` → `Wit's End` and `Staff of Flowing
   Waters` → `Staff of Flowing Water`.
@@ -128,8 +135,15 @@ The inputs are the snapshot diff, the review flags `buildPatchDiff` already comp
 the hand-modelled ids and the new snapshot.
 
 - **Mentioned or not.** An id is mentioned if any matched notes entry maps to it.
-- **Auto-clear.** A flag with severity `changed` whose id is not mentioned becomes a generated
-  `ReviewedEntry`. Its note reads: `Not in the official <patch> notes (<url>); wrpocket-only change to
+- **Auto-clear.** A flag with severity `changed` becomes a generated `ReviewedEntry` only when all of
+  these hold:
+  - its id is not mentioned;
+  - its id is not matched by an entry in an excluded section;
+  - its name doesn't appear in any unmatched heading or any change line, excluded sections included (§4.2);
+  - it isn't already stale from an earlier patch;
+  - the notes have at least one entry outside excluded sections (otherwise "not mentioned" proves nothing).
+
+  Its note reads: `Not in the official <patch> notes (<url>); wrpocket-only change to
   <fields>`. Flags with severity `removed` are never auto-cleared.
 - **Notes-only flag.** A hand-modelled id that is mentioned, not covered (by an override or a hand
   review), and absent from the snapshot diff becomes a new flag. Its severity is `notes` and it carries
@@ -198,9 +212,10 @@ After implementation, `patch:update --from-cache .cache/wrpocket/7.3a-2026092916
   reflected status.
 - The augment, champion-adjustment and Nexus headings unmatched under "other".
 
-A test runs the cross-check on the 7.3a fixtures with no hand reviews. It must produce exactly 30
-auto-reviewed entries and leave only Death's Dance flagged. That is the 7.3a outcome we worked out by
-hand, made executable.
+A test runs the cross-check on the 7.3a fixtures with no hand reviews. It must produce exactly 29
+auto-reviewed entries and leave Death's Dance and Infinity Edge flagged. The hand review cleared 30, but an
+ARAM augment line names Infinity Edge, and the loose-text rule (§4.2) deliberately keeps that flag: a false
+flag costs one manual review, a false clear hides a real change.
 
 ## 6. Testing
 
