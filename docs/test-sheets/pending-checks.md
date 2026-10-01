@@ -9,6 +9,10 @@ Patch 7.3a is live.
 
 - Eclipse: in a Q then Q2 sequence, does Ever Rising Moon proc on Q2 (two hits within 1.8s)? The engine
   says yes. The recorded Q2 reading (693) didn't say whether it was on cooldown.
+- Shop rules (no combat needed): how many item slots does the inventory have, with boots in or out of them?
+  The engine allows 6 items plus a separate boots slot (`ITEM_SLOTS` / `HAS_SEPARATE_BOOTS_SLOT` in
+  `packages/calc/src/rules.ts`); if it's 5 + boots, that's a one-line change. Also: can the same legendary
+  be bought twice? The engine says no (components can).
 - Seraph's Embrace: is it in the same one-per-build group as Sterak's Gage and Maw of Malmortius (a guess
   from its passive's name)?
 

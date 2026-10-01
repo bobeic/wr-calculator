@@ -82,7 +82,7 @@ describe('resolveStats', () => {
   })
 
   it('includes boots and enchant stats in the bonus layer, not just build.items', () => {
-    const boots = itemWithStats('boots-of-swiftness', 0)
+    const boots: Item = { ...itemWithStats('boots-of-swiftness', 0), tier: 'boots' }
     boots.stats = { moveSpeed: 45 }
     const enchant = itemWithStats('stasis-enchant', 0)
     enchant.stats = { ad: 15 }

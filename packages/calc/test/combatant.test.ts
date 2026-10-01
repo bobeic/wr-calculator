@@ -46,7 +46,7 @@ describe('combatantFromChampion', () => {
   it('collects build.items plus boots and enchant, in that order', () => {
     const items = new Map([
       ['long-sword', itemWithStats('long-sword', 10)],
-      ['boots', itemWithStats('boots', 0)],
+      ['boots', { ...itemWithStats('boots', 0), tier: 'boots' }],
       ['enchant', itemWithStats('enchant', 0)],
     ])
     const build = emptyBuild({ items: ['long-sword'], boots: 'boots', enchant: 'enchant' })

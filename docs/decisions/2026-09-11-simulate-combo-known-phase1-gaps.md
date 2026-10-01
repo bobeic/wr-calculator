@@ -126,3 +126,15 @@ correctness bugs, and are not listed here.
   Step 5's `compareBuilds` crossover charts can build on an unbiased `timeToKill`.
 - This ADR supersedes the plan's inline "Known Phase 1 gaps" note as the durable reference —
   future steps should update this file, not the (by then historical) Step 4 plan document.
+
+## Update (2026-10-01): build validation
+
+`validateBuild` (`packages/calc/src/validate-build.ts`) now checks every build before stats resolve:
+- unknown ids;
+- the slot count from `rules.ts` (6 items, with boots and enchants counted according to its flags);
+- one copy of each finished item (legendary, boots, enchant, support), while components may repeat;
+- boots only in the boots slot;
+- one item per exclusive group.
+
+`resolveStats` throws with every issue listed, which the debug page shows as a stage error. The slot
+count is still TODO-VERIFY(itemSlots).

@@ -10,6 +10,7 @@ import { championKitEffects } from './kit-effects'
 import { contributeStats, stageOf } from './effects/registry'
 import type { StatContribution, StatContext, StatLayer, StatSource } from './effects/types'
 import type { UnsupportedEffectEntry } from './result-envelope'
+import { validateBuild } from './validate-build'
 
 export interface StatSheet {
   base: Partial<Record<StatKey, number>>
@@ -105,23 +106,9 @@ export function resolveStats(
     ...(build.boots ? [build.boots] : []),
     ...(build.enchant ? [build.enchant] : []),
   ]
-  const items = itemIds.map((id) => {
-    const item = catalog.items.get(id)
-    if (!item) throw new Error(`resolveStats: unknown item id '${id}' in build`)
-    return item
-  })
-  const holderByGroup = new Map<string, string>()
-  for (const item of items) {
-    if (!item.exclusiveGroup) continue
-    const holder = holderByGroup.get(item.exclusiveGroup)
-    if (holder) {
-      throw new Error(
-        `resolveStats: items '${holder}' and '${item.id}' can't be held together `
-        + `(both in exclusive group '${item.exclusiveGroup}')`
-      )
-    }
-    holderByGroup.set(item.exclusiveGroup, item.id)
-  }
+  const issues = validateBuild(build, catalog.items)
+  if (issues.length > 0) throw new Error(`resolveStats: ${issues.map((issue) => issue.message).join('; ')}`)
+  const items = itemIds.map((id) => catalog.items.get(id) as Item)
   const runes = build.runes.map((id) => {
     const rune = catalog.runes.get(id)
     if (!rune) throw new Error(`resolveStats: unknown rune id '${id}' in build`)
