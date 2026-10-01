@@ -52,5 +52,9 @@ export const OVERRIDE_ITEMS: Item[] = [
       + 'number with the hit that triggers it.',
     damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.07 }], tags: [] },
   }),
+  // Practice tool, 2026-10-01: no Frostbite burn. The in-game description has only Icy ("damaging active abilities
+  // and empowered attacks slow enemies below 60% Health by 30% for 1 second"), matching wrpocket; the burn came from
+  // an out-of-date WR wiki page. Icy's slow isn't modelled, so Serylda's is stats only.
+  { ...inherited('seryldas-grudge'), effects: [], provenance: IN_GAME_7_3A },
 ]
 export const OVERRIDE_CHAMPIONS: Champion[] = []

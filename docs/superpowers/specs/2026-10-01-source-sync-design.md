@@ -28,28 +28,26 @@ number-only changes should apply by themselves. A change to how an item works sh
 - **Pins.** `Item.sourcePins` (optional, e.g. `['cost', 'stats.ad']`) keeps a hand-written value
   where a better source disagrees with wrpocket (in-game reading or official notes, per the
   source-priority ADR). Each pin needs a comment naming that source. No item has pins today.
-- **Pipeline.** `buildPatchDiff({ autoApply: { pinnedItems } })`: a hand-modelled, uncovered, unpinned
-  item is **auto-applied** when both of these hold:
-  - every change is `name`, `price`, `tier`, `components` or a stat whose value changed;
-  - the official notes mention the item and every new number in their lines appears in wrpocket's
-    record (the cross-check's `reflected` status).
+- **Pipeline.** `buildPatchDiff({ autoApply: { handItems } })`: a hand-modelled, uncovered, unpinned
+  item is **auto-applied** when every change is `name`, `price`, `tier`, `components`, a stat whose value
+  changed, or a qualifying description change (§3). The official notes don't have to mention it, but if
+  they do they must agree (§3). An auto-applied item isn't flagged, isn't added to `changed-ids.ts` (so it
+  doesn't go stale), and is listed in `patch-diff.json` `autoApplied` and under "Applied automatically" in
+  `PATCH_DIFF.md`.
 
-  wrpocket alone isn't trusted for this. It carries Tencent CN values and sometimes regresses against
-  the global notes. On 7.3a its BotRK text went 7% → 6%, copied from the Chinese text, while the
-  global 7.3a notes list no BotRK change. What 7.3a did change is Viego's Q, which is also titled "Blade
-  of the Ruined King". The notes list that change on Viego's champion card, and the matcher attributes it
-  to Viego, not to the item. A test pins this, so a name shared between an ability and an item never
-  counts as an item mention. An auto-applied item isn't flagged, isn't added to `changed-ids.ts` (so it doesn't go stale), and is
-  listed in `patch-diff.json` `autoApplied` and under "Applied automatically" in `PATCH_DIFF.md`.
   These are still flagged:
-  - a synced change the notes don't confirm. The notes cross-check also never auto-clears a flag that
-    has a synced change, because the overlay already applied wrpocket's value: clearing it as
-    "wrpocket-only" would hide it;
+  - a change the notes contradict;
   - a stat that is added or dropped, because a dropped stat can't be told apart from a hand-only extra
     at build time;
   - a `category` change (tags are hand-written);
-  - any description change;
+  - a description change that isn't number-only, or that moves an unlinked number;
   - any change to a pinned item.
+
+  The notes cross-check never auto-clears a flag that has a synced change or a text change that moves a
+  number. The notes don't list every change: BotRK's 7% → 6% in 7.3a was real and undocumented.
+  What the 7.3a notes did change is Viego's Q, which is also titled "Blade of the Ruined King". The notes
+  list that change on Viego's champion card, and the matcher attributes it to Viego, not to the item. A
+  test pins this, so a name shared between an ability and an item never counts as an item mention.
 - **Safety.** Turning sync on changed no value in 7.3 or 7.3a. Every hand-modelled stat, cost and recipe
   already matched wrpocket, apart from key order and the hand-only extras. All goldens still pass.
 
@@ -81,10 +79,13 @@ Effects are hand-modelled from description text (Rabadon's "Increases Ability Po
     with (BotRK, Eclipse) never auto-applies;
   - every changed number is linked or ignored.
 - **Auto-apply** (`autoAppliedItems`). A flagged item is auto-applied when every change is synced
-  (§2) or a qualifying description change, and the official notes:
-  - mention the item;
-  - are `reflected` in wrpocket;
-  - contain each changed linked number.
+  (§2) or a qualifying description change. If the official notes mention the item, they must agree:
+  - the entry is `reflected` in wrpocket;
+  - it contains each changed linked number.
+
+  If the notes don't mention the item, or there are no notes, wrpocket's numbers apply: in-game checks on
+  7.3a backed wrpocket on BotRK and Eclipse, where the notes and the wiki were silent or out of date
+  (decided 2026-10-01; this replaces the earlier "notes must confirm" rule).
 
   The new values go into `generated/text-sync.ts` (`TEXT_SYNC`). `layer.ts` passes them as `textSync`, and
   the overlay applies them to inherited hand-modelled items before overrides, so later patches inherit
@@ -116,3 +117,11 @@ before base stats sync.
 
 Diffing the Tencent CN feed field by field against our live data lists changes CN already has and global
 doesn't yet (brainstorm §9). It reuses `diffSnapshots` once a Tencent → snapshot mapper exists.
+
+## 6. Changes after in-game readings (2026-10-01)
+
+- BotRK's 7% → 6% was a real, undocumented 7.3a change. The notes cross-check no longer auto-clears a
+  text change whose numbers changed (as a multiset, so moved numbers don't count). Such a change
+  auto-applies through its links, or stays flagged.
+- §2's "notes must confirm" rule is relaxed as described in §3: wrpocket's numbers apply unless the notes
+  contradict them. The stale-hold rule still keeps a flagged item at its last values until it's covered.

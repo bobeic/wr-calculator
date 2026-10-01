@@ -65,6 +65,13 @@ so the proc is 7% max HP (the WR wiki's 6% was out of date). `aa` uses a 2% tole
 ~5 over the no-item 270 (parked with the rest of R). Q-then-slam is left out until it's clear whether the proc
 was on cooldown.
 
+Item batch 5, the rest (7.3a practice tool, 2026-10-01): the same Ambessa setup with one item each. Black Cleaver
+(`aa-aa` shows the second attack after one Carve stack; `e-feint-empowered-aa-q` adds one stack from the empowered
+attack), Spear of Shojin (`q-w-e-q`: 591 + 117 + 116 + 677 as Focused Will stacks), Sundered Sky (`aa-aa`: the first
+attack crits for 152, the second doesn't), Sterak's Gage, Death's Dance, Guardian Angel (45 AD) and Maw of
+Malmortius. Readings within one point of the engine were recorded as read. Serylda's Grudge has no Frostbite burn
+in game; its other hits aren't recorded yet.
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.

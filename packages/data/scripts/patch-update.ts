@@ -224,7 +224,7 @@ async function run(options: Options): Promise<void> {
       autoApply: { handItems: dataset.items.filter((item) => dataset.handModelled.items.some((hand) => hand.id === item.id)) },
     })
     needsReview = diff.needsReview.length
-    if (diff.autoApplied.length > 0) console.log(`${diff.autoApplied.length} hand-modelled items took number-only changes the official notes confirm, automatically.`)
+    if (diff.autoApplied.length > 0) console.log(`${diff.autoApplied.length} hand-modelled items took number-only changes from wrpocket automatically.`)
     // Auto-applied items took their new values from wrpocket, so they don't go stale.
     const changedIds = changedIdsOf(diffSnapshots(before, committed))
     const applied = new Set(diff.autoApplied.map((entry) => entry.id))

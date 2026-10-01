@@ -197,7 +197,7 @@ export const ITEM_TEXT_LINKS: Record<string, ItemTextLinks> = {
     ],
     ignore: [/\([\d.]+% for ranged champions\)/, /absorbs damage equal to [^)]*\)/, /for \d+ seconds \(/],
   },
-  // wrpocket's text has only Icy (a slow); Frostbite's numbers come from the WR wiki and have no text to link.
+  // Icy is a slow, which isn't modelled (there is no Frostbite burn: in-game check, 2026-10-01).
   'seryldas-grudge': { links: [], ignore: [/Icy:[^\n]*/] },
   'spear-of-shojin': {
     links: [

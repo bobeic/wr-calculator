@@ -111,11 +111,11 @@ describe('auto-apply of number-only item changes', () => {
     notesBefore: [], notesAfter: [], notes: withNotes ? { url: 'u', notes } : null, autoApply: { handItems: ids.map(model), links },
   })
 
-  it('applies changes the notes confirm; flags wording, added stats, pins, unconfirmed and contradicted changes', () => {
+  it('applies number-only changes the notes confirm or leave out; flags wording, added stats, pins and contradictions', () => {
     const result = run(true)
-    expect(result.autoApplied.map((entry) => entry.id)).toEqual(['linked', 'price', 'stat'])
+    expect(result.autoApplied.map((entry) => entry.id)).toEqual(['linked', 'price', 'stat', 'unconfirmed'])
     expect(result.needsReview.map((flag) => flag.id).sort())
-      .toEqual(['added-stat', 'contradicted', 'linked-unconfirmed', 'pinned', 'text', 'unconfirmed'])
+      .toEqual(['added-stat', 'contradicted', 'linked-unconfirmed', 'pinned', 'text'])
   })
 
   it('turns a confirmed linked description number into a text-sync update', () => {
@@ -126,16 +126,17 @@ describe('auto-apply of number-only item changes', () => {
     expect(run(true).officialNotes?.autoReviewed).toEqual([])
   })
 
-  it('auto-applies nothing without the official notes, or when autoApply is off', () => {
-    expect(run(false).autoApplied).toEqual([])
-    expect(run(false).textSync).toEqual([])
-    expect(run(false).needsReview).toHaveLength(9)
+  it('trusts wrpocket when there are no official notes, and auto-applies nothing when autoApply is off', () => {
+    const result = run(false)
+    expect(result.autoApplied.map((entry) => entry.id)).toEqual(['contradicted', 'linked', 'linked-unconfirmed', 'price', 'stat', 'unconfirmed'])
+    expect(result.needsReview.map((flag) => flag.id).sort()).toEqual(['added-stat', 'pinned', 'text'])
     const { autoApply: _, ...input } = {
       before: base, after, handModelled: { items: ids, champions: [] }, previousStale: [], covered: NONE, goldens: [],
       notesBefore: [], notesAfter: [], notes: { url: 'u', notes }, autoApply: undefined,
     }
     expect(buildPatchDiff(input).autoApplied).toEqual([])
   })
+
 })
 
 describe('buildPatchDiff', () => {

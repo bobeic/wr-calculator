@@ -1,0 +1,27 @@
+{
+  "scenario": {
+    "championId": "ambessa",
+    "level": 15,
+    "build": {
+      "items": [
+        "deaths-dance"
+      ],
+      "runes": [],
+      "inputs": {}
+    },
+    "target": {
+      "hp": 10000,
+      "armor": 100,
+      "mr": 100
+    },
+    "combo": [
+      "AA"
+    ]
+  },
+  "expected": {
+    "totalDamage": 101
+  },
+  "tolerance": 0.02,
+  "patch": "7.3a",
+  "source": "practice-tool"
+}

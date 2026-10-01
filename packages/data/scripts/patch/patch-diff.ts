@@ -56,15 +56,13 @@ export interface AutoApplyInput {
 }
 
 /**
- * Flagged items the official notes confirm and whose every change applies without a hand edit: synced fields
- * (price, recipe, tier, stat values), plus description changes where only linked or ignored numbers move. The notes
- * must mention the item with every new number matching wrpocket (reflected), and contain each changed linked number.
- * wrpocket sometimes carries CN-only or regressed values (7.3a BotRK), so anything unconfirmed stays flagged.
- * Pinned items are never auto-applied.
+ * Flagged items whose every change applies without a hand edit: synced fields (price, recipe, tier, stat values), plus
+ * description changes where only linked or ignored numbers move. wrpocket's numbers are trusted (in-game checks on
+ * 7.3a backed it on BotRK and Eclipse where the notes and wiki were silent or stale), so the official notes don't
+ * have to mention the item. When they do, they must agree: every new number in them shows up in wrpocket (reflected)
+ * and each changed linked number is among them; otherwise the item stays flagged. Pinned items are never auto-applied.
  */
 export function autoAppliedItems(flags: Flag[], officialNotes: NotesCrossCheck | null, input: AutoApplyInput): { applied: Flag[]; textSync: TextUpdate[] } {
-  const none = { applied: [], textSync: [] }
-  if (officialNotes === null || !officialNotes.found) return none
   const links = input.links ?? ITEM_TEXT_LINKS
   const items = new Map(input.handItems.map((item) => [item.id, item]))
   const applied: Flag[] = []
@@ -72,16 +70,20 @@ export function autoAppliedItems(flags: Flag[], officialNotes: NotesCrossCheck |
   for (const flag of flags) {
     const item = items.get(flag.id)
     if (flag.kind !== 'item' || flag.severity !== 'changed' || item === undefined || (item.sourcePins ?? []).length > 0) continue
-    const entries = officialNotes.mentioned.filter((entry) => entry.ref.kind === 'item' && entry.ref.id === flag.id)
-    if (entries.length === 0 || entries.some((entry) => entry.status !== 'reflected')) continue
     if (!flag.changes.every((change) => isSyncedChange(change) || change.field === 'description')) continue
     const description = flag.changes.find((change) => change.field === 'description')
     const check = description === undefined
       ? { ok: true as const, updates: [], changedLinkedNumbers: [] }
       : checkDescription(flag.id, description.before, description.after, links[flag.id], item)
     if (!check.ok) continue
-    const notesNumbers = new Set(entries.flatMap((entry) => entry.lines.flatMap((line) => (line.after === null ? [] : numberTokens(line.after)))))
-    if (!check.changedLinkedNumbers.every((number) => notesNumbers.has(number))) continue
+    const entries = officialNotes?.found === true
+      ? officialNotes.mentioned.filter((entry) => entry.ref.kind === 'item' && entry.ref.id === flag.id)
+      : []
+    if (entries.length > 0) {
+      if (entries.some((entry) => entry.status !== 'reflected')) continue
+      const notesNumbers = new Set(entries.flatMap((entry) => entry.lines.flatMap((line) => (line.after === null ? [] : numberTokens(line.after)))))
+      if (!check.changedLinkedNumbers.every((number) => notesNumbers.has(number))) continue
+    }
     applied.push(flag)
     textSync.push(...check.updates)
   }
@@ -113,7 +115,7 @@ export interface BuildPatchDiffInput {
   notesAfter: NoteRef[]
   /** The official notes for the new patch; null when no notes stage ran. */
   notes: { url: string; notes: OfficialNotes | null } | null
-  /** Turns on auto-apply of notes-confirmed number-only item changes. Omitted: everything is flagged. */
+  /** Turns on auto-apply of number-only item changes the notes don't contradict. Omitted: everything is flagged. */
   autoApply?: AutoApplyInput
 }
 

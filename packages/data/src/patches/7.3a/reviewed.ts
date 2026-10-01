@@ -52,7 +52,6 @@ export const REVIEWED: ReviewedEntry[] = [
   { kind: 'item', id: 'plated-steelcaps', note: REORDER },
   { kind: 'item', id: 'rabadons-deathcap', note: WORDING },
   { kind: 'item', id: 'riftmaker', note: REORDER },
-  { kind: 'item', id: 'seryldas-grudge', note: WORDING },
   {
     kind: 'item', id: 'spear-of-shojin',
     note: 'wrpocket added "stacks have a 1 second cooldown per ability cast"; the model already stacks '

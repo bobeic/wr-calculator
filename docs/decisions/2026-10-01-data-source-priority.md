@@ -55,3 +55,14 @@ comment at the value naming the sources. Anything still open goes on
 - **wrpocket was right on Eclipse too.** The proc is 7% max HP (melee); the WR wiki's 6% was out of date.
 - wrpocket's text was wrong on Sterak's Gage (30% tenacity on Fury; it is 20% flat) and dropped Infinity Orb's
   15 magic pen (still there), so wrpocket text changes still need confirming.
+
+## Update (2026-10-01, later): trust wrpocket's numbers by default
+
+After the batch 5 readings (every stat and almost every hit matched wrpocket-based predictions, within the
+practice tool's rounding), the user chose to use wrpocket's numbers as they are and ask for in-game testing
+only where a passive's behaviour is unclear. In the pipeline:
+- A number-only change (synced fields, or linked description numbers) applies from wrpocket
+  automatically, whether or not the official notes mention it. It stays flagged only when the notes
+  contradict it.
+- Wording changes, unlinked numbers and pinned items are still flagged.
+- The source order above still decides conflicts: an in-game reading or a stated patch note beats wrpocket.

@@ -706,18 +706,57 @@
         "ambessa-l15-bf-sword-q-then-slam.json",
         "ambessa-l15-bf-sword-q.json",
         "ambessa-l15-bf-sword-w.json",
+        "ambessa-l15-black-cleaver-aa-aa.json",
+        "ambessa-l15-black-cleaver-aa.json",
+        "ambessa-l15-black-cleaver-e-feint-empowered-aa-q.json",
+        "ambessa-l15-black-cleaver-e.json",
+        "ambessa-l15-black-cleaver-q-then-slam.json",
+        "ambessa-l15-black-cleaver-q.json",
+        "ambessa-l15-black-cleaver-w.json",
+        "ambessa-l15-deaths-dance-aa.json",
+        "ambessa-l15-deaths-dance-e.json",
+        "ambessa-l15-deaths-dance-q-then-slam.json",
+        "ambessa-l15-deaths-dance-q.json",
+        "ambessa-l15-deaths-dance-w.json",
         "ambessa-l15-eclipse-aa.json",
         "ambessa-l15-eclipse-e-then-feint-proc.json",
         "ambessa-l15-eclipse-e.json",
         "ambessa-l15-eclipse-q.json",
         "ambessa-l15-eclipse-w.json",
+        "ambessa-l15-guardian-angel-aa.json",
+        "ambessa-l15-guardian-angel-e.json",
+        "ambessa-l15-guardian-angel-q-then-slam.json",
+        "ambessa-l15-guardian-angel-q.json",
+        "ambessa-l15-guardian-angel-w.json",
+        "ambessa-l15-maw-of-malmortius-aa.json",
+        "ambessa-l15-maw-of-malmortius-e.json",
+        "ambessa-l15-maw-of-malmortius-q-then-slam.json",
+        "ambessa-l15-maw-of-malmortius-q.json",
+        "ambessa-l15-maw-of-malmortius-w.json",
         "ambessa-l15-no-items-aa.json",
         "ambessa-l15-no-items-e-feint-empowered-aa.json",
         "ambessa-l15-no-items-e-then-feint.json",
         "ambessa-l15-no-items-e.json",
         "ambessa-l15-no-items-q-then-slam.json",
         "ambessa-l15-no-items-q.json",
-        "ambessa-l15-no-items-w.json"
+        "ambessa-l15-no-items-w.json",
+        "ambessa-l15-spear-of-shojin-aa.json",
+        "ambessa-l15-spear-of-shojin-e.json",
+        "ambessa-l15-spear-of-shojin-q-then-slam.json",
+        "ambessa-l15-spear-of-shojin-q-w-e-q.json",
+        "ambessa-l15-spear-of-shojin-q.json",
+        "ambessa-l15-spear-of-shojin-w.json",
+        "ambessa-l15-steraks-gage-aa.json",
+        "ambessa-l15-steraks-gage-e.json",
+        "ambessa-l15-steraks-gage-q-then-slam.json",
+        "ambessa-l15-steraks-gage-q.json",
+        "ambessa-l15-steraks-gage-w.json",
+        "ambessa-l15-sundered-sky-aa-aa.json",
+        "ambessa-l15-sundered-sky-aa.json",
+        "ambessa-l15-sundered-sky-e.json",
+        "ambessa-l15-sundered-sky-q-then-slam.json",
+        "ambessa-l15-sundered-sky-q.json",
+        "ambessa-l15-sundered-sky-w.json"
       ],
       "id": "ambessa",
       "kind": "champion",
@@ -16960,7 +16999,15 @@
           "wordDiff": "~~UNIQUE - SUNDER~~**Sunder**: Dealing physical damage to a champion reduces their Armor by 6% for 6 seconds, stacking up to 5 times for 30% reduction. ~~UNIQUE - RAGE~~\n**Rage**: Gain 20 Movement Speed when you deal physical damage, and gain 40 Movement Speed when moving toward enemy champions with 5 Sunder stacks. Ranged champions gain halved values."
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-black-cleaver-aa-aa.json",
+        "ambessa-l15-black-cleaver-aa.json",
+        "ambessa-l15-black-cleaver-e-feint-empowered-aa-q.json",
+        "ambessa-l15-black-cleaver-e.json",
+        "ambessa-l15-black-cleaver-q-then-slam.json",
+        "ambessa-l15-black-cleaver-q.json",
+        "ambessa-l15-black-cleaver-w.json"
+      ],
       "id": "black-cleaver",
       "kind": "item",
       "name": "Black Cleaver"
@@ -17227,7 +17274,13 @@
           "field": "price"
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-deaths-dance-aa.json",
+        "ambessa-l15-deaths-dance-e.json",
+        "ambessa-l15-deaths-dance-q-then-slam.json",
+        "ambessa-l15-deaths-dance-q.json",
+        "ambessa-l15-deaths-dance-w.json"
+      ],
       "id": "deaths-dance",
       "kind": "item",
       "name": "Death's Dance"
@@ -17623,7 +17676,13 @@
           "wordDiff": "~~UNIQUE - RESURRECT~~**Resurrect**: Upon taking lethal damage, ~~resurrects~~**you** **fall in place, untargetable,** and ~~restores~~**enter** ~~50%~~**stasis** ~~of~~**for** ~~base~~**4** ~~health~~**seconds,** **then resurrect** and ~~100%~~**restore** ~~of~~**50%** ~~maximum~~**of** ~~mana~~**base** ~~after~~**Health** ~~4~~**and** ~~seconds~~**100%** of ~~stasis~~**maximum Mana**. (180 second ~~cooldown~~**Cooldown**)"
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-guardian-angel-aa.json",
+        "ambessa-l15-guardian-angel-e.json",
+        "ambessa-l15-guardian-angel-q-then-slam.json",
+        "ambessa-l15-guardian-angel-q.json",
+        "ambessa-l15-guardian-angel-w.json"
+      ],
       "id": "guardian-angel",
       "kind": "item",
       "name": "Guardian Angel"
@@ -18357,7 +18416,13 @@
           "wordDiff": "~~UNIQUE -~~ Lifeline: Upon taking ~~Magic~~**magic** ~~Damage~~**damage** that would reduce your ~~health~~**Health** below 35%, gain 10% Omnivamp until the end of combat and a magic shield that absorbs ~~(~~220 ~~-~~**–**530 ~~Magic~~**magic** ~~Damage)~~**damage** for 3~~s~~ **seconds**. (70 second ~~cooldown~~**Cooldown**)"
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-maw-of-malmortius-aa.json",
+        "ambessa-l15-maw-of-malmortius-e.json",
+        "ambessa-l15-maw-of-malmortius-q-then-slam.json",
+        "ambessa-l15-maw-of-malmortius-q.json",
+        "ambessa-l15-maw-of-malmortius-w.json"
+      ],
       "id": "maw-of-malmortius",
       "kind": "item",
       "name": "Maw of Malmortius"
@@ -19009,7 +19074,14 @@
           "wordDiff": "~~Unique -~~ Dragonforce: Gain 20 Basic Ability Haste. ~~Unique -~~ \nFocused Will: Dealing damage to monsters or enemies with abilities increases your ~~champion’s~~**champion's** ability and passive damage by 3% for 6~~s.~~ **seconds** (~~Stacks~~**stacks** 4 times)\n**Focused Will stacks have a 1 second cooldown per ability cast.**"
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-spear-of-shojin-aa.json",
+        "ambessa-l15-spear-of-shojin-e.json",
+        "ambessa-l15-spear-of-shojin-q-then-slam.json",
+        "ambessa-l15-spear-of-shojin-q-w-e-q.json",
+        "ambessa-l15-spear-of-shojin-q.json",
+        "ambessa-l15-spear-of-shojin-w.json"
+      ],
       "id": "spear-of-shojin",
       "kind": "item",
       "name": "Spear of Shojin"
@@ -19212,7 +19284,13 @@
           "wordDiff": "~~\\*\\*~~Heavy Handed~~\\*\\*~~: ~~+~~**Gain** 50% base Attack Damage as bonus Attack Damage.\n~~\\*\\*~~Lifeline~~\\*\\*~~: Damage that puts you under 35% Health grants a shield equal to 75% bonus Health that decays over 5 seconds. \n(70 second ~~cooldown~~**Cooldown**)\n~~\\*\\*~~Sterak's Fury~~\\*\\*~~: Triggering Lifeline increases size and ~~strength~~**grants** **30% Tenacity** for 8 seconds."
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-steraks-gage-aa.json",
+        "ambessa-l15-steraks-gage-e.json",
+        "ambessa-l15-steraks-gage-q-then-slam.json",
+        "ambessa-l15-steraks-gage-q.json",
+        "ambessa-l15-steraks-gage-w.json"
+      ],
       "id": "steraks-gage",
       "kind": "item",
       "name": "Sterak's Gage"
@@ -19289,7 +19367,14 @@
           "wordDiff": "Lightshield Strike ~~-~~**:** The first attack against an enemy champion Critically Strikes (6~~s~~ ~~cooldown~~**second** **Cooldown** per target), dealing 160% damage and restoring Health ~~(~~equal to 125% of base Attack Damage + 6% of missing Health~~)~~ to you."
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-sundered-sky-aa-aa.json",
+        "ambessa-l15-sundered-sky-aa.json",
+        "ambessa-l15-sundered-sky-e.json",
+        "ambessa-l15-sundered-sky-q-then-slam.json",
+        "ambessa-l15-sundered-sky-q.json",
+        "ambessa-l15-sundered-sky-w.json"
+      ],
       "id": "sundered-sky",
       "kind": "item",
       "name": "Sundered Sky"

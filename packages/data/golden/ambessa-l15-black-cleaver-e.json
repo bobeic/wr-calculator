@@ -1,0 +1,27 @@
+{
+  "scenario": {
+    "championId": "ambessa",
+    "level": 15,
+    "build": {
+      "items": [
+        "black-cleaver"
+      ],
+      "runes": [],
+      "inputs": {}
+    },
+    "target": {
+      "hp": 10000,
+      "armor": 100,
+      "mr": 100
+    },
+    "combo": [
+      "E"
+    ]
+  },
+  "expected": {
+    "totalDamage": 110
+  },
+  "tolerance": 0.01,
+  "patch": "7.3a",
+  "source": "practice-tool"
+}
