@@ -345,7 +345,7 @@ Knocking up or stunning champions with ~~his~~**Alistar's** abilities reduces th
 
 ### champion ambessa (Ambessa)
 
-Goldens: ambessa-l15-bf-sword-aa.json, ambessa-l15-bf-sword-e-feint-empowered-aa.json, ambessa-l15-bf-sword-e.json, ambessa-l15-bf-sword-q-then-slam.json, ambessa-l15-bf-sword-q.json, ambessa-l15-bf-sword-w.json, ambessa-l15-no-items-aa.json, ambessa-l15-no-items-e-feint-empowered-aa.json, ambessa-l15-no-items-e-then-feint.json, ambessa-l15-no-items-e.json, ambessa-l15-no-items-q-then-slam.json, ambessa-l15-no-items-q.json, ambessa-l15-no-items-w.json
+Goldens: ambessa-l15-bf-sword-aa.json, ambessa-l15-bf-sword-e-feint-empowered-aa.json, ambessa-l15-bf-sword-e.json, ambessa-l15-bf-sword-q-then-slam.json, ambessa-l15-bf-sword-q.json, ambessa-l15-bf-sword-w.json, ambessa-l15-eclipse-aa.json, ambessa-l15-eclipse-e-then-feint-proc.json, ambessa-l15-eclipse-e.json, ambessa-l15-eclipse-q.json, ambessa-l15-eclipse-w.json, ambessa-l15-no-items-aa.json, ambessa-l15-no-items-e-feint-empowered-aa.json, ambessa-l15-no-items-e-then-feint.json, ambessa-l15-no-items-e.json, ambessa-l15-no-items-q-then-slam.json, ambessa-l15-no-items-q.json, ambessa-l15-no-items-w.json
 
 - `r.description`: wording only
 
@@ -8083,7 +8083,7 @@ Soul Siphon: **Store** 30% of pre-mitigation damage dealt to enemy champions ~~i
 
 ### item eclipse (Eclipse)
 
-Goldens: none
+Goldens: ambessa-l15-eclipse-aa.json, ambessa-l15-eclipse-e-then-feint-proc.json, ambessa-l15-eclipse-e.json, ambessa-l15-eclipse-q.json, ambessa-l15-eclipse-w.json
 
 - `description`: wording only
 

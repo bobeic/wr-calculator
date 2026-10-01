@@ -60,20 +60,29 @@ describe('crossCheckNotes', () => {
   const before = snap([item('a', 'Alpha', '3200', 'Deals 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
 
   it('auto-clears a changed flag the notes do not mention, naming the fields', () => {
-    const check = run(before, snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]), notes([{ heading: 'Beta' }]), ['a'])
+    const check = run(before, snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]), notes([{ heading: 'Beta' }]), ['a'])
     expect(check.autoReviewed).toEqual([{
       kind: 'item', id: 'a', note: 'Not in the official 9.9 notes (https://example.test/9-9); wrpocket-only change to description',
     }])
   })
 
+  // The notes don't list every change: on 7.3a, BotRK's 7% -> 6% was real but unlisted.
+  it('never auto-clears a text change that moves a number, but does when numbers only move position', () => {
+    const changed = run(before, snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]), notes([{ heading: 'Beta' }]), ['a'])
+    expect(changed.autoReviewed).toEqual([])
+    const moved = run(snap([item('a', 'Alpha', '3200', 'Deals 7% for 1,200 units'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]),
+      snap([item('a', 'Alpha', '3200', 'Over 1200 units, deals 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]), notes([{ heading: 'Beta' }]), ['a'])
+    expect(moved.autoReviewed.map((entry) => entry.id)).toEqual(['a'])
+  })
+
   it('never auto-clears an entry already stale from an earlier patch', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([{ heading: 'Beta' }]), ['a'], [], ['a'])
     expect(check.autoReviewed).toEqual([])
   })
 
   it('never auto-clears an entry named only in an excluded section, but reports nothing else for it', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000', 'Deals well'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([
       { heading: 'Alpha', section: 'Item System Adjustments', excluded: true, lines: [{ text: 'Price: 3200 → 3300', after: '3300' }] },
       { heading: 'Gone' },
@@ -85,14 +94,14 @@ describe('crossCheckNotes', () => {
   })
 
   it('never auto-clears an entry whose name sits inside an unmatched heading', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000', 'Deals well'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([{ heading: 'Alpha Reforged' }, { heading: 'Gone' }]), ['a', 'b'])
     expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
     expect(check.unmatched).toEqual([{ section: 'ITEMS', heading: 'Alpha Reforged' }])
   })
 
   it('never auto-clears an entry named in a line of another entry', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000', 'Deals well'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([
       { heading: 'Items Removed', lines: [{ text: 'Alpha’s recipe now uses Gone', after: null }] },
       { heading: 'Gone' },
@@ -101,7 +110,7 @@ describe('crossCheckNotes', () => {
   })
 
   it('never auto-clears an entry named only in a line of an excluded section', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000', 'Deals 1%'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000', 'Deals well'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([
       { heading: 'Augment Adjustments', section: 'AAA ARAM', excluded: true, lines: [{ text: 'Alpha now grants 10% more', after: null }] },
       { heading: 'Gone' },
@@ -111,7 +120,7 @@ describe('crossCheckNotes', () => {
 
   // 7.3a: Viego's Q is titled 'Blade of the Ruined King'; its lines change Viego, not the item of the same name.
   it('does not treat a champion ability titled like an item as a mention of that item', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
     const viego: OfficialNotes = {
       ...notes([]),
       entries: [{
@@ -131,7 +140,7 @@ describe('crossCheckNotes', () => {
   })
 
   it('auto-clears nothing when the notes page was not found', () => {
-    const check = run(before, snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]), null, ['a'])
+    const check = run(before, snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')]), null, ['a'])
     expect(check).toMatchObject({ found: false, autoReviewed: [], notesFlags: [], mentioned: [], published: null })
   })
 
@@ -141,7 +150,7 @@ describe('crossCheckNotes', () => {
   })
 
   it('skips covered ids for both auto-clear and notes flags', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
     const check = run(before, after, notes([{ heading: 'Beta', lines: [{ text: 'Price: 1000 → 1100', after: '1100' }] }]), ['a', 'b'], ['a', 'b'])
     expect(check.autoReviewed).toEqual([])
     expect(check.notesFlags).toEqual([])
@@ -173,7 +182,7 @@ describe('crossCheckNotes', () => {
   })
 
   it('auto-clears nothing when the notes have no entries outside excluded sections', () => {
-    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const after = snap([item('a', 'Alpha', '3200', 'Inflicts 7%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
     const excludedOnly = run(before, after, notes([{ heading: 'Augments', section: 'GAME MODE CHANGES', excluded: true }]), ['a'])
     expect(excludedOnly).toMatchObject({ found: true, autoReviewed: [], excludedCount: 1 })
     expect(run(before, after, notes([]), ['a']).autoReviewed).toEqual([])
@@ -183,9 +192,10 @@ describe('crossCheckNotes', () => {
     expect(() => run(before, before, notes([{ heading: 'Nexus' }, { heading: 'Smite' }]), [])).toThrow(/none of its 2 entries matched/)
   })
 
-  // The hand review cleared 30. Infinity Edge is one of them, but an ARAM augment line names it ('without Infinity Edge'),
-  // and a name in any notes line, excluded sections included, blocks the auto-clear: a false flag costs one review.
-  it('reproduces the hand review of 7.3a: 29 auto-cleared, Death\'s Dance and Infinity Edge left', async () => {
+  // The hand review cleared 30. Infinity Edge is named in an ARAM augment line ('without Infinity Edge'), which blocks
+  // its auto-clear. Nine more move a number in wrpocket's text; the notes don't list every change (BotRK's 6% was
+  // real), so those stay for a human: exactly the items the hand review had to take to in-game checks.
+  it('reproduces the hand review of 7.3a: 20 auto-cleared, the rest left for a human', async () => {
     const before73 = await readSnapshot(`${SNAPSHOTS}7.3`)
     const after73a = await readSnapshot(`${SNAPSHOTS}7.3a`)
     const dataset = getPatchDataset('7.3')
@@ -194,14 +204,16 @@ describe('crossCheckNotes', () => {
     const flags = flagHandModelled(diff, handModelled, NONE, [])
     const notes73a = parseNotesPage(fixture('7.3a'), '7.3a', 'https://example.test/7-3a')
     const check = crossCheckNotes({ patch: '7.3a', url: notes73a.url, notes: notes73a, after: after73a, diff, flags, handModelled, covered: NONE, goldens: [], previousStale: [] })
-    expect(check.autoReviewed).toHaveLength(29)
+    expect(check.autoReviewed).toHaveLength(20)
     const cleared = new Set(check.autoReviewed.map((entry) => entry.id))
-    expect(flags.filter((flag) => !cleared.has(flag.id)).map((flag) => flag.id).sort()).toEqual(['deaths-dance', 'infinity-edge'])
+    expect(flags.filter((flag) => !cleared.has(flag.id)).map((flag) => flag.id).sort()).toEqual([
+      'blade-of-the-ruined-king', 'deaths-dance', 'hextech-rocketbelt', 'infinity-edge', 'infinity-orb', 'lich-bane',
+      'ludens-echo', 'riftmaker', 'spear-of-shojin', 'steraks-gage', 'trinity-force',
+    ])
     expect(check.notesFlags).toEqual([])
     expect(check.mentioned.find((entry) => entry.ref.id === 'deaths-dance')?.status).toBe('reflected')
-    // Viego's Q, 'Blade of the Ruined King', is a Viego change: the item of that name is not mentioned and is cleared.
+    // Viego's Q, 'Blade of the Ruined King', is a Viego change: the item of that name is not mentioned.
     expect(check.mentioned.some((entry) => entry.ref.id === 'blade-of-the-ruined-king')).toBe(false)
     expect(check.mentioned.find((entry) => entry.ref.id === 'viego')?.lines.map((line) => line.group)).toContain('Blade of the Ruined King')
-    expect(cleared.has('blade-of-the-ruined-king')).toBe(true)
   })
 })

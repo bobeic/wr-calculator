@@ -11,14 +11,7 @@ export const REVIEWED: ReviewedEntry[] = [
   { kind: 'item', id: 'archangels-staff', note: WORDING },
   { kind: 'item', id: 'black-cleaver', note: WORDING },
   { kind: 'item', id: 'blackfire-torch', note: WORDING },
-  {
-    kind: 'item', id: 'blade-of-the-ruined-king',
-    note: 'wrpocket text went 7% -> 6% (8.5% -> 8% melee), which matches its Chinese text, but the '
-      + 'official 7.3 notes say 7% / 8.5% and the 7.3a notes list no BotRK change; Ruined Strike stays at 7%. '
-      + 'Verify the tooltip in game',
-  },
   { kind: 'item', id: 'cryptbloom', note: WORDING },
-  { kind: 'item', id: 'eclipse', note: WORDING },
   {
     kind: 'item', id: 'force-of-nature',
     note: `${REORDER}; "magic damage" now reads "ability damage", against the official 7.3 wording `

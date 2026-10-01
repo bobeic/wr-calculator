@@ -12,10 +12,7 @@ const SNAPSHOTS = new URL('../snapshots/wrpocket/', import.meta.url).pathname
 
 // Links whose current text and model disagree on purpose, by `<effect or item id>.<path>`. A number-only
 // text change to one of these always stays flagged, because checkDescription refuses a link the model disagrees with.
-const KNOWN_DIVERGENCES: Record<string, string> = {
-  'botrk-mists-edge.pctTargetCurrentHp': "wrpocket's 7.3a text says 6%; the official notes say 7% and list no 7.3a change (reviewed.ts)",
-  'eclipse-ever-rising-moon.damage.ratios[0].value': 'the model uses the WR wiki melee value (6%); wrpocket says 7%. Pending an in-game check',
-}
+const KNOWN_DIVERGENCES: Record<string, string> = {}
 
 describe(`text links against patch ${CURRENT_PATCH}`, async () => {
   const snapshot = await readSnapshot(`${SNAPSHOTS}${CURRENT_PATCH}`)

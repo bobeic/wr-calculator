@@ -5,23 +5,31 @@ item off (or delete it) once its reading has been applied. Patch 7.3a is live.
 
 ## 1. Item batch 5 (Ambessa AD items)
 
-The full sheet with engine predictions is `docs/test-sheets/2026-10-01-item-batch5.md` on branch
-`docs/tvanmook/batch5-test-sheet/20261001`. Its readings become golden cases.
+Setup: Ambessa level 15, Q/W/E rank 4, R rank 3, the 100 armor / 100 MR / 10,000 HP dummy, no damage
+runes, one item at a time. The sheet with engine predictions is to be regenerated (its branch isn't on
+GitHub).
 
-The official 7.3 notes settled two of the sheet's wrpocket-vs-wiki conflicts in wrpocket's favour:
-Serylda's Grudge is 50 AD / 35% pen and Death's Dance is 50 AD / 45 armor. The wiki pages are out of date.
-Still open: Guardian Angel, 45 AD (wrpocket) vs 40 AD (wiki); no patch note settles it.
+Done 2026-10-01: base stats (2340 HP, 121 AD, 106 armor, 64 MR) and the no-item hits all match the engine.
+Eclipse is done too: attack, Q, W and E match, and the proc on E's recast showed 7% max HP (the model
+now uses 7%). These are golden cases now.
 
-## 2. Patch 7.3a spot checks (shop tooltips only, no combat needed)
+Still to read, one item at a time, with tooltip stats plus attack, Q (edge), Q then Q2, W and E:
+- Black Cleaver: E, feint, empowered attack, then Q. Does the empowered attack add exactly one stack?
+- Serylda's Grudge: three abilities, then the burn's total.
+- Spear of Shojin: four Q/W/E hits in a row, each number.
+- Sundered Sky: two attacks in a row (only the first should crit). Does it trigger on the dummy, or
+  only on Garen?
+- Sterak's Gage, Death's Dance, Guardian Angel (45 or 40 AD?), Maw of Malmortius: stats and attack/Q.
+- Is Seraph's Embrace in the same one-per-build group as Sterak's and Maw?
+- One full-build combo.
+- Eclipse follow-up: in the Q then Q2 reading (Q2 edge 693), did Eclipse proc, or was it on cooldown or
+  more than 1.8s after Q? The engine expects a proc on Q2.
 
-- Death's Dance costs 3300 (override written from the official notes).
-- Blade of the Ruined King: is it 7% current HP (8.5% melee), as the official 7.3 notes and our model say,
-  or 6% (8% melee), as wrpocket's 7.3a text and its Chinese text say?
-- Sterak's Gage: 20% tenacity as a flat stat (official 7.3 notes, our model), not 30% on Sterak's Fury
-  (wrpocket's 7.3a text). Doesn't affect damage.
-- Infinity Orb still gives +15 magic penetration (wrpocket's description dropped the line).
-- Nashor's Tooth is still a magic item (wrpocket now says Physical).
-- Luden's Echo: up to 4 or 5 other enemies (only matters for the text; we model 1v1).
+## 2. Patch 7.3a spot checks
+
+All answered on 2026-10-01: Death's Dance 3300; BotRK 6% (8% melee), which is an undocumented change
+that wrpocket had right and the model now uses; Sterak's 20% flat tenacity; Infinity Orb +15 magic pen;
+Nashor's Tooth magic, 80 AP; Luden's Echo up to 4 other enemies.
 
 ## 3. Open engine rules (TODO-VERIFY in `packages/calc/src/rules.ts`)
 
@@ -35,6 +43,7 @@ Each `TODO-VERIFY` comment there says how to check it. The ones most likely to m
 ## 4. Parked unknowns (only if convenient)
 
 - Ambessa R deals ~57 more pre-mitigation damage than its tooltip, on both the dummy and a full-HP
-  Garen. A fixed bonus or a hidden ~14% amp would fit.
+  Garen. A fixed bonus or a hidden ~14% amp would fit. With Eclipse (+65 bonus AD) it read 275, against 270
+  with no items, so R may scale slightly with bonus AD (~13% of bonus AD before mitigation).
 - Hextech Rocketbelt sometimes shows an extra ~75 damage on top of 7 bolts.
 - Stormsurge never triggered on the dummy; needs a real champion target.

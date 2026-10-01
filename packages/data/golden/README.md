@@ -57,6 +57,14 @@ small number. R is left out: the rank-3 tooltip reads "400 + 25% of their missin
 before mitigation than that on both the full-HP dummy (270, not 236) and a full-HP Garen with 114
 armor (254, not 223), with no damaging runes. The cause is unknown and parked.
 
+Item batch 5, Eclipse (7.3a practice tool, 2026-10-01): the Ambessa setup above with Eclipse only (65 AD, 20
+ability haste). Readings: attack 110, Q edge 658 (center 329), Q2 edge 693 (center 347), W 125, E 119 per hit, R 275.
+`e-then-feint-proc` is Lacerate then its dash recast with Ever Rising Moon procing on the recast: 119 + 531,
+where 531 showed as one number holding the recast's 119 and the proc's 412. 412 after armor is 700 before it,
+so the proc is 7% max HP (the WR wiki's 6% was out of date). `aa` uses a 2% tolerance, as `no-items-aa`. R gained
+~5 over the no-item 270 (parked with the rest of R). Q-then-slam is left out until it's clear whether the proc
+was on cooldown.
+
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%
 tolerance covers this.

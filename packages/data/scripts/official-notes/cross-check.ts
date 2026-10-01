@@ -3,6 +3,7 @@ import { goldensUsing, isSyncedChange } from '../patch/patch-diff'
 import type { GoldenRef } from '../patch/patch-diff'
 import type { Snapshot } from '../patch/snapshot'
 import type { EntryRef, Flag, IdLists, SnapshotDiff, StaleRef } from '../patch/types'
+import { numbersChanged } from '../patch/text-sync'
 import { matchNotes, normaliseName, notesNames } from './match'
 import type { CheckedEntry, CheckedLine, EntryStatus, NotesCrossCheck, OfficialNotes } from './types'
 
@@ -89,8 +90,10 @@ export function crossCheckNotes(input: CrossCheckInput): NotesCrossCheck {
   // With nothing outside excluded sections, "not mentioned" proves nothing, so nothing is auto-cleared.
   const autoReviewed: ReviewedEntry[] = included.length === 0 ? [] : input.flags
     // The overlay syncs price, recipe and stat values from wrpocket, so "not in the notes" must not wave one through.
+    // Nor a text change that moves a number: the notes don't list every change (7.3a BotRK 7% -> 6% was real).
     .filter((flag) => flag.severity === 'changed' && !blocking.has(refKey(flag)) && !staleKeys.has(refKey(flag)) && !namedLoosely(flag)
-      && !(flag.kind === 'item' && flag.changes.some(isSyncedChange)))
+      && !(flag.kind === 'item' && flag.changes.some(isSyncedChange))
+      && !flag.changes.some((change) => change.wordDiff !== undefined && numbersChanged(change.before, change.after)))
     .map((flag) => ({
       kind: flag.kind, id: flag.id,
       note: `Not in the official ${input.patch} notes (${input.url}); wrpocket-only change to ${[...new Set(flag.changes.map((change) => change.field))].join(', ')}`,

@@ -44,3 +44,14 @@ comment at the value naming the sources. Anything still open goes on
 - A wrpocket text change is not a patch change. The next pipeline step cross-checks it against the
   official notes.
 - Values cited from the wiki are suspect when the page's patch version is old.
+
+## Update (2026-10-01, in-game readings)
+
+- **The official notes don't list every change.** BotRK went 7% → 6% (8.5% → 8% melee) in 7.3a, but neither the
+  7.3 nor the 7.3a notes say so. wrpocket's text had it right. Notes still outrank wrpocket for anything
+  they state, but a wrpocket number change the notes leave out is not proof of a wrpocket error. The notes
+  cross-check therefore no longer auto-clears a text change that moves a number; it stays flagged for an
+  in-game check.
+- **wrpocket was right on Eclipse too.** The proc is 7% max HP (melee); the WR wiki's 6% was out of date.
+- wrpocket's text was wrong on Sterak's Gage (30% tenacity on Fury; it is 20% flat) and dropped Infinity Orb's
+  15 magic pen (still there), so wrpocket text changes still need confirming.

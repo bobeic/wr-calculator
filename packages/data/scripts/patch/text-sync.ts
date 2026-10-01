@@ -19,6 +19,12 @@ export function numberSpans(text: string): NumberSpan[] {
   })
 }
 
+/** True when the two texts don't hold the same numbers (as a multiset); moved or reworded numbers don't count. */
+export function numbersChanged(before: string, after: string): boolean {
+  const sorted = (text: string): string => numberSpans(text).map((span) => span.text).sort().join(' ')
+  return sorted(before) !== sorted(after)
+}
+
 /** The text with every number replaced by #, case and whitespace folded: two texts that differ only in numbers mask the same. */
 export function maskNumbers(text: string): string {
   return text.replace(/\d+(?:,\d{3})*(?:\.\d+)?/g, '#').toLowerCase().replace(/\s+/g, ' ').trim()

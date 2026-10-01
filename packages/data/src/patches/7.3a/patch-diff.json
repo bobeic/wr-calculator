@@ -706,6 +706,11 @@
         "ambessa-l15-bf-sword-q-then-slam.json",
         "ambessa-l15-bf-sword-q.json",
         "ambessa-l15-bf-sword-w.json",
+        "ambessa-l15-eclipse-aa.json",
+        "ambessa-l15-eclipse-e-then-feint-proc.json",
+        "ambessa-l15-eclipse-e.json",
+        "ambessa-l15-eclipse-q.json",
+        "ambessa-l15-eclipse-w.json",
         "ambessa-l15-no-items-aa.json",
         "ambessa-l15-no-items-e-feint-empowered-aa.json",
         "ambessa-l15-no-items-e-then-feint.json",
@@ -17351,7 +17356,13 @@
           "wordDiff": "~~\\*\\*~~Ever Rising Moon~~\\*\\*~~: Hitting ~~the same~~**an** enemy champion with 2 separate attacks or abilities within 1.8 seconds deals bonus physical damage equal to 7% of the target's ~~maximum~~**Max** Health (3.5% for ranged champions), and grants you a shield **that absorbs damage** equal to 150 + 40% bonus Attack Damage (70 + 18% bonus Attack Damage for ranged champions) for 2 seconds~~.~~ (6~~s~~ ~~cooldown~~**second Cooldown**)**.**"
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-eclipse-aa.json",
+        "ambessa-l15-eclipse-e-then-feint-proc.json",
+        "ambessa-l15-eclipse-e.json",
+        "ambessa-l15-eclipse-q.json",
+        "ambessa-l15-eclipse-w.json"
+      ],
       "id": "eclipse",
       "kind": "item",
       "name": "Eclipse"
