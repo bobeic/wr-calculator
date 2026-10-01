@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { buildCatalog } from '@wr-calc/data'
 import { defaultState, emptyBuild } from '../src/lib/debug-state'
-import { PATCH_7_3_DATASET } from '../src/lib/dataset'
+import { datasetFor } from '../src/lib/dataset'
 
 describe('defaultState', () => {
   it('uses the first champion at max level, empty builds and the first preset', () => {
-    expect(defaultState(PATCH_7_3_DATASET)).toEqual({
+    expect(defaultState(datasetFor('7.3'))).toEqual({
       championId: 'aatrox',
       level: 15,
       buildA: { items: [], runes: [], inputs: {} },
@@ -32,10 +32,10 @@ describe('emptyBuild', () => {
   })
 })
 
-describe('PATCH_7_3_DATASET', () => {
+describe("datasetFor('7.3')", () => {
   it('wires the real patch 7.3 champions, items and presets', () => {
-    expect(PATCH_7_3_DATASET.champions.has('jinx')).toBe(true)
-    expect(PATCH_7_3_DATASET.catalog.items.has('trinity-force')).toBe(true)
-    expect(PATCH_7_3_DATASET.targets.map((preset) => preset.id)).toEqual(['squishy', 'bruiser', 'tank'])
+    expect(datasetFor('7.3').champions.has('jinx')).toBe(true)
+    expect(datasetFor('7.3').catalog.items.has('trinity-force')).toBe(true)
+    expect(datasetFor('7.3').targets.map((preset) => preset.id)).toEqual(['squishy', 'bruiser', 'tank'])
   })
 })

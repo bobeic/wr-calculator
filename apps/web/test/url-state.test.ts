@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { decodeState, encodeState } from '../src/lib/url-state'
 import { MAX_DURATION_SECONDS, defaultState, emptyBuild } from '../src/lib/debug-state'
 import type { DebugState, DebugTarget } from '../src/lib/debug-state'
-import { PATCH_7_3_DATASET } from '../src/lib/dataset'
+import { datasetFor } from '../src/lib/dataset'
 
-const dataset = PATCH_7_3_DATASET
+const dataset = datasetFor('7.3')
 
 function decode(query: string) {
   return decodeState(new URLSearchParams(query), dataset)
