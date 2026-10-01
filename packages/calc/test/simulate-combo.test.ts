@@ -824,5 +824,48 @@ describe('simulateCombo', () => {
       expect(result.instances.map((i) => [i.source.id, i.mitigated])).toEqual([['q', 50], ['AA', 90]])
       expect(result.totalsBySource).toEqual({ q: 50, AA: 90 })
     })
+
+    it('procs an Eclipse-style hitStackProc on the second hit, inside that hit', () => {
+      const moon = baseItem('test-moon', {
+        id: 'test-moon-proc', name: 'Moon', description: '', support: 'full', kind: 'hitStackProc',
+        stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6, stacksFrom: ['basicAttack', 'ability'],
+        damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.06 }], tags: [] },
+        delivery: { kind: 'instant' },
+      })
+      const catalog = { items: new Map([[moon.id, moon]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [moon.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'Q'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.mitigated, i.hitId])).toEqual([
+        ['AA', 60, 1], ['q', 50, 2], ['test-moon-proc', 60, 2],
+      ])
+    })
+
+    it('does not stack from an ability stage that deals no damage', () => {
+      const moon = baseItem('test-moon', {
+        id: 'test-moon-proc', name: 'Moon', description: '', support: 'full', kind: 'hitStackProc',
+        stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6, stacksFrom: ['basicAttack', 'ability'],
+        damage: { type: 'physical', base: 100, ratios: [], tags: [] }, delivery: { kind: 'instant' },
+      })
+      const catalog = { items: new Map([[moon.id, moon]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [moon.id] }), catalog)
+      // championWithAbility's W deals no damage.
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['W', 'AA'], { critMode: 'never' })
+      expect(result.instances.map((i) => i.source.id)).toEqual(['AA'])
+    })
+
+    it('gives dot-delivered proc ticks no hit id', () => {
+      const frost = baseItem('test-frost', {
+        id: 'test-frost-proc', name: 'Frost', description: '', support: 'full', kind: 'hitStackProc',
+        stacksToProc: 2, stackWindowSeconds: 6, cooldownSeconds: 5, stacksFrom: ['basicAttack', 'ability'],
+        damage: { type: 'physical', base: 10, ratios: [], tags: [] },
+        delivery: { kind: 'dot', tickIntervalSeconds: 0.5, durationSeconds: 1 },
+      })
+      const catalog = { items: new Map([[frost.id, frost]]), runes: new Map() }
+      const attacker = combatantFromChampion(championWithAbility(), 1, emptyBuild({ items: [frost.id] }), catalog)
+      const result = simulateCombo(attacker, combatantFromDummy(dummy()), ['AA', 'Q', 'wait:1'], { critMode: 'never' })
+      expect(result.instances.map((i) => [i.source.id, i.hitId])).toEqual([
+        ['AA', 1], ['q', 2], ['test-frost-proc', undefined], ['test-frost-proc', undefined],
+      ])
+    })
   })
 })

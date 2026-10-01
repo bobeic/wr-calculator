@@ -19,6 +19,7 @@ import { AbilityHitProcEffectSchema } from './kinds/ability-hit-proc'
 import { DamageWindowProcEffectSchema } from './kinds/damage-window-proc'
 import { CombatRampAmpEffectSchema } from './kinds/combat-ramp-amp'
 import { EmpoweredAttackEffectSchema } from './kinds/empowered-attack'
+import { HitStackProcEffectSchema } from './kinds/hit-stack-proc'
 import { CustomEffectSchema } from './kinds/custom'
 
 export const EffectSchema = z.discriminatedUnion('kind', [
@@ -42,6 +43,7 @@ export const EffectSchema = z.discriminatedUnion('kind', [
   DamageWindowProcEffectSchema,
   CombatRampAmpEffectSchema,
   EmpoweredAttackEffectSchema,
+  HitStackProcEffectSchema,
   CustomEffectSchema,
 ])
 export type Effect = z.infer<typeof EffectSchema>
@@ -67,6 +69,7 @@ export * from './kinds/ability-hit-proc'
 export * from './kinds/damage-window-proc'
 export * from './kinds/combat-ramp-amp'
 export * from './kinds/empowered-attack'
+export * from './kinds/hit-stack-proc'
 export * from './kinds/custom'
 export * from './condition'
 export * from './kinds/common'
