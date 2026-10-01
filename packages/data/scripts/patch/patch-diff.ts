@@ -1,4 +1,6 @@
 import type { LoadedGoldenCase } from '../../src/golden-loader'
+import { crossCheckNotes } from '../official-notes/cross-check'
+import type { OfficialNotes } from '../official-notes/types'
 import { diffSnapshots } from './diff'
 import type { Snapshot } from './snapshot'
 import type { EntryDiff, EntryRef, Flag, IdLists, NoteRef, PatchDiff, ReportedDiff, SnapshotDiff, StaleRef } from './types'
@@ -55,6 +57,8 @@ export interface BuildPatchDiffInput {
   goldens: GoldenRef[]
   notesBefore: NoteRef[]
   notesAfter: NoteRef[]
+  /** The official notes for the new patch; null when no notes stage ran. */
+  notes: { url: string; notes: OfficialNotes | null } | null
 }
 
 const noteKey = (note: NoteRef): string => `${note.subject}\u0000${note.note}`
@@ -63,10 +67,16 @@ const noteKey = (note: NoteRef): string => `${note.subject}\u0000${note.note}`
 export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
   const diff = diffSnapshots(input.before, input.after)
   const flags = flagHandModelled(diff, input.handModelled, input.covered, input.goldens)
+  const officialNotes = input.notes === null ? null : crossCheckNotes({
+    patch: input.after.meta.patch, url: input.notes.url, notes: input.notes.notes, after: input.after, diff,
+    flags, handModelled: input.handModelled, covered: input.covered, goldens: input.goldens,
+  })
+  const autoCleared = new Set((officialNotes?.autoReviewed ?? []).map((entry) => `${entry.kind}\u0000${entry.id}`))
+  const needsReview = [...flags.filter((flag) => !autoCleared.has(`${flag.kind}\u0000${flag.id}`)), ...(officialNotes?.notesFlags ?? [])]
   const withGoldens = (entries: EntryDiff[]): ReportedDiff[] =>
     entries.map((entry) => ({ ...entry, goldens: goldensUsing(entry, input.goldens) }))
   const coveredIds = (kind: EntryRef['kind']): Set<string> => new Set(kind === 'item' ? input.covered.items : input.covered.champions)
-  const flagged = new Set(flags.map((flag) => `${flag.kind}\u0000${flag.id}`))
+  const flagged = new Set(needsReview.map((flag) => `${flag.kind}\u0000${flag.id}`))
   const beforeKeys = new Set(input.notesBefore.map(noteKey))
   const afterKeys = new Set(input.notesAfter.map(noteKey))
   return {
@@ -74,7 +84,7 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     to: input.after.meta.patch,
     fromUpdated: input.before.meta.updated,
     toUpdated: input.after.meta.updated,
-    needsReview: flags,
+    needsReview,
     carriedStale: input.previousStale
       .filter((entry) => !coveredIds(entry.kind).has(entry.id) && !flagged.has(`${entry.kind}\u0000${entry.id}`)).sort(compareRefs),
     items: withGoldens(diff.items),
@@ -85,5 +95,6 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
       added: input.notesAfter.filter((note) => !beforeKeys.has(noteKey(note))),
       removed: input.notesBefore.filter((note) => !afterKeys.has(noteKey(note))),
     },
+    officialNotes,
   }
 }

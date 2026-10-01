@@ -71,6 +71,7 @@ describe('buildPatchDiff', () => {
     covered: NONE, goldens: GOLDENS,
     notesBefore: [{ subject: 'item plain', note: 'gone note' }, { subject: 'item plain', note: 'kept' }],
     notesAfter: [{ subject: 'item plain', note: 'kept' }, { subject: 'item plain', note: 'new note' }],
+    notes: null,
   })
 
   it('carries the header fields and the flags', () => {
@@ -87,7 +88,7 @@ describe('buildPatchDiff', () => {
     expect(result.carriedStale.map((entry) => entry.id)).toEqual(['old-stale'])
     const covered = buildPatchDiff({
       before, after, handModelled: NONE, previousStale: [{ kind: 'item', id: 'old-stale', name: 'Old', since: '7.2' }],
-      covered: { items: ['old-stale'], champions: [] }, goldens: [], notesBefore: [], notesAfter: [],
+      covered: { items: ['old-stale'], champions: [] }, goldens: [], notesBefore: [], notesAfter: [], notes: null,
     })
     expect(covered.carriedStale).toEqual([])
   })
@@ -96,10 +97,27 @@ describe('buildPatchDiff', () => {
     const again = buildPatchDiff({
       before, after, handModelled: { items: ['trinity-force'], champions: [] },
       previousStale: [{ kind: 'item', id: 'trinity-force', name: 'Trinity Force', since: '7.2' }],
-      covered: NONE, goldens: [], notesBefore: [], notesAfter: [],
+      covered: NONE, goldens: [], notesBefore: [], notesAfter: [], notes: null,
     })
     expect(again.needsReview.map((flag) => flag.id)).toEqual(['trinity-force'])
     expect(again.carriedStale).toEqual([])
+  })
+
+  it('auto-clears flags the official notes do not mention', () => {
+    const notes = {
+      patch: '7.3a', url: 'u', title: '', published: '',
+      entries: [{ source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: 'Long Sword', lines: [] }],
+    }
+    const withNotes = buildPatchDiff({
+      before, after, handModelled: { items: ['trinity-force'], champions: [] }, previousStale: [],
+      covered: NONE, goldens: [], notesBefore: [], notesAfter: [], notes: { url: 'u', notes },
+    })
+    expect(withNotes.needsReview).toEqual([])
+    expect(withNotes.officialNotes?.autoReviewed.map((entry) => entry.id)).toEqual(['trinity-force'])
+  })
+
+  it('reports no notes stage when notes is null', () => {
+    expect(result.officialNotes).toBeNull()
   })
 
   it('reports mapper notes that are new or gone', () => {

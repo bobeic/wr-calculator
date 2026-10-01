@@ -183,6 +183,7 @@ async function run(options: Options): Promise<void> {
       goldens: goldenRefs(loadGoldenCases(GOLDEN_DIR)),
       notesBefore: mapSnapshot(before, provenance).notes,
       notesAfter: mapped.notes,
+      notes: null,
     })
     needsReview = diff.needsReview.length
     await writeFile(join(staged.generated, 'changed-ids.ts'), renderChangedIds(changedIdsOf(diffSnapshots(before, committed)), plan.patch))

@@ -1,3 +1,5 @@
+import type { NotesCrossCheck } from '../official-notes/types'
+
 export type EntryKind = 'item' | 'champion'
 
 /** A number that changed inside a text field, e.g. 7% -> 6%; '' when one side has no partner. */
@@ -73,4 +75,6 @@ export interface PatchDiff {
   added: EntryRef[]
   removed: EntryRef[]
   mapperNotes: { added: NoteRef[]; removed: NoteRef[] }
+  /** The official notes cross-check; null when no notes stage ran. */
+  officialNotes: NotesCrossCheck | null
 }

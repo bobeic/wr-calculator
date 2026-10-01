@@ -1,5 +1,12 @@
+import { renderNotesSection } from '../official-notes/render'
 import { GENERATOR_SCRIPT } from '../wrpocket/render'
-import type { EntryRef, FieldChange, PatchDiff, ReportedDiff } from './types'
+import type { EntryRef, FieldChange, Flag, PatchDiff, ReportedDiff } from './types'
+
+const SEVERITY_LABEL: Record<Flag['severity'], string> = {
+  removed: 'removed from wrpocket',
+  changed: 'changed',
+  notes: 'in the official notes, wrpocket unchanged',
+}
 
 const label = (ref: EntryRef): string => `${ref.kind} ${ref.id} (${ref.name})`
 
@@ -17,13 +24,21 @@ function renderChange(change: FieldChange): string[] {
   ]
 }
 
-function renderEntry(heading: string, goldens: string[], changes: FieldChange[]): string[] {
+function renderEntry(heading: string, goldens: string[], changes: FieldChange[], inNotes: boolean | null = null): string[] {
   return [
     `### ${heading}`, '',
     `Goldens: ${goldens.length === 0 ? 'none' : goldens.join(', ')}`, '',
+    ...(inNotes === null ? [] : [`In the official notes: ${inNotes ? 'yes' : 'no'}`, '']),
     ...changes.flatMap(renderChange),
     '',
   ]
+}
+
+/** Whether the official notes mention the flagged entry; null when there is no found notes page to ask. */
+function mentionedInNotes(diff: PatchDiff, flag: Flag): boolean | null {
+  const notes = diff.officialNotes
+  if (notes === null || !notes.found) return null
+  return notes.mentioned.some((entry) => entry.ref.kind === flag.kind && entry.ref.id === flag.id)
 }
 
 const orNone = (lines: string[]): string[] => (lines.length === 0 ? ['None.', ''] : lines)
@@ -44,8 +59,9 @@ export function renderPatchDiff(diff: PatchDiff): string {
     'Clear a flag by writing an override in `overrides.ts` (values changed) or adding the id to '
       + '`reviewed.ts` with a note (nothing we model changed).', '',
     ...orNone(diff.needsReview.flatMap((flag) => renderEntry(
-      `${label(flag)}: ${flag.severity === 'removed' ? 'removed from wrpocket' : 'changed'}`, flag.goldens, flag.changes,
+      `${label(flag)}: ${SEVERITY_LABEL[flag.severity]}`, flag.goldens, flag.changes, mentionedInNotes(diff, flag),
     ))),
+    ...renderNotesSection(diff.officialNotes),
     '## Still stale from earlier patches', '',
     ...orNone(diff.carriedStale.map((entry) => `- ${label(entry)}, stale since ${entry.since}`)),
     ...(diff.carriedStale.length > 0 ? [''] : []),

@@ -15,6 +15,7 @@ const DIFF: PatchDiff = {
         { field: 'name', before: 'a b', after: 'b a', numbers: [], wordDiff: '~~a~~ b **a**' },
       ],
     },
+    { severity: 'notes', kind: 'item', id: 'notes-only', name: 'Notes Only', changes: [], goldens: [] },
   ],
   carriedStale: [{ kind: 'champion', id: 'ambessa', name: 'Ambessa', since: '7.2' }],
   items: [], champions: [
@@ -22,6 +23,7 @@ const DIFF: PatchDiff = {
   ],
   added: [{ kind: 'item', id: 'new-item', name: 'New Item' }], removed: [],
   mapperNotes: { added: [{ subject: 'item x', note: 'n' }], removed: [] },
+  officialNotes: null,
 }
 
 describe('renderPatchDiff', () => {
@@ -47,8 +49,45 @@ describe('renderPatchDiff', () => {
 
   it('says None. for empty sections and shows summary counts', () => {
     expect(report).toContain('## Removed\n\nNone.')
-    expect(report).toContain('- 2 hand-modelled entries need review')
+    expect(report).toContain('- 3 hand-modelled entries need review')
     expect(report).toContain('- 0 items and 1 champions changed, 1 added, 0 removed')
     expect(report).toContain('- champion ambessa (Ambessa), stale since 7.2')
+  })
+
+  it('labels a notes-only flag', () => {
+    expect(report).toContain('### item notes-only (Notes Only): in the official notes, wrpocket unchanged')
+  })
+
+  it('puts the notes section after Needs review when present', () => {
+    const withNotes = renderPatchDiff({
+      ...DIFF,
+      officialNotes: { url: 'https://example.test/n', found: false, published: null, autoReviewed: [], notesFlags: [], mentioned: [], unmatched: [], excludedCount: 0 },
+    })
+    expect(withNotes.indexOf('## Official notes cross-check')).toBeGreaterThan(withNotes.indexOf('## Needs review'))
+    expect(withNotes.indexOf('## Official notes cross-check')).toBeLessThan(withNotes.indexOf('## Still stale from earlier patches'))
+  })
+
+  describe('In the official notes line', () => {
+    const FOUND = {
+      url: 'https://example.test/n', found: true, published: '2026-09-29T09:00:00.000Z', autoReviewed: [], notesFlags: [],
+      mentioned: [{ ref: { kind: 'item' as const, id: 'blade-of-the-ruined-king', name: 'Blade of the Ruined King' }, heading: 'Blade', status: 'reflected' as const, lines: [] }],
+      unmatched: [], excludedCount: 0,
+    }
+    const entryBlock = (text: string, heading: string): string => text.split('### ').find((block) => block.startsWith(heading)) ?? ''
+
+    it('says yes for a flagged entry the notes mention', () => {
+      const block = entryBlock(renderPatchDiff({ ...DIFF, officialNotes: FOUND }), 'item blade-of-the-ruined-king')
+      expect(block).toContain('In the official notes: yes')
+      expect(block.indexOf('Goldens:')).toBeLessThan(block.indexOf('In the official notes:'))
+    })
+
+    it('says no for a flagged entry the notes do not mention', () => {
+      expect(entryBlock(renderPatchDiff({ ...DIFF, officialNotes: FOUND }), 'item gone-item')).toContain('In the official notes: no')
+    })
+
+    it('omits the line when there is no notes stage or the notes were not found', () => {
+      expect(report).not.toContain('In the official notes:')
+      expect(renderPatchDiff({ ...DIFF, officialNotes: { ...FOUND, found: false, mentioned: [] } })).not.toContain('In the official notes:')
+    })
   })
 })
