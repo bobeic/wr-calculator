@@ -759,6 +759,27 @@ describe('simulateCombo', () => {
       expect(result.instances[2].parts).toBeUndefined()
     })
 
+    it('counts only empowered attacks toward an empoweredAttack-triggered proc', () => {
+      const proc = baseItem('test-empowered-proc', {
+        id: 'test-empowered-proc-passive', name: 'Empowered proc', description: '', support: 'full',
+        kind: 'hitStackProc', stacksToProc: 2, stackWindowSeconds: 30, cooldownSeconds: 0,
+        stacksFrom: ['empoweredAttack'],
+        damage: { type: 'physical', base: 100, ratios: [], tags: [] }, delivery: { kind: 'instant' },
+      })
+      const catalog = { items: new Map([[proc.id, proc]]), runes: new Map() }
+      const attacker = () => combatantFromChampion(feintChampion(), 1, emptyBuild({ items: [proc.id] }), catalog)
+      const options = { critMode: 'never' as const, ignoreCooldowns: true }
+      const once = simulateCombo(attacker(), combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'AA'], options)
+      expect(once.instances.some((i) => i.source.id === 'test-empowered-proc-passive')).toBe(false)
+      const twice = simulateCombo(
+        attacker(), combatantFromDummy(dummy()), ['Q', 'dash', 'AA', 'Q', 'dash', 'AA'], options
+      )
+      const procs = twice.instances.filter((i) => i.source.id === 'test-empowered-proc-passive')
+      const secondAttack = twice.instances.filter((i) => i.source.id === 'AA')[1]
+      expect(procs).toHaveLength(1)
+      expect(procs[0].hitId).toBe(secondAttack.hitId)
+    })
+
     it('gives Black Cleaver-style shred one stack for an empowered attack, not two', () => {
       const shred = baseItem('test-shred', {
         id: 'test-shred-passive', name: 'Shred', description: '', support: 'full',
