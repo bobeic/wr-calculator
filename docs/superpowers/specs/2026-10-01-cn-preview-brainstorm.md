@@ -1,6 +1,6 @@
 # China test server preview: brainstorm
 
-**Status:** Brainstorm, waiting on the user. Not a design yet.
+**Status:** Brainstorm. The user answered §6 on 2026-10-01 (see §8); the data source is still unconfirmed.
 **Date:** 2026-10-01
 **Builds on:** `2026-10-01-patch-update-pipeline-design.md` (the patch-tracking steps),
 `2026-10-01-official-notes-cross-check-design.md`, ADR `2026-10-01-data-source-priority.md`
@@ -97,3 +97,32 @@ official notes: overrides stay human-written.
   listing, `meta.json` fields, network calls on any preview page). This is the cheapest check and
   the biggest win.
 - Check whether wrpocket's raw records carry Chinese names (the `name.zh` question in §2).
+
+## 8. User answers and findings (2026-10-01)
+
+**Answers:**
+- The priority is live accuracy: correct data as soon as a patch is live. The preview matters less.
+  Any source is fine as long as it's accurate.
+- No manual entry, not even as a first step.
+- Text first is fine. But once an item is modelled, a change that only tweaks numbers should apply
+  automatically, without a hand-written override. That changes "overrides stay human-written" for the
+  number-only case: hand-modelled values need a link to the source field they came from, so that a
+  number-only change can be applied and a change to the structure or text is still flagged.
+- Preferred source: whatever wildriftalpha uses, most likely a Chinese API.
+
+**Findings** (from this environment, which can't reach wildriftalpha, wrpocket or any Tencent host;
+nothing below was fetched):
+- Tencent's official CN Wild Rift database is served from
+  `https://game.gtimg.cn/images/lgamem/act/lrlib/js/`. `heroList/hero_list.js` is confirmed by public
+  code (github.com/ry2x/WildRift-Champs). The item and ability files are probably in the same folder,
+  but their paths are unknown.
+- CN ranked win rates come from `https://mlol.qt.qq.com/go/lgame_battle_info/hero_rank_list_v2`
+  (github.com/ry2x/WildRift-Merged-Stats-Data). wildriftalpha advertises "China ranked win rates", so
+  it very likely uses Tencent's endpoints. Its patch data probably comes from the same place, but
+  that is unverified.
+- wrpocket already mixes in Tencent CN data (see the wrpocket import design). On 7.3a its Chinese
+  text had BotRK at 6% / 8% before the English text did, which is a hint that the CN feed runs ahead.
+
+**To unblock:** either allow `game.gtimg.cn`, `mlol.qt.qq.com`, `wildriftalpha.com` and `wrpocket.app`
+in this environment's network settings, or capture wildriftalpha's network requests in browser
+devtools and commit the request URLs here.
