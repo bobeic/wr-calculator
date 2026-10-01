@@ -69,7 +69,7 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
   const flags = flagHandModelled(diff, input.handModelled, input.covered, input.goldens)
   const officialNotes = input.notes === null ? null : crossCheckNotes({
     patch: input.after.meta.patch, url: input.notes.url, notes: input.notes.notes, after: input.after, diff,
-    flags, handModelled: input.handModelled, covered: input.covered, goldens: input.goldens,
+    flags, handModelled: input.handModelled, covered: input.covered, goldens: input.goldens, previousStale: input.previousStale,
   })
   const autoCleared = new Set((officialNotes?.autoReviewed ?? []).map((entry) => `${entry.kind}\u0000${entry.id}`))
   const needsReview = [...flags.filter((flag) => !autoCleared.has(`${flag.kind}\u0000${flag.id}`)), ...(officialNotes?.notesFlags ?? [])]

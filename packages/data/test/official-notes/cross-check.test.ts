@@ -30,13 +30,16 @@ function notes(entries: Array<{ heading: string; lines?: Array<{ text: string; a
 
 const NONE = { items: [], champions: [] }
 
-function run(before: Snapshot, after: Snapshot, notesOrNull: OfficialNotes | null, handItems: string[], coveredItems: string[] = []) {
+function run(
+  before: Snapshot, after: Snapshot, notesOrNull: OfficialNotes | null, handItems: string[], coveredItems: string[] = [], staleItems: string[] = [],
+) {
   const diff = diffSnapshots(before, after)
   const handModelled = { items: handItems, champions: [] }
   const covered = { items: coveredItems, champions: [] }
+  const previousStale = staleItems.map((id) => ({ kind: 'item' as const, id, name: id, since: '9.8' }))
   return crossCheckNotes({
     patch: '9.9', url: 'https://example.test/9-9', notes: notesOrNull, after, diff,
-    flags: flagHandModelled(diff, handModelled, covered, []), handModelled, covered, goldens: [],
+    flags: flagHandModelled(diff, handModelled, covered, []), handModelled, covered, goldens: [], previousStale,
   })
 }
 
@@ -54,6 +57,12 @@ describe('crossCheckNotes', () => {
     expect(check.autoReviewed).toEqual([{
       kind: 'item', id: 'a', note: 'Not in the official 9.9 notes (https://example.test/9-9); wrpocket-only change to description',
     }])
+  })
+
+  it('never auto-clears an entry already stale from an earlier patch', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const check = run(before, after, notes([{ heading: 'Beta' }]), ['a'], [], ['a'])
+    expect(check.autoReviewed).toEqual([])
   })
 
   it('never auto-clears a removed entry or a mentioned one', () => {
@@ -116,7 +125,7 @@ describe('crossCheckNotes', () => {
     const diff = diffSnapshots(before73, after73a)
     const flags = flagHandModelled(diff, handModelled, NONE, [])
     const notes73a = parseNotesPage(fixture('7.3a'), '7.3a', 'https://example.test/7-3a')
-    const check = crossCheckNotes({ patch: '7.3a', url: notes73a.url, notes: notes73a, after: after73a, diff, flags, handModelled, covered: NONE, goldens: [] })
+    const check = crossCheckNotes({ patch: '7.3a', url: notes73a.url, notes: notes73a, after: after73a, diff, flags, handModelled, covered: NONE, goldens: [], previousStale: [] })
     expect(check.autoReviewed).toHaveLength(30)
     const cleared = new Set(check.autoReviewed.map((entry) => entry.id))
     expect(flags.filter((flag) => !cleared.has(flag.id)).map((flag) => flag.id)).toEqual(['deaths-dance'])

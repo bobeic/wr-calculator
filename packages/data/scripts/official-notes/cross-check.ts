@@ -2,7 +2,7 @@ import type { ReviewedEntry } from '../../src/patches/overlay'
 import { goldensUsing } from '../patch/patch-diff'
 import type { GoldenRef } from '../patch/patch-diff'
 import type { Snapshot } from '../patch/snapshot'
-import type { EntryRef, Flag, IdLists, SnapshotDiff } from '../patch/types'
+import type { EntryRef, Flag, IdLists, SnapshotDiff, StaleRef } from '../patch/types'
 import { matchNotes } from './match'
 import type { CheckedEntry, CheckedLine, EntryStatus, NotesCrossCheck, OfficialNotes } from './types'
 
@@ -18,6 +18,8 @@ export interface CrossCheckInput {
   handModelled: IdLists
   covered: IdLists
   goldens: GoldenRef[]
+  /** Entries already stale from an earlier patch; never auto-cleared, so their staleness carries on. */
+  previousStale: StaleRef[]
 }
 
 const refKey = (ref: { kind: string; id: string }): string => `${ref.kind}\u0000${ref.id}`
@@ -73,9 +75,10 @@ export function crossCheckNotes(input: CrossCheckInput): NotesCrossCheck {
   const mentionedKeys = new Set(mentioned.map((entry) => refKey(entry.ref)))
   const changedKeys = new Set([...input.diff.items, ...input.diff.champions, ...input.diff.removed].map(refKey))
   const isCovered = (ref: EntryRef): boolean => listFor(input.covered, ref.kind).includes(ref.id)
+  const staleKeys = new Set(input.previousStale.map(refKey))
 
   const autoReviewed: ReviewedEntry[] = input.flags
-    .filter((flag) => flag.severity === 'changed' && !mentionedKeys.has(refKey(flag)))
+    .filter((flag) => flag.severity === 'changed' && !mentionedKeys.has(refKey(flag)) && !staleKeys.has(refKey(flag)))
     .map((flag) => ({
       kind: flag.kind, id: flag.id,
       note: `Not in the official ${input.patch} notes (${input.url}); wrpocket-only change to ${[...new Set(flag.changes.map((change) => change.field))].join(', ')}`,

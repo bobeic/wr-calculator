@@ -116,6 +116,20 @@ describe('buildPatchDiff', () => {
     expect(withNotes.officialNotes?.autoReviewed.map((entry) => entry.id)).toEqual(['trinity-force'])
   })
 
+  it('keeps a previously stale flag in needsReview instead of auto-clearing it', () => {
+    const notes = {
+      patch: '7.3a', url: 'u', title: '', published: '',
+      entries: [{ source: 'rich-text' as const, section: 'ITEMS', excluded: false, heading: 'Long Sword', lines: [] }],
+    }
+    const stale = buildPatchDiff({
+      before, after, handModelled: { items: ['trinity-force'], champions: [] },
+      previousStale: [{ kind: 'item', id: 'trinity-force', name: 'Trinity Force', since: '7.2' }],
+      covered: NONE, goldens: [], notesBefore: [], notesAfter: [], notes: { url: 'u', notes },
+    })
+    expect(stale.officialNotes?.autoReviewed).toEqual([])
+    expect(stale.needsReview.map((flag) => flag.id)).toEqual(['trinity-force'])
+  })
+
   it('reports no notes stage when notes is null', () => {
     expect(result.officialNotes).toBeNull()
   })
