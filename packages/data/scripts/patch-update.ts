@@ -167,9 +167,13 @@ async function run(options: Options): Promise<void> {
     throw new Error(`bootstrapping ${plan.patch} needs an existing root layer at ${join(patchDir, 'layer.ts')}`)
   }
   const cacheDir = options.fromCache ?? join(DATA_ROOT, '.cache', 'wrpocket', `${meta.patch}-${meta.updated.replace(/[^0-9]/g, '')}`)
-  if (options.fromCache === null && options.refresh) await rm(cacheDir, { recursive: true, force: true })
+  const notesCacheFile = join(DATA_ROOT, '.cache', 'official-notes', `${plan.patch}.html`)
+  if (options.fromCache === null && options.refresh) {
+    await rm(cacheDir, { recursive: true, force: true })
+    await rm(notesCacheFile, { force: true })
+  }
   const snapshot = await fetchSnapshot(meta, cacheDir, options.fromCache !== null)
-  // Keep the raw meta beside the cached responses so a later --from-cache run can restore its sources.
+  // Keep the raw meta beside the cached responses for reference and recovery; --from-cache reuses the committed meta.
   if (fetchedMetaText !== null) await writeFile(join(cacheDir, 'meta.json'), fetchedMetaText)
 
   const provenance: Provenance = { source: 'wiki', patch: plan.patch, verifiedInGame: false }
@@ -203,7 +207,7 @@ async function run(options: Options): Promise<void> {
     const url = options.notesUrl ?? notesUrl(plan.patch)
     const notes: OfficialNotes | null = await loadNotes({
       patch: plan.patch, url,
-      cacheFile: join(DATA_ROOT, '.cache', 'official-notes', `${plan.patch}.html`),
+      cacheFile: notesCacheFile,
       snapshotFile: join(NOTES_SNAPSHOT_ROOT, `${plan.patch}.json`),
       offline: options.fromCache !== null, allowFetch: options.notesUrl !== null,
       fetchPage: (target) => fetch(target),

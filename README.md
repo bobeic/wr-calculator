@@ -63,7 +63,8 @@ and cross-checks them against the wrpocket diff:
 
 If the notes page doesn't exist yet (HTTP 404), the import runs without it and nothing is auto-cleared.
 A `--from-cache` run uses the cached page or the committed notes snapshot, and fetches only with
-`--notes-url`.
+`--notes-url`. Notes published after an import are picked up by re-running with `--refresh`, or with
+`--from-cache <dir> --notes-url <url>`.
 
 `--from-cache <dir>` reads the raw responses from a local cache folder named
 `<patch>-<YYYYMMDDhhmmss>` instead of the network; it was used to bootstrap 7.3. When that patch's
