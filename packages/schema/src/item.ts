@@ -19,6 +19,11 @@ export const ItemSchema = z.object({
   tags: z.array(z.string()),
   /** A build may hold at most one item from each exclusive group (a shop restriction). */
   exclusiveGroup: z.string().optional(),
+  /**
+   * Hand-modelled items only: fields kept as written instead of taken from the patch's imported data,
+   * e.g. 'cost', 'recipe', 'stats.ad'. Each pin needs a comment naming the better source (notes, in-game).
+   */
+  sourcePins: z.array(z.string()).optional(),
   provenance: ProvenanceSchema,
 }).strict()
 export type Item = z.infer<typeof ItemSchema>

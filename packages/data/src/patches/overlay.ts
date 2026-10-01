@@ -2,6 +2,7 @@ import type { Champion, Item, Provenance } from '@wr-calc/schema'
 import type { StatCatalog } from '@wr-calc/calc'
 import { buildCatalog, mergeById, withExclusiveGroups } from '../catalog'
 import type { TargetPreset } from './7.3/targets'
+import { syncItem } from './source-sync'
 
 /** Ids of every source record that changed or disappeared since the previous patch. */
 export interface ChangedIds {
@@ -83,7 +84,9 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
     items: mergeById(inheritedItems, layer.overrideItems),
     champions: mergeById(inheritedChampions, layer.overrideChampions),
   }
-  const merged = mergeById(layer.generatedItems, markStale(handModelled.items, stale.items))
+  const generatedById = new Map(layer.generatedItems.map((entry) => [entry.id, entry]))
+  const syncedItems = handModelled.items.map((entry) => syncItem(entry, generatedById.get(entry.id)))
+  const merged = mergeById(layer.generatedItems, markStale(syncedItems, stale.items))
   // Inherited groups drop ids wrpocket removed (the report lists the removal); a layer's own groups stay strict.
   const presentIds = new Set(merged.map((entry) => entry.id))
   const exclusiveGroups = layer.exclusiveGroups ?? Object.fromEntries(

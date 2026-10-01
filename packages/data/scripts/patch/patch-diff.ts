@@ -1,9 +1,9 @@
 import type { LoadedGoldenCase } from '../../src/golden-loader'
 import { crossCheckNotes } from '../official-notes/cross-check'
 import type { OfficialNotes } from '../official-notes/types'
-import { diffSnapshots } from './diff'
+import { diffSnapshots, MISSING } from './diff'
 import type { Snapshot } from './snapshot'
-import type { EntryDiff, EntryRef, Flag, IdLists, NoteRef, PatchDiff, ReportedDiff, SnapshotDiff, StaleRef } from './types'
+import type { EntryDiff, EntryRef, FieldChange, Flag, IdLists, NoteRef, PatchDiff, ReportedDiff, SnapshotDiff, StaleRef } from './types'
 
 /** What a golden case touches, for matching against changed entries. */
 export interface GoldenRef {
@@ -34,13 +34,38 @@ export function goldensUsing(ref: EntryRef, goldens: GoldenRef[]): string[] {
 
 const compareRefs = (a: EntryRef, b: EntryRef): number => a.kind.localeCompare(b.kind) || a.id.localeCompare(b.id)
 
-/** Flags hand-modelled entries that changed or disappeared and are not covered; removed ones first. */
-export function flagHandModelled(diff: SnapshotDiff, handModelled: IdLists, covered: IdLists, goldens: GoldenRef[]): Flag[] {
+// Item diff fields the overlay takes from wrpocket for hand-modelled items (see src/patches/source-sync.ts).
+const SYNCED_DIFF_FIELDS = new Set(['name', 'price', 'tier', 'components'])
+
+/** True when a change is applied by the overlay's source sync: a synced field, or a stat that changed value (not one added or dropped). */
+function isSyncedChange(change: FieldChange): boolean {
+  if (SYNCED_DIFF_FIELDS.has(change.field)) return true
+  return change.field.startsWith('stats.') && change.before !== MISSING && change.after !== MISSING
+}
+
+/**
+ * Hand-modelled, uncovered items whose every change the overlay applies by itself, so they need no review.
+ * An item with source pins is never auto-applied: a pinned value next to a moving source needs a look.
+ */
+export function autoAppliedItems(diff: SnapshotDiff, handModelled: IdLists, covered: IdLists, pinnedItems: string[]): EntryDiff[] {
+  const hand = new Set(handModelled.items)
+  const skip = new Set([...covered.items, ...pinnedItems])
+  return diff.items
+    .filter((entry) => hand.has(entry.id) && !skip.has(entry.id) && entry.changes.every(isSyncedChange))
+    .sort(compareRefs)
+}
+
+/** Flags hand-modelled entries that changed or disappeared and are not covered or auto-applied; removed ones first. */
+export function flagHandModelled(
+  diff: SnapshotDiff, handModelled: IdLists, covered: IdLists, goldens: GoldenRef[], autoApplied: EntryRef[] = [],
+): Flag[] {
   const listFor = (lists: IdLists, kind: EntryRef['kind']): Set<string> => new Set(kind === 'item' ? lists.items : lists.champions)
+  const applied = new Set(autoApplied.map((ref) => `${ref.kind}\u0000${ref.id}`))
   const needsFlag = (ref: EntryRef): boolean => listFor(handModelled, ref.kind).has(ref.id) && !listFor(covered, ref.kind).has(ref.id)
   const removed: Flag[] = diff.removed.filter(needsFlag).sort(compareRefs)
     .map((ref) => ({ ...ref, severity: 'removed', changes: [], goldens: goldensUsing(ref, goldens) }))
-  const changed: Flag[] = [...diff.items, ...diff.champions].filter(needsFlag).sort(compareRefs)
+  const changed: Flag[] = [...diff.items, ...diff.champions]
+    .filter((entry) => needsFlag(entry) && !applied.has(`${entry.kind}\u0000${entry.id}`)).sort(compareRefs)
     .map((entry) => ({ ...entry, severity: 'changed', goldens: goldensUsing(entry, goldens) }))
   return [...removed, ...changed]
 }
@@ -59,6 +84,8 @@ export interface BuildPatchDiffInput {
   notesAfter: NoteRef[]
   /** The official notes for the new patch; null when no notes stage ran. */
   notes: { url: string; notes: OfficialNotes | null } | null
+  /** Turns on auto-apply of synced item changes; pinnedItems are hand-modelled items with sourcePins. Omitted: everything is flagged. */
+  autoApply?: { pinnedItems: string[] }
 }
 
 const noteKey = (note: NoteRef): string => `${note.subject}\u0000${note.note}`
@@ -66,7 +93,8 @@ const noteKey = (note: NoteRef): string => `${note.subject}\u0000${note.note}`
 /** Builds the full report data for one patch: flags, carried staleness, diffs with goldens, note changes. */
 export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
   const diff = diffSnapshots(input.before, input.after)
-  const flags = flagHandModelled(diff, input.handModelled, input.covered, input.goldens)
+  const autoApplied = input.autoApply === undefined ? [] : autoAppliedItems(diff, input.handModelled, input.covered, input.autoApply.pinnedItems)
+  const flags = flagHandModelled(diff, input.handModelled, input.covered, input.goldens, autoApplied)
   const officialNotes = input.notes === null ? null : crossCheckNotes({
     patch: input.after.meta.patch, url: input.notes.url, notes: input.notes.notes, after: input.after, diff,
     flags, handModelled: input.handModelled, covered: input.covered, goldens: input.goldens, previousStale: input.previousStale,
@@ -85,6 +113,7 @@ export function buildPatchDiff(input: BuildPatchDiffInput): PatchDiff {
     fromUpdated: input.before.meta.updated,
     toUpdated: input.after.meta.updated,
     needsReview,
+    autoApplied: autoApplied.map((entry) => ({ ...entry, goldens: goldensUsing(entry, input.goldens) })),
     carriedStale: input.previousStale
       .filter((entry) => !coveredIds(entry.kind).has(entry.id) && !flagged.has(`${entry.kind}\u0000${entry.id}`)).sort(compareRefs),
     items: withGoldens(diff.items),

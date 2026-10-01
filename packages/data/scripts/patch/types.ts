@@ -69,6 +69,8 @@ export interface PatchDiff {
   fromUpdated: string
   toUpdated: string
   needsReview: Flag[]
+  /** Hand-modelled items whose changes were all applied from wrpocket by the overlay's source sync; no review needed. */
+  autoApplied: ReportedDiff[]
   carriedStale: StaleRef[]
   items: ReportedDiff[]
   champions: ReportedDiff[]

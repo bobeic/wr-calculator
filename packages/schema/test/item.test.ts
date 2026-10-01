@@ -21,6 +21,10 @@ describe('ItemSchema', () => {
     expect(result.id).toBe('long-sword')
   })
 
+  it('accepts optional sourcePins', () => {
+    expect(ItemSchema.parse({ ...validItem(), sourcePins: ['cost', 'stats.ad'] }).sourcePins).toEqual(['cost', 'stats.ad'])
+  })
+
   it('accepts an optional exclusiveGroup', () => {
     const result = ItemSchema.parse({ ...validItem(), exclusiveGroup: 'percent-magic-pen' })
     expect(result.exclusiveGroup).toBe('percent-magic-pen')

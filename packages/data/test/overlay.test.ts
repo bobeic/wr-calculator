@@ -7,12 +7,14 @@ const PROV = { source: 'wiki' as const, patch: '7.3', verifiedInGame: true }
 const item = (id: string, ad = 10): Item => ({
   id, name: id, tier: 'legendary', cost: { total: 1, combine: 1 }, recipe: [], stats: { ad }, effects: [], tags: [], provenance: PROV,
 })
+// A hand-modelled item whose ad is pinned, so these tests see the hand value rather than the synced one.
+const hand = (id: string, ad: number): Item => ({ ...item(id, ad), sourcePins: ['stats.ad'] })
 const champion = { id: 'ambessa', name: 'Ambessa', provenance: PROV } as unknown as Champion
 const NO_CHANGES = { items: [], champions: [] }
 
 const root: PatchLayer = {
   id: '7.3', generatedItems: [item('hand', 1), item('plain'), item('grouped')], generatedChampions: [],
-  overrideItems: [item('hand', 99)], overrideChampions: [champion], reviewed: [], changedIds: NO_CHANGES,
+  overrideItems: [hand('hand', 99)], overrideChampions: [champion], reviewed: [], changedIds: NO_CHANGES,
   exclusiveGroups: { grouped: 'g' }, targets: [],
 }
 const next = (overrides: Partial<PatchLayer>): PatchLayer => ({
@@ -46,10 +48,10 @@ describe('buildPatchDataset', () => {
   it('does not mark overridden or reviewed entries stale', () => {
     const dataset = buildPatchDataset(next({
       changedIds: { items: ['hand'], champions: ['ambessa'] },
-      overrideItems: [item('hand', 50)],
+      overrideItems: [hand('hand', 50)],
       reviewed: [{ kind: 'champion', id: 'ambessa', note: 'wording only' }],
     }), base)
-    expect(dataset.items.find((entry) => entry.id === 'hand')).toEqual(item('hand', 50))
+    expect(dataset.items.find((entry) => entry.id === 'hand')).toEqual(hand('hand', 50))
     expect(dataset.stale.items.size + dataset.stale.champions.size).toBe(0)
   })
 
@@ -78,5 +80,41 @@ describe('buildPatchDataset', () => {
     const datasets = buildPatchDatasets([root, next({ changedIds: { items: ['hand'], champions: [] } })])
     expect([...datasets.keys()]).toEqual(['7.3', '7.3a'])
     expect(datasets.get('7.3a')?.stale.items.get('hand')).toBe('7.3a')
+  })
+})
+
+describe('source sync of hand-modelled items', () => {
+  const effect = { kind: 'statMultiplier', id: 'x', name: 'X', description: '', support: 'full', stat: 'ap', layer: 'total', amount: 0.3 } as unknown as Item['effects'][number]
+  const handItem: Item = {
+    ...item('hand', 1), name: 'Old', cost: { total: 3200, combine: 400 }, recipe: ['a'],
+    stats: { ad: 1, critDamage: 0.3 }, effects: [effect], tags: ['physical'],
+  }
+  const generated: Item = {
+    ...item('hand', 2), name: 'New', cost: { total: 3300, combine: 500 }, recipe: ['a', 'b'], stats: { ad: 2, armor: 5 },
+  }
+  const layer = (overrides: Item[]): PatchLayer => ({
+    id: '7.3', generatedItems: [generated], generatedChampions: [], overrideItems: overrides, overrideChampions: [],
+    reviewed: [], changedIds: NO_CHANGES, exclusiveGroups: {}, targets: [],
+  })
+
+  it('takes name, tier, cost, recipe and shared stats from the generated entry and keeps the rest', () => {
+    const synced = buildPatchDataset(layer([handItem]), null).items.find((entry) => entry.id === 'hand')
+    expect(synced).toEqual({
+      ...handItem, name: 'New', cost: { total: 3300, combine: 500 }, recipe: ['a', 'b'], stats: { ad: 2, critDamage: 0.3, armor: 5 },
+    })
+  })
+
+  it('keeps pinned fields and stats as written', () => {
+    const pinned = { ...handItem, sourcePins: ['cost', 'stats.ad'] }
+    const synced = buildPatchDataset(layer([pinned]), null).items.find((entry) => entry.id === 'hand')
+    expect(synced?.cost).toEqual({ total: 3200, combine: 400 })
+    expect(synced?.stats).toEqual({ ad: 1, critDamage: 0.3, armor: 5 })
+    expect(synced?.recipe).toEqual(['a', 'b'])
+  })
+
+  it('leaves a hand-modelled item with no generated entry unchanged and keeps the inherited copy unsynced', () => {
+    const dataset = buildPatchDataset({ ...layer([handItem]), generatedItems: [] }, null)
+    expect(dataset.items).toEqual([handItem])
+    expect(buildPatchDataset(layer([handItem]), null).handModelled.items).toEqual([handItem])
   })
 })

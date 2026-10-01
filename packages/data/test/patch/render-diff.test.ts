@@ -17,6 +17,9 @@ const DIFF: PatchDiff = {
     },
     { severity: 'notes', kind: 'item', id: 'notes-only', name: 'Notes Only', changes: [], goldens: [] },
   ],
+  autoApplied: [
+    { kind: 'item', id: 'deaths-dance', name: "Death's Dance", goldens: [], changes: [{ field: 'price', before: '3200', after: '3300' }] },
+  ],
   carriedStale: [{ kind: 'champion', id: 'ambessa', name: 'Ambessa', since: '7.2' }],
   items: [], champions: [
     { kind: 'champion', id: 'annie', name: 'Annie', goldens: ['annie-q.json'], changes: [{ field: 'stats.ad', before: 'Lv1 52', after: 'Lv1 55' }] },
@@ -30,7 +33,7 @@ describe('renderPatchDiff', () => {
   const report = renderPatchDiff(DIFF)
 
   it('puts the sections in order', () => {
-    const order = ['# Patch diff: 7.3 → 7.3a', '## Needs review', '## Still stale from earlier patches',
+    const order = ['# Patch diff: 7.3 → 7.3a', '## Needs review', '## Applied automatically', '## Still stale from earlier patches',
       '## Changed champions', '## Changed items', '## Added', '## Removed', '## Mapper notes']
     const positions = order.map((heading) => report.indexOf(heading))
     expect(positions.every((position) => position >= 0)).toBe(true)
@@ -52,6 +55,13 @@ describe('renderPatchDiff', () => {
     expect(report).toContain('- 3 hand-modelled entries need review')
     expect(report).toContain('- 0 items and 1 champions changed, 1 added, 0 removed')
     expect(report).toContain('- champion ambessa (Ambessa), stale since 7.2')
+  })
+
+  it('lists auto-applied items with their changes and counts them', () => {
+    expect(report).toContain('- 1 hand-modelled items took number-only changes from wrpocket automatically')
+    const section = report.slice(report.indexOf('## Applied automatically'), report.indexOf('## Still stale'))
+    expect(section).toContain("### item deaths-dance (Death's Dance)")
+    expect(section).toContain('- `price`: 3200 → 3300')
   })
 
   it('labels a notes-only flag', () => {

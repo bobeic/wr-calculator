@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { diffSnapshots } from '../../scripts/patch/diff'
-import { buildPatchDiff, flagHandModelled, goldenRefs, goldensUsing } from '../../scripts/patch/patch-diff'
+import { autoAppliedItems, buildPatchDiff, flagHandModelled, goldenRefs, goldensUsing } from '../../scripts/patch/patch-diff'
 import type { GoldenRef } from '../../scripts/patch/patch-diff'
 import type { LoadedGoldenCase } from '../../src/golden-loader'
 import { makeRawChampion, makeRawItem, makeSnapshot } from './fixtures'
@@ -61,6 +61,42 @@ describe('flagHandModelled', () => {
     const flags = flagHandModelled(diff, handModelled, { items: ['trinity-force'], champions: ['annie'] }, GOLDENS)
     expect(flags.map((flag) => flag.id)).toEqual(['rabadons-deathcap', 'bf-sword'])
     expect(flags.some((flag) => flag.id === 'plain')).toBe(false)
+  })
+})
+
+describe('autoAppliedItems', () => {
+  const item = (id: string, overrides: Parameters<typeof makeRawItem>[0] = {}) => makeRawItem({ id, name: { en: id }, ...overrides })
+  const base = [item('price'), item('stat'), item('text'), item('added-stat'), item('pinned'), item('covered'), item('generated')]
+  const changed = makeSnapshot('7.3a', '2026-09-29 16:09:43', [
+    item('price', { price: '600', components: ['dagger'], tier: 'epic' }),
+    item('stat', { numeric_stats: { attackDamage: 15 } }),
+    item('text', { price: '600', description: { en: '+12 Attack Damage. New passive.' } }),
+    item('added-stat', { numeric_stats: { attackDamage: 12, armor: 5 } }),
+    item('pinned', { price: '600' }),
+    item('covered', { price: '600' }),
+    item('generated', { price: '600' }),
+  ], [])
+  const itemDiff = diffSnapshots(makeSnapshot('7.3', '2026-09-23 10:19:27', base, []), changed)
+  const hand = { items: ['price', 'stat', 'text', 'added-stat', 'pinned', 'covered'], champions: [] }
+
+  it('applies price, recipe, tier and stat value changes; flags text changes, added stats, pinned and covered items', () => {
+    const applied = autoAppliedItems(itemDiff, hand, { items: ['covered'], champions: [] }, ['pinned'])
+    expect(applied.map((entry) => entry.id)).toEqual(['price', 'stat'])
+    const flags = flagHandModelled(itemDiff, hand, { items: ['covered'], champions: [] }, [], applied)
+    expect(flags.map((flag) => flag.id)).toEqual(['added-stat', 'pinned', 'text'])
+  })
+
+  it('reports auto-applied items in buildPatchDiff only when autoApply is on', () => {
+    const input = {
+      before: makeSnapshot('7.3', '2026-09-23 10:19:27', base, []), after: changed, handModelled: hand, previousStale: [],
+      covered: NONE, goldens: [], notesBefore: [], notesAfter: [], notes: null,
+    }
+    const on = buildPatchDiff({ ...input, autoApply: { pinnedItems: [] } })
+    expect(on.autoApplied.map((entry) => entry.id)).toEqual(['covered', 'pinned', 'price', 'stat'])
+    expect(on.needsReview.map((flag) => flag.id)).toEqual(['added-stat', 'text'])
+    const off = buildPatchDiff(input)
+    expect(off.autoApplied).toEqual([])
+    expect(off.needsReview).toHaveLength(6)
   })
 })
 

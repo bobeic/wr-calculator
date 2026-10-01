@@ -4,7 +4,8 @@ import type { Snapshot, SnapshotChampion, SnapshotItem } from './snapshot'
 import { diffWords, numberChanges, renderWordDiff } from './text-diff'
 import type { EntryDiff, EntryRef, FieldChange, IdLists, SnapshotDiff } from './types'
 
-const MISSING = '—'
+/** Shown for a value one side doesn't have. */
+export const MISSING = '—'
 const SLOT_BY_KEY = new Map(SLOTS.map(([slot, key]) => [key, slot]))
 const STAT_BY_COLUMN = new Map<string, string>([
   ...STAT_COLUMNS.map(([stat, column]): [string, string] => [column, stat]),

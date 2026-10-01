@@ -221,9 +221,14 @@ async function run(options: Options): Promise<void> {
       notesBefore: mapSnapshot(before, provenance).notes,
       notesAfter: mapped.notes,
       notes: { url, notes },
+      autoApply: { pinnedItems: dataset.handModelled.items.filter((item) => (item.sourcePins ?? []).length > 0).map((item) => item.id) },
     })
     needsReview = diff.needsReview.length
-    await writeFile(join(staged.generated, 'changed-ids.ts'), renderChangedIds(changedIdsOf(diffSnapshots(before, committed)), plan.patch))
+    if (diff.autoApplied.length > 0) console.log(`${diff.autoApplied.length} hand-modelled items took number-only changes from wrpocket automatically.`)
+    // Auto-applied items took their new values from wrpocket, so they don't go stale.
+    const changedIds = changedIdsOf(diffSnapshots(before, committed))
+    const applied = new Set(diff.autoApplied.map((entry) => entry.id))
+    await writeFile(join(staged.generated, 'changed-ids.ts'), renderChangedIds({ ...changedIds, items: changedIds.items.filter((id) => !applied.has(id)) }, plan.patch))
     await writeFile(join(staged.reports, 'patch-diff.json'), stableStringify(diff))
     await writeFile(join(staged.reports, 'PATCH_DIFF.md'), renderPatchDiff(diff))
     await writeFile(join(staged.generated, 'notes-review.ts'), renderNotesReview(diff.officialNotes, plan.patch))
