@@ -109,6 +109,21 @@ describe('crossCheckNotes', () => {
     expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['b'])
   })
 
+  // 7.3a: Viego's Q is titled 'Blade of the Ruined King'; its lines change Viego, not the item of the same name.
+  it('does not treat a champion ability titled like an item as a mention of that item', () => {
+    const after = snap([item('a', 'Alpha', '3200', 'Deals 6%'), item('b', 'Beta', '1000'), item('gone', 'Gone', '1')])
+    const viego: OfficialNotes = {
+      ...notes([]),
+      entries: [{
+        source: 'champion-blade', section: '', excluded: false, heading: 'BETA',
+        lines: [{ group: 'Alpha', text: 'Passive Damage: 2% → 3%', before: '2%', after: '3%' }],
+      }],
+    }
+    const check = run(before, { ...after, champions: [{ id: 'beta', name: { en: 'Beta' } } as unknown as Snapshot['champions'][number]] }, viego, ['a'])
+    expect(check.mentioned.map((entry) => entry.ref)).toEqual([{ kind: 'champion', id: 'beta', name: 'Beta' }])
+    expect(check.autoReviewed.map((entry) => entry.id)).toEqual(['a'])
+  })
+
   it('never auto-clears a removed entry or a mentioned one', () => {
     const after = snap([item('a', 'Alpha', '3300', 'Deals 7%'), item('b', 'Beta', '1000')])
     const check = run(before, after, notes([{ heading: 'Alpha', lines: [{ text: 'Price: 3200 → 3,300', after: '3,300' }] }]), ['a', 'gone'])
@@ -184,5 +199,9 @@ describe('crossCheckNotes', () => {
     expect(flags.filter((flag) => !cleared.has(flag.id)).map((flag) => flag.id).sort()).toEqual(['deaths-dance', 'infinity-edge'])
     expect(check.notesFlags).toEqual([])
     expect(check.mentioned.find((entry) => entry.ref.id === 'deaths-dance')?.status).toBe('reflected')
+    // Viego's Q, 'Blade of the Ruined King', is a Viego change: the item of that name is not mentioned and is cleared.
+    expect(check.mentioned.some((entry) => entry.ref.id === 'blade-of-the-ruined-king')).toBe(false)
+    expect(check.mentioned.find((entry) => entry.ref.id === 'viego')?.lines.map((line) => line.group)).toContain('Blade of the Ruined King')
+    expect(cleared.has('blade-of-the-ruined-king')).toBe(true)
   })
 })

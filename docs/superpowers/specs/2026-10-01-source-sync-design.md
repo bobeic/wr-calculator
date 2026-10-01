@@ -20,6 +20,11 @@ number-only changes should apply by themselves. A change to how an item works sh
   such as Infinity Edge `critDamage`, Malignance `ultimateHaste`, Shojin `basicAbilityHaste`). Effects
   and tags stay hand-written. An item with no generated entry (Seraph's Embrace) is unchanged.
   `handModelled` keeps the unsynced copy, so the next patch syncs against its own data.
+- **Stale items keep their last values.** While a hand-modelled item is stale (flagged and not yet
+  covered by an override or review), it syncs against the previous patch's effective item, not the new
+  generated one. An unconfirmed wrpocket number therefore never reaches the calculator. Once the item
+  is covered, or auto-applied with notes confirmation, it syncs to the new values. (Decided 2026-10-01:
+  BotRK showed that wrpocket's unconfirmed numbers can be wrong.)
 - **Pins.** `Item.sourcePins` (optional, e.g. `['cost', 'stats.ad']`) keeps a hand-written value
   where a better source disagrees with wrpocket (in-game reading or official notes, per the
   source-priority ADR). Each pin needs a comment naming that source. No item has pins today.
@@ -31,7 +36,10 @@ number-only changes should apply by themselves. A change to how an item works sh
 
   wrpocket alone isn't trusted for this. It carries Tencent CN values and sometimes regresses against
   the global notes. On 7.3a its BotRK text went 7% → 6%, copied from the Chinese text, while the
-  global 7.3a notes list no BotRK change. An auto-applied item isn't flagged, isn't added to `changed-ids.ts` (so it doesn't go stale), and is
+  global 7.3a notes list no BotRK change. What 7.3a did change is Viego's Q, which is also titled "Blade
+  of the Ruined King". The notes list that change on Viego's champion card, and the matcher attributes it
+  to Viego, not to the item. A test pins this, so a name shared between an ability and an item never
+  counts as an item mention. An auto-applied item isn't flagged, isn't added to `changed-ids.ts` (so it doesn't go stale), and is
   listed in `patch-diff.json` `autoApplied` and under "Applied automatically" in `PATCH_DIFF.md`.
   These are still flagged:
   - a synced change the notes don't confirm. The notes cross-check also never auto-clears a flag that

@@ -85,7 +85,12 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
     champions: mergeById(inheritedChampions, layer.overrideChampions),
   }
   const generatedById = new Map(layer.generatedItems.map((entry) => [entry.id, entry]))
-  const syncedItems = handModelled.items.map((entry) => syncItem(entry, generatedById.get(entry.id)))
+  // A stale item's new wrpocket values are unconfirmed, so it keeps the values it last had; it syncs again once covered.
+  const previousItems = new Map((previous?.items ?? []).map((entry) => [entry.id, entry]))
+  const syncedItems = handModelled.items.map((entry) => {
+    const kept = stale.items.has(entry.id) ? previousItems.get(entry.id) : undefined
+    return syncItem(entry, kept ?? generatedById.get(entry.id))
+  })
   const merged = mergeById(layer.generatedItems, markStale(syncedItems, stale.items))
   // Inherited groups drop ids wrpocket removed (the report lists the removal); a layer's own groups stay strict.
   const presentIds = new Set(merged.map((entry) => entry.id))

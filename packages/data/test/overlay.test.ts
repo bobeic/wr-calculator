@@ -117,4 +117,17 @@ describe('source sync of hand-modelled items', () => {
     expect(dataset.items).toEqual([handItem])
     expect(buildPatchDataset(layer([handItem]), null).handModelled.items).toEqual([handItem])
   })
+
+  it('keeps a stale item at its last values until the change is covered, then syncs', () => {
+    const rootDataset = buildPatchDataset(layer([handItem]), null)
+    const moved: Item = { ...generated, cost: { total: 3400, combine: 600 }, stats: { ad: 3, armor: 5 } }
+    const pending: PatchLayer = { ...layer([]), id: '7.3a', generatedItems: [moved], changedIds: { items: ['hand'], champions: [] }, exclusiveGroups: undefined, targets: undefined }
+    const stale = buildPatchDataset(pending, rootDataset).items.find((entry) => entry.id === 'hand')
+    expect(stale?.cost).toEqual({ total: 3300, combine: 500 })
+    expect(stale?.stats).toEqual({ ad: 2, critDamage: 0.3, armor: 5 })
+    expect(stale?.provenance.staleSince).toBe('7.3a')
+    const reviewed = buildPatchDataset({ ...pending, reviewed: [{ kind: 'item', id: 'hand', note: 'checked' }] }, rootDataset)
+    expect(reviewed.items.find((entry) => entry.id === 'hand')?.cost).toEqual({ total: 3400, combine: 600 })
+  })
 })
+
