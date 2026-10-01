@@ -14,6 +14,8 @@ export const cooldownRefundHandler: EffectHandler<CooldownRefundEffect> = {
       for (const key of keys) {
         const availableAt = ctx.self.cooldowns[key]
         if (availableAt === undefined || availableAt <= ctx.time) continue
+        // Infinity marks a recast chain whose cooldown hasn't started yet; there is nothing to refund.
+        if (!Number.isFinite(availableAt)) continue
         if (effect.mode === 'flat') {
           ctx.self.cooldowns[key] = Math.max(ctx.time, availableAt - resolved.value)
         } else {
