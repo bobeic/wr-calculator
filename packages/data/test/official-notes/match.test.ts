@@ -30,7 +30,7 @@ function notes(entries: Array<Partial<OfficialNotes['entries'][number]> & { head
 describe('normaliseName', () => {
   it('folds case, quotes, entities and punctuation', () => {
     expect(normaliseName('Serylda’s Grudge')).toBe('seryldas grudge')
-    expect(normaliseName("Serylda’s  Grudge&nbsp;")).toBe('seryldas grudge')
+    expect(normaliseName("Serylda's  Grudge&nbsp;")).toBe('seryldas grudge')
     expect(normaliseName('Nunu & Willump')).toBe('nunu willump')
     expect(normaliseName('HWEI')).toBe('hwei')
   })
@@ -41,7 +41,7 @@ describe('matchNotes', () => {
 
   it('matches curly-quoted items and upper-case champion cards', () => {
     const matched = matchNotes(notes([
-      { heading: "Serylda’s Grudge" },
+      { heading: "Serylda's Grudge" },
       { heading: 'HWEI', source: 'champion-blade', section: '' },
     ]), snap)
     expect(matched.map((entry) => entry.ref)).toEqual([
