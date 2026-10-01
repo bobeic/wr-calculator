@@ -28,11 +28,18 @@ export function numberTokens(text: string): string[] {
   return (text.replace(/(\d),(\d{3})/g, '$1$2').match(/\d+(?:\.\d+)?/g) ?? [])
 }
 
+function leafTexts(value: unknown): string[] {
+  if (typeof value === 'string' || typeof value === 'number') return [String(value)]
+  if (Array.isArray(value)) return value.flatMap(leafTexts)
+  if (typeof value === 'object' && value !== null) return Object.values(value).flatMap(leafTexts)
+  return []
+}
+
 function recordNumbers(after: Snapshot, ref: EntryRef): Set<string> {
   const record = ref.kind === 'item'
     ? after.items.find((entry) => entry.id === ref.id)
     : after.champions.find((entry) => entry.id === ref.id)
-  return new Set(record === undefined ? [] : numberTokens(JSON.stringify(record)))
+  return new Set(leafTexts(record).flatMap(numberTokens))
 }
 
 function entryStatus(lines: CheckedLine[]): EntryStatus {

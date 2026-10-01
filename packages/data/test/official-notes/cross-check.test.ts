@@ -96,6 +96,14 @@ describe('crossCheckNotes', () => {
     expect(check.mentioned[0].status).toBe('no numbers')
   })
 
+  it('tokenises each wrpocket value separately and ignores object keys', () => {
+    const withArray = { ...item('b', 'Beta', '1000'), numeric_stats: { stat999: 5 }, extra: [10, 200] } as Snapshot['items'][number]
+    const check = run(before, snap([withArray]), notes([
+      { heading: 'Beta', lines: [{ text: 'Extra: 1 → 200', after: '200' }, { text: 'Stat: 1 → 999', after: '999' }] },
+    ]), [])
+    expect(check.mentioned[0].lines.map((line) => line.status)).toEqual(['reflected', 'not found'])
+  })
+
   it('throws when the page has entries but none match', () => {
     expect(() => run(before, before, notes([{ heading: 'Nexus' }, { heading: 'Smite' }]), [])).toThrow(/none of its 2 entries matched/)
   })
