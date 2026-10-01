@@ -1,4 +1,5 @@
-import type { EntryRef } from '../patch/types'
+import type { ReviewedEntry } from '../../src/patches/overlay'
+import type { EntryRef, Flag } from '../patch/types'
 
 /** One bullet from the notes, e.g. 'Price: 3200 → 3300'. */
 export interface NotesLine {
@@ -33,4 +34,35 @@ export interface OfficialNotes {
 /** A notes entry with the item or champion it names; ref is null when unmatched or excluded. */
 export interface MatchedEntry extends NotesEntry {
   ref: EntryRef | null
+}
+
+/** Whether a notes line's new numbers appear in wrpocket's record for that entry. */
+export type LineStatus = 'reflected' | 'not found' | 'no numbers'
+export type EntryStatus = 'reflected' | 'partly' | 'not in wrpocket' | 'no numbers'
+
+export interface CheckedLine extends NotesLine {
+  status: LineStatus
+}
+
+/** A matched notes entry with its reflected status. */
+export interface CheckedEntry {
+  ref: EntryRef
+  heading: string
+  status: EntryStatus
+  lines: CheckedLine[]
+}
+
+/** Everything the notes cross-check found for one patch. */
+export interface NotesCrossCheck {
+  url: string
+  /** False when the page wasn't found; nothing is auto-cleared then. */
+  found: boolean
+  published: string | null
+  /** Flagged entries the notes don't mention, cleared as wrpocket-only changes. */
+  autoReviewed: ReviewedEntry[]
+  /** Hand-modelled entries the notes change but wrpocket didn't. */
+  notesFlags: Flag[]
+  mentioned: CheckedEntry[]
+  unmatched: Array<{ section: string; heading: string }>
+  excludedCount: number
 }

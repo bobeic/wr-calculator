@@ -40,9 +40,9 @@ export interface IdLists {
   champions: string[]
 }
 
-/** A hand-modelled entry that needs review in this patch. */
+/** A hand-modelled entry that needs review in this patch; 'notes' = changed in the official notes only. */
 export interface Flag extends EntryRef {
-  severity: 'removed' | 'changed'
+  severity: 'removed' | 'changed' | 'notes'
   changes: FieldChange[]
   goldens: string[]
 }
