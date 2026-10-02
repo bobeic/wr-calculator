@@ -67,7 +67,8 @@ Steps once a name is chosen:
    via the new `buildBreakpoints`), and picking a champion target's runes (turned out already wired: `TargetPicker`
    already reuses the same `BuildPanel` as the attacker's build, runes included — just checked it actually changes
    the target's resolved stats).
-4. **"Best first item" view:** time to kill for every legendary on a given champion, built on the build comparison.
+4. **"Best first item" view:** done — a "Best first item" panel in the calculator ranks every legendary item bought
+   alone by time to kill, computed lazily (only once opened) so it doesn't slow down every edit.
 5. **Patch preview:** Tencent's CN data runs ahead of global servers, so it can show changes before they arrive.
 6. **Design pass** once the design answers are in.
 7. **Housekeeping:** GitHub warns that the workflows' actions (checkout, setup-node, pnpm, configure-pages) target

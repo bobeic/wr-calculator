@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { combatantFromChampion, combatantFromDummy } from '@wr-calc/calc'
-import { abilityRows, castActions, displayName, isEmptyBuild, rotation, runCalculator } from '../src/lib/calculator'
+import { abilityRows, bestFirstItems, castActions, displayName, isEmptyBuild, rotation, runCalculator } from '../src/lib/calculator'
 import { defaultState, emptyBuild } from '../src/lib/debug-state'
 import type { DebugState } from '../src/lib/debug-state'
 import { datasetFor } from '../src/lib/dataset'
@@ -125,6 +125,24 @@ describe('runCalculator', () => {
     expect(runCalculator(state(), dataset, false).a).toMatchObject({ ok: true, value: { buildOrder: [] } })
     const broken = runCalculator(state({ buildA: { ...emptyBuild(), items: ['bf-sword'] }, combo: 'bogus' }), dataset, false)
     expect(broken.a.ok && broken.a.value.buildOrder).toEqual([])
+  })
+})
+
+describe('bestFirstItems', () => {
+  it('ranks every legendary item by time to kill, fastest first', () => {
+    const result = bestFirstItems(state(), dataset)
+    if (!result.ok) throw new Error(result.error)
+    expect(result.value.length).toBe([...dataset.catalog.items.values()].filter((item) => item.tier === 'legendary').length)
+    expect(new Set(result.value.map((row) => row.itemId)).size).toBe(result.value.length)
+    const kills = result.value.filter((row) => row.timeToKill !== undefined).map((row) => row.timeToKill!)
+    expect(kills).toEqual([...kills].sort((a, b) => a - b))
+    // Items that don't kill within the limit sort after every item that does.
+    const firstMiss = result.value.findIndex((row) => row.timeToKill === undefined)
+    if (firstMiss !== -1) expect(result.value.slice(firstMiss).every((row) => row.timeToKill === undefined)).toBe(true)
+  })
+
+  it('reports an unknown champion as an error', () => {
+    expect(bestFirstItems(state({ championId: 'nobody' }), dataset)).toEqual({ ok: false, error: "unknown champion 'nobody'" })
   })
 })
 

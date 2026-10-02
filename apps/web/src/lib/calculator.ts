@@ -264,3 +264,37 @@ export function runCalculator(state: DebugState, dataset: DebugDataset, compare:
     priorityError: priorityParse.ok ? null : priorityParse.error,
   }
 }
+
+export interface FirstItemRow {
+  itemId: string
+  itemName: string
+  cost: number
+  dps: number
+  /** Undefined: doesn't kill within MAX_TTK_SECONDS. */
+  timeToKill?: number
+}
+
+/** Time to kill for every legendary item bought alone as the sole item, fastest kill first. */
+export function bestFirstItems(state: DebugState, dataset: DebugDataset): Outcome<FirstItemRow[]> {
+  return attempt(() => {
+    const champion = dataset.champions.get(state.championId)
+    if (champion === undefined) throw new Error(`unknown champion '${state.championId}'`)
+    const target = targetCombatant(state.target, dataset)
+    const priorityParse = parsePriority(state.priority)
+    const priority = priorityParse.ok && priorityParse.keys.length > 0 ? priorityParse.keys : (['q', 'w', 'e', 'r'] as AbilityKey[])
+
+    const rows = [...dataset.catalog.items.values()].filter((item) => item.tier === 'legendary').map((item): FirstItemRow => {
+      const build = toBuild({ items: [item.id], runes: [], inputs: {} }, dataset, state.abilityRanks, champion)
+      const attacker = combatantFromChampion(champion, state.level, build, dataset.catalog)
+      const long = simulateCombo(
+        attacker, target, rotation(priority, attacker.sheet.total.attackSpeed ?? 1, MAX_TTK_SECONDS), { critMode: 'expected' },
+      )
+      return {
+        itemId: item.id, itemName: item.name, cost: item.cost.total,
+        dps: sustainedDps(attacker, target, state.durationSeconds, priority),
+        ...(long.killed && long.timeToKill !== undefined && long.timeToKill <= MAX_TTK_SECONDS && { timeToKill: long.timeToKill }),
+      }
+    })
+    return rows.sort((a, b) => (a.timeToKill ?? Infinity) - (b.timeToKill ?? Infinity))
+  })
+}

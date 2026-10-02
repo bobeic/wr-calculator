@@ -13,6 +13,7 @@ import { ChampionPicker } from './champion-picker'
 import { BuildPanel } from './build-panel'
 import { TargetPicker } from './target-picker'
 import { Results } from './results'
+import { BestFirstItem } from './best-first-item'
 
 const dataset = CURRENT_DATASET
 const champions = [...dataset.champions.values()].sort((left, right) => left.name.localeCompare(right.name))
@@ -164,6 +165,7 @@ export function CalculatorPage({ modelledIds }: CalculatorPageProps) {
 
         <section className="calc-results" aria-label="Results" aria-live="polite">
           <Results report={report} comboText={<code>{state.combo}</code>} />
+          <BestFirstItem state={state} dataset={dataset} />
         </section>
       </div>
     </div>
