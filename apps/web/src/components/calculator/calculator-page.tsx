@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { MAX_CHAMPION_LEVEL } from '@wr-calc/calc'
 import { CURRENT_PATCH } from '@wr-calc/data'
 import { CURRENT_DATASET } from '../../lib/dataset'
-import { MAX_DURATION_SECONDS, emptyBuild } from '../../lib/debug-state'
+import { MAX_DURATION_SECONDS, RANK_SLOTS, emptyBuild } from '../../lib/debug-state'
 import type { DebugBuild, DebugState } from '../../lib/debug-state'
 import { decodeState, encodeState } from '../../lib/url-state'
 import { isEmptyBuild, runCalculator } from '../../lib/calculator'
@@ -99,6 +99,27 @@ export function CalculatorPage({ modelledIds }: CalculatorPageProps) {
               onChange={(event) => update({ level: Number(event.target.value) })}
             />
           </label>
+
+          <div className="field-row">
+            <span className="chip-label">Ability ranks (blank = max)</span>
+            {RANK_SLOTS.map((slot) => {
+              const maxRank = champion?.abilities[slot].maxRank
+              return (
+                <label key={slot} className="number-field">
+                  {slot.toUpperCase()}
+                  <input
+                    type="number" min={1} max={maxRank} placeholder={maxRank !== undefined ? String(maxRank) : ''}
+                    value={state.abilityRanks[slot] ?? ''}
+                    onChange={(event) => {
+                      const { [slot]: _, ...rest } = state.abilityRanks
+                      const rank = Number(event.target.value)
+                      update({ abilityRanks: event.target.value === '' || !Number.isInteger(rank) || rank < 1 ? rest : { ...rest, [slot]: rank } })
+                    }}
+                  />
+                </label>
+              )
+            })}
+          </div>
 
           <h2>Target</h2>
           <TargetPicker target={state.target} dataset={dataset} onChange={(target) => update({ target })} />
