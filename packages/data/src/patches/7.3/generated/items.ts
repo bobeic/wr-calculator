@@ -160,6 +160,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Cloudwalker"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -181,6 +184,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "boots"
+    ],
+    "uniquePassives": [
+      "Block",
+      "Noxian Endurance"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -270,6 +277,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Blessed Blade"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -314,6 +324,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "SUNDER"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -362,6 +375,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Ruined Strike",
+      "Drain"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -404,6 +421,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Vile Decay"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -450,6 +470,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Strike"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -472,6 +495,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "boots"
+    ],
+    "uniquePassives": [
+      "World Balance",
+      "Big Bully"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -615,6 +642,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Noxian Endurance"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -637,6 +667,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Punishment"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -702,6 +735,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Summoned",
+      "Noxian Haste"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -725,6 +762,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Life from Death"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -933,6 +973,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "support"
     ],
+    "uniquePassives": [
+      "Soul Siphon"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -978,6 +1021,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Gouge"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1047,6 +1093,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "HEXCHARGED"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1089,6 +1138,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Night Vigil",
+      "Opening Barrage"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1225,6 +1278,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "defense"
     ],
+    "uniquePassives": [
+      "Stoneplate"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1287,6 +1343,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Balance of Power",
+      "Conversion"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1311,6 +1371,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Goredrink",
+      "Thirsting Slash"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1332,6 +1396,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "RESURRECT"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1378,6 +1445,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "boots"
+    ],
+    "uniquePassives": [
+      "Noxian Gait",
+      "Blessed Blade"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1469,6 +1540,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "defense"
     ],
+    "uniquePassives": [
+      "Colossal Consumption"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1514,6 +1588,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Magnification",
+      "Arcane Aim"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1558,6 +1636,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "magic"
     ],
+    "uniquePassives": [
+      "Protobelt"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1580,6 +1661,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "defense"
+    ],
+    "uniquePassives": [
+      "IMMOLATE"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1652,6 +1736,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "defense"
     ],
+    "uniquePassives": [
+      "SPELLBLADE"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1671,6 +1758,11 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "boots"
+    ],
+    "uniquePassives": [
+      "Balance of Power",
+      "Conversion",
+      "Now and Forever"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1694,6 +1786,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Lifeline"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1783,6 +1878,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "boots"
+    ],
+    "uniquePassives": [
+      "Summoned"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -1892,6 +1990,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "defense"
     ],
+    "uniquePassives": [
+      "SACRIFICE"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -1983,6 +2084,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "magic"
     ],
+    "uniquePassives": [
+      "SPELLBLADE"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2072,6 +2176,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "magic"
     ],
+    "uniquePassives": [
+      "Echo"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2094,6 +2201,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "SCORN"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2164,6 +2274,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Lifeline"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2184,6 +2297,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Takedowns increase AP Glory"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2208,6 +2324,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Quicksilver"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2256,6 +2375,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "support"
     ],
+    "uniquePassives": [
+      "Base Mana Regen"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2279,6 +2401,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "AFFLICTION"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2351,6 +2476,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Deft Strikes"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2498,6 +2626,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "TYRANNY"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2586,6 +2717,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "Block"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2605,6 +2739,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Quicksilver"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2626,6 +2763,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "OVERKILL"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2651,6 +2791,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "defense"
+    ],
+    "uniquePassives": [
+      "Guiding Light"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2697,6 +2840,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Energized",
+      "Sharpshooter"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2739,6 +2886,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Salvation"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2822,6 +2972,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "magic"
     ],
+    "uniquePassives": [
+      "ETERNITY"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2886,6 +3039,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "magic"
     ],
+    "uniquePassives": [
+      "ICY"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2907,6 +3063,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Turn invulnerable Stasis"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -2931,6 +3090,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Shield Reaver"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -2951,6 +3113,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Sharp"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -3100,6 +3265,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "boots"
     ],
+    "uniquePassives": [
+      "World Balance",
+      "Big Bully"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -3148,6 +3317,11 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Energized",
+      "Electrospark",
+      "ElectroShock"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -3193,6 +3367,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Energized",
+      "Bolt"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -3327,6 +3505,10 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Shadow",
+      "Juxtaposition"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -3395,6 +3577,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "physical"
     ],
+    "uniquePassives": [
+      "Cleave"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -3445,6 +3630,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "defense"
     ],
+    "uniquePassives": [
+      "ANGUISH"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -3487,6 +3675,9 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Annul"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -3573,6 +3764,9 @@ export const GENERATED_ITEMS: Item[] = [
     "tags": [
       "defense"
     ],
+    "uniquePassives": [
+      "WARMOG'S HEART"
+    ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
   {
@@ -3596,6 +3790,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "magic"
+    ],
+    "uniquePassives": [
+      "Harmony",
+      "Mana Charge"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },
@@ -3736,6 +3934,10 @@ export const GENERATED_ITEMS: Item[] = [
     "effects": [],
     "tags": [
       "physical"
+    ],
+    "uniquePassives": [
+      "Practice Makes Perfect",
+      "Flurry"
     ],
     "provenance": WRPOCKET_7_3_PROVENANCE
   },

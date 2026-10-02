@@ -20,6 +20,11 @@ export const ItemSchema = z.object({
   /** A build may hold at most one item from each exclusive group (a shop restriction). */
   exclusiveGroup: z.string().optional(),
   /**
+   * Names of the item's named passives and actives, e.g. ['Spellblade']. A build may hold at most one finished
+   * item with a given name (user, 2026-10-02: "passives are unique"); components don't count.
+   */
+  uniquePassives: z.array(z.string()).optional(),
+  /**
    * Hand-modelled items only: fields kept as written instead of taken from the patch's imported data,
    * e.g. 'cost', 'recipe', 'stats.ad'. Each pin needs a comment naming the better source (notes, in-game).
    */

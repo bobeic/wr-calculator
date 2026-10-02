@@ -7,11 +7,10 @@ Patch 7.3a is live.
 
 ## 1. Unclear passives
 
-- Eclipse: in a Q then Q2 sequence, does Ever Rising Moon proc on Q2 (two hits within 1.8s)? The engine
-  says yes. The recorded Q2 reading (693) didn't say whether it was on cooldown.
-- Shop rule (no combat needed): can the same legendary be bought twice? The engine says no (components can).
-- Seraph's Embrace: is it in the same one-per-build group as Sterak's Gage and Maw of Malmortius (a guess
-  from its passive's name)?
+- Shared passive names (user, 2026-10-02: "passives are unique"). The validator now blocks two finished items
+  with the same named passive. The obvious ones (Spellblade, Lifeline, Annul) are expected; these pairs are
+  less obvious and worth a look in the shop: Rylai's Crystal Scepter + Serylda's Grudge (both "Icy"),
+  Dead Man's Plate + Youmuu's Ghostblade ("Momentum"), Sunfire Aegis + Hollow Radiance ("Immolate").
 
 ## 2. Open engine rules (TODO-VERIFY in `packages/calc/src/rules.ts`)
 

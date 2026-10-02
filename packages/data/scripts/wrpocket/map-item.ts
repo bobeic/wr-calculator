@@ -57,6 +57,19 @@ function tierOf(raw: RawItem, notes: string[]): Item['tier'] {
   return 'legendary'
 }
 
+// "Name:", "Name (Active):" or "UNIQUE - Name:" at the start of a description line; up to four words.
+const PASSIVE_NAME = /^(?:UNIQUE\s*-\s*)?([A-Z][A-Za-z'’]*(?:[ -][A-Za-z'’]+){0,3})(?:\s*\((?:Active|Passive)\))?:\s/
+
+/** The named passives and actives in an item description, in order and without repeats. */
+export function passiveNames(description: string): string[] {
+  const names: string[] = []
+  for (const line of description.split('\n')) {
+    const name = PASSIVE_NAME.exec(line.trim())?.[1]
+    if (name !== undefined && !names.includes(name)) names.push(name)
+  }
+  return names
+}
+
 /** Maps one wrpocket item to an Item with no modeled effects, noting anything it had to guess or skip. */
 export function mapItem(raw: RawItem, rawPrices: Map<string, number>, provenance: Provenance): Mapped<Item> {
   const total = Number(raw.price)
@@ -80,11 +93,14 @@ export function mapItem(raw: RawItem, rawPrices: Map<string, number>, provenance
   }
 
   const stats = mapItemStats(raw.numeric_stats)
+  const passives = passiveNames(raw.description.en)
   return {
     value: {
       id: normalizeId(raw.id), name: raw.name.en, tier,
       cost: { total, combine }, recipe: raw.components.map(normalizeId),
-      stats: stats.value, effects: [], tags: [raw.category.en.toLowerCase()], provenance,
+      stats: stats.value, effects: [], tags: [raw.category.en.toLowerCase()],
+      ...(passives.length > 0 ? { uniquePassives: passives } : {}),
+      provenance,
     },
     notes: [...notes, ...stats.notes],
   }

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { ItemSchema } from '@wr-calc/schema'
 import type { Provenance } from '@wr-calc/schema'
-import { mapItem, mapItemStats } from '../../scripts/wrpocket/map-item'
+import { mapItem, mapItemStats, passiveNames } from '../../scripts/wrpocket/map-item'
 import type { RawItem } from '../../scripts/wrpocket/raw-schemas'
 
 const PROVENANCE: Provenance = { source: 'wiki', patch: '7.3', verifiedInGame: false }
@@ -86,5 +86,25 @@ describe('mapItem', () => {
 
   it('throws on a non-numeric price', () => {
     expect(() => mapItem(rawItem({ price: 'free' }), prices, PROVENANCE)).toThrow(/test-item: price 'free'/)
+  })
+})
+
+describe('passiveNames', () => {
+  it('reads named passives and actives at the start of each line, once each', () => {
+    expect(passiveNames(
+      'Spellblade: After casting an ability, your next attack deals bonus damage.\n'
+      + 'Against monsters, deals 40 more.\nThirsting Slash (Active): Deal damage.\nUNIQUE - Strike: +10 Armor penetration.\n'
+      + 'Spellblade: repeated.',
+    )).toEqual(['Spellblade', 'Thirsting Slash', 'Strike'])
+  })
+
+  it('returns nothing for a stat-only description', () => {
+    expect(passiveNames('+40 Attack Damage')).toEqual([])
+  })
+
+  it('puts the names on the mapped item', () => {
+    const mapped = mapItem(rawItem({ description: { en: "Sterak's Fury: Gain a shield." } }), new Map(), PROVENANCE)
+    expect(mapped.value.uniquePassives).toEqual(["Sterak's Fury"])
+    expect(mapItem(rawItem({}), new Map(), PROVENANCE).value.uniquePassives).toBeUndefined()
   })
 })

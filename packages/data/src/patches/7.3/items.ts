@@ -453,6 +453,8 @@ export const STARTER_ITEMS: Item[] = [
     // (2026-09-29); no extra gold to "buy" it.
     cost: { total: 3000, combine: 0 }, recipe: ['archangels-staff'],
     stats: { ap: 60, mana: 1200, abilityHaste: 25 }, tags: ['magic'],
+    // Not imported (no wrpocket entry), so written here; Lifeline is the same passive Sterak's and Maw have.
+    uniquePassives: ['Awe', 'Lifeline'],
     effects: [
       {
         kind: 'statConversion', id: 'seraphs-embrace-focused-will', name: 'Awe',
@@ -536,6 +538,7 @@ export const STARTER_ITEMS: Item[] = [
         + 'bonus physical damage and grant a 150 (+40% bonus AD) shield for 2 seconds (6s cooldown).',
       support: 'partial',
       // 7% per wrpocket's 7.3 text, confirmed in game on 7.3a (2026-10-01); the WR wiki's 6% was out of date.
+      // Procs on Q2 in a Q then Q2 sequence, and shows merged into the triggering hit's number (user, 2026-10-02).
       supportNotes: 'Melee values (3.5% for ranged is not modeled). The shield is not modeled; item effects, '
         + 'crowd control and damage over time don\'t add stacks here. In game the proc shows as one number with '
         + 'the hit that triggers it.',

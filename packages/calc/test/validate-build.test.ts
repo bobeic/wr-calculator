@@ -43,6 +43,16 @@ describe('validateBuild', () => {
     }])
   })
 
+  it('flags two finished items sharing a named passive, but not a component that shares it', () => {
+    const passive = (id: string, tier: Item['tier']): [string, Item] => [id, { ...item(id, tier), uniquePassives: ['Spellblade', 'Valor'] }]
+    const withPassives = new Map([...catalog, passive('sheen', 'epic'), passive('trinity', 'legendary'), passive('lich', 'legendary')])
+    expect(validateBuild(build(['sheen', 'trinity']), withPassives)).toEqual([])
+    expect(validateBuild(build(['trinity', 'lich']), withPassives)).toEqual([{
+      code: 'shared-passive',
+      message: "items 'trinity' and 'lich' can't be held together (both have the unique passive 'Spellblade')",
+    }])
+  })
+
   it('flags unknown ids', () => {
     expect(codes(build(['nope'], { boots: 'nada' }))).toEqual(['unknown-item', 'unknown-item'])
   })
