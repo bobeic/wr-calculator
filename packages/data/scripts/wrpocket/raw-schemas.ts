@@ -21,6 +21,17 @@ export const RawItemSchema = z.object({
   components: z.array(z.string()),
 }).passthrough()
 
+const SourceIdSchema = z.union([z.string(), z.number()]).transform(String)
+
+export const RawRuneSchema = z.object({
+  id: z.string(), name: LocalizedSchema, description: LocalizedSchema, category: LocalizedSchema,
+  slot: z.number(), slot_order: z.number(), source_id: SourceIdSchema,
+}).passthrough()
+
+export const RawSpellSchema = z.object({
+  id: z.string(), name: LocalizedSchema, description: LocalizedSchema, source_id: SourceIdSchema,
+}).passthrough()
+
 export const RawChampionSummarySchema = z.array(z.object({ id: z.string() }).passthrough())
 
 const RawScalingSchema = z.object({
@@ -43,5 +54,7 @@ export const RawChampionSchema = z.object({
 
 export type RawMeta = z.infer<typeof RawMetaSchema>
 export type RawItem = z.infer<typeof RawItemSchema>
+export type RawRune = z.infer<typeof RawRuneSchema>
+export type RawSpell = z.infer<typeof RawSpellSchema>
 export type RawAbility = z.infer<typeof RawAbilitySchema>
 export type RawChampion = z.infer<typeof RawChampionSchema>

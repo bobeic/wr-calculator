@@ -9560,3 +9560,9 @@ None.
 - champion xayah: q: damage is per second/hit ('each and leaving two Feathers'); modeled as one hit
 - champion zeri: passive: base has 5 ranks but maxRank is 1
 - champion zeri: passive: ratios.totalAd has 5 ranks but maxRank is 1
+
+## Runes and summoner spells
+
+Hand-modelled in `runes.ts` / `spells.ts` and never updated automatically: check each change against the model.
+
+None.

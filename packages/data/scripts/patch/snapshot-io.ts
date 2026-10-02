@@ -1,8 +1,9 @@
+import { existsSync } from 'node:fs'
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { stableStringify } from './stable-json'
 import {
-  SnapshotChampionSchema, SnapshotItemSchema, SnapshotMetaSchema,
+  SnapshotChampionSchema, SnapshotItemSchema, SnapshotMetaSchema, SnapshotRuneSchema, SnapshotSpellSchema,
 } from './snapshot'
 import type { Snapshot, SnapshotMeta } from './snapshot'
 
@@ -10,12 +11,14 @@ async function readJson(file: string): Promise<unknown> {
   return JSON.parse(await readFile(file, 'utf-8'))
 }
 
-/** Writes meta.json, items.json and champions.json into dir as stable JSON. */
+/** Writes meta.json, items.json, champions.json and (when present) runes.json and spells.json as stable JSON. */
 export async function writeSnapshot(dir: string, snapshot: Snapshot): Promise<void> {
   await mkdir(dir, { recursive: true })
   await writeFile(join(dir, 'meta.json'), stableStringify(snapshot.meta))
   await writeFile(join(dir, 'items.json'), stableStringify(snapshot.items))
   await writeFile(join(dir, 'champions.json'), stableStringify(snapshot.champions))
+  if (snapshot.runes !== undefined) await writeFile(join(dir, 'runes.json'), stableStringify(snapshot.runes))
+  if (snapshot.spells !== undefined) await writeFile(join(dir, 'spells.json'), stableStringify(snapshot.spells))
 }
 
 /** Reads and validates a snapshot folder. */
@@ -24,6 +27,8 @@ export async function readSnapshot(dir: string): Promise<Snapshot> {
     meta: SnapshotMetaSchema.parse(await readJson(join(dir, 'meta.json'))),
     items: SnapshotItemSchema.array().parse(await readJson(join(dir, 'items.json'))),
     champions: SnapshotChampionSchema.array().parse(await readJson(join(dir, 'champions.json'))),
+    ...(existsSync(join(dir, 'runes.json')) && { runes: SnapshotRuneSchema.array().parse(await readJson(join(dir, 'runes.json'))) }),
+    ...(existsSync(join(dir, 'spells.json')) && { spells: SnapshotSpellSchema.array().parse(await readJson(join(dir, 'spells.json'))) }),
   }
 }
 

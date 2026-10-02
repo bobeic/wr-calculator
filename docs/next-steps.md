@@ -62,10 +62,10 @@ Steps once a name is chosen:
 ## Development, roughly in order
 
 1. **More champion kits.** Continue down the CN pick rates (sixth most-picked per lane next).
-2. **Runes and spells in the patch pipeline.** They're hand-copied now; importing them from wrpocket each patch would
-   keep them current. `https://wrpocket.app/site_data/champions/<slug>.json` already carries full tooltip text and
-   per-rank tables (used for the batch 3 kits below) — the champion page itself only renders descriptions for some
-   abilities client-side, so fetch this JSON directly rather than the page HTML.
+2. **Runes and spells in the patch pipeline:** done — `patch:update` now fetches wrpocket's `runes.json` and
+   `spells.json` into each patch snapshot and lists every added, removed or reworded rune/spell (with the numbers
+   that moved) in a "Runes and summoner spells" section of `PATCH_DIFF.md`. The models in `runes.ts`/`spells.ts` stay
+   hand-written and carry into later patches unchanged; a flagged one gets a corrected list in the new patch's layer.
 3. **Calculator polish:** done — ability ranks in the UI, a per-build item order (gold/burst/DPS/TTK at each item,
    via the new `buildBreakpoints`), and picking a champion target's runes (turned out already wired: `TargetPicker`
    already reuses the same `BuildPanel` as the attacker's build, runes included — just checked it actually changes

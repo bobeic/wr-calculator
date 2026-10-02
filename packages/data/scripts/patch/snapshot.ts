@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { RawChampion, RawItem, RawMeta } from '../wrpocket/raw-schemas'
+import type { RawChampion, RawItem, RawMeta, RawRune, RawSpell } from '../wrpocket/raw-schemas'
 
 const EnSchema = z.object({ en: z.string() }).strict()
 
@@ -26,16 +26,30 @@ export const SnapshotChampionSchema = z.object({
   abilities: z.record(z.string(), SnapshotAbilitySchema),
 }).strict()
 
+export const SnapshotRuneSchema = z.object({
+  id: z.string(), name: EnSchema, description: EnSchema, category: EnSchema,
+  slot: z.number(), slot_order: z.number(), source_id: z.string(),
+}).strict()
+
+export const SnapshotSpellSchema = z.object({
+  id: z.string(), name: EnSchema, description: EnSchema, source_id: z.string(),
+}).strict()
+
 export type SnapshotMeta = z.infer<typeof SnapshotMetaSchema>
 export type SnapshotItem = z.infer<typeof SnapshotItemSchema>
 export type SnapshotAbility = z.infer<typeof SnapshotAbilitySchema>
 export type SnapshotChampion = z.infer<typeof SnapshotChampionSchema>
+export type SnapshotRune = z.infer<typeof SnapshotRuneSchema>
+export type SnapshotSpell = z.infer<typeof SnapshotSpellSchema>
 
 /** One patch's trimmed wrpocket data: the single source of truth for that patch's generated files. */
 export interface Snapshot {
   meta: SnapshotMeta
   items: SnapshotItem[]
   champions: SnapshotChampion[]
+  /** Runes and summoner spells; absent from snapshots taken before the pipeline imported them (7.3). */
+  runes?: SnapshotRune[]
+  spells?: SnapshotSpell[]
 }
 
 /** Keeps the meta fields worth recording; the optional ones only when the site sends them. */
@@ -68,13 +82,28 @@ export function trimChampion(raw: RawChampion): SnapshotChampion {
   }
 }
 
+export function trimRune(raw: RawRune): SnapshotRune {
+  return {
+    id: raw.id, name: { en: raw.name.en }, description: { en: raw.description.en }, category: { en: raw.category.en },
+    slot: raw.slot, slot_order: raw.slot_order, source_id: raw.source_id,
+  }
+}
+
+export function trimSpell(raw: RawSpell): SnapshotSpell {
+  return { id: raw.id, name: { en: raw.name.en }, description: { en: raw.description.en }, source_id: raw.source_id }
+}
+
 const byId = (a: { id: string }, b: { id: string }): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
 
-/** Trims validated raw responses into a snapshot with items and champions sorted by id. */
-export function buildSnapshot(meta: RawMeta, items: RawItem[], champions: RawChampion[]): Snapshot {
+/** Trims validated raw responses into a snapshot with every list sorted by id. */
+export function buildSnapshot(
+  meta: RawMeta, items: RawItem[], champions: RawChampion[], runes: RawRune[] = [], spells: RawSpell[] = [],
+): Snapshot {
   return {
     meta: trimMeta(meta),
     items: items.map(trimItem).sort(byId),
     champions: champions.map(trimChampion).sort(byId),
+    runes: runes.map(trimRune).sort(byId),
+    spells: spells.map(trimSpell).sort(byId),
   }
 }

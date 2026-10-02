@@ -15,6 +15,7 @@ import { changedIdsOf, diffSnapshots } from './patch/diff'
 import { mapSnapshot } from './patch/map-snapshot'
 import { buildPatchDiff, goldenRefs } from './patch/patch-diff'
 import { renderPatchDiff } from './patch/render-diff'
+import { diffRunesAndSpells, renderRuneSpellChanges } from './patch/rune-spell-diff'
 import { metaFromCacheDir, planRun, stripGeneratorHeader } from './patch/run-plan'
 import type { RunPlan } from './patch/run-plan'
 import {
@@ -26,7 +27,7 @@ import { listSnapshotMetas, readSnapshot, writeSnapshot } from './patch/snapshot
 import { stableStringify } from './patch/stable-json'
 import type { IdLists, StaleRef } from './patch/types'
 import {
-  RawChampionSchema, RawChampionSummarySchema, RawItemSchema, RawMetaSchema,
+  RawChampionSchema, RawChampionSummarySchema, RawItemSchema, RawMetaSchema, RawRuneSchema, RawSpellSchema,
 } from './wrpocket/raw-schemas'
 import type { RawChampion } from './wrpocket/raw-schemas'
 import { renderModule, renderReport } from './wrpocket/render'
@@ -100,7 +101,9 @@ async function fetchSnapshot(meta: SnapshotMeta, cacheDir: string, offline: bool
   for (const { id } of summary) {
     champions.push(await getJson(`champions/${id}.json`, cacheDir, offline, (raw) => RawChampionSchema.parse(raw)))
   }
-  return buildSnapshot(meta, items, champions)
+  const runes = await getJson('runes.json', cacheDir, offline, (raw) => RawRuneSchema.array().parse(raw))
+  const spells = await getJson('spells.json', cacheDir, offline, (raw) => RawSpellSchema.array().parse(raw))
+  return buildSnapshot(meta, items, champions, runes, spells)
 }
 
 async function readCovered(patchDir: string): Promise<IdLists> {
@@ -202,6 +205,7 @@ async function run(options: Options): Promise<void> {
   const previous = plan.kind === 'bootstrap' ? null : plan.previous
   let needsReview = 0
   let notesSummary = ''
+  let runeSpellSummary = ''
   if (previous !== null) {
     const before = await readSnapshot(join(SNAPSHOT_ROOT, previous))
     const dataset = getPatchDataset(previous)
@@ -237,7 +241,9 @@ async function run(options: Options): Promise<void> {
       champions: changedIds.champions.filter((id) => !applied.has(`champion ${id}`)),
     }, plan.patch))
     await writeFile(join(staged.reports, 'patch-diff.json'), stableStringify(diff))
-    await writeFile(join(staged.reports, 'PATCH_DIFF.md'), renderPatchDiff(diff))
+    const runeSpellChanges = diffRunesAndSpells(before, committed)
+    runeSpellSummary = `Runes and spells: ${runeSpellChanges.length} changed, added or removed (see PATCH_DIFF.md)`
+    await writeFile(join(staged.reports, 'PATCH_DIFF.md'), `${renderPatchDiff(diff)}\n${renderRuneSpellChanges(runeSpellChanges)}`)
     await writeFile(join(staged.generated, 'notes-review.ts'), renderNotesReview(diff.officialNotes, plan.patch))
     await writeFile(join(staged.generated, 'text-sync.ts'), renderTextSync(diff.textSync, plan.patch, diff.championSync))
     if (notes !== null) await writeFile(join(staged.reports, 'official-notes.json'), stableStringify(notes))
@@ -271,6 +277,7 @@ async function run(options: Options): Promise<void> {
   console.log(`${plan.kind} ${plan.patch}: ${mapped.champions.length} champions, ${mapped.items.length} items, ${mapped.notes.length} mapper notes.`)
   if (previous !== null) console.log(`Diff against ${previous}: ${needsReview} hand-modelled entries need review. See ${join(patchDir, 'PATCH_DIFF.md')}`)
   if (notesSummary !== '') console.log(notesSummary)
+  if (runeSpellSummary !== '') console.log(runeSpellSummary)
   if (previous !== null) {
     // A fresh process: this one loaded the patch registry before the new patch's files existed.
     const impact = spawnSync(process.execPath, [...process.execArgv, join(DATA_ROOT, 'scripts', 'build-impact.ts'), previous, plan.patch], { stdio: 'inherit' })

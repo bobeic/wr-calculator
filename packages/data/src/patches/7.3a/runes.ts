@@ -1,7 +1,7 @@
 import type { Effect, Rune } from '@wr-calc/schema'
 
 // Runes, first modelled 2026-10-02 from wrpocket's 7.3a text (snapshots/wrpocket/7.3a/runes.json; the patch pipeline
-// doesn't import runes yet). Every rune is listed so a build can name it; only effects that move a 1v1 damage number
+// snapshots runes and lists any text change in PATCH_DIFF.md, but never edits this file). Every rune is listed so a build can name it; only effects that move a 1v1 damage number
 // are modelled, and nothing here has been checked in game. Assumptions are in each effect's supportNotes and in
 // docs/test-sheets/pending-checks.md. Values that differ for ranged champions are in each effect's `ranged`.
 
