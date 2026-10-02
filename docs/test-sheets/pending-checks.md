@@ -53,6 +53,19 @@ Patch 7.3a is live.
   - Yasuo: "90% critical damage" (and Senna's) isn't modelled. Does a Yasuo crit deal 1.8× (90% of 2×) or 1.9×?
   - Cho'Gath: how long do Vorpal Spikes stay ready after E (the engine says 5 s)?
 
+- Batch 3 kits (2026-10-02, from wrpocket.app's per-champion JSON; all unchecked). The guesses most likely to be off:
+  - Garen: Judgment's armor shred (10% after 6 landed hits) isn't modelled at all — the engine has no way to gate a
+    resist reduction on a hit count. The spin is capped at 8 hits even past level 4 (real cap: 11).
+  - Xin Zhao: how long Three Talon Strike's 3 charges last before expiring (engine: 10 s, not stated in the text).
+  - Brand: Ablaze is modelled as a flat 3% max-Health tick once per cast; the 3-stack detonation (10% +0.02% AP)
+    and every Blaze-conditional bonus (Sear stun, Pillar +30%, Conflagration spread, Pyroclasm slow) are skipped.
+  - Yunara: only the base Cultivation of Spirit (on-hit + Spirit Unbound) and base Arc of Judgment are modelled.
+    Vow of the First Lands (crit bonus), the Unleash resource gating Spirit Unbound, and both Transcendent-state
+    upgrades (Arc of Ruin, Untouchable Shadow) are skipped entirely. How long the Arc of Judgment bead lingers
+    is a guess (1 s).
+  - Thresh: Flay's passive "2 per Soul" flat bonus isn't modelled (only its AD ratio is); Damnation's Armor/AP
+    per Soul is modelled with a 40-soul cap that isn't from the text.
+
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
   engine uses one value per combo (listed in the file).

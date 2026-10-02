@@ -28,6 +28,7 @@ describe('7.3a hand-modelled champions', () => {
     expect(dataset.handModelled.champions.map((entry) => entry.id))
       .toEqual([
         'ambessa', 'darius', 'lee-sin', 'hwei', 'caitlyn', 'senna', 'chogath', 'master-yi', 'yasuo', 'miss-fortune', 'nautilus',
+        'garen', 'xin-zhao', 'brand', 'yunara', 'thresh',
       ])
   })
 
@@ -308,5 +309,109 @@ describe('Nautilus', () => {
   it("Titan's Wrath empowers every attack while it lasts", () => {
     const result = run('nautilus', ['W', 'AA', 'AA', 'AA'])
     expect(bySource(result, 'nautilus-w-titans-wrath').map((i) => [i.type, i.raw])).toEqual(Array(3).fill(['magic', 80]))
+  })
+})
+
+describe('Garen', () => {
+  const ad = () => attacker('garen').sheet.total.ad!
+
+  it('Q deals its text damage', () => {
+    expect(run('garen', ['Q']).instances[0].raw).toBeCloseTo(160 + 0.4 * ad(), 6)
+  })
+
+  it('Judgment ticks 8 times for 25 (+40% AD) physical damage', () => {
+    const ticks = bySource(run('garen', ['E', 'wait:3']), 'garen-e-judgment')
+    expect(ticks).toHaveLength(8)
+    for (const tick of ticks) expect(tick.raw).toBeCloseTo(25 + 0.4 * ad(), 6)
+  })
+
+  it('R deals 350 true plus 15% of missing Health', () => {
+    const result = simulateCombo(attacker('garen'), { ...dummy(), startHpFraction: 0.5 }, ['R'], { critMode: 'never' })
+    expect([result.instances[0].type, result.instances[0].raw]).toEqual(['true', 350 + 0.15 * 5000])
+  })
+})
+
+describe('Xin Zhao', () => {
+  const ad = () => attacker('xin-zhao').sheet.total.ad!
+  const bonusAd = () => attacker('xin-zhao').sheet.bonus.ad ?? 0
+
+  it('Determination adds 22% AD to every third attack', () => {
+    const result = run('xin-zhao', ['AA', 'AA', 'AA'])
+    expect(partFrom(result, 'xin-zhao-passive-determination').map((part) => part.amount)).toEqual([0.22 * ad()])
+  })
+
+  it('Three Talon Strike empowers the next 3 attacks', () => {
+    const procs = partFrom(run('xin-zhao', ['Q', 'AA', 'AA', 'AA', 'AA']), 'xin-zhao-q-three-talon-strike')
+    expect(procs).toHaveLength(3)
+    for (const proc of procs) expect(proc.amount).toBeCloseTo(44 + 0.4 * bonusAd(), 6)
+  })
+
+  it('Wind Becomes Lightning hits twice', () => {
+    const [hit1, hit2] = run('xin-zhao', ['W']).instances
+    expect(hit1.raw).toBeCloseTo(70 + 0.5 * ad(), 6)
+    expect(hit2.raw).toBeCloseTo(175 + 0.75 * ad(), 6)
+  })
+
+  it('Audacious Charge speeds up attacks', () => {
+    const gap = (combo: ComboAction[]) => {
+      const times = run('xin-zhao', combo).instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+      return times[1] - times[0]
+    }
+    expect(gap(['E', 'AA', 'AA'])).toBeLessThan(gap(['AA', 'AA']))
+  })
+
+  it('Crescent Guard deals bonus AD, AP and 15% of max Health', () => {
+    const result = run('xin-zhao', ['R'])
+    expect(result.instances[0].raw).toBeCloseTo(225 + 1 * bonusAd() + 0.15 * 10000, 6)
+  })
+})
+
+describe('Brand', () => {
+  it('Sear, Pillar of Flame and Conflagration deal their text damage', () => {
+    expect(run('brand', ['Q']).instances[0].raw).toBe(200)
+    expect(run('brand', ['W']).instances[0].raw).toBe(220)
+    expect(run('brand', ['E']).instances[0].raw).toBe(150)
+  })
+
+  it('abilities set the target Ablaze for 3% of max Health over 4 seconds', () => {
+    const ablaze = bySource(run('brand', ['Q', 'wait:4']), 'brand-passive-ablaze')
+    expect(ablaze).toHaveLength(1)
+    expect(ablaze[0].raw).toBeCloseTo(0.03 * 10000, 6)
+  })
+})
+
+describe('Yunara', () => {
+  it('Spirit Charge adds 10 (+20% AP) to every attack', () => {
+    const result = run('yunara', ['AA'])
+    expect(bySource(result, 'yunara-q-spirit-charge').map((instance) => instance.raw)).toEqual([25])
+  })
+
+  it('Arc of Judgment deals its text damage and lingers for 4 ticks', () => {
+    const bonusAd = attacker('yunara').sheet.bonus.ad ?? 0
+    const result = run('yunara', ['W', 'wait:1'])
+    expect(result.instances[0].raw).toBeCloseTo(210 + 0.85 * bonusAd, 6)
+    const lingering = bySource(result, 'yunara-w-lingering-bead')
+    expect(lingering).toHaveLength(4)
+    for (const tick of lingering) expect(tick.raw).toBeCloseTo(8 + 0.12 * bonusAd, 6)
+  })
+})
+
+describe('Thresh', () => {
+  it('Death Sentence and The Box deal their text damage', () => {
+    expect(run('thresh', ['Q']).instances[0].raw).toBe(280)
+    expect(run('thresh', ['R']).instances[0].raw).toBe(550)
+  })
+
+  it('Souls grant 2 Armor and 2 Ability Power each', () => {
+    const base = attacker('thresh').sheet.total
+    const withSouls = attacker('thresh', { 'thresh-souls': 10 }).sheet.total
+    expect(withSouls.armor! - (base.armor ?? 0)).toBeCloseTo(20, 6)
+    expect(withSouls.ap! - (base.ap ?? 0)).toBeCloseTo(20, 6)
+  })
+
+  it("Flay's passive adds its AD ratio on-hit", () => {
+    const ad = attacker('thresh').sheet.total.ad!
+    const result = run('thresh', ['AA'])
+    expect(bySource(result, 'thresh-e-flay-passive').map((instance) => instance.raw)).toEqual([2 * ad])
   })
 })

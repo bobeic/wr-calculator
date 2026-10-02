@@ -10,7 +10,8 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
 - Pages: home, CN tier list, champions, items, runes, patches, the calculator (two-build comparison, damage per ability,
   time to kill) and `/debug`.
 - Hand-modelled champion kits: Ambessa; Darius, Lee Sin, Hwei (all nine spells), Caitlyn, Senna; Cho'Gath, Master Yi,
-  Yasuo, Miss Fortune, Nautilus. The other 131 champions use auto-imported ability numbers ("rough kit" on the site).
+  Yasuo, Miss Fortune, Nautilus; Garen, Xin Zhao, Brand, Yunara, Thresh. The other 126 champions use auto-imported
+  ability numbers ("rough kit" on the site).
 - Every item and rune that changes a damage number is modelled. Most values are unchecked in game; the open questions
   are in `docs/test-sheets/pending-checks.md`.
 
@@ -59,7 +60,9 @@ Steps once a name is chosen:
 
 1. **More champion kits.** Continue down the CN pick rates (third most-picked per lane, and so on).
 2. **Runes and spells in the patch pipeline.** They're hand-copied now; importing them from wrpocket each patch would
-   keep them current.
+   keep them current. `https://wrpocket.app/site_data/champions/<slug>.json` already carries full tooltip text and
+   per-rank tables (used for the batch 3 kits below) — the champion page itself only renders descriptions for some
+   abilities client-side, so fetch this JSON directly rather than the page HTML.
 3. **Calculator polish:** ability ranks in the UI, a per-level item build order (the engine's build comparison already
    computes breakpoints), and picking a champion target's runes.
 4. **"Best first item" view:** time to kill for every legendary on a given champion, built on the build comparison.
