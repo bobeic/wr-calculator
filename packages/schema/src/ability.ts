@@ -17,6 +17,20 @@ export const AbilityStageSchema = z.object({
 }).strict()
 export type AbilityStage = z.infer<typeof AbilityStageSchema>
 
+/**
+ * One of several spells cast from the same key, picked by a follow-up press (Hwei: Q then W casts Severing Bolt).
+ * `key` is the follow-up letter; combos cast it as e.g. `Q:w` (written `QW`). The variants share the ability's
+ * cooldown, rank and effects; an effect can be limited to one with the `abilityVariant` condition.
+ */
+export const AbilityVariantSchema = z.object({
+  id: z.string(),
+  key: z.enum(['q', 'w', 'e']),
+  name: z.string(),
+  castTime: z.number().nonnegative().optional(),
+  damage: z.array(DamageComponentSchema),
+}).strict()
+export type AbilityVariant = z.infer<typeof AbilityVariantSchema>
+
 // Extract effects array with explicit type annotation using named references to avoid TS7056 serialization overflow.
 export const AbilityEffectsSchema: z.ZodArray<typeof EffectSchema> = z.array(EffectSchema)
 
@@ -40,5 +54,7 @@ export const AbilitySchema = z.object({
   /** Stages 2..n; the ability's own damage and castTime are stage 1. */
   stages: z.array(AbilityStageSchema).optional(),
   cooldownStartsOn: z.enum(['firstCast', 'lastStage']).optional(),
+  /** Alternative spells on this key; a plain cast uses the first. The ability's own damage is unused when set. */
+  variants: z.array(AbilityVariantSchema).min(2).optional(),
 }).strict()
 export type Ability = z.infer<typeof AbilitySchema>

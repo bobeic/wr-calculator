@@ -6,7 +6,7 @@ import { WRPOCKET_7_3A_PROVENANCE } from './provenance'
 // Darius (Baron), Lee Sin (Jungle), Hwei (Mid), Caitlyn (Dragon) and Senna (Support). Numbers come from wrpocket's 7.3a
 // ability text and scaling rows; base stats and attack speed sync from the generated entry. Nothing here has been
 // checked in game yet. Each kit models one-on-one damage dealt: shields, heals, slows, crowd control, movement and
-// resource costs beyond the listed cost are left out. Wind-up times marked "League" are League of Legends values,
+// resource costs beyond the listed cost are left out. Hwei's nine spells are variants of his Q, W and E. Wind-up times marked "League" are League of Legends values,
 // kept because they move time-to-kill; they are not timed in Wild Rift.
 
 /** The generated champion with hand-written abilities. */
@@ -119,10 +119,12 @@ const LEE_SIN = modelled('lee-sin', {
     id: 'lee-sin-q', name: 'Sonic Wave', maxRank: 4, cooldown: { byRank: [8, 7, 6, 5] }, cost: 50, castTime: 0, flags: {},
     damage: [physical({ byRank: [60, 100, 140, 180] }, [{ stat: 'bonusAd', value: 0.9 }])],
     stages: [{
-      // Resonating Strike doubles from full to no Health ("based on its missing Health"); the model uses the
-      // full-Health (minimum) value, which matches the opening hit of a combo.
+      // Resonating Strike doubles from full to no Health ("based on its missing Health"), taken as a straight line.
       id: 'lee-sin-q-resonating-strike', name: 'Resonating Strike', trigger: 'press', windowSeconds: 3,
-      damage: [physical({ byRank: [60, 100, 140, 180] }, [{ stat: 'bonusAd', value: 0.9 }])],
+      damage: [physical({ byRank: [60, 100, 140, 180] }, [
+        { stat: 'bonusAd', value: 0.9 },
+        { stat: 'targetMissingHpFraction', value: { byRank: [60, 100, 140, 180] }, perStat: { stat: 'bonusAd', value: 0.9 } },
+      ])],
     }],
   },
   w: {
@@ -150,6 +152,11 @@ const LEE_SIN = modelled('lee-sin', {
   },
 })
 
+// Hwei has nine spells: each of Q, W and E opens a subject, and a second press (Q, W or E) picks the spell. Each
+// subject is an ability with three variants; a combo casts one as e.g. QW (Severing Bolt). A plain Q, W or E casts
+// the first variant listed, the subject's usual damage spell.
+const HWEI_E_DAMAGE = () => [magic({ byRank: [70, 120, 170, 220] }, [{ stat: 'ap', value: 0.7 }])]
+
 const HWEI = modelled('hwei', {
   passive: {
     id: 'hwei-passive', name: 'SIGNATURE OF THE VISIONARY', maxRank: 1, cooldown: null, castTime: 0, damage: [], flags: {},
@@ -165,32 +172,72 @@ const HWEI = modelled('hwei', {
     }],
   },
   q: {
-    // Q is one of three spells; the model is Devastating Fire (Q then Q), Hwei's usual damage spell. Severing Bolt
-    // and Molten Fissure are not modelled.
-    id: 'hwei-q', name: 'SUBJECT: DISASTER (Devastating Fire)', maxRank: 4, cooldown: { byRank: [9.5, 8.5, 7.5, 6.5] },
-    cost: { byRank: [80, 90, 100, 110] }, castTime: 0, flags: {},
-    damage: [magic({ byRank: [50, 85, 120, 155] }, [
-      { stat: 'ap', value: 0.7 }, { stat: 'targetMaxHp', value: { byRank: [0.04, 0.05, 0.06, 0.07] } },
-    ])],
+    id: 'hwei-q', name: 'SUBJECT: DISASTER', maxRank: 4, cooldown: { byRank: [9.5, 8.5, 7.5, 6.5] },
+    cost: { byRank: [80, 90, 100, 110] }, castTime: 0, damage: [], flags: {},
+    variants: [
+      {
+        id: 'hwei-q-devastating-fire', key: 'q', name: 'Devastating Fire',
+        damage: [magic({ byRank: [50, 85, 120, 155] }, [
+          { stat: 'ap', value: 0.7 }, { stat: 'targetMaxHp', value: { byRank: [0.04, 0.05, 0.06, 0.07] } },
+        ])],
+      },
+      {
+        // One target (the 1v1 case), so the missing-Health bonus applies: up to 200/330/490/680 (+75% AP), taken
+        // as rising in a straight line to its full value at no Health. The bolt's delay is not timed.
+        id: 'hwei-q-severing-bolt', key: 'w', name: 'Severing Bolt',
+        damage: [magic({ byRank: [80, 110, 140, 170] }, [
+          { stat: 'ap', value: 0.3 },
+          { stat: 'targetMissingHpFraction', value: { byRank: [200, 330, 490, 680] }, perStat: { stat: 'ap', value: 0.75 } },
+        ])],
+      },
+      {
+        // One eruption hits the target; the lava burn is the effect below.
+        id: 'hwei-q-molten-fissure', key: 'e', name: 'Molten Fissure',
+        damage: [magic({ byRank: [20, 35, 50, 65] }, [{ stat: 'ap', value: 0.3 }])],
+      },
+    ],
+    effects: [{
+      kind: 'dot', id: 'hwei-q-molten-fissure-lava', name: 'Molten Fissure (lava)',
+      description: 'Enemies in the lava area are dealt 20 (+30% AP) magic damage per second. Each lava pool lasts 2.5 '
+        + 'seconds.',
+      support: 'partial',
+      supportNotes: 'The target is assumed to stand in the lava for all 2.5 seconds (ticks every 0.5 s). The slow is '
+        + 'not modelled.',
+      condition: { type: 'abilityVariant', value: 'e' },
+      damageType: 'magic', tickAmount: { byRank: [10, 20, 30, 40] }, tickIntervalSeconds: 0.5, durationSeconds: 2.5,
+      refresh: 'refresh', appliedBy: ['q'], ratios: [{ stat: 'ap', value: 0.15 }],
+    }],
   },
   w: {
-    // The model is Stirring Lights (W then E); Fleeting Current and Pool of Reflection deal no damage.
-    ...utility('hwei-w', 'SUBJECT: SERENITY (Stirring Lights)', 4, { byRank: [17, 16.5, 16, 15.5] }, { byRank: [90, 95, 100, 105] }),
+    id: 'hwei-w', name: 'SUBJECT: SERENITY', maxRank: 4, cooldown: { byRank: [17, 16.5, 16, 15.5] },
+    cost: { byRank: [90, 95, 100, 105] }, castTime: 0, damage: [], flags: {},
+    // Stirring Lights is listed first, so a plain W casts it. Fleeting Current (speed) and Pool of Reflection (a
+    // shield) deal no damage.
+    variants: [
+      { id: 'hwei-w-stirring-lights', key: 'e', name: 'Stirring Lights', damage: [] },
+      { id: 'hwei-w-fleeting-current', key: 'q', name: 'Fleeting Current', damage: [] },
+      { id: 'hwei-w-pool-of-reflection', key: 'w', name: 'Pool of Reflection', damage: [] },
+    ],
     effects: [{
-      kind: 'empoweredAttack', id: 'hwei-w-stirring-lights', name: 'Stirring Lights',
+      kind: 'empoweredAttack', id: 'hwei-w-stirring-lights-empower', name: 'Stirring Lights',
       description: 'His next 3 abilities or attacks deal 30 (+15% AP) bonus magic damage and restore 45 Mana on hit.',
       support: 'partial',
       supportNotes: 'Only attacks spend the lights; abilities do not yet. How long they last is not stated (6 s '
         + 'assumed). Mana is not modelled.',
+      condition: { type: 'abilityVariant', value: 'e' },
       grant: { on: 'abilityCast', slots: ['w'], charges: 3 }, maxCharges: 3, durationSeconds: 6,
       bonus: magic({ byRank: [30, 40, 50, 60] }, [{ stat: 'ap', value: 0.15 }]),
     }],
   },
   e: {
-    // Grim Visage, Gaze of the Abyss and Crushing Maw all deal the same damage.
+    // All three deal the same damage; they differ in crowd control (fear, root, pull), which isn't modelled.
     id: 'hwei-e', name: 'SUBJECT: TORMENT', maxRank: 4, cooldown: { byRank: [13, 12, 11, 10] },
-    cost: { byRank: [50, 55, 60, 65] }, castTime: 0, flags: {},
-    damage: [magic({ byRank: [70, 120, 170, 220] }, [{ stat: 'ap', value: 0.7 }])],
+    cost: { byRank: [50, 55, 60, 65] }, castTime: 0, damage: [], flags: {},
+    variants: [
+      { id: 'hwei-e-grim-visage', key: 'q', name: 'Grim Visage', damage: HWEI_E_DAMAGE() },
+      { id: 'hwei-e-gaze-of-the-abyss', key: 'w', name: 'Gaze of the Abyss', damage: HWEI_E_DAMAGE() },
+      { id: 'hwei-e-crushing-maw', key: 'e', name: 'Crushing Maw', damage: HWEI_E_DAMAGE() },
+    ],
   },
   r: {
     id: 'hwei-r', name: 'SPIRALING DESPAIR', maxRank: 3, cooldown: { byRank: [70, 60, 50] }, cost: 100, castTime: 0, flags: {},

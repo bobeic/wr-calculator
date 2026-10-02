@@ -1,4 +1,4 @@
-import type { Champion, StatKey } from '@wr-calc/schema'
+import type { AbilityVariant, Champion, StatKey } from '@wr-calc/schema'
 import type {
   AbilityKey, BuildIssue, ComboAction, ComboResult, Combatant, UnsupportedEffectEntry,
 } from '@wr-calc/calc'
@@ -13,7 +13,8 @@ const SETTLE_SECONDS = 6
 /** The longest rotation the time-to-kill search simulates. */
 export const MAX_TTK_SECONDS = 60
 
-export type RowKey = 'aa' | AbilityKey
+/** 'aa', an ability key, or an ability key and a variant key ('q:w' is Hwei's Severing Bolt). */
+export type RowKey = 'aa' | AbilityKey | `${AbilityKey}:${AbilityVariant['key']}`
 
 export interface SourceDamage {
   name: string
@@ -23,6 +24,8 @@ export interface SourceDamage {
 /** One row of the per-ability table: what a basic attack or one cast does to the target. */
 export interface AbilityRow {
   key: RowKey
+  /** How a combo writes it: 'AA', 'Q' or 'QW'. */
+  label: string
   name: string
   /**
    * 'hit': damage from the cast itself (every stage, plus the procs and burns it sets off). 'empowers': the cast deals
@@ -93,33 +96,49 @@ function bySource(result: ComboResult): SourceDamage[] {
   return [...totals.values()]
 }
 
-/** The actions that cast an ability and every follow-up stage (a press or a dash), then wait for its burns. */
-export function castActions(champion: Champion, key: AbilityKey): ComboAction[] {
+/** The action that casts an ability, or one of its variants. */
+function castAction(key: AbilityKey, variant?: AbilityVariant['key']): ComboAction {
+  return variant === undefined ? ABILITY_ACTIONS[key] : `${ABILITY_ACTIONS[key] as 'Q' | 'W' | 'E' | 'R'}:${variant}`
+}
+
+/** The actions that cast an ability (or one variant) and every follow-up stage (a press or a dash), then wait for its burns. */
+export function castActions(champion: Champion, key: AbilityKey, variant?: AbilityVariant['key']): ComboAction[] {
   const stages = champion.abilities[key].stages ?? []
   return [
-    ABILITY_ACTIONS[key],
+    castAction(key, variant),
     ...stages.map((stage): ComboAction => (stage.trigger === 'press' ? ABILITY_ACTIONS[key] : 'dash')),
     `wait:${SETTLE_SECONDS}`,
   ]
 }
 
-/** The basic attack row and one row per ability, each simulated alone against a fresh target. */
+/**
+ * The basic attack row and one row per ability (one per spell for an ability with variants), each simulated alone
+ * against a fresh target.
+ */
 export function abilityRows(champion: Champion, attacker: Combatant, target: Combatant): AbilityRow[] {
   const simulate = (actions: ComboAction[]) => simulateCombo(attacker, target, actions, { critMode: 'expected', ignoreCooldowns: true })
   const attack = simulate(['AA', `wait:${SETTLE_SECONDS}`])
-  const rows: AbilityRow[] = [{ key: 'aa', name: 'Basic attack', kind: 'hit', damage: total(attack), sources: bySource(attack) }]
+  const rows: AbilityRow[] = [{ key: 'aa', label: 'AA', name: 'Basic attack', kind: 'hit', damage: total(attack), sources: bySource(attack) }]
   for (const key of ['q', 'w', 'e', 'r'] as const) {
-    const name = champion.abilities[key].name
-    const cast = simulate(castActions(champion, key))
-    if (total(cast) > 0) {
-      rows.push({ key, name, kind: 'hit', damage: total(cast), sources: bySource(cast) })
-      continue
+    const ability = champion.abilities[key]
+    const casts = ability.variants === undefined
+      ? [{ rowKey: key as RowKey, label: ABILITY_ACTIONS[key], name: ability.name, variant: undefined }]
+      : ability.variants.map((variant) => ({
+        rowKey: `${key}:${variant.key}` as RowKey, label: `${ABILITY_ACTIONS[key]}${variant.key.toUpperCase()}`,
+        name: variant.name, variant: variant.key,
+      }))
+    for (const { rowKey, label, name, variant } of casts) {
+      const cast = simulate(castActions(champion, key, variant))
+      if (total(cast) > 0) {
+        rows.push({ key: rowKey, label, name, kind: 'hit', damage: total(cast), sources: bySource(cast) })
+        continue
+      }
+      const empowered = simulate([castAction(key, variant), 'AA', `wait:${SETTLE_SECONDS}`])
+      const extra = total(empowered) - total(attack)
+      rows.push(extra > 0.05
+        ? { key: rowKey, label, name, kind: 'empowers', damage: extra, sources: bySource(empowered) }
+        : { key: rowKey, label, name, kind: 'none', damage: 0, sources: [] })
     }
-    const empowered = simulate([ABILITY_ACTIONS[key], 'AA', `wait:${SETTLE_SECONDS}`])
-    const extra = total(empowered) - total(attack)
-    rows.push(extra > 0.05
-      ? { key, name, kind: 'empowers', damage: extra, sources: bySource(empowered) }
-      : { key, name, kind: 'none', damage: 0, sources: [] })
   }
   return rows
 }

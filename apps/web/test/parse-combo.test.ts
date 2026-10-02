@@ -9,6 +9,10 @@ describe('parseCombo', () => {
     })
   })
 
+  it('reads two keys together as the spell the second key picks', () => {
+    expect(parseCombo('QW Q:e ee R')).toEqual({ ok: true, actions: ['Q:w', 'Q:e', 'E:e', 'R'] })
+  })
+
   it('is case-insensitive for AA/Q/W/E/R and tolerates extra whitespace', () => {
     expect(parseCombo('  q aa\tR  ')).toEqual({ ok: true, actions: ['Q', 'AA', 'R'] })
   })

@@ -133,6 +133,8 @@ export interface ConditionExtra {
   damageType?: DamageType
   sourceKind?: SourceKind
   abilityKey?: AbilityKey
+  /** The variant being cast (AbilityVariant.key), for abilityVariant conditions. */
+  abilityVariant?: 'q' | 'w' | 'e'
 }
 
 export interface HookHandlers<E extends Effect> {

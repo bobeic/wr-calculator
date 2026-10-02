@@ -7,6 +7,8 @@ export type DamageType = z.infer<typeof DamageTypeSchema>
 export const DamageRatioStatSchema = z.enum([
   'totalAd', 'bonusAd', 'ap', 'maxHp', 'bonusHp',
   'targetMaxHp', 'targetCurrentHp', 'targetMissingHp',
+  // The target's missing Health as a fraction of its max, 0..1: "up to X based on missing Health" is X × this.
+  'targetMissingHpFraction',
 ])
 export type DamageRatioStat = z.infer<typeof DamageRatioStatSchema>
 

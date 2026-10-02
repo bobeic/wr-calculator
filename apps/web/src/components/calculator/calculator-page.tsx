@@ -119,7 +119,7 @@ export function CalculatorPage({ modelledIds }: CalculatorPageProps) {
           <details className="rotation">
             <summary>Combo and rotation</summary>
             <label className="text-field">
-              Combo <small className="muted">AA, Q, W, E, R, dash, item:&lt;id&gt;, spell:&lt;id&gt;, wait:&lt;seconds&gt;</small>
+              Combo <small className="muted">AA, Q, W, E, R, QW (a spell picked by a second key, e.g. Hwei), dash, item:&lt;id&gt;, spell:&lt;id&gt;, wait:&lt;seconds&gt;</small>
               <input value={state.combo} onChange={(event) => update({ combo: event.target.value })} />
             </label>
             {report.comboError !== null && <p role="alert" className="note">{report.comboError}</p>}

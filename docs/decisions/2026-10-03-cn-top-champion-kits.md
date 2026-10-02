@@ -16,8 +16,8 @@ Lee Sin (Jungle), Hwei (Mid), Caitlyn (Dragon) and Senna (Support).
   that only changes those numbers updates them without a hand edit.
 - Each kit models one-on-one damage dealt. Shields, heals, crowd control, movement and resources are left out, and
   each effect's `supportNotes` says what it leaves out.
-- Champions with three spells per key (Hwei) model one spell per key: Q is Devastating Fire, W is Stirring Lights
-  and E is Subject: Torment (all three E spells deal the same damage).
+- Hwei's nine spells are variants of his Q, W and E (`Ability.variants`; user, 2026-10-03: "model all of these").
+  A combo casts one by its two keys, e.g. `QW` (Severing Bolt); a plain key casts the first variant listed.
 - A recast that only adds empowered attacks is folded into the first cast (Lee Sin's Iron Will).
 - Wind-up times are left at 0 except where they move time-to-kill a lot (Darius Q 0.75s, Caitlyn R and Senna R 1s);
   those are League of Legends values and are marked as such.
@@ -29,6 +29,11 @@ Engine additions (all optional fields, so existing data is unchanged):
   the new stack count (Darius's Hemorrhage).
 - `damageAmp.perTargetDotStack`: the amp is multiplied by the target's stacks of one of the owner's dots (Darius R).
 - `empoweredAttack.grant.charges`: charges one grant adds (Lee Sin's Iron Will: 2, Hwei's Stirring Lights: 3).
+- `Ability.variants`, the `Q:w` combo action (written `QW`) and the `abilityVariant` condition: several spells on
+  one key that share its cooldown and rank. `abilitySlot` and `abilityVariant` now gate only cast and hit hooks; other
+  hooks (e.g. an attack spending a charge the cast granted) ignore them.
+- The `targetMissingHpFraction` damage ratio (0..1): "up to X based on missing Health" (Severing Bolt, Lee Sin's
+  Resonating Strike), taken as a straight line.
 
 ## Consequences
 

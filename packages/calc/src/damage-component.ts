@@ -20,6 +20,10 @@ function resolveRatioStat(
     case 'targetMaxHp': return target.sheet.total.hp ?? 0
     case 'targetCurrentHp': return targetCurrentHp
     case 'targetMissingHp': return Math.max(0, (target.sheet.total.hp ?? 0) - targetCurrentHp)
+    case 'targetMissingHpFraction': {
+      const maxHp = target.sheet.total.hp ?? 0
+      return maxHp > 0 ? Math.min(1, Math.max(0, (maxHp - targetCurrentHp) / maxHp)) : 0
+    }
   }
 }
 

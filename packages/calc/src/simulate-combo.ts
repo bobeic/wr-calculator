@@ -1,4 +1,4 @@
-import type { Effect, DamageType, Condition, AbilityStage, StatKey } from '@wr-calc/schema'
+import type { Effect, DamageType, Condition, AbilityStage, AbilityVariant, StatKey } from '@wr-calc/schema'
 import type { Combatant } from './combatant'
 import type {
   AbilityKey, AttackModifier, CombatantRuntime, ConditionExtra, DamageInstance, EffectHandler, HookContext,
@@ -23,6 +23,8 @@ const MAX_DAMAGE_CHAIN_DEPTH = 64
 
 export type ComboAction =
   'AA' | 'Q' | 'W' | 'E' | 'R' | 'dash' | `item:${string}` | `spell:${string}` | `wait:${number}`
+  // One of an ability's variants, by its key (AbilityVariant): 'Q:w' is Hwei's Q then W.
+  | `${'Q' | 'W' | 'E' | 'R'}:${'q' | 'w' | 'e'}`
 
 export interface SimulateComboOptions {
   critMode?: 'expected' | 'always' | 'never'
@@ -78,6 +80,8 @@ function evaluateCondition(
       return extra?.sourceKind === condition.value
     case 'abilitySlot':
       return extra?.abilityKey === condition.value
+    case 'abilityVariant':
+      return extra?.abilityVariant === condition.value
     case 'targetHasDot':
       // Phase 1 only lets the attacker apply dots, so any active dot buff on the target is ours.
       return Object.entries(opponentRuntime.buffs).some(([key, buff]) =>
@@ -109,7 +113,17 @@ function conditionAllows(
   effect: Effect, ctx: HookContext,
   extra?: ConditionExtra
 ): boolean {
-  return !effect.condition || ctx.conditionMet(effect, effect.condition, extra)
+  if (!effect.condition) return true
+  // abilitySlot and abilityVariant describe a cast, so they gate cast and hit hooks only. Elsewhere (e.g. an attack
+  // spending a charge an ability cast granted) they hold, and the effect's other conditions decide.
+  if (extra?.abilityKey === undefined) {
+    const castOnly = (leaf: Condition) => leaf.type === 'abilitySlot' || leaf.type === 'abilityVariant'
+    if (castOnly(effect.condition)) return true
+    if (effect.condition.type === 'allOf') {
+      return effect.condition.conditions.every((leaf) => castOnly(leaf) || ctx.conditionMet(effect, leaf, extra))
+    }
+  }
+  return ctx.conditionMet(effect, effect.condition, extra)
 }
 
 /**
@@ -412,12 +426,18 @@ export function simulateCombo(
     }
   }
 
+  // The variant of the ability cast in progress, if it has variants; cast and hit conditions can check it.
+  let castingVariant: AbilityVariant['key'] | undefined
+  const castExtra = (abilityKey: AbilityKey): ConditionExtra => ({
+    abilityKey, ...(castingVariant !== undefined && { abilityVariant: castingVariant }),
+  })
+
   function dispatchOnAbilityCast(abilityKey: AbilityKey) {
     const ctx = buildCtx(attacker, attackerRuntime, target, targetRuntime)
     for (const effect of attackerEffectsList) {
       const handler = resolve(effect)
       if (!handler?.hooks?.onAbilityCast) continue
-      if (!conditionAllows(effect, ctx, { abilityKey })) continue
+      if (!conditionAllows(effect, ctx, castExtra(abilityKey))) continue
       handler.hooks.onAbilityCast(effect, ctx, abilityKey)
       trackSupport(effect)
     }
@@ -428,7 +448,7 @@ export function simulateCombo(
     for (const effect of attackerEffectsList) {
       const handler = resolve(effect)
       if (!handler?.hooks?.onAbilityHit) continue
-      if (!conditionAllows(effect, ctx, { abilityKey })) continue
+      if (!conditionAllows(effect, ctx, castExtra(abilityKey))) continue
       handler.hooks.onAbilityHit(effect, ctx, abilityKey, hitInstances)
       trackSupport(effect)
     }
@@ -525,6 +545,7 @@ export function simulateCombo(
 
   for (const action of sequence) {
     if (killed) break
+    castingVariant = undefined
 
     if (action === 'AA') {
       // The attack lands at the current time (an idle attacker's first swing is ~instant); the
@@ -579,11 +600,20 @@ export function simulateCombo(
         ))
       const interval = 1 / Math.max(swingAttackSpeed, 0.01)
       time += interval
-    } else if (action === 'Q' || action === 'W' || action === 'E' || action === 'R') {
+    } else if (/^[QWER](:[qwe])?$/.test(action)) {
       if (!attacker.abilities) continue
-      const abilityKey = action.toLowerCase() as AbilityKey
+      const abilityKey = action[0].toLowerCase() as AbilityKey
       const ability = attacker.abilities[abilityKey]
       const stages = ability.stages ?? []
+      const variantKey = action.length > 1 ? action.slice(2) : undefined
+      const variant = variantKey === undefined
+        ? ability.variants?.[0]
+        : ability.variants?.find((candidate) => candidate.key === variantKey)
+      if (variantKey !== undefined && variant === undefined) {
+        dataWarnings.push(`${ability.name} has no variant '${variantKey}'; "${action}" was skipped.`)
+        continue
+      }
+      castingVariant = variant?.key
 
       settleStageWindow(abilityKey)
       const window = stageWindows[abilityKey]
@@ -598,7 +628,7 @@ export function simulateCombo(
       const availableAt = attackerRuntime.cooldowns[abilityKey] ?? 0
       if (!ignoreCooldowns && time < availableAt) continue
 
-      const hitInstances = castStage(abilityKey, ability)
+      const hitInstances = castStage(abilityKey, variant ?? ability)
       attackerRuntime.lastAbilityCast = { at: time, feintUsed: false }
       if (stages.length > 0) {
         stageWindows[abilityKey] = { nextStage: 0, closesAt: time + stages[0].windowSeconds }

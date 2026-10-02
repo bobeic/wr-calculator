@@ -9,7 +9,6 @@ const STAT_LABELS: Record<string, string> = {
   pctArmorPen: 'Armor pen %', flatArmorPen: 'Armor pen', pctMagicPen: 'Magic pen %', flatMagicPen: 'Magic pen',
 }
 const PERCENT_STATS: ReadonlySet<StatKey> = new Set(['critChance', 'pctArmorPen', 'pctMagicPen'])
-const ROW_KEYS: Record<AbilityRow['key'], string> = { aa: 'AA', q: 'Q', w: 'W', e: 'E', r: 'R' }
 
 const whole = (value: number) => Math.round(value).toLocaleString('en')
 const seconds = (value: number | undefined) => (value === undefined ? `over ${MAX_TTK_SECONDS}s` : `${value.toFixed(1)}s`)
@@ -94,7 +93,7 @@ export function Results({ report, comboText }: ResultsProps) {
           <tbody>
             {(a ?? b)?.rows.map((row, index) => (
               <tr key={row.key}>
-                <td><span className="key">{ROW_KEYS[row.key]}</span> {displayName(row.name)}</td>
+                <td><span className="key">{row.label}</span> {displayName(row.name)}</td>
                 <td className="num">{a ? <Sources row={a.rows[index]} hp={hp} /> : '—'}</td>
                 {comparing && <td className="num">{b ? <Sources row={b.rows[index]} hp={hp} /> : '—'}</td>}
                 {comparing && <td className="num"><Delta a={a?.rows[index].damage} b={b?.rows[index].damage} /></td>}

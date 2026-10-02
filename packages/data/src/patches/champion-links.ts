@@ -78,6 +78,7 @@ export const CHAMPION_LINKS: Record<string, ChampionLinks> = {
       { path: 'abilities.q.cost', row: 'q.scaling.Resource', value: flat },
       { path: 'abilities.q.damage[0].base', row: 'q.scaling.基础伤害' },
       { path: 'abilities.q.stages[0].damage[0].base', row: 'q.scaling.基础伤害' },
+      { path: 'abilities.q.stages[0].damage[0].ratios[1].value', row: 'q.scaling.基础伤害' },
       { path: 'abilities.w.cooldown', row: 'w.scaling.cd' },
       { path: 'abilities.w.cost', row: 'w.scaling.Resource', value: flat },
       { path: 'abilities.w.effects[0].bonus.base', row: 'w.scaling.基础伤害' },
@@ -95,28 +96,32 @@ export const CHAMPION_LINKS: Record<string, ChampionLinks> = {
     links: [
       { path: 'abilities.q.cooldown', row: 'q.scaling.cd' },
       { path: 'abilities.q.cost', row: 'q.scaling.MP' },
-      { path: 'abilities.q.damage[0].base', row: 'q.scaling.没骨火丨基础伤害' },
-      { path: 'abilities.q.damage[0].ratios[1].value', row: 'q.scaling.没骨火丨最大生命值伤害', value: pctByRank },
+      { path: 'abilities.q.variants[0].damage[0].base', row: 'q.scaling.没骨火丨基础伤害' },
+      { path: 'abilities.q.variants[0].damage[0].ratios[1].value', row: 'q.scaling.没骨火丨最大生命值伤害', value: pctByRank },
+      { path: 'abilities.q.variants[1].damage[0].base', row: 'q.scaling.攒聚雷丨基础伤害' },
+      { path: 'abilities.q.variants[1].damage[0].ratios[1].value', row: 'q.scaling.攒聚雷丨基础额外伤害' },
+      { path: 'abilities.q.variants[2].damage[0].base', row: 'q.scaling.连皴山丨爆炸伤害' },
+      // The lava ticks every half second, so each tick is half the per-second number.
+      { path: 'abilities.q.effects[0].tickAmount', row: 'q.scaling.连皴山丨持续伤害', value: (ranks) => ({ byRank: ranks.map((rank) => rank / 2) }) },
       { path: 'abilities.w.cooldown', row: 'w.scaling.cd' },
       { path: 'abilities.w.cost', row: 'w.scaling.MP' },
       { path: 'abilities.w.effects[0].bonus.base', row: 'w.scaling.宿墨丨基础伤害' },
       { path: 'abilities.e.cooldown', row: 'e.scaling.cd' },
       { path: 'abilities.e.cost', row: 'e.scaling.MP' },
-      { path: 'abilities.e.damage[0].base', row: 'e.scaling.阴沉变意丨基础伤害' },
+      { path: 'abilities.e.variants[0].damage[0].base', row: 'e.scaling.阴沉变意丨基础伤害' },
+      { path: 'abilities.e.variants[1].damage[0].base', row: 'e.scaling.滞涩幽瞳丨基础伤害' },
+      { path: 'abilities.e.variants[2].damage[0].base', row: 'e.scaling.双钩血喉丨基础伤害' },
       { path: 'abilities.r.cooldown', row: 'r.scaling.cd' },
       { path: 'abilities.r.cost', row: 'r.scaling.MP', value: flat },
       { path: 'abilities.r.effects[0].tickAmount', row: 'r.scaling.基础伤害' },
       { path: 'abilities.r.damage[0].base', row: 'r.scaling.基础伤害#2' },
     ],
     ignore: [
-      // Severing Bolt and Molten Fissure (Q) aren't modelled; the model's Q is Devastating Fire.
-      'q.scaling.攒聚雷丨基础伤害', 'q.scaling.攒聚雷丨基础额外伤害', 'q.scaling.连皴山丨爆炸伤害', 'q.scaling.连皴山丨持续伤害',
       // Fleeting Current, Pool of Reflection and Stirring Lights' mana don't change damage dealt.
       'w.scaling.飞染丨持续时间', 'w.scaling.飞染丨移速加成', 'w.scaling.渲浓丨基础护盾', 'w.scaling.渲浓丨最大基础护盾',
       'w.scaling.宿墨丨法力回复',
-      // E's crowd control; Gaze of the Abyss and Crushing Maw deal the same damage as Grim Visage (linked).
-      'e.scaling.阴沉变意丨恐惧时长', 'e.scaling.滞涩幽瞳丨基础伤害', 'e.scaling.滞涩幽瞳丨禁锢时长', 'e.scaling.双钩血喉丨基础伤害',
-      'e.scaling.双钩血喉丨移速降低',
+      // E's crowd control.
+      'e.scaling.阴沉变意丨恐惧时长', 'e.scaling.滞涩幽瞳丨禁锢时长', 'e.scaling.双钩血喉丨移速降低',
     ],
   },
   caitlyn: {

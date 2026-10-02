@@ -44,8 +44,19 @@ describe('abilityRows', () => {
 
   it('a two-stage ability counts both stages', () => {
     const q = abilityRows(champion('lee-sin'), attacker('lee-sin'), dummy())[1]
-    expect(q.damage).toBeCloseTo(180, 6)
+    // 90 each after armor; the recast gains 90/10000 for the Health the first hit took.
+    expect(q.damage).toBeCloseTo(90 + 90 * (1 + 90 / 10000), 6)
     expect(q.sources.map((source) => source.name)).toEqual(['Sonic Wave', 'Resonating Strike'])
+  })
+})
+
+describe('abilityRows with variants', () => {
+  it('lists each of Hwei\'s nine spells under its two keys', () => {
+    const rows = abilityRows(champion('hwei'), attacker('hwei'), dummy())
+    expect(rows.map((row) => row.label)).toEqual(['AA', 'QQ', 'QW', 'QE', 'WE', 'WQ', 'WW', 'EQ', 'EW', 'EE', 'R'])
+    expect(rows.find((row) => row.label === 'QW')?.name).toBe('Severing Bolt')
+    expect(rows.find((row) => row.label === 'WE')?.kind).toBe('empowers')
+    expect(rows.find((row) => row.label === 'WQ')?.kind).toBe('none')
   })
 })
 

@@ -15,6 +15,8 @@ const LEAF_CONDITIONS = [
   // Known only to ability cast/hit hooks (e.g. a burn applied when the ultimate hits), not to
   // per-damage-instance checks like damageAmp.
   z.object({ type: z.literal('abilitySlot'), value: z.enum(['q', 'w', 'e', 'r']) }).strict(),
+  // The variant (AbilityVariant.key) of the ability being cast; like abilitySlot, known only to cast/hit hooks.
+  z.object({ type: z.literal('abilityVariant'), value: z.enum(['q', 'w', 'e']) }).strict(),
   // True while the target has an active dot from the effect's owner — only the dot effect with
   // `effectId` when given. Known only during combat, so stat effects gated on it are applied by
   // the combat simulation rather than stat resolution.

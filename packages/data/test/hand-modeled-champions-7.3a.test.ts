@@ -91,10 +91,12 @@ describe('Lee Sin', () => {
     expect(run('lee-sin', ['R']).instances[0].mitigated).toBeCloseTo(575 / 2, 6)
   })
 
-  it('Q, then the Resonating Strike recast', () => {
+  it('Q, then the Resonating Strike recast, which rises with missing Health (180 to 360)', () => {
     const result = run('lee-sin', ['Q', 'Q'])
     expect(result.instances.map((instance) => instance.source.id)).toEqual(['lee-sin-q', 'lee-sin-q-resonating-strike'])
-    expect(result.instances.map((instance) => instance.raw)).toEqual([180, 180])
+    const missing = 180 / 2 / 10000
+    expect(result.instances[0].raw).toBe(180)
+    expect(result.instances[1].raw).toBeCloseTo(180 * (1 + missing), 6)
   })
 
   it('W empowers the next two attacks with 65 magic damage each', () => {
@@ -116,23 +118,47 @@ describe('Lee Sin', () => {
 })
 
 describe('Hwei', () => {
-  it('Devastating Fire takes 7% max Health; the second ability hit sets off his passive', () => {
-    const result = run('hwei', ['Q', 'E'])
-    expect(result.instances.map((instance) => instance.source.id)).toEqual(['hwei-q', 'hwei-e', 'hwei-passive-signature'])
-    expect(result.instances.map((instance) => instance.raw)).toEqual([155 + 0.07 * 10000, 220, 285])
+  const sources = (combo: ComboAction[], target = dummy()) =>
+    simulateCombo(attacker('hwei'), target, combo, { critMode: 'never', ignoreCooldowns: true }).instances.map((i) => [i.source.id, i.raw])
+
+  it('casts each of the nine spells by its two keys', () => {
+    expect(sources(['Q:q'])).toEqual([['hwei-q-devastating-fire', 155 + 0.07 * 10000]])
+    expect(sources(['Q:w'])).toEqual([['hwei-q-severing-bolt', 170]])
+    expect(sources(['Q:e', 'wait:2.5'])).toEqual([
+      ['hwei-q-molten-fissure', 65], ...Array.from({ length: 5 }, () => ['hwei-q-molten-fissure-lava', 40]),
+    ])
+    for (const [action, id] of [['E:q', 'hwei-e-grim-visage'], ['E:w', 'hwei-e-gaze-of-the-abyss'], ['E:e', 'hwei-e-crushing-maw']] as const) {
+      expect(sources([action]), action).toEqual([[id, 220]])
+    }
+    for (const action of ['W:q', 'W:w', 'W:e'] as const) expect(sources([action]), action).toEqual([])
+  })
+
+  it('a plain key casts the usual damage spell: Devastating Fire, Stirring Lights, Grim Visage', () => {
+    expect(sources(['Q'])[0][0]).toBe('hwei-q-devastating-fire')
+    expect(sources(['W', 'AA']).map(([id]) => id)).toContain('hwei-w-stirring-lights-empower')
+    expect(sources(['E'])[0][0]).toBe('hwei-e-grim-visage')
+  })
+
+  it('Severing Bolt rises with missing Health, up to 170 + 680 at none left', () => {
+    const half = { ...dummy(), startHpFraction: 0.5 }
+    expect(sources(['Q:w'], half)).toEqual([['hwei-q-severing-bolt', 170 + 680 * 0.5]])
+  })
+
+  it('only Stirring Lights empowers attacks, three of them', () => {
+    const empowered = (cast: ComboAction) => sources([cast, 'AA', 'AA', 'AA', 'AA'])
+      .filter(([id]) => id === 'hwei-w-stirring-lights-empower').length
+    expect([empowered('W:e'), empowered('W:q'), empowered('W:w')]).toEqual([3, 0, 0])
+  })
+
+  it('the second ability hit sets off his passive', () => {
+    expect(sources(['Q:q', 'E:w']).map(([id]) => id)).toEqual(['hwei-q-devastating-fire', 'hwei-e-gaze-of-the-abyss', 'hwei-passive-signature'])
   })
 
   it('R shatters for 400 and burns 30 a second for 3 seconds', () => {
-    const result = run('hwei', ['R', 'wait:3'])
-    expect(result.instances.map((instance) => [instance.source.id, instance.raw])).toEqual([
+    expect(sources(['R', 'wait:3'])).toEqual([
       ['hwei-r', 400],
       ['hwei-r-spiraling-despair', 30], ['hwei-r-spiraling-despair', 30], ['hwei-r-spiraling-despair', 30],
     ])
-  })
-
-  it('W empowers the next three attacks', () => {
-    const result = run('hwei', ['W', 'AA', 'AA', 'AA', 'AA'])
-    expect(result.instances.filter((instance) => instance.source.id === 'hwei-w-stirring-lights')).toHaveLength(3)
   })
 })
 

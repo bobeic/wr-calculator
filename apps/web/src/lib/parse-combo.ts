@@ -12,13 +12,22 @@ function tokenize(text: string): string[] {
   return text.trim().split(/\s+/).filter((token) => token !== '')
 }
 
-/** Parses combo text like "Q AA dash item:trinity-force spell:ignite wait:0.5 R" into simulateCombo actions. */
+/**
+ * Parses combo text like "Q AA dash item:trinity-force spell:ignite wait:0.5 R" into simulateCombo actions. Two keys
+ * together ("QW") cast the spell the second key picks, for champions with several spells per key (Hwei).
+ */
 export function parseCombo(text: string): ComboParse {
   const actions: ComboAction[] = []
   for (const [tokenIndex, token] of tokenize(text).entries()) {
     const simple = SIMPLE_ACTIONS.find((action) => action === token.toUpperCase())
     if (simple) {
       actions.push(simple)
+      continue
+    }
+    // A spell picked by a second key (Hwei): 'QW' or 'Q:w'.
+    const variant = /^([QWER]):?([QWE])$/i.exec(token)
+    if (variant) {
+      actions.push(`${variant[1].toUpperCase() as 'Q' | 'W' | 'E' | 'R'}:${variant[2].toLowerCase() as 'q' | 'w' | 'e'}`)
       continue
     }
     if (token.toLowerCase() === 'dash') {
