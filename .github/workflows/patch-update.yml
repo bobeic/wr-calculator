@@ -16,11 +16,11 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
         with:
           version: 10.28.0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -40,7 +40,7 @@ jobs:
             echo 'See `PATCH_DIFF.md` (Needs review) and `BUILD_IMPACT.md` in the new patch folder.'
           } >> patch-update.log
       - name: Open a pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: patch-update/auto
           commit-message: 'chore: import the latest wrpocket patch data'
