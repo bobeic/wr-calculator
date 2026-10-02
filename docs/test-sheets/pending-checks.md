@@ -45,6 +45,14 @@ Patch 7.3a is live.
     engine says 6s)?
   - Senna: Mist's crit is modelled as 0.5% per stack instead of 10% per 20.
 
+- Batch 2 kits (2026-10-03, unchecked). The guesses most likely to be off:
+  - Master Yi: Wuju Style's passive reads "5 Attack Damage (8% AD)"; the engine gives 5 AD plus 8% of AD. And is
+    Double Strike's 150% the total of both strikes (the engine: the second strike is 50% AD)?
+  - Nautilus: Staggering Blow's "13 (based on level)": what is it at level 15? The engine uses 13 at every level.
+  - Miss Fortune: Love Tap's "6% (based on level)" extra damage isn't modelled; what is it at level 15?
+  - Yasuo: "90% critical damage" (and Senna's) isn't modelled. Does a Yasuo crit deal 1.8× (90% of 2×) or 1.9×?
+  - Cho'Gath: how long do Vorpal Spikes stay ready after E (the engine says 5 s)?
+
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
   engine uses one value per combo (listed in the file).

@@ -26,7 +26,9 @@ describe('7.3a hand-modelled champions', () => {
       expect(hand.attackSpeed, hand.id).toEqual(generated.attackSpeed)
     }
     expect(dataset.handModelled.champions.map((entry) => entry.id))
-      .toEqual(['ambessa', 'darius', 'lee-sin', 'hwei', 'caitlyn', 'senna'])
+      .toEqual([
+        'ambessa', 'darius', 'lee-sin', 'hwei', 'caitlyn', 'senna', 'chogath', 'master-yi', 'yasuo', 'miss-fortune', 'nautilus',
+      ])
   })
 
   it("prefix every kit effect and input id with the champion's id", () => {
@@ -206,5 +208,105 @@ describe('Senna', () => {
 
   it('R scales with bonus AD and AP', () => {
     expect(run('senna', ['R'], { 'senna-mist-stacks': 40 }).instances[0].raw).toBeCloseTo(550 + 1.2 * 50, 6)
+  })
+})
+
+const bySource = (result: ReturnType<typeof run>, id: string) => result.instances.filter((instance) => instance.source.id === id)
+const partFrom = (result: ReturnType<typeof run>, id: string) =>
+  result.instances.flatMap((instance) => instance.parts ?? []).filter((part) => part.source.id === id)
+
+describe("Cho'Gath", () => {
+  it('Feast stacks add Health and grow the spikes: 10 stacks at rank 3 / rank 4', () => {
+    const base = attacker('chogath').sheet.total.hp!
+    expect(attacker('chogath', { 'chogath-feast-stacks': 10 }).sheet.total.hp! - base).toBeCloseTo(1600, 6)
+    const result = run('chogath', ['E', 'AA', 'AA', 'AA', 'AA'], { 'chogath-feast-stacks': 10 })
+    const spikes = bySource(result, 'chogath-e-vorpal-spikes')
+    expect(spikes).toHaveLength(3)
+    expect(spikes[0].raw).toBeCloseTo(95 + 10000 * (0.035 + 0.006 * 10), 6)
+  })
+
+  it('R deals 600 true plus 10% of bonus Health', () => {
+    const r = run('chogath', ['R'], { 'chogath-feast-stacks': 10 }).instances[0]
+    expect([r.type, r.raw]).toEqual(['true', 600 + 0.1 * 1600])
+  })
+})
+
+describe('Master Yi', () => {
+  const ad = () => attacker('master-yi').sheet.total.ad!
+
+  it('Wuju Style adds 5 AD and then 8%', () => {
+    const generated = GENERATED_CHAMPIONS.find((entry) => entry.id === 'master-yi')!
+    const plain = generated.baseStats.ad!.base + generated.baseStats.ad!.perLevel * 14
+    expect(ad()).toBeCloseTo((plain + 5) * 1.08, 6)
+  })
+
+  it('every 4th attack strikes again for 50% AD', () => {
+    const result = run('master-yi', ['AA', 'AA', 'AA', 'AA'])
+    expect(partFrom(result, 'master-yi-passive-double-strike').map((part) => part.amount)).toEqual([0.5 * ad()])
+    expect(result.instances[3].raw).toBeCloseTo(1.5 * ad(), 6)
+  })
+
+  it('Alpha Strike on one target: the strike plus three 25% returns', () => {
+    expect(run('master-yi', ['Q']).instances.reduce((sum, i) => sum + i.raw, 0)).toBeCloseTo(1.75 * (140 + 0.6 * ad()), 6)
+  })
+
+  it('E adds 45 (+25% bonus AD) true damage to every attack for 5 seconds', () => {
+    const bonusAd = attacker('master-yi').sheet.bonus.ad!
+    const result = run('master-yi', ['E', 'AA', 'AA', 'AA', 'wait:5', 'AA'])
+    const procs = bySource(result, 'master-yi-e-wuju-style')
+    expect(procs.map((instance) => instance.type)).toEqual(['true', 'true', 'true'])
+    for (const proc of procs) expect(proc.raw).toBeCloseTo(45 + 0.25 * bonusAd, 6)
+  })
+
+  it('R speeds up attacks', () => {
+    const gap = (combo: ComboAction[]) => {
+      const times = run('master-yi', combo).instances.filter((instance) => instance.source.id === 'AA').map((instance) => instance.time)
+      return times[1] - times[0]
+    }
+    expect(gap(['R', 'AA', 'AA'])).toBeLessThan(gap(['AA', 'AA']))
+  })
+})
+
+describe('Yasuo', () => {
+  it('doubles crit chance from items', () => {
+    const critItem = [...dataset.catalog.items.values()].find((item) => item.tier === 'legendary' && (item.stats.critChance ?? 0) > 0)!
+    const sheet = combatantFromChampion(champion('yasuo'), 15, { items: [critItem.id], runes: [], inputs: {} }, dataset.catalog).sheet
+    expect(sheet.total.critChance).toBeCloseTo(2 * critItem.stats.critChance!, 6)
+  })
+
+  it('Q, E and R deal their text damage', () => {
+    const ad = attacker('yasuo').sheet.total.ad!
+    expect(run('yasuo', ['Q']).instances[0].raw).toBeCloseTo(110 + 1.05 * ad, 6)
+    expect(run('yasuo', ['E']).instances[0].raw).toBe(100)
+    expect(run('yasuo', ['R']).instances[0].raw).toBe(500)
+  })
+})
+
+describe('Miss Fortune', () => {
+  it('is ranged; Love Tap adds 9 to every third attack', () => {
+    expect(champion('miss-fortune').attackType).toBe('ranged')
+    const result = run('miss-fortune', ['AA', 'AA', 'AA'])
+    expect(partFrom(result, 'miss-fortune-passive-love-tap').map((part) => part.amount)).toEqual([9])
+  })
+
+  it('E rains 8 waves of 30 over 2 seconds; R fires 16 waves at rank 3', () => {
+    expect(bySource(run('miss-fortune', ['E', 'wait:2']), 'miss-fortune-e-make-it-rain').map((i) => i.raw)).toEqual(Array(8).fill(30))
+    const ad = attacker('miss-fortune').sheet.total.ad!
+    const waves = bySource(run('miss-fortune', ['R', 'wait:4']), 'miss-fortune-r-bullet-time')
+    expect(waves).toHaveLength(16)
+    expect(waves[0].raw).toBeCloseTo(40 + 0.6 * ad, 6)
+  })
+})
+
+describe('Nautilus', () => {
+  it('Staggering Blow adds 13 once per 6 seconds', () => {
+    const result = run('nautilus', ['AA', 'AA', 'AA'])
+    const procs = [...bySource(result, 'nautilus-passive-staggering-blow'), ...partFrom(result, 'nautilus-passive-staggering-blow')]
+    expect(procs.map((proc) => ('raw' in proc ? proc.raw : proc.amount))).toEqual([13])
+  })
+
+  it("Titan's Wrath empowers every attack while it lasts", () => {
+    const result = run('nautilus', ['W', 'AA', 'AA', 'AA'])
+    expect(bySource(result, 'nautilus-w-titans-wrath').map((i) => [i.type, i.raw])).toEqual(Array(3).fill(['magic', 80]))
   })
 })

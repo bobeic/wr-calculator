@@ -35,6 +35,16 @@ Engine additions (all optional fields, so existing data is unchanged):
 - The `targetMissingHpFraction` damage ratio (0..1): "up to X based on missing Health" (Severing Bolt, Lee Sin's
   Resonating Strike), taken as a straight line.
 
+Batch 2 (same day, user: "the next batch is fine"): the second most-picked per lane, Cho'Gath, Master Yi, Yasuo,
+Miss Fortune and Nautilus (`7.3a/champions-batch2.ts`). Two more engine pieces:
+
+- `DamageRatio.perInput`: adds `value` × one of the owner's number inputs to a ratio (Cho'Gath's spikes grow 0.6% of
+  max Health per Feast stack).
+- `castBuff.amount` takes a scalar, so a champion's cast buff can scale by rank (Highlander, Strut).
+
+Effects that last for a window rather than a number of attacks (Wuju Style, Titan's Wrath) are empowered attacks with
+99 charges, so every attack in the window is empowered.
+
 ## Consequences
 
 - `docs/test-sheets/pending-checks.md` lists the guesses most likely to be off (Darius's Noxian Might at level 15,

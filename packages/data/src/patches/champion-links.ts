@@ -162,4 +162,94 @@ export const CHAMPION_LINKS: Record<string, ChampionLinks> = {
     // Healing, shields, slows, roots and Wraith form don't change damage dealt.
     ignore: ['q.scaling.回复', 'q.scaling.持续时间', 'w.scaling.禁锢时长', 'e.scaling.持续时间', 'r.scaling.护盾'],
   },
+  chogath: {
+    links: [
+      { path: 'abilities.q.cooldown', row: 'q.scaling.cd', value: flat },
+      { path: 'abilities.q.cost', row: 'q.scaling.MP', value: flat },
+      { path: 'abilities.q.damage[0].base', row: 'q.scaling.基础伤害' },
+      { path: 'abilities.w.cooldown', row: 'w.scaling.cd' },
+      { path: 'abilities.w.cost', row: 'w.scaling.MP' },
+      { path: 'abilities.w.damage[0].base', row: 'w.scaling.基础伤害' },
+      { path: 'abilities.e.cooldown', row: 'e.scaling.cd' },
+      { path: 'abilities.e.cost', row: 'e.scaling.MP', value: flat },
+      { path: 'abilities.e.effects[0].bonus.base', row: 'e.scaling.基础伤害' },
+      { path: 'abilities.e.effects[0].bonus.ratios[1].value', row: 'e.scaling.最大生命值伤害', value: pctByRank },
+      { path: 'abilities.r.cooldown', row: 'r.scaling.cd' },
+      { path: 'abilities.r.cost', row: 'r.scaling.MP', value: flat },
+      { path: 'abilities.r.damage[0].base', row: 'r.scaling.基础伤害' },
+      { path: 'abilities.r.effects[0].perStack', row: 'r.scaling.最大生命值' },
+    ],
+    // W's silence, E's slow and Feast's attack range don't change damage dealt.
+    ignore: ['w.scaling.沉默时长', 'e.scaling.移速降低', 'r.scaling.攻击距离'],
+  },
+  'master-yi': {
+    links: [
+      { path: 'abilities.q.cooldown', row: 'q.scaling.cd' },
+      { path: 'abilities.q.cost', row: 'q.scaling.MP' },
+      { path: 'abilities.q.damage[0].base', row: 'q.scaling.基础伤害' },
+      // The three returning strikes deal 25% each.
+      { path: 'abilities.q.damage[1].base', row: 'q.scaling.基础伤害', value: (ranks) => ({ byRank: ranks.map((rank) => rank / 4) }) },
+      { path: 'abilities.w.cooldown', row: 'w.scaling.cd', value: flat },
+      { path: 'abilities.w.cost', row: 'w.scaling.MP', value: flat },
+      { path: 'abilities.e.cooldown', row: 'e.scaling.cd' },
+      { path: 'abilities.e.effects[2].bonus.base', row: 'e.scaling.真实伤害' },
+      { path: 'abilities.r.cooldown', row: 'r.scaling.cd' },
+      { path: 'abilities.r.cost', row: 'r.scaling.MP', value: flat },
+      { path: 'abilities.r.effects[0].amount', row: 'r.scaling.攻速加成', value: pctByRank },
+    ],
+    // Q's bonus against monsters, Meditate's heal and damage reduction, and Highlander's speed.
+    ignore: ['q.scaling.额外伤害', 'w.scaling.回复', 'w.scaling.减伤比例', 'r.scaling.移速加成'],
+  },
+  yasuo: {
+    links: [
+      { path: 'abilities.q.cooldown', row: 'q.scaling.cd', value: flat },
+      { path: 'abilities.q.damage[0].base', row: 'q.scaling.基础伤害' },
+      { path: 'abilities.w.cooldown', row: 'w.scaling.cd' },
+      { path: 'abilities.e.damage[0].base', row: 'e.scaling.基础伤害' },
+      { path: 'abilities.r.cooldown', row: 'r.scaling.cd' },
+      { path: 'abilities.r.damage[0].base', row: 'r.scaling.基础伤害' },
+    ],
+    // Wind Wall's width; E's per-dash cooldown (one target can only be dashed through once per 7 s, the model's cooldown).
+    ignore: ['w.scaling.风墙宽度', 'e.scaling.cd'],
+  },
+  'miss-fortune': {
+    links: [
+      { path: 'abilities.q.cooldown', row: 'q.scaling.cd' },
+      { path: 'abilities.q.cost', row: 'q.scaling.MP', value: flat },
+      { path: 'abilities.q.damage[0].base', row: 'q.scaling.基础伤害' },
+      { path: 'abilities.q.damage[0].ratios[0].value', row: 'q.scaling.攻击系数', value: (ranks) => ranks[0] / 100 },
+      { path: 'abilities.w.cooldown', row: 'w.scaling.cd', value: flat },
+      { path: 'abilities.w.cost', row: 'w.scaling.MP', value: flat },
+      { path: 'abilities.w.effects[0].amount', row: 'w.scaling.攻速加成', value: pctByRank },
+      { path: 'abilities.e.cooldown', row: 'e.scaling.cd' },
+      { path: 'abilities.e.cost', row: 'e.scaling.MP' },
+      { path: 'abilities.e.effects[0].tickAmount', row: 'e.scaling.基础伤害' },
+      { path: 'abilities.e.effects[0].ratios[0].value', row: 'e.scaling.法强系数', value: pctByRank },
+      { path: 'abilities.r.cooldown', row: 'r.scaling.cd' },
+      { path: 'abilities.r.cost', row: 'r.scaling.MP', value: flat },
+      { path: 'abilities.r.effects[0].tickAmount', row: 'r.scaling.基础伤害' },
+      // One wave every 0.25 s, so the waves set the duration.
+      { path: 'abilities.r.effects[0].durationSeconds', row: 'r.scaling.弹幕波数', value: (ranks) => ({ byRank: ranks.map((waves) => waves / 4) }) },
+    ],
+    // The bounce's crit, Strut's speed and Make It Rain's slow.
+    ignore: ['q.scaling.暴击伤害率', 'w.scaling.移速加成', 'e.scaling.移速降低'],
+  },
+  nautilus: {
+    links: [
+      { path: 'abilities.q.cooldown', row: 'q.scaling.cd' },
+      { path: 'abilities.q.cost', row: 'q.scaling.MP', value: flat },
+      { path: 'abilities.q.damage[0].base', row: 'q.scaling.基础伤害' },
+      { path: 'abilities.w.cooldown', row: 'w.scaling.cd', value: flat },
+      { path: 'abilities.w.cost', row: 'w.scaling.MP', value: flat },
+      { path: 'abilities.w.effects[0].bonus.base', row: 'w.scaling.基础伤害' },
+      { path: 'abilities.e.cooldown', row: 'e.scaling.cd' },
+      { path: 'abilities.e.cost', row: 'e.scaling.MP' },
+      { path: 'abilities.e.damage[0].base', row: 'e.scaling.基础伤害' },
+      { path: 'abilities.r.cooldown', row: 'r.scaling.cd' },
+      { path: 'abilities.r.cost', row: 'r.scaling.MP', value: flat },
+      { path: 'abilities.r.damage[0].base', row: 'r.scaling.主要伤害' },
+    ],
+    // The shield, the slow, and R's other targets and stun.
+    ignore: ['w.scaling.护盾', 'w.scaling.最大生命值系数', 'e.scaling.移速降低', 'r.scaling.次要伤害', 'r.scaling.眩晕时间'],
+  },
 }

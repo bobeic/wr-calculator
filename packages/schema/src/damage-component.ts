@@ -14,12 +14,14 @@ export type DamageRatioStat = z.infer<typeof DamageRatioStatSchema>
 
 /**
  * One ratio term. With `perStat`, the coefficient is `value + perStat.value × perStat.stat`,
- * e.g. "7% (+0.04% per bonus AD) of max HP".
+ * e.g. "7% (+0.04% per bonus AD) of max HP". With `perInput`, it also adds `perInput.value` × the owner's number
+ * input (an effect's stackCount), e.g. Cho'Gath's spikes: "(2.3% + 0.6% × Feast stacks) of max Health".
  */
 export const DamageRatioSchema = z.object({
   stat: DamageRatioStatSchema,
   value: NullableScalarSchema,
   perStat: z.object({ stat: DamageRatioStatSchema, value: NullableScalarSchema }).strict().optional(),
+  perInput: z.object({ inputId: z.string(), value: z.number() }).strict().optional(),
 }).strict()
 export type DamageRatio = z.infer<typeof DamageRatioSchema>
 

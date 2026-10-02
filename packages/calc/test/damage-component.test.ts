@@ -130,3 +130,17 @@ describe('resolveDamageComponent', () => {
     )
   })
 })
+
+describe('resolveDamageComponent perInput', () => {
+  it("adds perInput.value × the attacker's number input to the coefficient", () => {
+    const component: DamageComponent = {
+      type: 'magic', base: 0, tags: [],
+      ratios: [{ stat: 'targetMaxHp', value: 0.03, perInput: { inputId: 'feast', value: 0.006 } }],
+    }
+    const target = combatant({ sheet: sheet({ total: { hp: 2000 } }) })
+    const withStacks = resolveDamageComponent(component, combatant({ inputs: { feast: 5 } }), target, 2000, 15, 'Spikes')
+    expect(withStacks.amount).toBeCloseTo(2000 * (0.03 + 0.03), 6)
+    const without = resolveDamageComponent(component, combatant(), target, 2000, 15, 'Spikes')
+    expect(without.amount).toBeCloseTo(60, 6)
+  })
+})

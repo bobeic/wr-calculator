@@ -95,10 +95,10 @@ describe('castBuffHandler', () => {
   it('grants the stat after casting a listed slot, for its duration', () => {
     const self = runtime()
     castBuffHandler.hooks!.onAbilityCast!(overdrive, ctx([], { self, time: 1 }), 'q')
-    expect(castBuffHandler.combatStats!(overdrive, self, 1)).toEqual([])
+    expect(castBuffHandler.combatStats!(overdrive, self, 1, statCtx)).toEqual([])
     castBuffHandler.hooks!.onAbilityCast!(overdrive, ctx([], { self, time: 1 }), 'r')
-    expect(castBuffHandler.combatStats!(overdrive, self, 9)).toEqual([{ stat: 'attackSpeed', amount: 0.4 }])
-    expect(castBuffHandler.combatStats!(overdrive, self, 9.1)).toEqual([])
+    expect(castBuffHandler.combatStats!(overdrive, self, 9, statCtx)).toEqual([{ stat: 'attackSpeed', amount: 0.4 }])
+    expect(castBuffHandler.combatStats!(overdrive, self, 9.1, statCtx)).toEqual([])
   })
 
   it('ends a charged buff after its attacks', () => {
@@ -106,9 +106,20 @@ describe('castBuffHandler', () => {
     const self = runtime()
     castBuffHandler.hooks!.onAbilityCast!(barrage, ctx([], { self }), 'r')
     castBuffHandler.hooks!.onHitLanded!(barrage, ctx([], { self }), attack(1))
-    expect(castBuffHandler.combatStats!(barrage, self, 0)).toHaveLength(1)
+    expect(castBuffHandler.combatStats!(barrage, self, 0, statCtx)).toHaveLength(1)
     castBuffHandler.hooks!.onHitLanded!(barrage, ctx([], { self }), attack(2))
-    expect(castBuffHandler.combatStats!(barrage, self, 0)).toEqual([])
+    expect(castBuffHandler.combatStats!(barrage, self, 0, statCtx)).toEqual([])
+  })
+})
+
+describe('castBuffHandler with a scalar amount', () => {
+  it('reads a by-level amount at the owner level', () => {
+    const buff = {
+      kind: 'castBuff' as const, id: 'scaled', name: 'Scaled', description: '', support: 'full' as const,
+      slots: ['r' as const], stat: 'attackSpeed' as const, amount: { byLevel: [0.1, 0.2] }, durationSeconds: 5, cooldownSeconds: 0,
+    }
+    const self = { currentHp: 1, shieldHp: 0, cooldowns: {}, buffs: { 'castBuff:scaled': { expiresAt: 5 } } }
+    expect(castBuffHandler.combatStats!(buff, self, 1, { level: 2, sheet: sheet() })).toEqual([{ stat: 'attackSpeed', amount: 0.2 }])
   })
 })
 

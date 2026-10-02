@@ -1,6 +1,6 @@
-import type { Ability, Champion, DamageComponent } from '@wr-calc/schema'
-import { GENERATED_CHAMPIONS } from './generated/champions'
-import { WRPOCKET_7_3A_PROVENANCE } from './provenance'
+import type { Champion } from '@wr-calc/schema'
+import { byLevelLine, magic, modelled, physical, utility } from './champion-helpers'
+import { HAND_MODELED_CHAMPIONS_BATCH2 } from './champions-batch2'
 
 // Hand-modelled kits for the most-picked champion in each lane on the CN server (CN_STATS, all ranks, 2026-09-30):
 // Darius (Baron), Lee Sin (Jungle), Hwei (Mid), Caitlyn (Dragon) and Senna (Support). Numbers come from wrpocket's 7.3a
@@ -8,31 +8,6 @@ import { WRPOCKET_7_3A_PROVENANCE } from './provenance'
 // checked in game yet. Each kit models one-on-one damage dealt: shields, heals, slows, crowd control, movement and
 // resource costs beyond the listed cost are left out. Hwei's nine spells are variants of his Q, W and E. Wind-up times marked "League" are League of Legends values,
 // kept because they move time-to-kill; they are not timed in Wild Rift.
-
-/** The generated champion with hand-written abilities. */
-function modelled(id: string, abilities: Champion['abilities']): Champion {
-  const generated = GENERATED_CHAMPIONS.find((champion) => champion.id === id)
-  if (generated === undefined) throw new Error(`hand-modelled champion ${id} has no generated 7.3a entry`)
-  return { ...generated, abilities, provenance: WRPOCKET_7_3A_PROVENANCE }
-}
-
-function physical(base: DamageComponent['base'], ratios: DamageComponent['ratios']): DamageComponent {
-  return { type: 'physical', base, ratios, tags: [] }
-}
-
-function magic(base: DamageComponent['base'], ratios: DamageComponent['ratios']): DamageComponent {
-  return { type: 'magic', base, ratios, tags: [] }
-}
-
-/** An ability with no damage of its own and no effects. */
-function utility(id: string, name: string, maxRank: number, cooldown: Ability['cooldown'], cost?: Ability['cost']): Ability {
-  return { id, name, maxRank, cooldown, ...(cost !== undefined && { cost }), castTime: 0, damage: [], flags: {} }
-}
-
-/** A value that grows in a straight line from `first` at level 1 to `last` at level 15. */
-function byLevelLine(first: number, last: number): { byLevel: number[] } {
-  return { byLevel: Array.from({ length: 15 }, (_, index) => first + ((last - first) * index) / 14) }
-}
 
 const HEMORRHAGE_ID = 'darius-passive-hemorrhage'
 
@@ -361,4 +336,4 @@ const SENNA = modelled('senna', {
 })
 
 /** Kits first hand-modelled on 7.3a: the most-picked champion in each lane on the CN server. */
-export const HAND_MODELED_CHAMPIONS_7_3A: Champion[] = [DARIUS, LEE_SIN, HWEI, CAITLYN, SENNA]
+export const HAND_MODELED_CHAMPIONS_7_3A: Champion[] = [DARIUS, LEE_SIN, HWEI, CAITLYN, SENNA, ...HAND_MODELED_CHAMPIONS_BATCH2]

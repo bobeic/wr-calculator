@@ -53,6 +53,10 @@ export function resolveDamageComponent(
       coefficient += perResolved.value
         * resolveRatioStat(ratio.perStat.stat, attacker, target, targetCurrentHp)
     }
+    if (ratio.perInput) {
+      const stacks = attacker.inputs[ratio.perInput.inputId]
+      coefficient += ratio.perInput.value * (typeof stacks === 'number' ? stacks : 0)
+    }
     amount += statValue * coefficient
   }
 
