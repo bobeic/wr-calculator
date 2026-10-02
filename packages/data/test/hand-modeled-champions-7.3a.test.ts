@@ -35,6 +35,7 @@ describe('7.3a hand-modelled champions', () => {
         'aatrox', 'nocturne', 'yone', 'jhin', 'malphite',
         'volibear', 'jarvan-iv', 'morgana', 'kaisa', 'yuumi',
         'ksante', 'kayn', 'ahri', 'ashe', 'lulu',
+        'teemo', 'pantheon', 'ziggs', 'ezreal', 'pyke',
       ])
   })
 
@@ -783,5 +784,44 @@ describe('Ashe', () => {
 describe('Lulu', () => {
   it('Pix adds 12 magic damage to every attack', () => {
     expect(bySource(run('lulu', ['AA', 'AA']), 'lulu-passive-pix').map((i) => i.raw)).toEqual([12, 12])
+  })
+})
+
+describe('Teemo', () => {
+  it('Toxic Shot poisons for 4 ticks after an attack', () => {
+    const result = run('teemo', ['AA', 'wait:4'])
+    expect(bySource(result, 'teemo-passive-poison').map((i) => i.raw)).toEqual([8, 8, 8, 8])
+  })
+})
+
+describe('Pantheon', () => {
+  it('Grand Starfall: Comet Spear at rank 4 plus the landing', () => {
+    expect(run('pantheon', ['R']).instances.map((i) => i.raw)).toEqual([200, 700])
+  })
+})
+
+describe('Ziggs', () => {
+  it('Bouncing Bomb includes Short Fuse', () => {
+    expect(run('ziggs', ['Q']).instances.map((i) => i.raw)).toEqual([265, 20])
+  })
+})
+
+describe('Ezreal', () => {
+  it('ability hits stack Rising Spell Force attack speed', () => {
+    const gap = (combo: ComboAction[]) => {
+      const times = run('ezreal', combo).instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+      return times[1] - times[0]
+    }
+    expect(gap(['Q', 'E', 'AA', 'AA'])).toBeLessThan(gap(['AA', 'AA']))
+  })
+})
+
+describe('Pyke', () => {
+  it('turns bonus Health into AD (14 to 1) and keeps none of it', () => {
+    const build = (items: string[]) => combatantFromChampion(champion('pyke'), 15, { items, runes: [], inputs: {} }, dataset.catalog).sheet
+    const bare = build([])
+    const withBelt = build(['giants-belt'])
+    expect(withBelt.total.hp).toBeCloseTo(bare.total.hp!, 6)
+    expect(withBelt.total.ad! - bare.total.ad!).toBeCloseTo(dataset.catalog.items.get('giants-belt')!.stats.hp! / 14, 6)
   })
 })

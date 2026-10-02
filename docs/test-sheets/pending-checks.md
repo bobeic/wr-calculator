@@ -144,6 +144,13 @@ Patch 7.3a is live.
   - Ahri: all 3 fox-fires and all 3 Spirit Rush casts land on the target, at once.
   - Ashe: Frost Shot's crit rework isn't modelled; Ranger's Focus is castable without its 4 Focus stacks.
   - Lulu: Pix's 12 is flat at every level; only one Glitterlance bolt hits.
+- Batch 11 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Teemo: Toxic Shot's poison restarts on each attack (assumed not to stack); Noxious Trap is one mushroom at once.
+  - Pantheon: Mortal Will and Comet Spear's low-Health crit aren't modelled; Grand Starfall's spear uses Comet Spear's
+    rank 4 numbers whatever its rank.
+  - Ziggs: Short Fuse assumed ready on every Bouncing Bomb.
+  - Ezreal: Mystic Shot's on-hit effects and cooldown refunds aren't modelled; Essence Flux detonates at once.
+  - Pyke: Death from Below is only its 50% damage (no execute, no Armor Penetration part).
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
