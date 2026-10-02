@@ -454,8 +454,9 @@ export const STARTER_ITEMS: Item[] = [
     // (2026-09-29); no extra gold to "buy" it.
     cost: { total: 3000, combine: 0 }, recipe: ['archangels-staff'],
     stats: { ap: 60, mana: 1200, abilityHaste: 25 }, tags: ['magic'],
-    // Not imported (no wrpocket entry), so written here; Lifeline is the same passive Sterak's and Maw have.
-    uniquePassives: ['Awe', 'Lifeline'],
+    // Not imported (no wrpocket entry), so written here. Its shield is also called Lifeline, but the shop sells it
+    // alongside Sterak's, Maw and Mantle (user, 2026-10-03), so only Awe is listed.
+    uniquePassives: ['Awe'],
     effects: [
       {
         kind: 'statConversion', id: 'seraphs-embrace-focused-will', name: 'Awe',

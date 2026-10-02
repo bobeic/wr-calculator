@@ -4,6 +4,7 @@ import { buildCatalog, mergeById, withExclusiveGroups } from '../catalog'
 import type { TargetPreset } from './7.3/targets'
 import { syncChampion, syncItem } from './source-sync'
 import { attackTypeOf } from '../attack-types'
+import { withoutNonBlockingPassives } from '../shop-rules'
 
 /** Ids of every source record that changed or disappeared since the previous patch. */
 export interface ChangedIds {
@@ -194,7 +195,7 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
   const exclusiveGroups = layer.exclusiveGroups ?? Object.fromEntries(
     Object.entries(previous?.exclusiveGroups ?? {}).filter(([id]) => presentIds.has(id)),
   )
-  const items = withExclusiveGroups(merged, exclusiveGroups)
+  const items = withExclusiveGroups(merged, exclusiveGroups).map(withoutNonBlockingPassives)
   const runes = layer.runes ?? previous?.runes ?? []
   const spells = layer.spells ?? previous?.spells ?? []
   return {

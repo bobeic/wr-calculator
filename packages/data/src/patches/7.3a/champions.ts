@@ -57,10 +57,11 @@ const DARIUS = modelled('darius', {
         description: 'Upon reaching full stacks, Darius gains Noxian Might for 5 seconds, gaining 32 (based on level) '
           + 'Attack Damage.',
         support: 'partial',
-        supportNotes: "32 AD is the number in wrpocket's text; how it grows with level is not stated, so it is 32 at "
-          + "every level. Counted from Darius's 5th, 10th, ... damaging hit (attacks and abilities), not from the "
-          + "target's Hemorrhage stacks.",
-        stat: 'ad', amountPerStack: 32, stacksFrom: ['basicAttack', 'ability'], maxStacks: 1, durationSeconds: 5,
+        // In game, 2026-10-03: 236 AD at level 15. Level 1 is the text's 32; levels between assume a straight line.
+        supportNotes: 'Only level 1 (32, from the text) and level 15 (236, read in game) are known; levels between '
+          + "assume a straight line. Counted from Darius's 5th, 10th, ... damaging hit (attacks and abilities), not "
+          + "from the target's Hemorrhage stacks.",
+        stat: 'ad', amountPerStack: byLevelLine(32, 236), stacksFrom: ['basicAttack', 'ability'], maxStacks: 1, durationSeconds: 5,
         every: 5, startAt: 5,
       },
     ],
@@ -97,6 +98,7 @@ const DARIUS = modelled('darius', {
     effects: [{
       kind: 'damageAmp', id: 'darius-r-hemorrhage-amp', name: 'Noxian Guillotine (Hemorrhage)',
       description: 'Damage increased by 20% per Hemorrhage stack.',
+      // In game, 2026-10-03: 375 true damage at rank 3 with no bonus AD, doubled at 5 Hemorrhage stacks.
       support: 'partial', supportNotes: 'The reset on a kill is not modelled.',
       condition: { type: 'abilitySlot', value: 'r' }, amount: 0.2, perTargetDotStack: { effectId: HEMORRHAGE_ID },
     }],

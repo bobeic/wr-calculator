@@ -57,8 +57,8 @@ describe('Darius', () => {
   it('caps Hemorrhage at 5 stacks, all on one timer', () => {
     const result = run('darius', ['AA', 'AA', 'AA', 'AA', 'AA', 'AA', 'wait:1'])
     const lastTick = result.instances.filter((instance) => instance.source.id === 'darius-passive-hemorrhage').at(-1)!
-    // Noxian Might (5th hit) adds 32 bonus AD, which the bleed reads: 5 × (3.6 + 8% × 32) per tick.
-    expect(lastTick.raw).toBeCloseTo(5 * (3.6 + 0.08 * 32), 6)
+    // Noxian Might (5th hit) adds 236 bonus AD at level 15, which the bleed reads: 5 × (3.6 + 8% × 236) per tick.
+    expect(lastTick.raw).toBeCloseTo(5 * (3.6 + 0.08 * 236), 6)
   })
 
   it('adds 60% AD to the attack after W, as one hit', () => {
@@ -71,10 +71,17 @@ describe('Darius', () => {
     const result = run('darius', ['AA', 'AA', 'AA', 'AA', 'AA', 'R'])
     const r = result.instances.find((instance) => instance.source.id === 'darius-r')!
     expect(r.type).toBe('true')
-    expect(r.raw).toBeCloseTo((375 + 0.75 * 32) * 2, 6)
+    expect(r.raw).toBeCloseTo((375 + 0.75 * 236) * 2, 6)
   })
 
-  it('R on a fresh target deals its base damage', () => {
+  it('Noxian Might gives 236 AD at level 15 (read in game) and 32 at level 1 (the text)', () => {
+    const might = championKitEffects(champion('darius')).find((effect) => effect.id === 'darius-passive-noxian-might')!
+    expect(might).toMatchObject({ amountPerStack: { byLevel: expect.any(Array) } })
+    const byLevel = (might as { amountPerStack: { byLevel: number[] } }).amountPerStack.byLevel
+    expect([byLevel[0], byLevel[14]]).toEqual([32, 236])
+  })
+
+  it('R on a fresh target deals its base damage (375 true at rank 3, read in game)', () => {
     expect(run('darius', ['R']).instances[0].raw).toBeCloseTo(375, 6)
   })
 })

@@ -7,10 +7,10 @@ Patch 7.3a is live.
 
 ## 1. Unclear passives
 
-- Shared passive names (user, 2026-10-02: "passives are unique"). The validator now blocks two finished items
-  with the same named passive. The obvious ones (Spellblade, Lifeline, Annul) are expected; these pairs are
-  less obvious and worth a look in the shop: Rylai's Crystal Scepter + Serylda's Grudge (both "Icy"),
-  Dead Man's Plate + Youmuu's Ghostblade ("Momentum"), Sunfire Aegis + Hollow Radiance ("Immolate").
+- Shared passive names: answered 2026-10-03. Rylai's + Serylda's can be bought together (Icy doesn't block,
+  `packages/data/src/shop-rules.ts`). Dead Man's Plate + Youmuu's can't. Only one of Sterak's, Maw and Mantle of
+  the Twelfth Hour; Seraph's Embrace goes with any of them. Only one of Sunfire and Hollow Radiance. All pinned in
+  `packages/data/test/shop-rules.test.ts`.
 
 - Batch 6 assumptions (2026-10-02; every batch 6 item is unchecked, these are the guesses most likely to be off):
   - Energized items (Rapid Firecannon, Stormrazor, Statikk Shiv): how many basic attacks charge one, standing still?
@@ -36,8 +36,9 @@ Patch 7.3a is live.
 
 - Champion kits for Darius, Lee Sin, Hwei, Caitlyn and Senna (2026-10-03, from wrpocket's 7.3a text; all unchecked).
   The guesses most likely to be off:
-  - Darius: Noxian Might's AD. The text says "32 (based on level)"; the engine gives 32 at every level. What is it at
-    level 15? Also: does Hemorrhage tick once a second, and does R's damage go up by 20% per stack (5 stacks = double)?
+  - Darius: answered 2026-10-03: Noxian Might is 236 AD at level 15, and R (375 true at rank 3) doubles at 5 stacks.
+    Still open: Noxian Might between levels 2 and 14 (the engine assumes a straight line from 32), and whether
+    Hemorrhage ticks once a second.
   - Caitlyn: is the Headshot the 6th attack or the 7th? The text reads "every 6 attacks, the next attack", so the
     engine fires it on the 7th.
   - Hwei: does Signature of the Visionary go off on every second ability hit? How long do Stirring Lights last (the

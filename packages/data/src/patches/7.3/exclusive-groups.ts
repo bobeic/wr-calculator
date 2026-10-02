@@ -20,8 +20,9 @@ const GROUP_MEMBERS: Record<string, string[]> = {
   ],
   // % magic pen items plus Bloodletter's Curse's magic resist shred; one of any of them.
   'magic-pen': ['void-amethyst', 'void-staff', 'cryptbloom', 'bloodletters-curse'],
-  // One Lifeline item. The shared-passive rule (Item.uniquePassives, user 2026-10-02) now covers this and
-  // also blocks Seraph's Embrace, Immortal Shieldbow and Mantle of the Twelfth Hour; kept as the user's 7.3 reading.
+  // One Lifeline item. The shared-passive rule (Item.uniquePassives) now covers this and also blocks Mantle of the
+  // Twelfth Hour (user, 2026-10-03: one of Sterak's, Maw and Mantle) and Immortal Shieldbow; kept as the user's 7.3
+  // reading. Seraph's Embrace is not blocked (user, 2026-10-03).
   lifeline: ['steraks-gage', 'maw-of-malmortius'],
 }
 
