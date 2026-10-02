@@ -98,6 +98,14 @@ describe('passiveNames', () => {
     )).toEqual(['Spellblade', 'Thirsting Slash', 'Strike'])
   })
 
+  it('reads bold names from older snapshots', () => {
+    expect(passiveNames('**Awe**: Refunds mana.\n**Quicksilver** (Active): Cleanse.')).toEqual(['Awe', 'Quicksilver'])
+  })
+
+  it('reads a name after a short lead-in', () => {
+    expect(passiveNames('Consumes Mana to heal Eternity: Restore Mana.')).toEqual(['Eternity'])
+  })
+
   it('returns nothing for a stat-only description', () => {
     expect(passiveNames('+40 Attack Damage')).toEqual([])
   })

@@ -9,6 +9,10 @@ export const damageAmpHandler: EffectHandler<DamageAmpEffect> = {
     const resolved = resolveScalar(effect.amount, ctx.level)
     const warning = scalarWarning(effect.name, 'amount', resolved)
     if (warning) ctx.addDataWarning(warning)
-    return 1 + resolved.value
+    let amount = resolved.value
+    if (effect.scaleWithTargetBonusHp) {
+      amount *= Math.min(1, Math.max(0, ctx.opponentSheet.bonus.hp ?? 0) / effect.scaleWithTargetBonusHp.fullAt)
+    }
+    return 1 + amount
   },
 }

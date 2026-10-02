@@ -4,8 +4,8 @@ import { CUSTOM_HANDLERS } from '../../src/custom/registry'
 import type { EffectHandler } from '../../src/effects/types'
 
 describe('CUSTOM_HANDLERS', () => {
-  it('is empty in Phase 1 (no real champion kits implemented yet)', () => {
-    expect(CUSTOM_HANDLERS).toEqual({})
+  it('holds the item handlers that need code: Guinsoo\'s phantom hit and Fiendhunter\'s Opening Barrage', () => {
+    expect(Object.keys(CUSTOM_HANDLERS).sort()).toEqual(['fiendhunter-opening-barrage', 'guinsoos-phantom-hit'])
   })
 })
 

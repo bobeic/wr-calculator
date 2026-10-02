@@ -38,7 +38,15 @@ export const spellbladeHandler: EffectHandler<SpellbladeEffect> = {
         amount += statValue * ratioResolved.value
       }
 
+      if (effect.pctTargetMaxHp !== undefined) {
+        const hpResolved = resolveScalar(effect.pctTargetMaxHp, ctx.level)
+        const hpWarning = scalarWarning(effect.name, 'pctTargetMaxHp', hpResolved)
+        if (hpWarning) ctx.addDataWarning(hpWarning)
+        amount += (ctx.opponentSheet.total.hp ?? 0) * hpResolved.value
+      }
       return {
+        // "Shortly afterward" in game; applied right after the attack here.
+        ...(effect.extraOnHitApplications !== undefined && { extraOnHitApplications: effect.extraOnHitApplications }),
         bonus: [{
           type: effect.damageType, amount,
           source: { kind: 'item', id: effect.id, name: effect.name },

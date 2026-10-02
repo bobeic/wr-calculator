@@ -1,6 +1,7 @@
 import type { ShieldEffect, HealEffect } from '@wr-calc/schema'
 import type { EffectHandler } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
+import { sumStatRatios } from './stat-ratios'
 
 export const shieldHandler: EffectHandler<ShieldEffect> = {
   kind: 'shield',
@@ -15,12 +16,7 @@ export const shieldHandler: EffectHandler<ShieldEffect> = {
       if (durationWarning) ctx.addDataWarning(durationWarning)
 
       let amount = amountResolved.value
-      for (const ratio of effect.ratios ?? []) {
-        const ratioResolved = resolveScalar(ratio.value, ctx.level)
-        const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
-        if (ratioWarning) ctx.addDataWarning(ratioWarning)
-        amount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
-      }
+      amount += sumStatRatios(effect.ratios ?? [], ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
       ctx.self.shieldHp += amount
     },
   },

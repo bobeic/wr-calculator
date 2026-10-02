@@ -38,6 +38,14 @@ export interface EffectHandler<E extends Effect = Effect> {
   damageMultiplier?(effect: E, ctx: HookContext, input: RawDamageInstanceInput): number
   damageReductionFraction?(effect: E, ctx: HookContext, damageType: DamageType): number
   activate?(effect: E, ctx: HookContext): void
+  /** Self stat changes that hold right now in combat (e.g. attack speed stacks), read from the runtime. */
+  combatStats?(effect: E, self: CombatantRuntime, time: number): CombatStat[]
+}
+
+/** A combat-time stat change; it adds to the bonus layer. */
+export interface CombatStat {
+  stat: StatKey
+  amount: number
 }
 
 export type SourceKind = 'basicAttack' | 'ability' | 'item' | 'passive' | 'other'
@@ -79,6 +87,8 @@ export interface AttackModifier {
   critMultiplier?: number
   /** True when this swing spent an empowered-attack charge. */
   empowered?: boolean
+  /** Times on-hit effects apply again after this attack (e.g. Dusk and Dawn's Spellblade). */
+  extraOnHitApplications?: number
 }
 
 /** A basic attack or ability stage cast that dealt damage, as passed to `onHitLanded`. */
@@ -150,8 +160,11 @@ export interface HookContext {
     effect: Effect, condition: Condition,
     extra?: ConditionExtra
   ): boolean
-  scheduleEvent?(atTime: number, run: (ctx: HookContext) => void, key?: string): void
+  /** `quiet` events (e.g. an aura's next tick) don't count as pending damage when the combo ends. */
+  scheduleEvent?(atTime: number, run: (ctx: HookContext) => void, key?: string, options?: { quiet?: boolean }): void
   cancelScheduled?(key: string): void
+  /** Applies the owner's on-hit effects once more, as an extra on-hit application of the current attack. */
+  applyOnHitEffects?(): void
   /** Resolves a damage component for this context's owner against its opponent, right now. */
   resolveComponent?(component: DamageComponent, ownerName: string): ResolvedDamageComponent
 }

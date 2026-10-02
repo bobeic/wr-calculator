@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { EffectBaseSchema } from './common'
+import { StatRatioSchema } from './stat-ratio'
 import { NullableScalarSchema } from '../../scalar'
-import { StatKeySchema } from '../../stat-key'
 
 export const DotEffectSchema = EffectBaseSchema.extend({
   kind: z.literal('dot'),
@@ -11,7 +11,7 @@ export const DotEffectSchema = EffectBaseSchema.extend({
   durationSeconds: NullableScalarSchema,
   refresh: z.enum(['refresh', 'stack', 'ignore']),
   /** Added to each tick: the attacker's stat times the ratio, read when the dot is applied. */
-  ratios: z.array(z.object({ stat: StatKeySchema, value: NullableScalarSchema }).strict())
+  ratios: z.array(StatRatioSchema)
     .default([]),
   /** Added to each tick: the target's max HP times this, read when the dot is applied. */
   targetMaxHpRatio: NullableScalarSchema.optional(),

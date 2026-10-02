@@ -1,7 +1,11 @@
 import type { EffectHandler } from '../effects/types'
+import { fiendhunterOpeningBarrageHandler } from './fiendhunter-opening-barrage'
+import { guinsoosPhantomHitHandler } from './guinsoos-phantom-hit'
 
 /**
  * Handler id -> implementation for `kind: 'custom'` effects that don't fit the declarative model.
- * Empty in Phase 1: no real champion kits are implemented until Step 6+ (real data skeletons).
  */
-export const CUSTOM_HANDLERS: Record<string, EffectHandler> = {}
+export const CUSTOM_HANDLERS: Record<string, EffectHandler> = {
+  'guinsoos-phantom-hit': guinsoosPhantomHitHandler as EffectHandler,
+  'fiendhunter-opening-barrage': fiendhunterOpeningBarrageHandler as EffectHandler,
+}

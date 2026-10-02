@@ -22,6 +22,11 @@ import { empoweredAttackHandler } from './empowered-attack'
 import { guaranteedCritHandler } from './guaranteed-crit'
 import { hitStackAmpHandler } from './hit-stack-amp'
 import { hitStackProcHandler } from './hit-stack-proc'
+import { attackStackHandler } from './attack-stack'
+import { castBuffHandler } from './cast-buff'
+import { combatAuraHandler } from './combat-aura'
+import { executeHandler } from './execute'
+import { adaptiveStatHandler } from './adaptive-stat'
 import { CUSTOM_HANDLERS } from '../custom/registry'
 
 /**
@@ -52,6 +57,11 @@ export const EFFECT_HANDLERS: Partial<Record<EffectKind, EffectHandler<any>>> = 
   guaranteedCrit: guaranteedCritHandler,
   hitStackAmp: hitStackAmpHandler,
   hitStackProc: hitStackProcHandler,
+  attackStack: attackStackHandler,
+  castBuff: castBuffHandler,
+  combatAura: combatAuraHandler,
+  execute: executeHandler,
+  adaptiveStat: adaptiveStatHandler,
 }
 
 /** Looks up and calls the registered handler's contributeStats for an effect, if any. */

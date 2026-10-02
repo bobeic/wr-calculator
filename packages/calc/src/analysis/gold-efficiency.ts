@@ -21,7 +21,9 @@ const numericStats = (item: Item): Array<[StatKey, number]> =>
  */
 export function statGoldValues(items: Iterable<Item>): StatGoldValues {
   const candidates = [...items]
-    .filter((item) => (item.tier === 'basic' || item.tier === 'epic') && item.effects.length === 0 && numericStats(item).length > 0)
+    // Only pure-stat components set prices: no modelled effects and no named passive (Tear's Mana Charge, Recurve Bow's on-hit).
+    .filter((item) => (item.tier === 'basic' || item.tier === 'epic') && item.effects.length === 0
+      && (item.uniquePassives ?? []).length === 0 && numericStats(item).length > 0)
     .sort((a, b) => (a.tier === b.tier ? 0 : a.tier === 'basic' ? -1 : 1) || a.cost.total - b.cost.total || a.id.localeCompare(b.id))
   const values: StatGoldValues = {}
   let progressed = true

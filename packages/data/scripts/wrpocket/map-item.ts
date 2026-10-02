@@ -57,14 +57,27 @@ function tierOf(raw: RawItem, notes: string[]): Item['tier'] {
   return 'legendary'
 }
 
-// "Name:", "Name (Active):" or "UNIQUE - Name:" at the start of a description line; up to four words.
-const PASSIVE_NAME = /^(?:UNIQUE\s*-\s*)?([A-Z][A-Za-z'’]*(?:[ -][A-Za-z'’]+){0,3})(?:\s*\((?:Active|Passive)\))?:\s/
+// "Name:", "Name (Active):" or "UNIQUE - Name:" at the start of a description line; up to four words. Older
+// snapshots (7.3) wrap the name in **bold**.
+const PASSIVE_NAME = /^(?:UNIQUE\s*-\s*)?(?:\*\*)?([A-Z][A-Za-z'’]*(?:[ -][A-Za-z'’]+){0,3})(?:\*\*)?(?:\s*\((?:Active|Passive)\))?(?:\*\*)?:\s/
+
+/**
+ * A name after a short lead-in, e.g. 7.3's "Consumes Mana to heal Eternity: ...": the capitalised words right
+ * before the first colon, when what precedes the colon is short and has no digits.
+ */
+function leadInName(line: string): string | undefined {
+  const colon = line.indexOf(':')
+  if (colon < 0 || colon > 40) return undefined
+  const prefix = line.slice(0, colon).replaceAll('*', '').trim()
+  if (/\d/.test(prefix)) return undefined
+  return /(?:^|\s)((?:[A-Z][A-Za-z'’]*\s?){1,3})$/.exec(prefix)?.[1].trim()
+}
 
 /** The named passives and actives in an item description, in order and without repeats. */
 export function passiveNames(description: string): string[] {
   const names: string[] = []
   for (const line of description.split('\n')) {
-    const name = PASSIVE_NAME.exec(line.trim())?.[1]
+    const name = PASSIVE_NAME.exec(line.trim())?.[1] ?? leadInName(line.trim())
     if (name !== undefined && !names.includes(name)) names.push(name)
   }
   return names

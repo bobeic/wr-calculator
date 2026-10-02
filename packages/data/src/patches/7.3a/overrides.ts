@@ -1,6 +1,7 @@
 import type { Champion, Item, Provenance } from '@wr-calc/schema'
 import { STARTER_ITEMS } from '../7.3/items'
 import { WRPOCKET_7_3A_PROVENANCE } from './provenance'
+import { BATCH6_ITEMS } from './items-batch6'
 
 /** Values read in the 7.3a practice tool. */
 const IN_GAME_7_3A: Provenance = { source: 'in-game', patch: '7.3a', verifiedInGame: true, verifiedAt: '2026-10-01' }
@@ -46,5 +47,7 @@ export const OVERRIDE_ITEMS: Item[] = [
   { ...inherited('eclipse'), provenance: IN_GAME_7_3A },
   // Practice tool, 2026-10-01: no Frostbite burn, only Icy's slow (not modelled), as the corrected 7.3 model says.
   { ...inherited('seryldas-grudge'), provenance: IN_GAME_7_3A },
+  // Items first modelled on 7.3a (batch 6).
+  ...BATCH6_ITEMS,
 ]
 export const OVERRIDE_CHAMPIONS: Champion[] = []

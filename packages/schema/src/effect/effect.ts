@@ -22,6 +22,11 @@ import { EmpoweredAttackEffectSchema } from './kinds/empowered-attack'
 import { GuaranteedCritEffectSchema } from './kinds/guaranteed-crit'
 import { HitStackAmpEffectSchema } from './kinds/hit-stack-amp'
 import { HitStackProcEffectSchema } from './kinds/hit-stack-proc'
+import { AttackStackEffectSchema } from './kinds/attack-stack'
+import { CombatAuraEffectSchema } from './kinds/combat-aura'
+import { CastBuffEffectSchema } from './kinds/cast-buff'
+import { ExecuteEffectSchema } from './kinds/execute'
+import { AdaptiveStatEffectSchema } from './kinds/adaptive-stat'
 import { CustomEffectSchema } from './kinds/custom'
 
 export const EffectSchema = z.discriminatedUnion('kind', [
@@ -48,6 +53,11 @@ export const EffectSchema = z.discriminatedUnion('kind', [
   GuaranteedCritEffectSchema,
   HitStackAmpEffectSchema,
   HitStackProcEffectSchema,
+  AttackStackEffectSchema,
+  CombatAuraEffectSchema,
+  CastBuffEffectSchema,
+  ExecuteEffectSchema,
+  AdaptiveStatEffectSchema,
   CustomEffectSchema,
 ])
 export type Effect = z.infer<typeof EffectSchema>
@@ -76,6 +86,12 @@ export * from './kinds/empowered-attack'
 export * from './kinds/guaranteed-crit'
 export * from './kinds/hit-stack-amp'
 export * from './kinds/hit-stack-proc'
+export * from './kinds/attack-stack'
+export * from './kinds/combat-aura'
+export * from './kinds/cast-buff'
+export * from './kinds/execute'
+export * from './kinds/adaptive-stat'
 export * from './kinds/custom'
+export * from './kinds/stat-ratio'
 export * from './condition'
 export * from './kinds/common'

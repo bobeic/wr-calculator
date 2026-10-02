@@ -15,5 +15,9 @@ export const SpellbladeEffectSchema = EffectBaseSchema.extend({
   }).strict())
     .default([]),
   internalCooldownSeconds: NullableScalarSchema,
+  /** Added to the damage: the target's max HP times this (e.g. Divine Sunderer's 10%). */
+  pctTargetMaxHp: NullableScalarSchema.optional(),
+  /** Times the empowered attack applies on-hit effects again (e.g. Dusk and Dawn: 1). */
+  extraOnHitApplications: z.number().int().nonnegative().optional(),
 })
 export type SpellbladeEffect = z.infer<typeof SpellbladeEffectSchema>

@@ -39,6 +39,17 @@ export function isCombatOnlyCondition(condition: Condition | undefined): boolean
   return condition.type === 'targetHasDot'
 }
 
+/**
+ * Whether a stat effect's condition holds when stats are resolved. Only toggles can be read here; every other
+ * condition is unknown until combat and counts as met (combat-only ones are deferred, see isCombatOnlyCondition).
+ */
+function statTimeConditionMet(condition: Condition | undefined, inputs: Record<string, number | boolean>): boolean {
+  if (!condition) return true
+  if (condition.type === 'toggle') return inputs[condition.inputId] === true
+  if (condition.type === 'allOf') return condition.conditions.every((leaf) => statTimeConditionMet(leaf, inputs))
+  return true
+}
+
 export interface StatCatalog {
   items: Map<string, Item>
   runes: Map<string, Rune>
@@ -138,6 +149,7 @@ export function resolveStats(
     frozen = stage === 'multiplier' ? { base: { ...base }, bonus: { ...bonus } } : undefined
     for (const effect of effects) {
       if (stageOf(effect) !== stage) continue
+      if (!statTimeConditionMet(effect.condition, build.inputs)) continue
       const contributions = contributeStats(effect, ctx)
       if (isCombatOnlyCondition(effect.condition)) {
         if (contributions.length > 0) combatContributions.push({ effect, contributions })

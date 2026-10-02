@@ -21,7 +21,7 @@ export const onHitHandler: EffectHandler<OnHitEffect> = {
       amount += part(effect.pctTargetMissingHp, 'pctTargetMissingHp')
         * Math.max(0, targetMaxHp - ctx.opponent.currentHp)
       if (effect.pctOwnStat) {
-        const statValue = ctx.selfSheet.total[effect.pctOwnStat.stat] ?? 0
+        const statValue = ctx.selfSheet[effect.pctOwnStat.layer ?? 'total'][effect.pctOwnStat.stat] ?? 0
         amount += part(effect.pctOwnStat.ratio, 'pctOwnStat.ratio') * statValue
       }
       if (effect.minDamage !== undefined) {

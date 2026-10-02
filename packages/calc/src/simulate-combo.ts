@@ -1,4 +1,4 @@
-import type { Effect, DamageType, Condition, AbilityStage } from '@wr-calc/schema'
+import type { Effect, DamageType, Condition, AbilityStage, StatKey } from '@wr-calc/schema'
 import type { Combatant } from './combatant'
 import type {
   AbilityKey, AttackModifier, CombatantRuntime, ConditionExtra, DamageInstance, EffectHandler, HookContext,
@@ -139,7 +139,7 @@ export function simulateCombo(
   const dataWarnings: string[] = []
   const unverifiedRuleIds = new Set<UnverifiedRuleId>()
   const unsupportedByEffectId = new Map<string, UnsupportedEffectEntry>()
-  const scheduled: { time: number; run: (ctx: HookContext) => void; key?: string }[] = []
+  const scheduled: { time: number; run: (ctx: HookContext) => void; key?: string; quiet?: boolean }[] = []
   let time = 0
   let killed = false
   let timeToKill: number | undefined
@@ -173,21 +173,28 @@ export function simulateCombo(
    * contributions (e.g. Blackfire's AP while the target burns) whose condition holds right now.
    */
   function attackerSheetNow(): StatSheet {
-    const deferred = attacker.sheet.combatContributions
-    if (!deferred) return attacker.sheet
+    const deferred = attacker.sheet.combatContributions ?? []
+    const live = attackerEffectsList.flatMap((effect) => {
+      const stats = resolve(effect)?.combatStats?.(effect, attackerRuntime, time) ?? []
+      if (stats.length > 0) trackSupport(effect)
+      return stats.map(({ stat, amount }) => ({ stat, layer: 'bonus' as const, amount }))
+    })
+    if (deferred.length === 0 && live.length === 0) return attacker.sheet
     const base = { ...attacker.sheet.base }
     const bonus = { ...attacker.sheet.bonus }
     const total = { ...attacker.sheet.total }
+    const apply = (stat: StatKey, layer: 'base' | 'bonus', amount: number) => {
+      const layerValues = layer === 'base' ? base : bonus
+      layerValues[stat] = (layerValues[stat] ?? 0) + amount
+      total[stat] = stat === 'attackSpeed'
+        ? Math.min(ATTACK_SPEED_CAP, totalAttackSpeed(base.attackSpeed ?? 0, bonus.attackSpeed ?? 0))
+        : (base[stat] ?? 0) + (bonus[stat] ?? 0)
+    }
+    for (const { stat, layer, amount } of live) apply(stat, layer, amount)
     for (const { effect, contributions } of deferred) {
       if (!evaluateCondition(effect, effect.condition!, attacker, target, targetRuntime, time)) continue
       trackSupport(effect)
-      for (const { stat, layer, amount } of contributions) {
-        const layerValues = layer === 'base' ? base : bonus
-        layerValues[stat] = (layerValues[stat] ?? 0) + amount
-        total[stat] = stat === 'attackSpeed'
-          ? totalAttackSpeed(base.attackSpeed ?? 0, bonus.attackSpeed ?? 0)
-          : (base[stat] ?? 0) + (bonus[stat] ?? 0)
-      }
+      for (const { stat, layer, amount } of contributions) apply(stat, layer, amount)
     }
     return { ...attacker.sheet, base, bonus, total }
   }
@@ -211,14 +218,17 @@ export function simulateCombo(
       addUnverifiedRule: (id) => unverifiedRuleIds.add(id),
       conditionMet: (effect, condition, extra) =>
         evaluateCondition(effect, condition, self, opponent, opponentRuntime, time, extra),
-      scheduleEvent: (atTime, run, key) => {
-        scheduled.push({ time: atTime, run, key })
+      scheduleEvent: (atTime, run, key, scheduleOptions) => {
+        scheduled.push({ time: atTime, run, key, quiet: scheduleOptions?.quiet })
         scheduled.sort((a, b) => a.time - b.time)
       },
       resolveComponent: (component, ownerName) => resolveDamageComponent(
         component, { ...self, sheet: sheetNow(self) }, opponent, opponentRuntime.currentHp,
         self.level, ownerName
       ),
+      applyOnHitEffects: () => {
+        if (self === attacker) dispatchOnBasicAttack()
+      },
       cancelScheduled: (key) => {
         for (let i = scheduled.length - 1; i >= 0; i--) {
           if (scheduled[i].key === key) scheduled.splice(i, 1)
@@ -551,6 +561,8 @@ export function simulateCombo(
         performDamage(bonus)
       }
       dispatchOnBasicAttack()
+      const extraOnHits = modifiers.reduce((sum, modifier) => sum + (modifier.extraOnHitApplications ?? 0), 0)
+      for (let repeat = 0; repeat < extraOnHits; repeat++) dispatchOnBasicAttack()
       dispatchOnHitLanded({
         id: currentHitId, kind: 'basicAttack',
         empowered: modifiers.some((modifier) => modifier.empowered === true),
@@ -657,9 +669,10 @@ export function simulateCombo(
     }
   }
 
-  if (scheduled.length > 0) {
+  const pending = scheduled.filter((event) => !event.quiet).length
+  if (pending > 0) {
     dataWarnings.push(
-      `${scheduled.length} scheduled effect tick(s) (e.g. a DoT) were still pending when the `
+      `${pending} scheduled effect tick(s) (e.g. a DoT) were still pending when the `
       + 'sequence ended and were not applied — add a trailing wait:<seconds> action to let them '
       + 'resolve.'
     )

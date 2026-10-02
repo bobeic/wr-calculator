@@ -28,12 +28,25 @@ export const ChampionAbilitiesSchema: z.ZodObject<{
   r: AbilitySchema,
 }).strict()
 
-export const ChampionSchema = z.object({
+const ChampionResourceSchema = z.enum(['mana', 'energy', 'none', 'other'])
+const ChampionAttackSpeedSchema = z.object({ base: z.number(), ratio: z.number().optional() }).strict()
+
+// Annotated with named references for the same TS7056 reason as ChampionAbilitiesSchema.
+export const ChampionSchema: z.ZodObject<{
+  id: z.ZodString
+  name: z.ZodString
+  resource: typeof ChampionResourceSchema
+  baseStats: typeof ChampionBaseStatsSchema
+  attackSpeed: typeof ChampionAttackSpeedSchema
+  abilities: typeof ChampionAbilitiesSchema
+  sourcePins: z.ZodOptional<z.ZodArray<z.ZodString>>
+  provenance: typeof ProvenanceSchema
+}, 'strict'> = z.object({
   id: z.string(),
   name: z.string(),
-  resource: z.enum(['mana', 'energy', 'none', 'other']),
+  resource: ChampionResourceSchema,
   baseStats: ChampionBaseStatsSchema,
-  attackSpeed: z.object({ base: z.number(), ratio: z.number().optional() }).strict(),
+  attackSpeed: ChampionAttackSpeedSchema,
   abilities: ChampionAbilitiesSchema,
   /** Hand-modelled champions only: fields kept as written instead of synced from the patch data, e.g. 'baseStats.ad'. */
   sourcePins: z.array(z.string()).optional(),

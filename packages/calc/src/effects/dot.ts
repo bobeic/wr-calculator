@@ -1,6 +1,7 @@
 import type { DotEffect } from '@wr-calc/schema'
 import type { EffectHandler } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
+import { sumStatRatios } from './stat-ratios'
 
 function buffKey(effect: DotEffect): string {
   return `dot:${effect.id}`
@@ -19,12 +20,7 @@ export const dotHandler: EffectHandler<DotEffect> = {
       const amountWarning = scalarWarning(effect.name, 'tickAmount', amountResolved)
       if (amountWarning) ctx.addDataWarning(amountWarning)
       let tickAmount = amountResolved.value
-      for (const ratio of effect.ratios) {
-        const ratioResolved = resolveScalar(ratio.value, ctx.level)
-        const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
-        if (ratioWarning) ctx.addDataWarning(ratioWarning)
-        tickAmount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
-      }
+      tickAmount += sumStatRatios(effect.ratios, ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
       if (effect.targetMaxHpRatio !== undefined) {
         const hpRatioResolved = resolveScalar(effect.targetMaxHpRatio, ctx.level)
         const hpRatioWarning = scalarWarning(effect.name, 'targetMaxHpRatio', hpRatioResolved)

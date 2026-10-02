@@ -1,6 +1,7 @@
 import type { DamageWindowProcEffect } from '@wr-calc/schema'
 import type { EffectHandler } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
+import { sumStatRatios } from './stat-ratios'
 
 function stateKey(effect: DamageWindowProcEffect): string {
   return `damageWindowProc:${effect.id}`
@@ -41,12 +42,7 @@ export const damageWindowProcHandler: EffectHandler<DamageWindowProcEffect> = {
       const damageWarning = scalarWarning(effect.name, 'damage', damageResolved)
       if (damageWarning) ctx.addDataWarning(damageWarning)
       let amount = damageResolved.value
-      for (const ratio of effect.ratios) {
-        const ratioResolved = resolveScalar(ratio.value, ctx.level)
-        const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
-        if (ratioWarning) ctx.addDataWarning(ratioWarning)
-        amount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
-      }
+      amount += sumStatRatios(effect.ratios, ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
 
       ctx.scheduleEvent?.(instance.time + effect.delaySeconds, (laterCtx) => {
         laterCtx.dealDamage({

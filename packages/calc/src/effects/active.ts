@@ -1,6 +1,7 @@
 import type { ActiveEffect } from '@wr-calc/schema'
 import type { EffectHandler } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
+import { sumStatRatios } from './stat-ratios'
 
 export const activeHandler: EffectHandler<ActiveEffect> = {
   kind: 'active',
@@ -11,11 +12,13 @@ export const activeHandler: EffectHandler<ActiveEffect> = {
     if (warning) ctx.addDataWarning(warning)
 
     let amount = resolved.value
-    for (const ratio of effect.ratios ?? []) {
-      const ratioResolved = resolveScalar(ratio.value, ctx.level)
-      const ratioWarning = scalarWarning(effect.name, `ratios.${ratio.stat}`, ratioResolved)
-      if (ratioWarning) ctx.addDataWarning(ratioWarning)
-      amount += (ctx.selfSheet.total[ratio.stat] ?? 0) * ratioResolved.value
+    amount += sumStatRatios(effect.ratios ?? [], ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
+
+    if (effect.targetMaxHpRatio !== undefined) {
+      const hpRatio = resolveScalar(effect.targetMaxHpRatio, ctx.level)
+      const hpRatioWarning = scalarWarning(effect.name, 'targetMaxHpRatio', hpRatio)
+      if (hpRatioWarning) ctx.addDataWarning(hpRatioWarning)
+      amount += (ctx.opponentSheet.total.hp ?? 0) * hpRatio.value
     }
 
     const source = { kind: 'item' as const, id: effect.id, name: effect.name }

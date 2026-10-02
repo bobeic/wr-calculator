@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { EffectBaseSchema } from './common'
+import { StatRatioSchema } from './stat-ratio'
 import { NullableScalarSchema } from '../../scalar'
-import { StatKeySchema } from '../../stat-key'
 
 /**
  * Delayed bonus damage once the damage dealt to the target within a time window reaches a
@@ -14,7 +14,7 @@ export const DamageWindowProcEffectSchema = EffectBaseSchema.extend({
   delaySeconds: z.number().nonnegative(),
   damageType: z.enum(['physical', 'magic', 'true']),
   damage: NullableScalarSchema,
-  ratios: z.array(z.object({ stat: StatKeySchema, value: NullableScalarSchema }).strict())
+  ratios: z.array(StatRatioSchema)
     .default([]),
   cooldownSeconds: NullableScalarSchema,
 })
