@@ -1,6 +1,8 @@
 import type { OnHitEffect, NullableScalar } from '@wr-calc/schema'
+import { effectDamageType } from './damage-type'
 import type { EffectHandler } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
+import { sumStatRatios } from './stat-ratios'
 
 export const onHitHandler: EffectHandler<OnHitEffect> = {
   kind: 'onHit',
@@ -24,6 +26,7 @@ export const onHitHandler: EffectHandler<OnHitEffect> = {
         const statValue = ctx.selfSheet[effect.pctOwnStat.layer ?? 'total'][effect.pctOwnStat.stat] ?? 0
         amount += part(effect.pctOwnStat.ratio, 'pctOwnStat.ratio') * statValue
       }
+      amount += sumStatRatios(effect.ratios ?? [], ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
       if (effect.minDamage !== undefined) {
         amount = Math.max(amount, part(effect.minDamage, 'minDamage'))
       }
@@ -32,7 +35,7 @@ export const onHitHandler: EffectHandler<OnHitEffect> = {
       }
 
       ctx.dealDamage({
-        type: effect.damageType, amount,
+        type: effectDamageType(effect.damageType, ctx), amount,
         source: { kind: 'item', id: effect.id, name: effect.name },
       })
     },

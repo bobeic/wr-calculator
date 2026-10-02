@@ -1,0 +1,782 @@
+[
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "While above 65% Health, gain a bonus 2 - 20 Attack Damage or 2 - 30 Ability Power (Adaptive)."
+    },
+    "id": "absolute-focus",
+    "name": {
+      "en": "Absolute Focus"
+    },
+    "slot": 1,
+    "slot_order": 3,
+    "source_id": "572427001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "PASSIVE: Basic attacks and abilities against an enemy champion signals Aery to dash to them, dealing 15 - 70 (based on level) (+10% bonus AD) (+5% AP) Adaptive damage. Healing, shielding, or buffing an ally signals Aery to dash to them, shielding them for 25 - 120 (based on level) (+10% bonus AD) (+5% AP) for 2 seconds. Aery lingers on the target for 2 seconds before flying back to the user, and cannot be sent out again until she returns. Aery is initially very slow, but gradually accelerates, and can be picked up by moving near her."
+    },
+    "id": "aery",
+    "name": {
+      "en": "Aery"
+    },
+    "slot": -1,
+    "slot_order": 9,
+    "source_id": "572114001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Damaging a champion with an ability hurls a comet at their location. When a comet hits an enemy champion, the next comet's damage increases. Damage: 15 - 100 + (2 x total hits on enemy champions) + 10% bonus Attack Damage + 5% Ability Power. Cooldown: 16-8 seconds."
+    },
+    "id": "arcane-comet",
+    "name": {
+      "en": "Arcane Comet"
+    },
+    "slot": -1,
+    "slot_order": 10,
+    "source_id": "572124001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Your ultimate ability has 10% increased damage, healing, and shielding. (AoE damage is reduced to a 5% increase) Scoring a takedown on an enemy champion reduces your ultimate ability's remaining cooldown by 7%."
+    },
+    "id": "axiom-arcanist",
+    "name": {
+      "en": "Axiom arcanist"
+    },
+    "slot": 0,
+    "slot_order": 1,
+    "source_id": "572424001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "While in combat with an enemy champion, gain 1.4% basic ability damage amplification against them every 1s, stacking up to 3 times for a maximum of 4.2%."
+    },
+    "id": "battle-zeal",
+    "name": {
+      "en": "Battle Zeal"
+    },
+    "slot": 0,
+    "slot_order": 3,
+    "source_id": "572225001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "Blocks damage from the next triggering champion attack and 2 more attacks. (40s cooldown)"
+    },
+    "id": "bone-plating",
+    "name": {
+      "en": "Bone Plating"
+    },
+    "slot": 1,
+    "slot_order": 3,
+    "source_id": "572312001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "When you destroy a plant, gain 10 gold and empowered plant effects. Honeyfruit: Heal is increased by 20% when consumed. Scryer's Bloom: Vision granted lasts 20% longer when destroyed. Blast Cone: Gain 40% Movement Speed for 2.5 seconds after the knockback."
+    },
+    "id": "botanist",
+    "name": {
+      "en": "Botanist"
+    },
+    "slot": 0,
+    "slot_order": 3,
+    "source_id": "572416001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "Attacks deal 5 (+ 6% Bonus Attack Damage + 3% Ability Power) bonus adaptive damage to enemy champions."
+    },
+    "id": "brutal",
+    "name": {
+      "en": "Brutal"
+    },
+    "slot": 0,
+    "slot_order": 1,
+    "source_id": "572211001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Gain 2% Movement Speed. All Movement Speed bonuses on you are also increased by 7%."
+    },
+    "id": "celerity",
+    "name": {
+      "en": "Celerity"
+    },
+    "slot": 1,
+    "slot_order": 2,
+    "source_id": "572425001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Hitting an enemy champion with an active ability applies a mark to them, causing your next 2 attacks or active ability casts against them to deal 12 - 38 (+3% bonus AD +1.5% bonus AP) bonus adaptive damage. (15 second cooldown)"
+    },
+    "id": "chain-assault",
+    "name": {
+      "en": "Chain Assault"
+    },
+    "slot": 1,
+    "slot_order": 1,
+    "source_id": "572523001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Deals 10 - 45 bonus true damage to enemies whose movement is impaired. (7 seconds cooldown)."
+    },
+    "id": "cheap-shot",
+    "name": {
+      "en": "Cheap Shot"
+    },
+    "slot": 0,
+    "slot_order": 1,
+    "source_id": "572515001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Basic attacks and abilities generate stacks of Conqueror on enemy champions hit, up to one per attack or cast, stacking up to 6 times. Each stack of Conqueror lasts 6 seconds and grants 3 - 5 (based on level) bonus Attack Damage or 5 - 8.33 (based on level) Ability Power (Adaptive). While fully stacked, gain 9% (melee) / 5% (ranged) bonus Omnivamp. Adaptive Damage: Deals either physical or magic damage depending on your bonus stats, defaulting based on the origin of the effect."
+    },
+    "id": "conqueror",
+    "name": {
+      "en": "Conqueror"
+    },
+    "slot": -1,
+    "slot_order": 6,
+    "source_id": "572112001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "When an enemy has less than 40% health, deals 8% bonus adaptive damage."
+    },
+    "id": "coup-de-grace",
+    "name": {
+      "en": "Coup de Grace"
+    },
+    "slot": 1,
+    "slot_order": 3,
+    "source_id": "572224001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "Gains a shield that absorbs up to 25-45+1% max health for 3 seconds when immobilizing an enemy. (18 seconds cooldown)"
+    },
+    "id": "courage-of-the-colossus",
+    "name": {
+      "en": "Courage of the Colossus"
+    },
+    "slot": 0,
+    "slot_order": 3,
+    "source_id": "572323001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "Your attacks deal 6.5% bonus adaptive damage to enemy champions with more than 60% Health."
+    },
+    "id": "cut-down",
+    "name": {
+      "en": "Cut Down"
+    },
+    "slot": 1,
+    "slot_order": 2,
+    "source_id": "572212001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Damaging a champion below 50% Health deals adaptive damage and harvests their soul, permanently increasing Dark Harvest's damage by 11. (20 second cooldown. Resets to 1 second on takedown.) Dark Harvest Damage: 35 + 11 per soul (+10% bonus AD +5% bonus AP)"
+    },
+    "id": "dark-harvest",
+    "name": {
+      "en": "Dark Harvest"
+    },
+    "slot": -1,
+    "slot_order": 2,
+    "source_id": "572126001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "After hitting a turret with 3 basic attacks, deal bonus physical damage equal to 85 + 28% of max Health (melee) or 50 + 20% of max Health (ranged)."
+    },
+    "id": "demolish",
+    "name": {
+      "en": "Demolish"
+    },
+    "slot": 0,
+    "slot_order": 1,
+    "source_id": "572415001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "PASSIVE: Basic attacks and abilities generate stacks on enemy champions hit, up to one per attack or cast. Applying 3 stacks to a target within a 3 second period causes them to be struck by lightning, dealing them 40 - 210 (based on level) (+10% bonus AD) (+5% AP) Adaptive damage. ADAPTIVE DAMAGE: Deals either physical or magic damage depending on your bonus statistics, defaulting based on the origin of the effect. Cooldown: 20-13 seconds"
+    },
+    "id": "electrocute",
+    "name": {
+      "en": "Electrocute"
+    },
+    "slot": -1,
+    "slot_order": 1,
+    "source_id": "572113001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Every 8 seconds, the next attack will be empowered, dealing 20 - 60 bonus adaptive damage. Ranged champions deal 80% damage."
+    },
+    "id": "empowered-attack",
+    "name": {
+      "en": "Empowered Attack"
+    },
+    "slot": 0,
+    "slot_order": 3,
+    "source_id": "572514001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Hitting an enemy champion with 3 consecutive attacks deals 40 - 165 bonus adaptive damage (based on level) and increases your damage dealt by 8%, lasting until you exit combat with champions."
+    },
+    "id": "empowerment",
+    "name": {
+      "en": "Empowerment"
+    },
+    "slot": -1,
+    "slot_order": 3,
+    "source_id": "572123001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Gain 1.5 Attack Damage or 3 Ability Power after scoring a champion or epic monster takedown, stacking up to 8 times."
+    },
+    "id": "eyeball-collection",
+    "name": {
+      "en": "Eyeball Collection"
+    },
+    "slot": 2,
+    "slot_order": 1,
+    "source_id": "572516001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "In 0.25s after engaging an enemy champion in combat, dealing damage to them grants 10 gold and a First Strike effect that lasts 3s to you, allowing you to deal 7% bonus true damage to the enemy champion. Once the effect has ended, gain gold according to the bonus damage dealt (melee: 60%/ranged: 45%) during the effect. (20-13s cooldown)"
+    },
+    "id": "first-strike",
+    "name": {
+      "en": "First Strike"
+    },
+    "slot": -1,
+    "slot_order": 12,
+    "source_id": "572122001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Moving, attacking and casting builds Energy stacks. At 100 stacks, your next attack heals you, grants increased Movement Speed, and restores mana or energy if you attack a champion. At 100 Energy stacks, your next attack gains 40% Attack Speed. Heal: 15 - 110 + 15% bonus Attack Damage + 10% Ability Power Movement Speed bonus: 20% for 1 second. When attacking a champion, restore 8% missing mana or 8% missing energy. Heals for 35% (Melee) / 15% (Ranged) when attacking minions or monsters."
+    },
+    "id": "fleet-footwork",
+    "name": {
+      "en": "Fleet Footwork"
+    },
+    "slot": -1,
+    "slot_order": 5,
+    "source_id": "572116001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "When your attacks or abilities hit an enemy champion, heal yourself and the lowest Health allied champion nearby. Ally: Heals for 1.5% of your max Health + 5% of your Ability Power. You: Heal for 1% of your max Health + 5% of your Ability Power. Cooldown: 20s. Melee Champion gain 130% effectiveness from this effect."
+    },
+    "id": "font-of-life",
+    "name": {
+      "en": "Font of Life"
+    },
+    "slot": 0,
+    "slot_order": 2,
+    "source_id": "572118001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Starting from 6 minutes into the game, gain Attack Damage or Ability Power (Adaptive) every 3 minutes. Bonuses increase over time, totaling 2/5/9/14/etc. or 4/10/18/28/etc. (based on game time)"
+    },
+    "id": "gathering-storm",
+    "name": {
+      "en": "Gathering Storm"
+    },
+    "slot": 2,
+    "slot_order": 3,
+    "source_id": "572215001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Entering combat generates one stack every second for the next 3 seconds. Additional stacks may be generated by re-entering combat after 2 seconds. After reaching 4 stacks, your next basic attack within 6 seconds against an enemy champion consumes all stacks to deal 3.3% of your maximum health in bonus magic damage, restore 1.3% of your maximum health, and permanently grant 10 bonus health. The empowered attack duration refreshes whenever going in combat. On ranged champions, all effects are reduced by 60%."
+    },
+    "id": "grasp-of-undying",
+    "name": {
+      "en": "Grasp of Undying"
+    },
+    "slot": -1,
+    "slot_order": 7,
+    "source_id": "572111001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Guard allies within 350 units of you and allies you target with abilities for 2.5s. While guarding, if you or the ally take more than a certain amount of damage, both of you gain a shield of (40 - 165 + 6% bonus Health + 15% Ability Power) for 1.5s, cooldown: 55s - 25s."
+    },
+    "id": "guardian",
+    "name": {
+      "en": "Guardian"
+    },
+    "slot": -1,
+    "slot_order": 8,
+    "source_id": "572129001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Replaces this item with Hex Flash when Flash is still on cooldown. You can blink to a new location after channeling for 2 seconds. When channeled for less than 1s, you will dash the distance as if you channeled for 1s. (18 seconds of cooldown)"
+    },
+    "id": "hextech-flashtraption",
+    "name": {
+      "en": "Hextech Flashtraption"
+    },
+    "slot": 0,
+    "slot_order": 4,
+    "source_id": "572421001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Scoring a takedown against an enemy champion within 3s of damaging them grants (5 + 1 per champion kill you've scored) Adaptive Force for 30s."
+    },
+    "id": "hubris",
+    "name": {
+      "en": "Hubris"
+    },
+    "slot": 1,
+    "slot_order": 3,
+    "source_id": "572527001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Immobilizing an enemy champion causes 3 beams to form around them, creating ice beneath them for 3s and slowing enemies inside by (15% + 1% Bonus Health). The slow lingers on enemies for 1.5s after they've left the ice zone. Gain a protective layer of ice around yourself, increasing your Armor and Magic Resistance by 35+75% Bonus Armor and Magic Resistance. After a delay of 2.5s, the ice explodes, dealing 15-100 + 5% Bonus Health magic damage around you."
+    },
+    "id": "ice-overlord",
+    "name": {
+      "en": "Ice Overlord"
+    },
+    "slot": -1,
+    "slot_order": 13,
+    "source_id": "572127001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "After destroying a plant, immediately gain a seed that replaces your trinket for 60 seconds. The seed matures and self-destructs shortly after it is planted at a target location. Seeds you can pick up will also drop when an ally destroys a plant. Seeds become obtainable 2 minutes after the game starts. Each plant has a unique 30 second cooldown."
+    },
+    "id": "ixtali-seedjar",
+    "name": {
+      "en": "Ixtali Seedjar"
+    },
+    "slot": 2,
+    "slot_order": 4,
+    "source_id": "572520001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "When health is lower that 60%, attacks launched at enemy champions deal 5-11% bonus adaptive damage."
+    },
+    "id": "last-stand",
+    "name": {
+      "en": "Last Stand"
+    },
+    "slot": 1,
+    "slot_order": 1,
+    "source_id": "572220001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "Gain 3% bonus attack speed when engaging in taking down monsters, enemy champions and minions, up to 18% at maximum stacks."
+    },
+    "id": "legend-alacrity",
+    "name": {
+      "en": "Legend Alacrity"
+    },
+    "slot": 2,
+    "slot_order": 1,
+    "source_id": "572221001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "Gain 1% omnivamp, up to bonus 7% of omnivamp when engaging in taking down monsters, enemy champions and minions."
+    },
+    "id": "legend-bloodline",
+    "name": {
+      "en": "Legend Bloodline"
+    },
+    "slot": 2,
+    "slot_order": 3,
+    "source_id": "572223001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "Gain Ability Haste from champion takedowns and from killing monsters and minions: 1.5 Ability Haste per stack, up to 15 Ability Haste."
+    },
+    "id": "legend-haste",
+    "name": {
+      "en": "Legend: Haste"
+    },
+    "slot": 2,
+    "slot_order": 2,
+    "source_id": "572226001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Hitting enemy champions with basic attacks grants stacking Attack Speed, up to 6 stacks. Each stack grants 8% (melee) or 6.4% (ranged) Attack Speed for 6 seconds. At max stacks, basic attacks also fire a bolt that deals 9 – 30 (melee) or 6 – 24 (ranged) adaptive damage, increased by 1% (melee) or 0.67% (ranged) per 1% bonus Attack Speed."
+    },
+    "id": "lethal-tempo",
+    "name": {
+      "en": "Lethal Tempo"
+    },
+    "slot": -1,
+    "slot_order": 4,
+    "source_id": "572120001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Hitting an enemy champion with an ability or empowered attack permanently increases your max mana by 30, up to 300 mana."
+    },
+    "id": "manaflow-band",
+    "name": {
+      "en": "Manaflow Band"
+    },
+    "slot": 0,
+    "slot_order": 2,
+    "source_id": "572412001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Casting a Summoner Spell grants 10% - 40% (based on Summoner Spell cooldown) bonus movement speed for 3 seconds."
+    },
+    "id": "nimbus-cloak",
+    "name": {
+      "en": "Nimbus Cloak"
+    },
+    "slot": 2,
+    "slot_order": 2,
+    "source_id": "572417001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "If you take damage from a champion that causes your health to fall below 35%, gain a shield that absorbs 60 - 180 (with level up) for 4 seconds. (60 second cooldown)"
+    },
+    "id": "nullifying-orb",
+    "name": {
+      "en": "Nullifying Orb"
+    },
+    "slot": 1,
+    "slot_order": 2,
+    "source_id": "572320001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "When 3 monsters or 3 minions are killed nearby, permanently gain 3 Max Health. Max Health can be increased indefinitely. Gains bonus 3% Max Health upon reaching 30 stacks."
+    },
+    "id": "overgrowth",
+    "name": {
+      "en": "Overgrowth"
+    },
+    "slot": 2,
+    "slot_order": 1,
+    "source_id": "572324001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "Gain 10% tenacity. While immobilized, gain 10 - 15 armor and magic resistance for 1.5 seconds. Refresh duration when immobilized multiple times."
+    },
+    "id": "perseverance",
+    "name": {
+      "en": "Perseverance"
+    },
+    "slot": 2,
+    "slot_order": 3,
+    "source_id": "572316001"
+  },
+  {
+    "category": {
+      "en": "Keystone"
+    },
+    "description": {
+      "en": "Hitting a champion with 3 separate attacks or abilities within 4 seconds grants (Melee 40% / 60% / Ranged 20% / 35%) Movement speed, 10 Ability Haste and reduces your current basic ability cooldowns by 20%. Cooldown: 21 - 7 seconds (based on level)"
+    },
+    "id": "phase-rush",
+    "name": {
+      "en": "Phase Rush"
+    },
+    "slot": -1,
+    "slot_order": 11,
+    "source_id": "572115001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Gain 10 out-of-combat Movement Speed. For each champion or epic monster takedown you score, gain 2 out-of-combat Movement Speed. Stacks up to 5 times."
+    },
+    "id": "relentless-hunter",
+    "name": {
+      "en": "Relentless Hunter"
+    },
+    "slot": 2,
+    "slot_order": 3,
+    "source_id": "572526001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "Gain a 5% amplification effect when healing or granting shields. If the target's Health is lower than 40%, the effect is amplified by an additional 10%"
+    },
+    "id": "revitalize",
+    "name": {
+      "en": "Revitalize"
+    },
+    "slot": 2,
+    "slot_order": 2,
+    "source_id": "572322001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Dealing ability damage to a champion deals an additional 21-49 magic damage after 1 second. Cooldown: 8s"
+    },
+    "id": "scorch",
+    "name": {
+      "en": "Scorch"
+    },
+    "slot": 2,
+    "slot_order": 1,
+    "source_id": "572213001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "Gain 5 health every 5 seconds. After taking damage from an enemy champion regenerate 3 (+1.5% of your missing health) over the next 5 seconds. This effect is doubled for melee champions."
+    },
+    "id": "second-wind",
+    "name": {
+      "en": "Second Wind"
+    },
+    "slot": 1,
+    "slot_order": 1,
+    "source_id": "572318001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Damaging an enemy champion deals a bonus 15–65 true damage after using a dash, leap, blink, teleport, or when exiting stealth for 4s. (15s cooldown) The damaging attack/ability gains bonuses at higher levels: Level 5: Deal an additional 5 true damage. Level 9: Deal an additional 5 true damage and gain 10% Movement Speed for 1.5s after dealing the damage."
+    },
+    "id": "sudden-impact",
+    "name": {
+      "en": "Sudden Impact"
+    },
+    "slot": 0,
+    "slot_order": 2,
+    "source_id": "572217001"
+  },
+  {
+    "category": {
+      "en": "Sorcery"
+    },
+    "description": {
+      "en": "Gain a bonus when reaching the following levels: -Level 1: Gain 5 Ability Haste. - Level 5: Gain an additional 5 Ability Haste. - Level 9: After a basic ability hits the target, reduce 8% of the ability's cooldown. (8s cooldown)"
+    },
+    "id": "transcendence",
+    "name": {
+      "en": "Transcendence"
+    },
+    "slot": 1,
+    "slot_order": 1,
+    "source_id": "572418001"
+  },
+  {
+    "category": {
+      "en": "Precision"
+    },
+    "description": {
+      "en": "Champion takedowns restore 10% of missing Health and 10% of max Mana and Energy and grant 35 Movement Speed for 2s."
+    },
+    "id": "triumph",
+    "name": {
+      "en": "Triumph"
+    },
+    "slot": 0,
+    "slot_order": 2,
+    "source_id": "572414001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "When damaging a champion below 50% Health, deal 20 - 70 (+6% bonus AD +3% AP) bonus adaptive damage. (10 second cooldown)"
+    },
+    "id": "tyrant",
+    "name": {
+      "en": "Tyrant"
+    },
+    "slot": 1,
+    "slot_order": 2,
+    "source_id": "572524001"
+  },
+  {
+    "category": {
+      "en": "Resolve"
+    },
+    "description": {
+      "en": "Gain 3% Armor and Magic Resist. For every 1 enemy champion nearby, gain an additional 2% Armor and Magic Resist. If the max number of enemy champions are nearby (max: 3), you also gain 20% Slow Resist."
+    },
+    "id": "unshakeable",
+    "name": {
+      "en": "Unshakeable"
+    },
+    "slot": 0,
+    "slot_order": 4,
+    "source_id": "572326001"
+  },
+  {
+    "category": {
+      "en": "Domination"
+    },
+    "description": {
+      "en": "Takedowns on enemy wards spawn a Zombie Ward in its place, granting vision of the surrounding area for 120 seconds. Additionally gain 3 Attack Damage or 6 Ability Power (max 5 stacks). (Assists on enemy wards also grant stacks and spawn Zombie Wards.)"
+    },
+    "id": "zombie-ward",
+    "name": {
+      "en": "Zombie Ward"
+    },
+    "slot": 2,
+    "slot_order": 4,
+    "source_id": "572518001"
+  }
+]

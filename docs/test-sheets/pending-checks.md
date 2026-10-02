@@ -23,6 +23,15 @@ Patch 7.3a is live.
   - Kraken Slayer: does 150–210 grow linearly with level, and does Guinsoo's extra on-hit count toward it?
   - Dusk and Dawn: the "shortly afterward" extra on-hit; the engine applies it right after the attack.
 
+- Runes (first modelled 2026-10-02 from wrpocket's 7.3a text; all unchecked):
+  - Rune page shape: the engine only enforces one keystone. How many minor runes, and one per path or per row?
+  - Aery: how long before she can be sent again? The engine says 2 seconds.
+  - Empowerment: once per fight, or every 3 attacks? And does the 8% start right after the proc? The engine procs
+    once and leaves the 8% to a toggle.
+  - Cut Down and Last Stand say "attacks": do abilities count? The engine amplifies everything.
+  - Grasp of Undying: the engine has it ready on the first attack, then every 4 seconds.
+  - Electrocute and Dark Harvest damage type: adaptive by bonus AD vs AP (rules.ts `adaptiveDamageType`).
+
 ## 2. Open engine rules (TODO-VERIFY in `packages/calc/src/rules.ts`)
 
 Each `TODO-VERIFY` comment there says how to check it. The ones most likely to move numbers:

@@ -1,4 +1,4 @@
-import type { Champion, Item, Provenance } from '@wr-calc/schema'
+import type { Champion, Item, Provenance, Rune } from '@wr-calc/schema'
 import type { StatCatalog } from '@wr-calc/calc'
 import { buildCatalog, mergeById, withExclusiveGroups } from '../catalog'
 import type { TargetPreset } from './7.3/targets'
@@ -57,6 +57,8 @@ export interface PatchLayer {
   exclusiveGroups?: Record<string, string>
   /** Replaces the inherited targets when set; required on the root patch. */
   targets?: TargetPreset[]
+  /** Hand-modelled runes; replace the inherited list when set (none before 7.3a). */
+  runes?: Rune[]
 }
 
 /** One patch's data as the engine and app consume it. */
@@ -65,6 +67,7 @@ export interface PatchDataset {
   items: Item[]
   champions: Champion[]
   catalog: StatCatalog
+  runes: Rune[]
   targets: TargetPreset[]
   exclusiveGroups: Record<string, string>
   /** Effective hand-modelled entries without stale marks; the next patch inherits these. */
@@ -188,11 +191,13 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
     Object.entries(previous?.exclusiveGroups ?? {}).filter(([id]) => presentIds.has(id)),
   )
   const items = withExclusiveGroups(merged, exclusiveGroups)
+  const runes = layer.runes ?? previous?.runes ?? []
   return {
     id: layer.id,
     items,
     champions: mergeById(layer.generatedChampions, markStale(syncedChampions, stale.champions)),
-    catalog: buildCatalog(items, []),
+    catalog: buildCatalog(items, runes),
+    runes,
     targets: layer.targets ?? previous?.targets ?? [],
     exclusiveGroups,
     handModelled,

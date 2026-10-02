@@ -1,4 +1,5 @@
 import type { AbilityHitProcEffect } from '@wr-calc/schema'
+import { effectDamageType } from './damage-type'
 import type { EffectHandler, HookContext, HitInfo } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
 import { sumStatRatios } from './stat-ratios'
@@ -34,10 +35,14 @@ function tryProc(effect: AbilityHitProcEffect, ctx: HookContext): void {
   if (damageWarning) ctx.addDataWarning(damageWarning)
 
   let amount = damageResolved.value
+  if (effect.damagePerStack) {
+    const stacks = ctx.inputs[effect.damagePerStack.inputId]
+    amount += (typeof stacks === 'number' ? stacks : 0) * effect.damagePerStack.amount
+  }
   amount += sumStatRatios(effect.ratios, ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
 
   ctx.dealDamage({
-    type: effect.damageType, amount,
+    type: effectDamageType(effect.damageType, ctx), amount,
     source: { kind: 'item', id: effect.id, name: effect.name },
   })
   ctx.self.cooldowns[key] = ctx.time + cooldownResolved.value

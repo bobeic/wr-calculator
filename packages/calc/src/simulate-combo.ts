@@ -175,7 +175,7 @@ export function simulateCombo(
   function attackerSheetNow(): StatSheet {
     const deferred = attacker.sheet.combatContributions ?? []
     const live = attackerEffectsList.flatMap((effect) => {
-      const stats = resolve(effect)?.combatStats?.(effect, attackerRuntime, time) ?? []
+      const stats = resolve(effect)?.combatStats?.(effect, attackerRuntime, time, { level: attacker.level, sheet: attacker.sheet }) ?? []
       if (stats.length > 0) trackSupport(effect)
       return stats.map(({ stat, amount }) => ({ stat, layer: 'bonus' as const, amount }))
     })
@@ -508,7 +508,7 @@ export function simulateCombo(
       resolved.dataWarnings.forEach((warning) => dataWarnings.push(warning))
       hitInstances.push(performDamage({
         type: resolved.type, amount: resolved.amount,
-        source: { kind: 'ability', id: stage.id, name: stage.name },
+        source: { kind: 'ability', id: stage.id, name: stage.name, abilityKey },
       }))
     }
     return hitInstances

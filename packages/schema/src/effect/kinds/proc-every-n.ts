@@ -6,7 +6,7 @@ import { NullableScalarSchema } from '../../scalar'
 export const ProcEveryNEffectSchema = EffectBaseSchema.extend({
   kind: z.literal('procEveryN'),
   n: z.number().int().positive(),
-  damageType: z.enum(['physical', 'magic', 'true']).optional(),
+  damageType: z.enum(['physical', 'magic', 'true', 'adaptive']).optional(),
   damage: NullableScalarSchema.optional(),
   debuffId: z.string().optional(),
   resetsOnMiss: z.boolean().default(false),

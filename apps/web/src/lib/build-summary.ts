@@ -37,5 +37,5 @@ export function summarizeBuild(build: DebugBuild, catalog: StatCatalog): BuildSu
     return { id, name: item.name, cost: item.cost.total, efficiency: goldEfficiency(item, values).efficiency }
   })
   const engineBuild: Build = { items: build.items, runes: build.runes, inputs: build.inputs, ...(build.boots !== undefined ? { boots: build.boots } : {}) }
-  return { items, totalCost: items.reduce((sum, item) => sum + item.cost, 0), issues: validateBuild(engineBuild, catalog.items) }
+  return { items, totalCost: items.reduce((sum, item) => sum + item.cost, 0), issues: validateBuild(engineBuild, catalog.items, catalog.runes) }
 }

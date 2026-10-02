@@ -1,4 +1,5 @@
 import type { ProcEveryNEffect } from '@wr-calc/schema'
+import { effectDamageType } from './damage-type'
 import type { EffectHandler, HookContext } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
 import { sumStatRatios } from './stat-ratios'
@@ -40,7 +41,7 @@ export const procEveryNHandler: EffectHandler<ProcEveryNEffect> = {
       if (instance.source.id === effect.id) return
       if (!countAndCheck(effect, ctx) || effect.damage === undefined) return
       ctx.dealDamage({
-        type: effect.damageType ?? 'physical', amount: procAmount(effect, ctx),
+        type: effectDamageType(effect.damageType ?? 'physical', ctx), amount: procAmount(effect, ctx),
         source: { kind: 'item', id: effect.id, name: effect.name },
       })
     },
@@ -49,7 +50,7 @@ export const procEveryNHandler: EffectHandler<ProcEveryNEffect> = {
       if (!countAndCheck(effect, ctx) || effect.damage === undefined) return undefined
       return {
         bonus: [{
-          type: effect.damageType ?? 'physical', amount: procAmount(effect, ctx),
+          type: effectDamageType(effect.damageType ?? 'physical', ctx), amount: procAmount(effect, ctx),
           source: { kind: 'item', id: effect.id, name: effect.name },
         }],
       }

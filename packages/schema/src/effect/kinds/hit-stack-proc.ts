@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ScalarSchema } from '../../scalar'
 import { EffectBaseSchema } from './common'
 import { DamageComponentSchema } from '../../damage-component'
 
@@ -13,7 +14,10 @@ export const HitStackProcEffectSchema = EffectBaseSchema.extend({
   stacksToProc: z.number().int().min(2),
   /** Stacks expire this long after the latest one. */
   stackWindowSeconds: z.number().positive(),
-  cooldownSeconds: z.number().nonnegative(),
+  /** May scale with level (e.g. Electrocute's 20-13 seconds). */
+  cooldownSeconds: ScalarSchema,
+  /** Deal the damage as adaptive (physical or magic by the owner's stats) instead of `damage.type`. */
+  adaptive: z.boolean().optional(),
   /** `empoweredAttack` is an attack that spent an empowered-attack charge; `basicAttack` is any attack. */
   stacksFrom: z.array(z.enum(['basicAttack', 'ability', 'empoweredAttack'])).min(1),
   damage: DamageComponentSchema,

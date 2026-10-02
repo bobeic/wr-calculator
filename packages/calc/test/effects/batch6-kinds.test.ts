@@ -34,6 +34,7 @@ function ctx(dealt: RawDamageInstanceInput[], overrides: Partial<HookContext> = 
   }
 }
 const base = { description: '', support: 'full' as const }
+const statCtx = { level: 15, sheet: sheet() }
 const attack = (id: number): HitInfo => ({ id, kind: 'basicAttack', empowered: false })
 const instance = (id: string): DamageInstance => ({
   time: 0, source: { kind: 'basicAttack', id, name: id }, type: 'physical', raw: 1, mitigated: 1, targetHpAfter: 0,
@@ -48,18 +49,30 @@ describe('attackStackHandler', () => {
   it('adds a stack per attack up to the max and grants the stat while it lasts', () => {
     const self = runtime()
     for (let i = 1; i <= 7; i++) attackStackHandler.hooks!.onHitLanded!(dancer, ctx([], { self, time: i }), attack(i))
-    expect(attackStackHandler.combatStats!(dancer, self, 7)).toEqual([{ stat: 'attackSpeed', amount: 0.3 }])
-    expect(attackStackHandler.combatStats!(dancer, self, 14)).toEqual([])
+    expect(attackStackHandler.combatStats!(dancer, self, 7, statCtx)).toEqual([{ stat: 'attackSpeed', amount: 0.3 }])
+    expect(attackStackHandler.combatStats!(dancer, self, 14, statCtx)).toEqual([])
   })
 
   it('counts only every second attack from the second for an alternating effect', () => {
     const dark: AttackStackEffect = { ...dancer, id: 'dark', stat: 'pctArmorPen', amountPerStack: 0.1, maxStacks: 3, every: 2, startAt: 2 }
     const self = runtime()
     attackStackHandler.hooks!.onHitLanded!(dark, ctx([], { self }), attack(1))
-    expect(attackStackHandler.combatStats!(dark, self, 0)).toEqual([])
+    expect(attackStackHandler.combatStats!(dark, self, 0, statCtx)).toEqual([])
     attackStackHandler.hooks!.onHitLanded!(dark, ctx([], { self }), attack(2))
     attackStackHandler.hooks!.onHitLanded!(dark, ctx([], { self }), attack(3))
-    expect(attackStackHandler.combatStats!(dark, self, 0)).toEqual([{ stat: 'pctArmorPen', amount: 0.1 }])
+    expect(attackStackHandler.combatStats!(dark, self, 0, statCtx)).toEqual([{ stat: 'pctArmorPen', amount: 0.1 }])
+  })
+
+  it('stacks from abilities and grants adaptive AD or AP by level (Conqueror)', () => {
+    const conqueror: AttackStackEffect = {
+      ...dancer, id: 'conq', stat: undefined, amountPerStack: undefined, maxStacks: 6, stacksFrom: ['basicAttack', 'ability'],
+      adaptive: { ad: { levelRange: { min: 3, max: 5 } }, ap: { levelRange: { min: 5, max: 8.33 } } },
+    }
+    const self = runtime()
+    attackStackHandler.hooks!.onHitLanded!(conqueror, ctx([], { self }), attack(1))
+    attackStackHandler.hooks!.onHitLanded!(conqueror, ctx([], { self }), { id: 2, kind: 'ability', empowered: false, abilityKey: 'q' })
+    expect(attackStackHandler.combatStats!(conqueror, self, 0, { level: 15, sheet: sheet({}, { ad: 40 }) })).toEqual([{ stat: 'ad', amount: 10 }])
+    expect(attackStackHandler.combatStats!(conqueror, self, 0, { level: 1, sheet: sheet({ ap: 100 }) })).toEqual([{ stat: 'ap', amount: 10 }])
   })
 
   it('does not regain a cooldown buff until the cooldown ends', () => {
@@ -67,9 +80,9 @@ describe('attackStackHandler', () => {
     const self = runtime()
     attackStackHandler.hooks!.onHitLanded!(flurry, ctx([], { self, time: 0 }), attack(1))
     attackStackHandler.hooks!.onHitLanded!(flurry, ctx([], { self, time: 7 }), attack(2))
-    expect(attackStackHandler.combatStats!(flurry, self, 7)).toEqual([])
+    expect(attackStackHandler.combatStats!(flurry, self, 7, statCtx)).toEqual([])
     attackStackHandler.hooks!.onHitLanded!(flurry, ctx([], { self, time: 25 }), attack(3))
-    expect(attackStackHandler.combatStats!(flurry, self, 25)).toEqual([{ stat: 'attackSpeed', amount: 0.35 }])
+    expect(attackStackHandler.combatStats!(flurry, self, 25, statCtx)).toEqual([{ stat: 'attackSpeed', amount: 0.35 }])
   })
 })
 

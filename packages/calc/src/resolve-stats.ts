@@ -117,7 +117,7 @@ export function resolveStats(
     ...(build.boots ? [build.boots] : []),
     ...(build.enchant ? [build.enchant] : []),
   ]
-  const issues = validateBuild(build, catalog.items)
+  const issues = validateBuild(build, catalog.items, catalog.runes)
   if (issues.length > 0) throw new Error(`resolveStats: ${issues.map((issue) => issue.message).join('; ')}`)
   const items = itemIds.map((id) => catalog.items.get(id) as Item)
   const runes = build.runes.map((id) => {

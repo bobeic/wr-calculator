@@ -1,9 +1,9 @@
-import type { Build, Item } from '@wr-calc/schema'
+import type { Build, Item, Rune } from '@wr-calc/schema'
 import { HAS_SEPARATE_BOOTS_SLOT, HAS_SEPARATE_ENCHANT_SLOT, ITEM_SLOTS } from './rules'
 
 export type BuildIssueCode =
   | 'unknown-item' | 'too-many-items' | 'duplicate-item' | 'boots-in-items' | 'not-boots' | 'exclusive-group'
-  | 'shared-passive'
+  | 'shared-passive' | 'too-many-keystones'
 
 export interface BuildIssue {
   code: BuildIssueCode
@@ -17,9 +17,9 @@ const UNIQUE_TIERS: ReadonlySet<Item['tier']> = new Set(['legendary', 'boots', '
 /**
  * Checks a build against the shop rules: known items, slot count (rules.ts ITEM_SLOTS), one copy of each
  * finished item, boots only in the boots slot, at most one item per exclusive group, and at most one finished item
- * per named passive. Returns every issue found.
+ * per named passive, and at most one keystone rune. Returns every issue found.
  */
-export function validateBuild(build: Build, items: ReadonlyMap<string, Item>): BuildIssue[] {
+export function validateBuild(build: Build, items: ReadonlyMap<string, Item>, runes?: ReadonlyMap<string, Rune>): BuildIssue[] {
   const issues: BuildIssue[] = []
   const lookup = (id: string): Item | undefined => {
     const item = items.get(id)
@@ -80,6 +80,11 @@ export function validateBuild(build: Build, items: ReadonlyMap<string, Item>): B
     } else {
       holderByGroup.set(item.exclusiveGroup, item.id)
     }
+  }
+  // A rune page has one keystone (rune slot 'keystone'). Unknown rune ids are resolveStats' error, not a shop rule.
+  const keystones = build.runes.filter((id) => runes?.get(id)?.slot === 'keystone')
+  if (keystones.length > 1) {
+    issues.push({ code: 'too-many-keystones', message: `the build has ${keystones.length} keystones (${keystones.join(', ')}); a rune page has one` })
   }
   return issues
 }

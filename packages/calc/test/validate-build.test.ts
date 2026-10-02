@@ -53,6 +53,13 @@ describe('validateBuild', () => {
     }])
   })
 
+  it('flags more than one keystone rune', () => {
+    const rune = (id: string, slot: string) => [id, { id, name: id, path: 'p', slot, effects: [] }] as const
+    const runes = new Map([rune('electrocute', 'keystone'), rune('conqueror', 'keystone'), rune('brutal', '0')])
+    expect(validateBuild(build([], { runes: ['electrocute', 'brutal'] }), catalog, runes)).toEqual([])
+    expect(validateBuild(build([], { runes: ['electrocute', 'conqueror'] }), catalog, runes).map((issue) => issue.code)).toEqual(['too-many-keystones'])
+  })
+
   it('flags unknown ids', () => {
     expect(codes(build(['nope'], { boots: 'nada' }))).toEqual(['unknown-item', 'unknown-item'])
   })

@@ -9,6 +9,7 @@ const NAV = [
   { href: '/tier-list/', label: 'Tier list' },
   { href: '/champions/', label: 'Champions' },
   { href: '/items/', label: 'Items' },
+  { href: '/runes/', label: 'Runes' },
   { href: '/patches/', label: 'Patches' },
   { href: '/calculator/', label: 'Calculator' },
 ]

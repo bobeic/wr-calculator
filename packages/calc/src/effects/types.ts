@@ -39,7 +39,13 @@ export interface EffectHandler<E extends Effect = Effect> {
   damageReductionFraction?(effect: E, ctx: HookContext, damageType: DamageType): number
   activate?(effect: E, ctx: HookContext): void
   /** Self stat changes that hold right now in combat (e.g. attack speed stacks), read from the runtime. */
-  combatStats?(effect: E, self: CombatantRuntime, time: number): CombatStat[]
+  combatStats?(effect: E, self: CombatantRuntime, time: number, ctx: CombatStatContext): CombatStat[]
+}
+
+/** What combatStats may read besides the runtime: the owner's level and its stats before combat effects. */
+export interface CombatStatContext {
+  level: number
+  sheet: StatSheet
 }
 
 /** A combat-time stat change; it adds to the bonus layer. */
@@ -54,6 +60,8 @@ export interface DamageSource {
   kind: SourceKind
   id: string
   name: string
+  /** Set on ability damage: the slot it came from, for slot conditions on damage amps (e.g. ultimate-only). */
+  abilityKey?: AbilityKey
 }
 
 /** One source's share of a merged damage instance. */

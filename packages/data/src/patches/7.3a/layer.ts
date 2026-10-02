@@ -6,6 +6,7 @@ import { NOTES_FLAGGED, NOTES_REVIEWED } from './generated/notes-review'
 import { CHAMPION_SYNC, TEXT_SYNC } from './generated/text-sync'
 import { OVERRIDE_CHAMPIONS, OVERRIDE_ITEMS } from './overrides'
 import { REVIEWED } from './reviewed'
+import { RUNES_7_3A } from './runes'
 
 /** Patch 7.3a: regenerated wrpocket data over the previous patch's hand-modelled entries. */
 export const PATCH_LAYER: PatchLayer = {
@@ -21,4 +22,5 @@ export const PATCH_LAYER: PatchLayer = {
   },
   textSync: TEXT_SYNC,
   championSync: CHAMPION_SYNC,
+  runes: RUNES_7_3A,
 }

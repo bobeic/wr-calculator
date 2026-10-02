@@ -81,3 +81,11 @@ export function loadItemText(patch: string): Map<string, string> {
   const raw = readJson(join(DATA_ROOT, 'snapshots', 'wrpocket', patch, 'items.json'))
   return new Map(z.array(SnapshotItemSchema).parse(raw ?? []).map((item) => [normalizeId(item.id), item.description.en]))
 }
+
+const SnapshotRuneSchema = z.object({ id: z.string(), description: Localized }).passthrough()
+
+/** Rune description text per rune id, from the patch's wrpocket rune snapshot (none before 7.3a). */
+export function loadRuneText(patch: string): Map<string, string> {
+  const raw = readJson(join(DATA_ROOT, 'snapshots', 'wrpocket', patch, 'runes.json'))
+  return new Map(z.array(SnapshotRuneSchema).parse(raw ?? []).map((rune) => [rune.id, rune.description.en]))
+}

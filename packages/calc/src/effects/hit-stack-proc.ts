@@ -1,5 +1,7 @@
 import type { HitStackProcEffect } from '@wr-calc/schema'
 import type { EffectHandler, HitInfo } from './types'
+import { effectDamageType } from './damage-type'
+import { resolveScalar, scalarWarning } from '../resolve-scalar'
 
 function key(effect: HitStackProcEffect): string {
   return `hitStackProc:${effect.id}`
@@ -28,12 +30,16 @@ export const hitStackProcHandler: EffectHandler<HitStackProcEffect> = {
         return
       }
       delete ctx.opponent.buffs[stackKey]
-      ctx.self.cooldowns[stackKey] = ctx.time + effect.cooldownSeconds
+      const cooldown = resolveScalar(effect.cooldownSeconds, ctx.level)
+      const cooldownWarning = scalarWarning(effect.name, 'cooldownSeconds', cooldown)
+      if (cooldownWarning) ctx.addDataWarning(cooldownWarning)
+      ctx.self.cooldowns[stackKey] = ctx.time + cooldown.value
 
       if (!ctx.resolveComponent) {
         throw new Error('hitStackProc: HookContext.resolveComponent is required')
       }
-      const resolved = ctx.resolveComponent(effect.damage, effect.name)
+      const component = effect.adaptive ? { ...effect.damage, type: effectDamageType('adaptive', ctx) } : effect.damage
+      const resolved = ctx.resolveComponent(component, effect.name)
       resolved.dataWarnings.forEach((warning) => ctx.addDataWarning(warning))
       const source = { kind: 'item' as const, id: effect.id, name: effect.name }
       if (effect.delivery.kind === 'instant') {
