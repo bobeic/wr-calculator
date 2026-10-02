@@ -21,8 +21,8 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
   Ahri, Ashe, Lulu; Teemo, Pantheon, Ziggs, Ezreal, Pyke; Urgot, Vi, Ekko, Kalista, Zyra; Renekton, Shyvana, Syndra,
   Twitch, Swain; Kayle, Kindred, Aurelion Sol, Vayne, Braum; Fiora, Wukong, Twisted Fate, Smolder, Soraka; Gnar,
   Rammus, Zed, Varus, Alistar; Jax, Nidalee, Aurora, Lucian, Maokai; Gwen, Rengar, Viktor, Xayah, Karma; Jayce,
-  Warwick, Orianna, Sivir, Nami; Riven, Lillia, Vel'Koz, Kog'Maw, Rell; Rumble, Skarner, Ryze, Zeri, Rakan; Camille, Evelynn, Fizz, Sona; Kennen, Olaf, Lissandra, Milio; Irelia, Talon, Vladimir, Janna; Sion, Amumu, Vex, Ornn; Shen, Fiddlesticks, Heimerdinger, Zilean; Poppy, Nunu & Willump, Annie; Hecarim, Diana, Taliyah, Norra, Katarina, Kassadin. The other 7 champions
-  (Akshan, Bard, Corki, Gragas, Nilah, Singed, Zoe; none appear in the CN pick lists) use auto-imported ability numbers ("rough kit" on the site).
+  Warwick, Orianna, Sivir, Nami; Riven, Lillia, Vel'Koz, Kog'Maw, Rell; Rumble, Skarner, Ryze, Zeri, Rakan; Camille, Evelynn, Fizz, Sona; Kennen, Olaf, Lissandra, Milio; Irelia, Talon, Vladimir, Janna; Sion, Amumu, Vex, Ornn; Shen, Fiddlesticks, Heimerdinger, Zilean; Poppy, Nunu & Willump, Annie; Hecarim, Diana, Taliyah, Norra, Katarina, Kassadin; Akshan, Bard, Corki, Gragas, Nilah, Singed, Zoe. That is every
+  champion: none uses the auto-imported ability numbers ("rough kit") any more.
 - Every item and rune that changes a damage number is modelled. Most values are unchecked in game; the open questions
   are in `docs/test-sheets/pending-checks.md`.
 
@@ -71,8 +71,9 @@ Steps once a name is chosen:
 
 ## Development, roughly in order
 
-1. **More champion kits.** Every champion in the CN pick lists is now modelled. Next: the 7 left (Akshan, Bard, Corki, Gragas, Nilah, Singed,
-   Zoe), in one batch.
+1. **More champion kits:** done — every champion has a hand-modelled kit (batches 1-29). The simplifications are listed
+   per batch in `docs/test-sheets/pending-checks.md`; the biggest gaps are mechanics the calculator lacks (abilities
+   applying on-hit effects, shreds limited to one ability, stacking/charges, pets and turrets).
 2. **Runes and spells in the patch pipeline:** done — `patch:update` now fetches wrpocket's `runes.json` and
    `spells.json` into each patch snapshot and lists every added, removed or reworded rune/spell (with the numbers
    that moved) in a "Runes and summoner spells" section of `PATCH_DIFF.md`. The models in `runes.ts`/`spells.ts` stay

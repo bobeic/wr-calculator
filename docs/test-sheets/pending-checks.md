@@ -265,6 +265,15 @@ Patch 7.3a is live.
   - Norra: Memory Surge fully charged; all 4 Portalpalooza! bolts hit; no Trinkets.
   - Katarina: no dagger pick-ups (her main damage in game), so she reads far low; every Death Lotus dagger hits.
   - Kassadin: Riftwalk unstacked and without its Mana ratio; Force Pulse un-enhanced.
+- Batch 29 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Akshan: Dirty Fighting 25 at every level with a 4 second window; the second shot always fires (folded into the
+    attack); Heroic Swing fires 3 shots; Comeuppance's missing-Health bonus on its base only.
+  - Bard: meeps without chimes.
+  - Corki: Hextech Shrapnel read as 16% AD true; Valkyrie's total and ratios combined loosely; no Big Ones.
+  - Gragas: Barrel Roll fully fermented read as 150%.
+  - Nilah: no Critical Rate scaling on Formless Blade.
+  - Singed: Poison Trail on for 5 seconds per cast.
+  - Zoe: More Sparkles! as a straight line 9-128; Paddle Star! at its longest; no Sleepy Trouble Bubble wake-up damage.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

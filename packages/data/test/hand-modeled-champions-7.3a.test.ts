@@ -53,6 +53,7 @@ describe('7.3a hand-modelled champions', () => {
         'shen', 'fiddlesticks', 'heimerdinger', 'zilean',
         'poppy', 'nunu-willump', 'annie',
         'hecarim', 'diana', 'taliyah', 'norra', 'katarina', 'kassadin',
+        'akshan', 'bard', 'corki', 'gragas', 'nilah', 'singed', 'zoe',
       ])
   })
 
@@ -1403,5 +1404,54 @@ describe('Katarina', () => {
 describe('Kassadin', () => {
   it('Nether Blade empowers one attack', () => {
     expect(bySource(run('kassadin', ['W', 'AA', 'AA']), 'kassadin-w-nether-blade').map((i) => i.raw)).toEqual([140])
+  })
+})
+
+describe('Akshan', () => {
+  it('Dirty Fighting procs on the third hit; Comeuppance fires 7 shots at rank 3', () => {
+    expect(bySource(run('akshan', ['AA', 'AA', 'AA']), 'akshan-passive-dirty-fighting').map((i) => i.raw)).toEqual([25])
+    const ad = attacker('akshan').sheet.total.ad!
+    // The 2 extra shots land after the first 5, so the target's missing Health already adds a little.
+    const [five, extra] = run('akshan', ['R']).instances.map((i) => i.raw)
+    expect(five).toBeCloseTo(5 * (45 + 0.15 * ad), 6)
+    expect(extra).toBeGreaterThan(2 * (45 + 0.15 * ad))
+  })
+})
+
+describe('Bard', () => {
+  it('A meep empowers one attack every 7 seconds', () => {
+    expect(bySource(run('bard', ['AA', 'AA']), 'bard-passive-meep')).toHaveLength(1)
+  })
+})
+
+describe('Corki', () => {
+  it('Gatling Gun ticks 4 times', () => {
+    expect(bySource(run('corki', ['E', 'wait:4']), 'corki-e-gatling-gun')).toHaveLength(4)
+  })
+})
+
+describe('Gragas', () => {
+  it('Drunken Rage empowers one attack with 8% max Health', () => {
+    expect(bySource(run('gragas', ['W', 'AA', 'AA']), 'gragas-w-drunken-rage').map((i) => i.raw)).toEqual([140 + 800])
+  })
+})
+
+describe('Nilah', () => {
+  it('Apotheosis deals the whirl and the retract', () => {
+    expect(run('nilah', ['R']).instances).toHaveLength(2)
+  })
+})
+
+describe('Singed', () => {
+  it('Insanity Potion grants 80 AP at rank 3', () => {
+    const before = attacker('singed').sheet.total.ap ?? 0
+    const parts = run('singed', ['R', 'E']).instances.find((i) => i.source.id === 'singed-e')!
+    expect(parts.raw).toBeCloseTo(100 + 0.5 * (before + 80) + 800, 6)
+  })
+})
+
+describe('Zoe', () => {
+  it('More Sparkles! adds 128 to the attack after an ability at level 15', () => {
+    expect(bySource(run('zoe', ['E', 'AA']), 'zoe-passive-more-sparkles').map((i) => i.raw)).toEqual([128])
   })
 })
