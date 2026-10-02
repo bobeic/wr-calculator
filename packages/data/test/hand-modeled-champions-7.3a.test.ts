@@ -47,6 +47,7 @@ describe('7.3a hand-modelled champions', () => {
         'riven', 'lillia', 'velkoz', 'kogmaw', 'rell',
         'rumble', 'skarner', 'ryze', 'zeri', 'rakan',
         'camille', 'evelynn', 'fizz', 'sona',
+        'kennen', 'olaf', 'lissandra', 'milio',
       ])
   })
 
@@ -1231,5 +1232,32 @@ describe('Fizz', () => {
 describe('Sona', () => {
   it('Hymn of Valor empowers her next attack', () => {
     expect(bySource(run('sona', ['Q', 'AA', 'AA']), 'sona-q-aura').map((i) => i.raw)).toEqual([23])
+  })
+})
+
+describe('Kennen', () => {
+  it('Electrical Surge procs on the 5th attack; Slicing Maelstrom bolts 6 times', () => {
+    expect(bySource(run('kennen', ['AA', 'AA', 'AA', 'AA', 'AA']), 'kennen-w-electrical-surge')).toHaveLength(1)
+    expect(bySource(run('kennen', ['R', 'wait:3']), 'kennen-r-maelstrom')).toHaveLength(6)
+  })
+})
+
+describe('Olaf', () => {
+  it('Reckless Swing deals true damage; Ragnarok adds 20% AD when toggled on', () => {
+    const ad = attacker('olaf').sheet.total.ad!
+    expect(run('olaf', ['E']).instances[0].raw).toBeCloseTo(195 + 0.55 * ad, 6)
+    expect(attacker('olaf', { 'olaf-ragnarok-active': true }).sheet.total.ad!).toBeCloseTo(1.2 * ad, 6)
+  })
+})
+
+describe('Lissandra', () => {
+  it('Frozen Tomb deals 350 at rank 3', () => {
+    expect(run('lissandra', ['R']).instances.map((i) => i.raw)).toEqual([350])
+  })
+})
+
+describe('Milio', () => {
+  it('Ultra Mega Fire Kick deals 320 at rank 4', () => {
+    expect(run('milio', ['Q']).instances.map((i) => i.raw)).toEqual([320])
   })
 })

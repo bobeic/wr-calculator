@@ -227,6 +227,12 @@ Patch 7.3a is live.
   - Fizz: Seastone Trident a flat 24 at every level; Urchin Strike doesn't apply on-hit; Rending Wave's follow-up
     bonus also on the first attack; Chum the Waters always the largest shark.
   - Sona: no Power Chord; Crescendo hits with one soundwave.
+- Batch 23 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Kennen: Electrical Surge's active assumes a Mark; Lightning Rush's attack speed starts on the cast; Slicing
+    Maelstrom's 6 bolts without the +10% per bolt.
+  - Olaf: no Berserker Rage; no Undertow Armor shred; Ragnarok's +20% AD is a toggle, its flat AD lasts 4 seconds.
+  - Lissandra: Frozen Tomb cast on the enemy.
+  - Milio: Ultra Mega Fire Kick only (the rest helps allies).
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
