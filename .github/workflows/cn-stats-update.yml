@@ -1,0 +1,40 @@
+name: CN stats update
+
+# Fetches the CN server's win, pick and ban rates and opens a pull request when they changed. Tencent publishes
+# them daily. Manual for now: uncomment `schedule` to run it every day. Needs the same "Allow GitHub Actions to
+# create and approve pull requests" setting as the patch update.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '23 4 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Fetch the latest CN stats
+        run: pnpm --filter @wr-calc/data cn-stats:update | tee cn-stats.log
+      - name: Check the result
+        run: pnpm --filter @wr-calc/data test -- test/cn-stats
+      - name: Open a pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: cn-stats-update/auto
+          commit-message: 'chore: refresh CN server win rates'
+          title: 'CN stats update'
+          body-path: cn-stats.log
+          add-paths: packages/data/src/cn-stats/generated
+          delete-branch: true
