@@ -16,7 +16,8 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
   time to kill) and `/debug`.
 - Hand-modelled champion kits: Ambessa; Darius, Lee Sin, Hwei (all nine spells), Caitlyn, Senna; Cho'Gath, Master Yi,
   Yasuo, Miss Fortune, Nautilus; Garen, Xin Zhao, Brand, Yunara, Thresh; Mordekaiser, Viego, Veigar, Tristana, Leona;
-  Sett, Graves, Galio, Samira, Lux. The other 116 champions use auto-imported ability numbers ("rough kit" on the site).
+  Sett, Graves, Galio, Samira, Lux; Dr. Mundo, Tryndamere, Mel, Jinx, Seraphine. The other 111 champions use
+  auto-imported ability numbers ("rough kit" on the site).
 - Every item and rune that changes a damage number is modelled. Most values are unchecked in game; the open questions
   are in `docs/test-sheets/pending-checks.md`.
 
@@ -65,7 +66,7 @@ Steps once a name is chosen:
 
 ## Development, roughly in order
 
-1. **More champion kits.** Continue down the CN pick rates (sixth most-picked per lane next).
+1. **More champion kits.** Continue down the CN pick rates (the next unmodelled pick per lane: Nasus, Kha'Zix, Akali, Draven, Blitzcrank).
 2. **Runes and spells in the patch pipeline:** done — `patch:update` now fetches wrpocket's `runes.json` and
    `spells.json` into each patch snapshot and lists every added, removed or reworded rune/spell (with the numbers
    that moved) in a "Runes and summoner spells" section of `PATCH_DIFF.md`. The models in `runes.ts`/`spells.ts` stay

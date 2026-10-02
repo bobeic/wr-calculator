@@ -100,6 +100,16 @@ Patch 7.3a is live.
     +2% per 100 AP.
   - Samira: the melee-range passive damage isn't modelled; Flair and Inferno Trigger don't crit.
   - Lux: Illumination detonates on every second ability hit only (not on attacks), with no level scaling.
+- Batch 6 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Dr. Mundo: Heart Zapper's table (20/40/60/80) read as both the per-second and the detonation base, all landing
+    at once. Nothing that scales with his own missing Health is modelled (Blunt Force Trauma's +60%, its passive AD),
+    nor Maximum Dosage's AD; Infected Bonesaw's minimum damage isn't applied.
+  - Tryndamere: Fury is an input (0.32% crit per point at every level); Bloodlust's AD from missing Health isn't
+    modelled.
+  - Mel: Overwhelm (stored damage and execute) isn't modelled at all, so her damage and Golden Eclipse are well under
+    real. Projectile Burst is 3 projectiles once per ability (no stacking to 9).
+  - Jinx: always on Pow-Pow (minigun); Fishbones isn't modelled. Death Rocket at full (travelled) damage.
+  - Seraphine: one Note per cast; Echo and Notes from allies aren't modelled; High Note's missing-Health increase isn't.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

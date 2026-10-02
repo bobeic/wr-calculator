@@ -30,6 +30,7 @@ describe('7.3a hand-modelled champions', () => {
         'ambessa', 'darius', 'lee-sin', 'hwei', 'caitlyn', 'senna', 'chogath', 'master-yi', 'yasuo', 'miss-fortune', 'nautilus',
         'garen', 'xin-zhao', 'brand', 'yunara', 'thresh', 'mordekaiser', 'viego', 'veigar', 'tristana', 'leona',
         'sett', 'graves', 'galio', 'samira', 'lux',
+        'dr-mundo', 'tryndamere', 'mel', 'jinx', 'seraphine',
       ])
   })
 
@@ -548,5 +549,52 @@ describe('Samira', () => {
 describe('Lux', () => {
   it('Illumination detonates on every second ability hit', () => {
     expect(bySource(run('lux', ['Q', 'E', 'R']), 'lux-passive-illumination').map((i) => i.raw)).toEqual([25.5])
+  })
+})
+
+describe('Dr. Mundo', () => {
+  it("Infected Bonesaw deals 29% of the target's current Health", () => {
+    expect(run('dr-mundo', ['Q']).instances[0].raw).toBeCloseTo(0.29 * 10000, 6)
+  })
+
+  it('Blunt Force Trauma empowers one attack with 50 (+5% bonus Health; none without items)', () => {
+    expect(partFrom(run('dr-mundo', ['E', 'AA', 'AA']), 'dr-mundo-e-blunt-force-trauma').map((part) => part.amount)).toEqual([50])
+  })
+})
+
+describe('Tryndamere', () => {
+  it('each point of Fury grants 0.32% crit', () => {
+    const base = attacker('tryndamere').sheet.total.critChance ?? 0
+    const full = attacker('tryndamere', { 'tryndamere-fury': 100 }).sheet.total.critChance ?? 0
+    expect(full - base).toBeCloseTo(0.32, 6)
+  })
+})
+
+describe('Mel', () => {
+  it('Projectile Burst fires on the attack after an ability, once', () => {
+    expect(bySource(run('mel', ['Q', 'AA', 'AA']), 'mel-passive-projectile-burst').map((i) => i.raw)).toEqual([99])
+  })
+
+  it('Radiant Volley deals every explosion (no AP without items)', () => {
+    expect(run('mel', ['Q']).instances[0].raw).toBe(200)
+  })
+})
+
+describe('Jinx', () => {
+  it('Pow-Pow attacks speed up the following attacks', () => {
+    const times = run('jinx', ['AA', 'AA', 'AA', 'AA']).instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+    expect(times[3] - times[2]).toBeLessThan(times[1] - times[0])
+  })
+
+  it('Super Mega Death Rocket adds 35% missing Health', () => {
+    const ad = attacker('jinx').sheet.total
+    const result = simulateCombo(attacker('jinx'), { ...dummy(), startHpFraction: 0.5 }, ['R'], { critMode: 'never' })
+    expect(result.instances[0].raw).toBeCloseTo(450 + 1.2 * ((ad.ad ?? 0) - (attacker('jinx').sheet.base.ad ?? 0)) + 0.35 * 5000, 6)
+  })
+})
+
+describe('Seraphine', () => {
+  it('each cast gives the next attack a Note of 4 bonus magic damage', () => {
+    expect(bySource(run('seraphine', ['Q', 'AA', 'AA']), 'seraphine-passive-harmony').map((i) => i.raw)).toEqual([4])
   })
 })
