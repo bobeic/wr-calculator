@@ -251,6 +251,12 @@ Patch 7.3a is live.
     Crowstorm read as always hitting its 600 cap.
   - Heimerdinger: no turrets and no UPGRADE!!! abilities, so his damage is far under the game's.
   - Zilean: Time Bomb detonates at once; its charges aren't modelled.
+- Batch 27 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Poppy: Iron Ambassador 20 damage every 12 seconds at every level; Heroic Charge always hits terrain;
+    Keeper's Verdict charged.
+  - Nunu & Willump: the largest snowball, a full Snowball Barrage and a full Absolute Zero channel; no Call of the
+    Freljord attack speed.
+  - Annie: Tibbers' attacks aren't modelled.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

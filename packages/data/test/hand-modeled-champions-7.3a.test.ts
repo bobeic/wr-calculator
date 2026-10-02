@@ -51,6 +51,7 @@ describe('7.3a hand-modelled champions', () => {
         'irelia', 'talon', 'vladimir', 'janna',
         'sion', 'amumu', 'vex', 'ornn',
         'shen', 'fiddlesticks', 'heimerdinger', 'zilean',
+        'poppy', 'nunu-willump', 'annie',
       ])
   })
 
@@ -1344,5 +1345,25 @@ describe('Heimerdinger', () => {
 describe('Zilean', () => {
   it('Time Bomb deals 255 at rank 4', () => {
     expect(run('zilean', ['Q']).instances.map((i) => i.raw)).toEqual([255])
+  })
+})
+
+describe('Poppy', () => {
+  it('Hammer Shock hits twice with 9% max Health; Iron Ambassador procs once in 12 seconds', () => {
+    const bonusAd = attacker('poppy').sheet.bonus.ad ?? 0
+    expect(run('poppy', ['Q']).instances[0].raw).toBeCloseTo(2 * (110 + 0.9 * bonusAd + 900), 6)
+    expect(bySource(run('poppy', ['AA', 'AA', 'AA']), 'poppy-passive-iron-ambassador').map((i) => i.raw)).toEqual([20])
+  })
+})
+
+describe('Nunu & Willump', () => {
+  it('Absolute Zero deals 1575 at rank 3', () => {
+    expect(run('nunu-willump', ['R']).instances.map((i) => i.raw)).toEqual([1575])
+  })
+})
+
+describe('Annie', () => {
+  it('Summon: Tibbers deals the summon and the pounce', () => {
+    expect(run('annie', ['R']).instances.map((i) => i.raw)).toEqual([330, 190])
   })
 })
