@@ -7,7 +7,8 @@
     "test": "vitest run",
     "patch:update": "tsx scripts/patch-update.ts",
     "patch:impact": "tsx scripts/build-impact.ts",
-    "cn-stats:update": "tsx scripts/cn-stats-update.ts"
+    "cn-stats:update": "tsx scripts/cn-stats-update.ts",
+    "test-sheet": "tsx scripts/test-sheet.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
