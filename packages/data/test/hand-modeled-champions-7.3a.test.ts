@@ -40,6 +40,7 @@ describe('7.3a hand-modelled champions', () => {
         'renekton', 'shyvana', 'syndra', 'twitch', 'swain',
         'kayle', 'kindred', 'aurelion-sol', 'vayne', 'braum',
         'fiora', 'wukong', 'twisted-fate', 'smolder', 'soraka',
+        'gnar', 'rammus', 'zed', 'varus', 'alistar',
       ])
   })
 
@@ -984,5 +985,43 @@ describe('Smolder', () => {
 describe('Soraka', () => {
   it('Equinox hits twice', () => {
     expect(run('soraka', ['E']).instances[0].raw).toBe(440)
+  })
+})
+
+describe('Gnar', () => {
+  it('Hyper procs on the 3rd hit for 40 + 13% max Health at rank 4', () => {
+    expect(bySource(run('gnar', ['AA', 'AA', 'AA']), 'gnar-w-hyper').map((i) => i.raw)).toEqual([40 + 1300])
+  })
+})
+
+describe('Rammus', () => {
+  it('Spiked Shell adds 18 (+10% Armor) to every attack', () => {
+    const armor = attacker('rammus').sheet.total.armor!
+    for (const proc of bySource(run('rammus', ['AA', 'AA']), 'rammus-w-spiked-shell')) expect(proc.raw).toBeCloseTo(18 + 0.1 * armor, 6)
+  })
+})
+
+describe('Zed', () => {
+  it('Contempt for the Weak only procs below 50% Health', () => {
+    const procs = (fraction: number) => bySource(
+      simulateCombo(attacker('zed'), { ...dummy(), startHpFraction: fraction }, ['AA'], { critMode: 'never' }), 'zed-passive-contempt',
+    ).map((i) => i.raw)
+    expect(procs(1)).toEqual([])
+    expect(procs(0.4)).toHaveLength(1)
+    expect(procs(0.4)[0]).toBeCloseTo(700, 6)
+  })
+})
+
+describe('Varus', () => {
+  it('ability hits detonate 3 Blight stacks for 13.5% max Health at rank 4', () => {
+    expect(bySource(run('varus', ['E']), 'varus-w-blight').map((i) => i.raw)).toEqual([1350])
+  })
+})
+
+describe('Alistar', () => {
+  it('Trample ticks 10 times over 5 seconds', () => {
+    const result = run('alistar', ['E', 'wait:5'])
+    expect(result.instances.filter((i) => i.source.id === 'alistar-e')).toHaveLength(1)
+    expect(bySource(result, 'alistar-e-trample')).toHaveLength(9)
   })
 })

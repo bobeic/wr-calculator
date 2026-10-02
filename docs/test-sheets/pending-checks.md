@@ -181,6 +181,12 @@ Patch 7.3a is live.
   - Twisted Fate: Pick a Card is always the Blue Card.
   - Smolder: Dragon Practice stacks are an input; the 25/100/175-stack effects and crit scaling aren't modelled.
   - Soraka: Equinox's two hits land at once; empowered Starcall isn't modelled.
+- Batch 16 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Gnar: Mini Gnar only (GNAR! is Mega's; the combo decides); Hyper's 3-hit window taken as 3.5s.
+  - Rammus: Defensive Ball Curl's curl (resists, +40% Spiked Shell) isn't modelled.
+  - Zed: no shadows (Razor Shuriken, Shadow Slash and Death Mark are Zed's own hits only); Death Mark is only 100% AD.
+  - Varus: every ability hit detonates 3 Blight stacks, even with no attacks before it.
+  - Alistar: Trample's empowered attack is granted on the cast (5 hits assumed), 40 at every level.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

@@ -14,6 +14,7 @@ import { HAND_MODELED_CHAMPIONS_BATCH12 } from './champions-batch12'
 import { HAND_MODELED_CHAMPIONS_BATCH13 } from './champions-batch13'
 import { HAND_MODELED_CHAMPIONS_BATCH14 } from './champions-batch14'
 import { HAND_MODELED_CHAMPIONS_BATCH15 } from './champions-batch15'
+import { HAND_MODELED_CHAMPIONS_BATCH16 } from './champions-batch16'
 
 // Hand-modelled kits for the most-picked champion in each lane on the CN server (CN_STATS, all ranks, 2026-09-30):
 // Darius (Baron), Lee Sin (Jungle), Hwei (Mid), Caitlyn (Dragon) and Senna (Support). Numbers come from wrpocket's 7.3a
@@ -363,4 +364,5 @@ export const HAND_MODELED_CHAMPIONS_7_3A: Champion[] = [
   ...HAND_MODELED_CHAMPIONS_BATCH13,
   ...HAND_MODELED_CHAMPIONS_BATCH14,
   ...HAND_MODELED_CHAMPIONS_BATCH15,
+  ...HAND_MODELED_CHAMPIONS_BATCH16,
 ]
