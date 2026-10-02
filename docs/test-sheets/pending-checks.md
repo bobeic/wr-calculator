@@ -159,6 +159,14 @@ Patch 7.3a is live.
   - Ekko: Z-Drive's 3-hit window taken as 4s; "Low Health" for Parallel Convergence taken as below 30%.
   - Kalista: Rend's spear count is an input, and each extra spear uses rank 4's 42 (+57% AD) at every rank.
   - Zyra: one Thorn Spitter per ability hit, attacking once a second for 6s.
+- Batch 13 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Renekton: no Fury, so never the empowered abilities; Ruthless Predator read as the attack plus 20 (+50% AD).
+  - Shyvana: human form only; Burnout lasts its base 3 seconds.
+  - Syndra: Transcendent isn't modelled; Unleashed Power counts only the 3 orbiting spheres.
+  - Twitch: Deadly Venom read as 1 (+3% AP) per second per stack; Contaminate assumes max stacks; Venom Cask applies
+    nothing.
+  - Swain: Death's Hand lands 5 bolts (count not in the text) and ignores "up to 95"; Demonic Ascension's aura lasts
+    6 seconds, with the recast's burst at once.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

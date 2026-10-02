@@ -37,6 +37,7 @@ describe('7.3a hand-modelled champions', () => {
         'ksante', 'kayn', 'ahri', 'ashe', 'lulu',
         'teemo', 'pantheon', 'ziggs', 'ezreal', 'pyke',
         'urgot', 'vi', 'ekko', 'kalista', 'zyra',
+        'renekton', 'shyvana', 'syndra', 'twitch', 'swain',
       ])
   })
 
@@ -872,5 +873,40 @@ describe('Kalista', () => {
 describe('Zyra', () => {
   it('each damaging ability sprouts its own Thorn Spitter', () => {
     expect(bySource(run('zyra', ['Q', 'E', 'wait:6']), 'zyra-thorn-spitter')).toHaveLength(12)
+  })
+})
+
+describe('Renekton', () => {
+  it('Dominus burns for 12 seconds in all', () => {
+    const result = run('renekton', ['R', 'wait:12'])
+    expect(result.instances.filter((i) => i.source.id === 'renekton-r')).toHaveLength(1)
+    expect(bySource(result, 'renekton-r-dominus')).toHaveLength(11)
+  })
+})
+
+describe('Shyvana', () => {
+  it('Scorch adds 3% max Health to every attack for 5 seconds after Flame Breath', () => {
+    const scorch = [...bySource(run('shyvana', ['E', 'AA', 'AA']), 'shyvana-e-scorch'), ...partFrom(run('shyvana', ['E', 'AA', 'AA']), 'shyvana-e-scorch')]
+    expect(scorch).toHaveLength(2)
+  })
+})
+
+describe('Syndra', () => {
+  it('Unleashed Power launches 3 spheres', () => {
+    expect(run('syndra', ['R']).instances[0].raw).toBe(480)
+  })
+})
+
+describe('Twitch', () => {
+  it('Deadly Venom stacks up to 5 and Contaminate assumes max stacks', () => {
+    expect(run('twitch', ['E']).instances[0].raw).toBe(235)
+    const ticks = bySource(run('twitch', ['AA', 'AA', 'AA', 'AA', 'AA', 'AA', 'AA', 'wait:1']), 'twitch-passive-deadly-venom')
+    expect(Math.max(...ticks.map((i) => i.raw))).toBeCloseTo(5, 6)
+  })
+})
+
+describe('Swain', () => {
+  it("Death's Hand lands all 5 bolts", () => {
+    expect(run('swain', ['Q']).instances.map((i) => i.raw)).toEqual([160, 160])
   })
 })
