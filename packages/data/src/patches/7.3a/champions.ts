@@ -2,6 +2,7 @@ import type { Champion } from '@wr-calc/schema'
 import { byLevelLine, magic, modelled, physical, utility } from './champion-helpers'
 import { HAND_MODELED_CHAMPIONS_BATCH2 } from './champions-batch2'
 import { HAND_MODELED_CHAMPIONS_BATCH3 } from './champions-batch3'
+import { HAND_MODELED_CHAMPIONS_BATCH4 } from './champions-batch4'
 
 // Hand-modelled kits for the most-picked champion in each lane on the CN server (CN_STATS, all ranks, 2026-09-30):
 // Darius (Baron), Lee Sin (Jungle), Hwei (Mid), Caitlyn (Dragon) and Senna (Support). Numbers come from wrpocket's 7.3a
@@ -339,4 +340,5 @@ const SENNA = modelled('senna', {
 /** Kits first hand-modelled on 7.3a: the most-picked champion in each lane on the CN server. */
 export const HAND_MODELED_CHAMPIONS_7_3A: Champion[] = [
   DARIUS, LEE_SIN, HWEI, CAITLYN, SENNA, ...HAND_MODELED_CHAMPIONS_BATCH2, ...HAND_MODELED_CHAMPIONS_BATCH3,
+  ...HAND_MODELED_CHAMPIONS_BATCH4,
 ]

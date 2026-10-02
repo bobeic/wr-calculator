@@ -28,7 +28,7 @@ describe('7.3a hand-modelled champions', () => {
     expect(dataset.handModelled.champions.map((entry) => entry.id))
       .toEqual([
         'ambessa', 'darius', 'lee-sin', 'hwei', 'caitlyn', 'senna', 'chogath', 'master-yi', 'yasuo', 'miss-fortune', 'nautilus',
-        'garen', 'xin-zhao', 'brand', 'yunara', 'thresh',
+        'garen', 'xin-zhao', 'brand', 'yunara', 'thresh', 'mordekaiser', 'viego', 'veigar', 'tristana', 'leona',
       ])
   })
 
@@ -413,5 +413,80 @@ describe('Thresh', () => {
     const ad = attacker('thresh').sheet.total.ad!
     const result = run('thresh', ['AA'])
     expect(bySource(result, 'thresh-e-flay-passive').map((instance) => instance.raw)).toEqual([2 * ad])
+  })
+})
+
+describe('Mordekaiser', () => {
+  it('attacks deal 30% bonus AD as magic damage', () => {
+    const ad = attacker('mordekaiser').sheet.total.ad!
+    expect(bySource(run('mordekaiser', ['AA']), 'mordekaiser-passive-bonus-magic').map((i) => i.raw)).toEqual([0.3 * ad])
+  })
+
+  it('Obliterate deals its text damage (no AP or bonus AD with no items, so just the base)', () => {
+    expect(run('mordekaiser', ['Q']).instances[0].raw).toBe(272)
+  })
+
+  it('3 ability hits within 5 seconds cloak him in a field for 5 ticks of 100', () => {
+    const ticks = bySource(run('mordekaiser', ['Q', 'AA', 'Q', 'AA', 'Q', 'wait:5']), 'mordekaiser-passive-negative-energy')
+    expect(ticks).toHaveLength(5)
+    for (const tick of ticks) expect(tick.raw).toBeCloseTo(100, 6)
+  })
+})
+
+describe('Viego', () => {
+  it('the on-hit current-Health bonus and Double Strike proc once each after an ability hit', () => {
+    const result = run('viego', ['Q', 'AA'])
+    expect(bySource(result, 'viego-passive-current-hp')).toHaveLength(1)
+    expect(partFrom(result, 'viego-passive-double-strike')).toHaveLength(1)
+  })
+
+  it('Heartbreaker deals 120% AD plus missing Health', () => {
+    const ad = attacker('viego').sheet.total.ad!
+    const result = simulateCombo(attacker('viego'), { ...dummy(), startHpFraction: 0.5 }, ['R'], { critMode: 'never' })
+    expect(result.instances[0].raw).toBeCloseTo(1.2 * ad + 0.2 * 5000, 6)
+  })
+})
+
+describe('Veigar', () => {
+  it('Phenomenal Evil Power stacks grant 1 AP each', () => {
+    const base = attacker('veigar').sheet.total.ap ?? 0
+    const withStacks = attacker('veigar', { 'veigar-phenomenal-evil-stacks': 10 }).sheet.total.ap ?? 0
+    expect(withStacks - base).toBeCloseTo(10, 6)
+  })
+
+  it('Q, W and R deal their text damage', () => {
+    expect(run('veigar', ['Q']).instances[0].raw).toBe(245)
+    expect(run('veigar', ['W']).instances[0].raw).toBe(280)
+    expect(run('veigar', ['R']).instances[0].raw).toBe(315)
+  })
+})
+
+describe('Tristana', () => {
+  it('Rapid Fire speeds up attacks', () => {
+    const gap = (combo: ComboAction[]) => {
+      const times = run('tristana', combo).instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+      return times[1] - times[0]
+    }
+    expect(gap(['Q', 'AA', 'AA'])).toBeLessThan(gap(['AA', 'AA']))
+  })
+
+  it('Rocket Jump, Explosive Charge and Buster Shot deal their text damage', () => {
+    expect(run('tristana', ['W']).instances[0].raw).toBe(200)
+    expect(run('tristana', ['E']).instances[0].raw).toBe(170)
+    expect(run('tristana', ['R']).instances[0].raw).toBe(400)
+  })
+})
+
+describe('Leona', () => {
+  it('Shield of Daybreak empowers the next attack', () => {
+    const procs = bySource(run('leona', ['Q', 'AA']), 'leona-q-shield-of-daybreak')
+    expect(procs).toHaveLength(1)
+    expect(procs[0].raw).toBe(120)
+  })
+
+  it('Eclipse, Zenith Blade and Solar Flare deal their text damage', () => {
+    expect(run('leona', ['W']).instances[0].raw).toBe(185)
+    expect(run('leona', ['E']).instances[0].raw).toBe(225)
+    expect(run('leona', ['R']).instances[0].raw).toBe(300)
   })
 })

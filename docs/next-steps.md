@@ -10,8 +10,8 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
 - Pages: home, CN tier list, champions, items, runes, patches, the calculator (two-build comparison, damage per ability,
   time to kill) and `/debug`.
 - Hand-modelled champion kits: Ambessa; Darius, Lee Sin, Hwei (all nine spells), Caitlyn, Senna; Cho'Gath, Master Yi,
-  Yasuo, Miss Fortune, Nautilus; Garen, Xin Zhao, Brand, Yunara, Thresh. The other 126 champions use auto-imported
-  ability numbers ("rough kit" on the site).
+  Yasuo, Miss Fortune, Nautilus; Garen, Xin Zhao, Brand, Yunara, Thresh; Mordekaiser, Viego, Veigar, Tristana, Leona.
+  The other 121 champions use auto-imported ability numbers ("rough kit" on the site).
 - Every item and rune that changes a damage number is modelled. Most values are unchecked in game; the open questions
   are in `docs/test-sheets/pending-checks.md`.
 

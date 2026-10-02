@@ -76,6 +76,21 @@ Patch 7.3a is live.
   - Thresh: Flay's passive "2 per Soul" flat bonus isn't modelled (only its AD ratio is); Damnation's Armor/AP
     per Soul is modelled with a 40-soul cap that isn't from the text.
 
+- Batch 4 kits (2026-10-02, from wrpocket.app's per-champion JSON; all unchecked). The guesses most likely to be off:
+  - Mordekaiser: Obliterate's numbers (byRank base 116/165/217/272, AP and bonus AD ratios) are a reconstruction —
+    wrpocket's prose ("80 + 4-70 by level, +70% AP +120% bonus AD") and its per-rank table (80-170 base, a
+    "Bonus AD Ratio" of 45-60%) don't reconcile cleanly, and the table's "Bonus AD Ratio" label is read here as the
+    single-target damage bonus instead (see the code comment in `champions-batch4.ts`). Worth checking against the
+    actual tooltip in game before trusting it. Darkness Rise's cloud damage (5 AP + 1% max Health, both "based on
+    level") is taken as flat 5%/1%; the 3% magic pen is not modelled at all.
+  - Viego: Double Strike's proc has no stated cooldown beyond its 5s window, so it can fire every time an ability
+    lands — may be too generous.
+  - Veigar: Primordial Burst's 0-100% amp against low-Health targets isn't modelled (no engine hook scales a plain
+    ability's damage by missing Health outside procEveryN).
+  - Tristana: Explosive Charge's 4s fuse, its stacking +25% per hit (up to 2x), and its on-kill explosion are all
+    skipped — only the base bomb damage is modelled.
+  - Leona: how long Shield of Daybreak's empower lasts unused before expiring (engine: 10s, not stated).
+
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
   engine uses one value per combo (listed in the file).
