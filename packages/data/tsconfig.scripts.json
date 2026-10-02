@@ -6,5 +6,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["scripts", "test/wrpocket", "test/patch", "test/official-notes", "test/cn-stats"]
+  "include": ["scripts", "test/wrpocket", "test/patch", "test/official-notes", "test/cn-stats", "test/cn-builds"]
 }

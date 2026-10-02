@@ -7,6 +7,11 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
 - The site is live at https://bobeic.github.io/wr-calculator/ and redeploys on every push to `main`
   (`.github/workflows/deploy-site.yml`).
 - The daily CN win-rate and patch-check workflows run on schedules and open pull requests when something changes.
+- Champion pages show CN Diamond+ builds (top 3-item cores and rune pages per lane, each with a "Try" link into the
+  calculator), from `https://wrchina.gg/api/build/<heroId>_1.json`, refreshed by the same daily workflow. Upgraded
+  support items and transformed items (Muramana, Seraph's, Fimbulwinter) show as their base item; Diadem of Songs
+  isn't in wrpocket's item list, so the builds that contain it (Sona support) are dropped. wrchina also serves
+  Master+ (`_2`) and Challenger (`_3`) if we ever want them.
 - Pages: home, CN tier list, champions, items, runes, patches, the calculator (two-build comparison, damage per ability,
   time to kill) and `/debug`.
 - Hand-modelled champion kits: Ambessa; Darius, Lee Sin, Hwei (all nine spells), Caitlyn, Senna; Cho'Gath, Master Yi,
@@ -44,8 +49,6 @@ Steps once a name is chosen:
 
 ## Needs the owner
 
-- **Builds source.** Champion pages can't show builds until there's a source. Open wrchina.gg or Tencent's
-  掌上英雄联盟 app on one champion's build page with browser devtools, and send the request URLs from the Network tab.
 - **Site design.** Sites you like and dislike; dark first, light first or both; whether to show champion and item
   icons (Tencent's CDN has them, but using them raises licensing and reliability questions). The styling is one token
   block in `apps/web/src/app/globals.css`, so a redesign doesn't touch the pages.
@@ -58,7 +61,7 @@ Steps once a name is chosen:
 
 ## Development, roughly in order
 
-1. **More champion kits.** Continue down the CN pick rates (third most-picked per lane, and so on).
+1. **More champion kits.** Continue down the CN pick rates (fifth most-picked per lane next).
 2. **Runes and spells in the patch pipeline.** They're hand-copied now; importing them from wrpocket each patch would
    keep them current. `https://wrpocket.app/site_data/champions/<slug>.json` already carries full tooltip text and
    per-rank tables (used for the batch 3 kits below) — the champion page itself only renders descriptions for some
@@ -71,5 +74,4 @@ Steps once a name is chosen:
    alone by time to kill, computed lazily (only once opened) so it doesn't slow down every edit.
 5. **Patch preview:** Tencent's CN data runs ahead of global servers, so it can show changes before they arrive.
 6. **Design pass** once the design answers are in.
-7. **Housekeeping:** GitHub warns that the workflows' actions (checkout, setup-node, pnpm, configure-pages) target
-   Node 20, which is deprecated; bump them when newer versions are available.
+7. **Housekeeping:** done — workflow actions bumped off Node 20.

@@ -1,6 +1,6 @@
 name: CN stats update
 
-# Fetches the CN server's win, pick and ban rates and opens a pull request when they changed. Tencent publishes
+# Fetches the CN server's win, pick and ban rates (Tencent) and Diamond+ builds (wrchina.gg) and opens a pull request when they changed. Tencent publishes
 # them daily. Runs every day (and by hand). Needs the "Allow GitHub Actions to create and approve pull requests"
 # setting, which is on (user, 2026-10-03).
 on:
@@ -27,14 +27,18 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Fetch the latest CN stats
         run: pnpm --filter @wr-calc/data cn-stats:update | tee cn-stats.log
+      - name: Fetch the latest CN builds
+        run: pnpm --filter @wr-calc/data cn-builds:update | tee -a cn-stats.log
       - name: Check the result
-        run: pnpm --filter @wr-calc/data test -- test/cn-stats
+        run: pnpm --filter @wr-calc/data test -- test/cn-stats test/cn-builds
       - name: Open a pull request
         uses: peter-evans/create-pull-request@v8
         with:
           branch: cn-stats-update/auto
-          commit-message: 'chore: refresh CN server win rates'
+          commit-message: 'chore: refresh CN server win rates and builds'
           title: 'CN stats update'
           body-path: cn-stats.log
-          add-paths: packages/data/src/cn-stats/generated
+          add-paths: |
+            packages/data/src/cn-stats/generated
+            packages/data/src/cn-builds/generated
           delete-branch: true

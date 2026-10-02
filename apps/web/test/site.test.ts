@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import type { CnChampionStat, CnStatsSnapshot } from '@wr-calc/data'
-import { CN_STATS } from '@wr-calc/data'
+import { CN_BUILDS, CN_STATS } from '@wr-calc/data'
 import { assignTiers } from '../src/lib/site/tiers'
 import { championLanes } from '../src/lib/site/champion-lanes'
-import { changeLabel, pct } from '../src/lib/site/format'
+import { calculatorHref, changeLabel, pct } from '../src/lib/site/format'
+import { CURRENT_DATASET } from '../src/lib/dataset'
+import { decodeState } from '../src/lib/url-state'
 
 const row = (championId: string, strengthRank: number): CnChampionStat => ({
   championId, heroId: '1', winRate: 0.5, pickRate: 0.1, banRate: 0, strengthRank,
@@ -42,5 +44,20 @@ describe('changeLabel', () => {
   it('takes the words before the old value', () => {
     expect(changeLabel('Health per level : 128 → 136', '128')).toBe('Health per level:')
     expect(changeLabel('Damage: 33 - 333 → 40-285', '33 - 333')).toBe('Damage:')
+  })
+})
+
+describe('CN build calculator links', () => {
+  it('decode every snapshot build with no dropped ids', () => {
+    for (const [championId, lanes] of Object.entries(CN_BUILDS.champions)) {
+      for (const { core, runes } of lanes) {
+        for (const build of core) {
+          const href = calculatorHref(championId, build.ids, runes[0]?.ids ?? [])
+          const { state, issues } = decodeState(new URLSearchParams(href.split('?')[1]), CURRENT_DATASET)
+          expect(issues, `${championId}: ${href}`).toEqual([])
+          expect(state.buildA.items).toEqual(build.ids)
+        }
+      }
+    }
   })
 })

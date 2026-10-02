@@ -6,6 +6,9 @@ export function pct(fraction: number, digits = 1): string {
 /** 'blade-of-the-ruined-king' style ids are already URL-safe; this keeps links in one place. */
 export const championHref = (id: string): string => `/champions/${id}/`
 export const itemHref = (id: string): string => `/items/${id}/`
+/** Calculator link with build A set to these items and runes. */
+export const calculatorHref = (championId: string, items: string[], runes: string[]): string =>
+  `/calculator/?${new URLSearchParams({ champ: championId, a: JSON.stringify({ items, runes, inputs: {} }) })}`
 export const patchHref = (id: string): string => `/patches/${id}/`
 
 /** Hotlinked from Tencent's CDN (wrchina.gg), keyed by their numeric hero id. No auth or referer needed. */
