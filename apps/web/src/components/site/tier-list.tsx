@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { CnRank, CnStatsSnapshot, Lane } from '@wr-calc/data'
-import { assignTiers } from '../../lib/site/tiers'
+import { assignTiers, TIERS } from '../../lib/site/tiers'
 import type { TieredStat } from '../../lib/site/tiers'
-import { championHref, pct } from '../../lib/site/format'
+import { championHref, championIconUrl, pct } from '../../lib/site/format'
 import { StatTable } from './stat-table'
 
 export interface TierListProps {
@@ -34,18 +34,34 @@ export function TierList({ ranks, rankLabels, laneLabels, names }: TierListProps
           <button key={option} type="button" aria-pressed={option === lane} onClick={() => setLane(option)}>{laneLabels[option]}</button>
         ))}
       </div>
-      <StatTable<TieredStat>
-        rows={rows}
-        rowKey={(row) => row.championId}
-        columns={[
-          { key: 'rank', label: '#', numeric: true, render: (row) => row.strengthRank },
-          { key: 'tier', label: 'Tier', render: (row) => row.tier },
-          { key: 'champion', label: 'Champion', render: (row) => <Link href={championHref(row.championId)}>{names[row.championId] ?? row.championId}</Link> },
-          { key: 'win', label: 'Win', numeric: true, render: (row) => pct(row.winRate) },
-          { key: 'pick', label: 'Pick', numeric: true, render: (row) => pct(row.pickRate) },
-          { key: 'ban', label: 'Ban', numeric: true, render: (row) => pct(row.banRate) },
-        ]}
-      />
+      {TIERS.map((tier) => {
+        const tierRows = rows.filter((row) => row.tier === tier)
+        if (tierRows.length === 0) return null
+        return (
+          <section key={tier} className="tier-group">
+            <h2 className="tier-heading">
+              {tier} <span className="muted">· {tierRows.length} champion{tierRows.length === 1 ? '' : 's'}</span>
+            </h2>
+            <StatTable<TieredStat>
+              rows={tierRows}
+              rowKey={(row) => row.championId}
+              columns={[
+                {
+                  key: 'champion', label: 'Champion', render: (row) => (
+                    <Link href={championHref(row.championId)} className="champ-link">
+                      <img src={championIconUrl(row.heroId)} alt="" width={28} height={28} className="champ-icon" loading="lazy" />
+                      {names[row.championId] ?? row.championId}
+                    </Link>
+                  ),
+                },
+                { key: 'win', label: 'Win', numeric: true, render: (row) => pct(row.winRate) },
+                { key: 'pick', label: 'Pick', numeric: true, render: (row) => pct(row.pickRate) },
+                { key: 'ban', label: 'Ban', numeric: true, render: (row) => pct(row.banRate) },
+              ]}
+            />
+          </section>
+        )
+      })}
     </>
   )
 }

@@ -8,6 +8,10 @@ export const championHref = (id: string): string => `/champions/${id}/`
 export const itemHref = (id: string): string => `/items/${id}/`
 export const patchHref = (id: string): string => `/patches/${id}/`
 
+/** Hotlinked from Tencent's CDN (wrchina.gg), keyed by their numeric hero id. No auth or referer needed. */
+export const championIconUrl = (heroId: string): string =>
+  `https://wrchina.gg/cdn/images/lgamem/act/lrlib/img/HeadIcon/H_S_${heroId}.png?v=4`
+
 /** The words before a notes line's old value: 'Health per level : 128 → 136' -> 'Health per level:'. */
 export function changeLabel(text: string, before: string): string {
   const at = text.indexOf(before)

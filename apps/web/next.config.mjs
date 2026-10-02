@@ -7,6 +7,8 @@ const nextConfig = {
   trailingSlash: true,
   // The workspace packages ship TypeScript source (package.json "main" points at src/*.ts).
   transpilePackages: ['@wr-calc/calc', '@wr-calc/data', '@wr-calc/schema'],
+  // Next 16 otherwise writes AGENTS.md/CLAUDE.md into apps/web on every `next dev`.
+  agentRules: false,
 }
 
 export default nextConfig

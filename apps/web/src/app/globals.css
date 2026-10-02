@@ -47,6 +47,10 @@ table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nu
 th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { font-weight: 600; color: var(--muted); font-size: 13px; }
 td.num, th.num { text-align: right; }
+.tier-group + .tier-group { margin-top: calc(var(--gap) * 1.5); }
+.tier-heading { border-top: 1px solid var(--line); padding-top: 6px; }
+.champ-link { display: inline-flex; align-items: center; gap: 8px; }
+.champ-icon { border-radius: 50%; object-fit: cover; }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: var(--gap); }
 .filters button { font: inherit; padding: 4px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
