@@ -46,6 +46,7 @@ describe('7.3a hand-modelled champions', () => {
         'jayce', 'warwick', 'orianna', 'sivir', 'nami',
         'riven', 'lillia', 'velkoz', 'kogmaw', 'rell',
         'rumble', 'skarner', 'ryze', 'zeri', 'rakan',
+        'camille', 'evelynn', 'fizz', 'sona',
       ])
   })
 
@@ -1201,5 +1202,34 @@ describe('Zeri', () => {
 describe('Rakan', () => {
   it('The Quickness deals 300 at rank 3', () => {
     expect(run('rakan', ['R']).instances.map((i) => i.raw)).toEqual([300])
+  })
+})
+
+describe('Camille', () => {
+  it('Precision Protocol empowers two attacks; The Hextech Ultimatum takes 25% current Health', () => {
+    const ad = attacker('camille').sheet.total.ad!
+    const parts = partFrom(run('camille', ['Q', 'AA', 'AA', 'AA']), 'camille-q-precision-protocol')
+    expect(parts).toHaveLength(2)
+    for (const part of parts) expect(part.amount).toBeCloseTo(0.6 * ad, 6)
+    expect(run('camille', ['R']).instances[0].raw).toBeCloseTo(30 + 2500, 6)
+  })
+})
+
+describe('Evelynn', () => {
+  it('Hate Spike hits twice; Whiplash adds 2% max Health', () => {
+    expect(run('evelynn', ['Q']).instances[0].raw).toBe(125)
+    expect(run('evelynn', ['E']).instances[0].raw).toBeCloseTo(115 + 200, 6)
+  })
+})
+
+describe('Fizz', () => {
+  it('Seastone Trident burns for 3 seconds after an attack', () => {
+    expect(bySource(run('fizz', ['AA', 'wait:3']), 'fizz-passive-seastone-trident').map((i) => i.raw)).toEqual([8, 8, 8])
+  })
+})
+
+describe('Sona', () => {
+  it('Hymn of Valor empowers her next attack', () => {
+    expect(bySource(run('sona', ['Q', 'AA', 'AA']), 'sona-q-aura').map((i) => i.raw)).toEqual([23])
   })
 })

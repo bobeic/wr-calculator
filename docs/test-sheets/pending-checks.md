@@ -220,6 +220,13 @@ Patch 7.3a is live.
   - Ryze: no bonus Mana ratios and no Flux bonus, so his damage is well under the game's.
   - Zeri: her attacks are plain attacks (no 6-round burst, no Attack Speed cap or conversion).
   - Rakan: nothing beyond the listed damage.
+- Batch 22 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Camille: Precision Protocol's second attack doesn't wait 1.6 seconds or convert to true damage; Hookshot's
+    attack speed starts on the cast.
+  - Evelynn: both Hate Spike lines hit, no recast; un-empowered Whiplash; no Allure shred; no Last Caress execute bonus.
+  - Fizz: Seastone Trident a flat 24 at every level; Urchin Strike doesn't apply on-hit; Rending Wave's follow-up
+    bonus also on the first attack; Chum the Waters always the largest shark.
+  - Sona: no Power Chord; Crescendo hits with one soundwave.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
