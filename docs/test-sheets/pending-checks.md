@@ -245,6 +245,12 @@ Patch 7.3a is live.
   - Amumu: Despair on for 5 seconds per cast; no Cursed Touch (10% of magic damage as extra true damage).
   - Vex: no Gloom bonus damage; Shadow Surge's bolt and dash at once.
   - Ornn: Living Forge's 7% at every level; Brittle's bonus damage isn't modelled; both elemental hits land.
+- Batch 26 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Shen: Twilight Assault always empowered (blade through the target), lasting 8 seconds.
+  - Fiddlesticks: Terrify without its minimum or the 200% on feared targets; Bountiful Harvest's channel at once;
+    Crowstorm read as always hitting its 600 cap.
+  - Heimerdinger: no turrets and no UPGRADE!!! abilities, so his damage is far under the game's.
+  - Zilean: Time Bomb detonates at once; its charges aren't modelled.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

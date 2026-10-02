@@ -50,6 +50,7 @@ describe('7.3a hand-modelled champions', () => {
         'kennen', 'olaf', 'lissandra', 'milio',
         'irelia', 'talon', 'vladimir', 'janna',
         'sion', 'amumu', 'vex', 'ornn',
+        'shen', 'fiddlesticks', 'heimerdinger', 'zilean',
       ])
   })
 
@@ -1315,5 +1316,33 @@ describe('Vex', () => {
 describe('Ornn', () => {
   it('Bellows Breath deals 13% max Health at rank 4', () => {
     expect(run('ornn', ['W']).instances[0].raw).toBeCloseTo(1300, 6)
+  })
+})
+
+describe('Shen', () => {
+  it('Twilight Assault empowers 3 attacks with 7% max Health', () => {
+    const hits = bySource(run('shen', ['Q', 'AA', 'AA', 'AA', 'AA']), 'shen-q-twilight-assault')
+    expect(hits).toHaveLength(3)
+    for (const hit of hits) expect(hit.raw).toBeCloseTo(700, 6)
+  })
+})
+
+describe('Fiddlesticks', () => {
+  it('Crowstorm deals 600 in 20 ticks', () => {
+    const ticks = bySource(run('fiddlesticks', ['R', 'wait:5']), 'fiddlesticks-r-crowstorm')
+    expect(ticks).toHaveLength(20)
+    expect(ticks.reduce((sum, tick) => sum + tick.raw, 0)).toBe(600)
+  })
+})
+
+describe('Heimerdinger', () => {
+  it('Hextech Micro-Rockets: the first rocket in full, 4 more at 20%', () => {
+    expect(run('heimerdinger', ['W']).instances.map((i) => i.raw)).toEqual([135, 4 * 27])
+  })
+})
+
+describe('Zilean', () => {
+  it('Time Bomb deals 255 at rank 4', () => {
+    expect(run('zilean', ['Q']).instances.map((i) => i.raw)).toEqual([255])
   })
 })
