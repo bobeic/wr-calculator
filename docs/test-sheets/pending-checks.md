@@ -206,6 +206,13 @@ Patch 7.3a is live.
   - Orianna: Clockwork Windup a flat 13 at every level, without its same-target stacks.
   - Sivir: Boomerang Blade hits the target twice (out and back), no crit scaling; no Morale from On the Hunt.
   - Nami: Tidecaller's Blessing cast on herself.
+- Batch 20 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Riven: Runic Blade charges last 6 seconds; Broken Wings' 3 charges are a separate pool (can exceed 3 with W/E/R);
+    Wind Slash's missing-Health bonus on its base only, as a straight line; Blade of the Exile's 25% AD is a toggle.
+  - Lillia: Dream Dust's +0.012% per AP isn't modelled; Blooming Blows always hits the outer edge; Watch Out! Eep! the centre.
+  - Vel'Koz: Deconstruction's "20 + 8 (based on level)" read as 20 + 8 per level; the ray all magic, all at once.
+  - Kog'Maw: no Caustic Spittle shred; Living Artillery without the missing-Health amp or the below-40% doubling.
+  - Rell: Full Tilt's empowered attack waits 3 seconds; no resist steal.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

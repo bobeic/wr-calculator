@@ -44,6 +44,7 @@ describe('7.3a hand-modelled champions', () => {
         'jax', 'nidalee', 'aurora', 'lucian', 'maokai',
         'gwen', 'rengar', 'viktor', 'xayah', 'karma',
         'jayce', 'warwick', 'orianna', 'sivir', 'nami',
+        'riven', 'lillia', 'velkoz', 'kogmaw', 'rell',
       ])
   })
 
@@ -1128,5 +1129,42 @@ describe('Sivir', () => {
 describe('Nami', () => {
   it("Tidecaller's Blessing empowers 3 attacks", () => {
     expect(bySource(run('nami', ['E', 'AA', 'AA', 'AA', 'AA']), 'nami-e-blessing').map((i) => i.raw)).toEqual([85, 85, 85])
+  })
+})
+
+describe('Riven', () => {
+  it('Broken Wings charges Runic Blade 3 times; Blade of the Exile adds 25% AD when toggled on', () => {
+    const ad = attacker('riven').sheet.total.ad!
+    const parts = partFrom(run('riven', ['Q', 'AA', 'AA', 'AA', 'AA']), 'riven-q-runic-blade')
+    expect(parts).toHaveLength(3)
+    for (const part of parts) expect(part.amount).toBeCloseTo(0.22 * ad, 6)
+    expect(attacker('riven', { 'riven-blade-of-the-exile-active': true }).sheet.total.ad!).toBeCloseTo(1.25 * ad, 6)
+  })
+})
+
+describe('Lillia', () => {
+  it('Dream Dust deals 6% max Health over 3 seconds', () => {
+    expect(bySource(run('lillia', ['E', 'wait:3']), 'lillia-passive-dream-dust').map((i) => i.raw)).toEqual([200, 200, 200])
+  })
+})
+
+describe("Vel'Koz", () => {
+  it('Organic Deconstruction procs on the third ability hit', () => {
+    expect(bySource(run('velkoz', ['Q', 'E']), 'velkoz-passive-deconstruction')).toHaveLength(0)
+    expect(bySource(run('velkoz', ['Q', 'E', 'R']), 'velkoz-passive-deconstruction').map((i) => i.raw)).toEqual([140])
+  })
+})
+
+describe("Kog'Maw", () => {
+  it('Bio-Arcane Barrage adds 4.5% max Health to attacks', () => {
+    expect(bySource(run('kogmaw', ['W', 'AA', 'AA']), 'kogmaw-w-barrage').map((i) => i.raw)).toEqual([450, 450])
+  })
+})
+
+describe('Rell', () => {
+  it('Full Tilt empowers one attack with 7% max Health', () => {
+    const hits = bySource(run('rell', ['E', 'AA', 'AA']), 'rell-e-full-tilt')
+    expect(hits).toHaveLength(1)
+    expect(hits[0].raw).toBeCloseTo(700, 6)
   })
 })
