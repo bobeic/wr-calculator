@@ -20,7 +20,8 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
   Blitzcrank; Aatrox, Nocturne, Yone, Jhin, Malphite; Volibear, Jarvan IV, Morgana, Kai'Sa, Yuumi; K'Sante, Kayn,
   Ahri, Ashe, Lulu; Teemo, Pantheon, Ziggs, Ezreal, Pyke; Urgot, Vi, Ekko, Kalista, Zyra; Renekton, Shyvana, Syndra,
   Twitch, Swain; Kayle, Kindred, Aurelion Sol, Vayne, Braum; Fiora, Wukong, Twisted Fate, Smolder, Soraka; Gnar,
-  Rammus, Zed, Varus, Alistar. The other 61 champions use auto-imported ability numbers ("rough kit" on the site).
+  Rammus, Zed, Varus, Alistar; Jax, Nidalee, Aurora, Lucian, Maokai. The other 56 champions use auto-imported ability
+  numbers ("rough kit" on the site).
 - Every item and rune that changes a damage number is modelled. Most values are unchecked in game; the open questions
   are in `docs/test-sheets/pending-checks.md`.
 
@@ -69,7 +70,7 @@ Steps once a name is chosen:
 
 ## Development, roughly in order
 
-1. **More champion kits.** Continue down the CN pick rates (the next unmodelled pick per lane: Jax, Nidalee, Aurora, Lucian, Maokai).
+1. **More champion kits.** Continue down the CN pick rates (the next unmodelled pick per lane: Gwen, Rengar, Viktor, Xayah, Karma).
 2. **Runes and spells in the patch pipeline:** done — `patch:update` now fetches wrpocket's `runes.json` and
    `spells.json` into each patch snapshot and lists every added, removed or reworded rune/spell (with the numbers
    that moved) in a "Runes and summoner spells" section of `PATCH_DIFF.md`. The models in `runes.ts`/`spells.ts` stay

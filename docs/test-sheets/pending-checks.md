@@ -187,6 +187,12 @@ Patch 7.3a is live.
   - Zed: no shadows (Razor Shuriken, Shadow Slash and Death Mark are Zed's own hits only); Death Mark is only 100% AD.
   - Varus: every ability hit detonates 3 Blight stacks, even with no attacks before it.
   - Alistar: Trample's empowered attack is granted on the cast (5 hits assumed), 40 at every level.
+- Batch 17 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Jax: Counter Strike with no dodged attacks; Grandmaster's Might passive on every 3rd attack without its window.
+  - Nidalee: Human Form only; Javelin Toss always at max range.
+  - Aurora: Spirit Abjuration's 3-hit window taken as 4s; Twofold Hex's recast missing-Health bonus on its base only.
+  - Lucian: Lightslinger's second shot folded into the attack (no separate on-hit or crit), 40% at every level.
+  - Maokai: one sapling outside brush, landing at once.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

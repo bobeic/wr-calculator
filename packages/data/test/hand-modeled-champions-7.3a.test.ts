@@ -41,6 +41,7 @@ describe('7.3a hand-modelled champions', () => {
         'kayle', 'kindred', 'aurelion-sol', 'vayne', 'braum',
         'fiora', 'wukong', 'twisted-fate', 'smolder', 'soraka',
         'gnar', 'rammus', 'zed', 'varus', 'alistar',
+        'jax', 'nidalee', 'aurora', 'lucian', 'maokai',
       ])
   })
 
@@ -1023,5 +1024,37 @@ describe('Alistar', () => {
     const result = run('alistar', ['E', 'wait:5'])
     expect(result.instances.filter((i) => i.source.id === 'alistar-e')).toHaveLength(1)
     expect(bySource(result, 'alistar-e-trample')).toHaveLength(9)
+  })
+})
+
+describe('Jax', () => {
+  it("Grandmaster's Might adds 185 magic to every 3rd attack at rank 3", () => {
+    expect(bySource(run('jax', ['AA', 'AA', 'AA']), 'jax-r-passive').map((i) => i.raw)).toEqual([185])
+  })
+})
+
+describe('Nidalee', () => {
+  it('Javelin Toss at max range; Bushwhack burns for 4 seconds', () => {
+    expect(run('nidalee', ['Q']).instances[0].raw).toBe(450)
+    expect(bySource(run('nidalee', ['W', 'wait:4']), 'nidalee-w-bushwhack')).toHaveLength(3)
+  })
+})
+
+describe('Aurora', () => {
+  it('Spirit Abjuration exorcises on the 3rd hit for 2.5% max Health (no AP)', () => {
+    expect(bySource(run('aurora', ['AA', 'AA', 'AA']), 'aurora-passive-exorcise').map((i) => i.raw)).toEqual([250])
+  })
+})
+
+describe('Lucian', () => {
+  it('Lightslinger adds a 40% AD second shot after an ability', () => {
+    const ad = attacker('lucian').sheet.total.ad!
+    expect(partFrom(run('lucian', ['Q', 'AA', 'AA']), 'lucian-passive-lightslinger').map((p) => p.amount)).toEqual([0.4 * ad])
+  })
+})
+
+describe('Maokai', () => {
+  it('Bramble Smash adds 4% max Health at rank 4', () => {
+    expect(run('maokai', ['Q']).instances[0].raw).toBe(225 + 400)
   })
 })
