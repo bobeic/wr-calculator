@@ -18,16 +18,19 @@ function modelled(id: string, effects: Effect[], extraStats: Item['stats'] = {})
 const toggle = (id: string, label: string, defaultOn = false) => [{ type: 'boolean' as const, id, label, default: defaultOn }]
 const stacks = (id: string, label: string, max: number) => [{ type: 'stackCount' as const, id, label, min: 0, max, default: 0 }]
 
-// Energized attacks charge from movement and attacks. How many attacks a charge takes in Wild Rift is unknown;
-// these follow SharpWR Damage Lab's kiting benchmark (7 attacks, Statikk Shiv 5), and the start-ready input covers
-// walking into the fight charged. TODO-VERIFY in game (pending-checks.md).
-const ENERGIZED_ATTACKS = 7
-const STATIKK_ENERGIZED_ATTACKS = 5
+// Energized attacks charge from movement and attacks: confirmed in game (2026-10-02) at 9 energy per attack, 100
+// needed for an Energized attack. Statikk Shiv's "5 additional Energized stacks" on top of the normal 9 means 14
+// per attack. Movement also charges it but isn't modelled, so standing-still attack counts (ceil(100/9) = 12,
+// ceil(100/14) = 8) overcount how long it takes while kiting. The start-ready input covers walking in charged.
+const ENERGIZED_ATTACKS = 12
+const STATIKK_ENERGIZED_ATTACKS = 8
 const ENERGIZED_READY = 'energized-ready'
 const energizedInput = toggle(ENERGIZED_READY, 'Energized attack charged at combo start', true)
 
-// "While in combat": how long combat lasts after the last hit isn't stated. 3 seconds is assumed where the text
-// gives nothing; Hollow Radiance states 5.
+// "While in combat": confirmed in game (2026-10-02) that these tick for as long as the target stays in range and
+// you're in combat, stopping immediately once the target leaves range — but how long "in combat" itself lasts after
+// your last hit (with no range check to fall back on) still isn't stated. 3 seconds is assumed where the text gives
+// nothing; Hollow Radiance states 5.
 const COMBAT_WINDOW_SECONDS = 3
 
 const SEETHING_STRIKE_ID = 'guinsoos-rageblade-seething-strike'
@@ -149,8 +152,8 @@ export const BATCH6_ITEMS: Item[] = [
         + 'and 10% Magic Penetration for 5 seconds on hit, stacking up to 3 times. Bonus penetration granted by it '
         + 'is capped at 40%.',
       support: 'partial' as const,
-      supportNotes: 'The first attack is Light (as SharpWR models it; unverified). Light\'s Armor and Magic Resist are '
-        + 'not modelled. The 40% cap never binds: 3 Dark stacks give 30%.',
+      supportNotes: "The first attack is Light (confirmed 2026-10-02). Light's Armor and Magic Resist are not "
+        + 'modelled. The 40% cap never binds: 3 Dark stacks give 30%.',
       stat, amountPerStack: 0.1, maxStacks: 3, durationSeconds: 5, every: 2, startAt: 2,
     })),
   ]),
@@ -162,8 +165,8 @@ export const BATCH6_ITEMS: Item[] = [
     {
       kind: 'attackStack', id: SEETHING_STRIKE_ID, name: 'Seething Strike',
       description: 'Basic attacks grant 8% Attack Speed, stacking up to 4 times for a maximum of 32% Attack Speed.',
-      support: 'partial', supportNotes: 'The text gives no duration; 5 seconds is assumed.',
-      stat: 'attackSpeed', amountPerStack: 0.08, maxStacks: 4, durationSeconds: 5,
+      support: 'full',
+      stat: 'attackSpeed', amountPerStack: 0.08, maxStacks: 4, durationSeconds: 4,
     },
     {
       kind: 'custom', id: 'guinsoos-rageblade-phantom-hit', name: 'Seething Strike (phantom hit)',
@@ -199,8 +202,9 @@ export const BATCH6_ITEMS: Item[] = [
     kind: 'procEveryN', id: `${id}-energized`, name,
     description: `Movement and basic attacks charge an Energized attack. ${text}`,
     support: 'partial',
-    supportNotes: `Charges every ${n} attacks (unverified; movement isn't modelled). Range, movement speed and bounces `
-      + 'to other targets are not modelled.',
+    supportNotes: `Charges every ${n} attacks while standing still (confirmed 2026-10-02: 9 energy per attack, 100 `
+      + "needed; Statikk Shiv's extra 5 stacks make it 14). Moving also charges it but isn't modelled, so this "
+      + 'overcounts attacks needed while kiting. Range, movement speed and bounces to other targets are not modelled.',
     n, countsFrom: 'basicAttack', damageType: 'magic', damage, resetsOnMiss: false,
     startReadyInputId: ENERGIZED_READY, inputs: energizedInput,
   }])),
@@ -342,7 +346,10 @@ export const BATCH6_ITEMS: Item[] = [
     kind: 'active', id: 'galeforce-cloudburst', name: 'Cloudburst',
     description: 'Dash in the target direction and fire 3 projectiles at the lowest-Health enemy near the destination, '
       + 'dealing 40–125 (based on level) + 35% bonus Attack Damage physical damage (60 second Cooldown).',
-    support: 'partial', supportNotes: 'Taken as the total of all 3 projectiles (unverified). 40–125 is linear over levels 1–15.',
+    support: 'partial',
+    supportNotes: 'Taken as the total of all 3 projectiles, split evenly: confirmed close enough in game 2026-10-02 '
+      + '(level 15 Caitlyn, 60 bonus AD, 100 armor dummy — 26 mitigated per bolt observed vs ~24 predicted). 40–125 '
+      + 'is linear over levels 1–15.',
     cooldownSeconds: 60, damageType: 'physical', damage: { levelRange: { min: 40, max: 125 } },
     ratios: [{ stat: 'ad', layer: 'bonus', value: 0.35 }],
   }]),

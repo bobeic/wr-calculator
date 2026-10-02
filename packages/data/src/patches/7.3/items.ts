@@ -438,10 +438,10 @@ export const STARTER_ITEMS: Item[] = [
         + 'Ability Power magic damage to enemies hit (30s cooldown). If a champion or monster is hit '
         + 'by more than one missile, each additional missile only deals 10% damage.',
       // Measured 2026-09-29 (AP 429): totals by bolts hit were 107, 118, 128, 139, 150, 160, 170.
-      // All 7 usually read 170, but sometimes an unexplained extra 75 appeared; not modeled.
+      // The occasional ~75 reading isn't extra damage on top (2026-10-02) — it's a different bolt
+      // count landing, not a separate bonus. Small enough not worth chasing further.
       support: 'partial',
-      supportNotes: 'Assumes all 7 bolts hit a single target (170 at 429 AP). In game an extra ~75 '
-        + 'sometimes appears on top, cause unknown and not modeled. The dash is not modeled.',
+      supportNotes: 'Assumes all 7 bolts hit a single target (170 at 429 AP). The dash is not modeled.',
       cooldownSeconds: 30, damageType: 'magic', damage: 100,
       ratios: [{ stat: 'ap', value: 0.1 }], extraHits: { count: 6, fraction: 0.1 },
     }],

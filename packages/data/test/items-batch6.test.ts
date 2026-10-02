@@ -55,9 +55,9 @@ describe('batch 6 items', () => {
     expect(result.instances.slice(0, 2).every((instance) => instance.parts === undefined)).toBe(true)
   })
 
-  it('Energized items proc on the first attack when charged, then every 7th', () => {
+  it('Energized items proc on the first attack when charged, then every 12th', () => {
     const procs = (inputs: Build['inputs']) => simulateCombo(
-      ambessaWith(['rapid-firecannon'], inputs), dummy(), Array<ComboAction>(8).fill('AA'), { critMode: 'never' },
+      ambessaWith(['rapid-firecannon'], inputs), dummy(), Array<ComboAction>(13).fill('AA'), { critMode: 'never' },
     ).instances.filter((instance) => instance.source.id === 'rapid-firecannon-energized').length
     expect(procs({ 'energized-ready': true })).toBe(2)
     expect(procs({})).toBe(1)

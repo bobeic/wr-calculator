@@ -12,16 +12,26 @@ Patch 7.3a is live.
   the Twelfth Hour; Seraph's Embrace goes with any of them. Only one of Sunfire and Hollow Radiance. All pinned in
   `packages/data/test/shop-rules.test.ts`.
 
-- Batch 6 assumptions (2026-10-02; every batch 6 item is unchecked, these are the guesses most likely to be off):
-  - Energized items (Rapid Firecannon, Stormrazor, Statikk Shiv): how many basic attacks charge one, standing still?
-    The engine says 7 (Statikk 5), from SharpWR Damage Lab's benchmark.
-  - Sunfire Aegis, Bami's Cinder, Unending Despair: first tick 1s (Despair 4s) after your first hit, and how long
-    after your last hit they keep ticking. The engine says 3s.
-  - Galeforce: is 40–125 + 35% bonus AD the total of all 3 projectiles, or per projectile? The engine says total.
-  - Guinsoo's Rageblade: how long do Seething Strike stacks last? The engine says 5s.
-  - Terminus: is the first attack Light (the engine) or Dark?
-  - Kraken Slayer: does 150–210 grow linearly with level, and does Guinsoo's extra on-hit count toward it?
-  - Dusk and Dawn: the "shortly afterward" extra on-hit; the engine applies it right after the attack.
+- Batch 6 assumptions (2026-10-02; status per item):
+  - Energized items (Rapid Firecannon, Stormrazor, Statikk Shiv): answered 2026-10-02. 9 energy per attack (14 for
+    Statikk Shiv — the "5 additional" is on top of the normal 9), 100 needed. Movement also charges it but isn't
+    modelled, so the engine's standing-still attack counts (12, Statikk 8) overcount how long it takes while kiting.
+  - Sunfire Aegis, Bami's Cinder, Unending Despair: answered 2026-10-02. They tick for as long as the target stays
+    in range and you're in combat, stopping immediately on leaving range. Exactly how long "in combat" itself lasts
+    after your last hit (absent a range check) is still a guess — the engine uses 3s.
+  - Galeforce: answered 2026-10-02. Total of all 3 projectiles, split evenly, confirmed close enough in game
+    (level 15 Caitlyn, 60 bonus AD, 100-armor dummy: 26 mitigated per bolt observed vs ~24 predicted).
+  - Guinsoo's Rageblade: answered 2026-10-02. Seething Strike stacks last 4 seconds (engine now matches).
+  - Terminus: answered 2026-10-02. The first attack is Light (engine already assumed this).
+  - Kraken Slayer: still open. Two things to check:
+    1. Does 150–210 grow linearly with level? Equip only Kraken Slayer, attack a full-Health dummy 3 times at
+       level 1 and note the bonus on the 3rd hit (should read ~150), then again at level 15 (~210); a level in
+       between (say 8) should fall roughly on the line between them.
+    2. Does Guinsoo's phantom extra on-hit count toward Kraken's "every 3rd attack"? Equip both, attack until
+       Guinsoo's 4 stacks are up (4+ hits), then keep attacking and watch which real attack number procs Kraken's
+       bonus. If it still lands on your 3rd/6th/9th real attack, phantom hits don't count (current assumption); if
+       the timing shifts, they do.
+  - Dusk and Dawn: answered 2026-10-02. The extra on-hit lands right after the attack (engine already assumed this).
 
 - Runes (first modelled 2026-10-02 from wrpocket's 7.3a text; all unchecked):
   - Rune page shape: the engine only enforces one keystone. How many minor runes, and one per path or per row?
@@ -83,6 +93,8 @@ Each `TODO-VERIFY` comment there says how to check it. The ones most likely to m
 
 - Ambessa R deals ~57 more pre-mitigation damage than its tooltip, on both the dummy and a full-HP
   Garen. A fixed bonus or a hidden ~14% amp would fit. With Eclipse (+65 bonus AD) it read 275, against 270
-  with no items, so R may scale slightly with bonus AD (~13% of bonus AD before mitigation).
-- Hextech Rocketbelt sometimes shows an extra ~75 damage on top of 7 bolts.
+  with no items, so R may scale slightly with bonus AD (~13% of bonus AD before mitigation). Decided 2026-10-02:
+  not worth chasing further — the engine keeps using the tooltip's literal numbers.
+- Hextech Rocketbelt's occasional ~75 reading isn't extra damage on top (2026-10-02) — it's a different bolt count
+  landing, not a separate bonus. Small enough not worth modelling.
 - Stormsurge never triggered on the dummy; needs a real champion target.
