@@ -53,6 +53,12 @@ describe('validateBuild', () => {
     }])
   })
 
+  it('reports a pair once when it shares both a group and a passive', () => {
+    const tear = (id: string): [string, Item] => [id, { ...item(id, 'legendary', 'tear'), uniquePassives: ['Awe'] }]
+    const withTear = new Map([...catalog, tear('archangel'), tear('manamune')])
+    expect(validateBuild(build(['archangel', 'manamune']), withTear).map((issue) => issue.code)).toEqual(['exclusive-group'])
+  })
+
   it('flags more than one keystone rune', () => {
     const rune = (id: string, slot: string) => [id, { id, name: id, path: 'p', slot, effects: [] }] as const
     const runes = new Map([rune('electrocute', 'keystone'), rune('conqueror', 'keystone'), rune('brutal', '0')])

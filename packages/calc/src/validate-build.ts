@@ -55,8 +55,10 @@ export function validateBuild(build: Build, items: ReadonlyMap<string, Item>, ru
     if (UNIQUE_TIERS.has(item.tier)) {
       for (const passive of item.uniquePassives ?? []) {
         const holder = holderByPassive.get(passive)
+        // A pair the exclusive-group check already reports isn't reported twice.
+        const sameGroup = item.exclusiveGroup !== undefined && items.get(holder ?? '')?.exclusiveGroup === item.exclusiveGroup
         if (holder === undefined) holderByPassive.set(passive, item.id)
-        else if (holder !== item.id && !reported.has(`${holder}|${item.id}`)) {
+        else if (holder !== item.id && !sameGroup && !reported.has(`${holder}|${item.id}`)) {
           reported.add(`${holder}|${item.id}`)
           issues.push({
             code: 'shared-passive',
