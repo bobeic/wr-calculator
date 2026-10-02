@@ -49,6 +49,7 @@ describe('7.3a hand-modelled champions', () => {
         'camille', 'evelynn', 'fizz', 'sona',
         'kennen', 'olaf', 'lissandra', 'milio',
         'irelia', 'talon', 'vladimir', 'janna',
+        'sion', 'amumu', 'vex', 'ornn',
       ])
   })
 
@@ -1288,5 +1289,31 @@ describe('Vladimir', () => {
 describe('Janna', () => {
   it('Howling Gale deals 170 at rank 4', () => {
     expect(run('janna', ['Q']).instances.map((i) => i.raw)).toEqual([170])
+  })
+})
+
+describe('Sion', () => {
+  it('Soul Furnace detonates for 13% max Health at rank 4', () => {
+    expect(run('sion', ['W']).instances[0].raw).toBeCloseTo(150 + 1300, 6)
+  })
+})
+
+describe('Amumu', () => {
+  it('Despair burns 40 + 2.1% max Health every second for 5 seconds', () => {
+    const ticks = bySource(run('amumu', ['W', 'wait:5']), 'amumu-w-despair')
+    expect(ticks).toHaveLength(5)
+    for (const tick of ticks) expect(tick.raw).toBeCloseTo(40 + 210, 6)
+  })
+})
+
+describe('Vex', () => {
+  it('Shadow Surge deals the bolt and the dash', () => {
+    expect(run('vex', ['R']).instances.map((i) => i.raw)).toEqual([175, 350])
+  })
+})
+
+describe('Ornn', () => {
+  it('Bellows Breath deals 13% max Health at rank 4', () => {
+    expect(run('ornn', ['W']).instances[0].raw).toBeCloseTo(1300, 6)
   })
 })

@@ -240,6 +240,11 @@ Patch 7.3a is live.
   - Vladimir: Crimson Pact's two conversions both apply (with Rabadon's, the Health came out at 1.5x the AP before
     Rabadon's multiplier); Tides of Blood fully charged; Hemoplague without its 10% of damage taken.
   - Janna: one Howling Gale; Zephyr's Movement Speed ratio isn't modelled.
+- Batch 25 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Sion: Decimating Smash and Unstoppable Onslaught fully charged; Soul Furnace detonates at once; no Armor shred.
+  - Amumu: Despair on for 5 seconds per cast; no Cursed Touch (10% of magic damage as extra true damage).
+  - Vex: no Gloom bonus damage; Shadow Surge's bolt and dash at once.
+  - Ornn: Living Forge's 7% at every level; Brittle's bonus damage isn't modelled; both elemental hits land.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
