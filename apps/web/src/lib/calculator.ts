@@ -1,8 +1,8 @@
 import type { AbilityVariant, Champion, StatKey } from '@wr-calc/schema'
 import type {
-  AbilityKey, BuildIssue, ComboAction, ComboResult, Combatant, UnsupportedEffectEntry,
+  AbilityKey, BuildBreakpoint, BuildIssue, ComboAction, ComboResult, Combatant, UnsupportedEffectEntry,
 } from '@wr-calc/calc'
-import { combatantFromChampion, simulateCombo, sustainedDps } from '@wr-calc/calc'
+import { buildBreakpoints, combatantFromChampion, simulateCombo, sustainedDps } from '@wr-calc/calc'
 import type { DebugBuild, DebugDataset, DebugState } from './debug-state'
 import { parseCombo, parsePriority } from './parse-combo'
 import { targetCombatant, toBuild } from './run-debug'
@@ -41,11 +41,19 @@ export const SHOWN_STATS: readonly StatKey[] = [
   'pctMagicPen', 'flatMagicPen',
 ]
 
+export interface BuildOrderStep {
+  itemId: string
+  itemName: string
+  breakpoint: BuildBreakpoint
+}
+
 export interface BuildReport {
   cost: number
   issues: BuildIssue[]
   stats: Partial<Record<StatKey, number>>
   rows: AbilityRow[]
+  /** Gold, burst, DPS, TTK and EHP after each item, in the order the build adds them. Empty without items or a combo. */
+  buildOrder: BuildOrderStep[]
   /** The combo text run once, cooldowns respected. Null when the combo text doesn't parse. */
   combo: { damage: number; killed: boolean; timeToKill?: number } | null
   /** Abilities in priority order off cooldown, basic attacks between: seconds to kill (undefined: not within the limit). */
@@ -161,14 +169,28 @@ function buildReport(
   build: DebugBuild, state: DebugState, champion: Champion, target: Combatant, dataset: DebugDataset,
   combo: ComboAction[] | null, priority: AbilityKey[],
 ): BuildReport {
-  const attacker = combatantFromChampion(champion, state.level, toBuild(build, dataset, state.abilityRanks, champion), dataset.catalog)
+  const builtBuild = toBuild(build, dataset, state.abilityRanks, champion)
+  const attacker = combatantFromChampion(champion, state.level, builtBuild, dataset.catalog)
   const summary = summarizeBuild(build, dataset.catalog)
   const comboResult = combo === null ? null : simulateCombo(attacker, target, combo, { critMode: state.critMode })
   const long = simulateCombo(
     attacker, target, rotation(priority, attacker.sheet.total.attackSpeed ?? 1, MAX_TTK_SECONDS), { critMode: 'expected' },
   )
+  const order = combo === null || builtBuild.items.length === 0
+    ? { breakpoints: [], unsupportedEffects: [], dataWarnings: [] }
+    : buildBreakpoints(
+      { champion, level: state.level, build: builtBuild, catalog: dataset.catalog }, target,
+      { durationSeconds: state.durationSeconds, priority, burstSequence: combo },
+    )
+  const buildOrder: BuildOrderStep[] = order.breakpoints.map((breakpoint, index) => {
+    const itemId = builtBuild.items[index]
+    return { itemId, itemName: dataset.catalog.items.get(itemId)?.name ?? itemId, breakpoint }
+  })
   const unmodelled = new Map<string, UnsupportedEffectEntry>()
-  for (const entry of [...attacker.sheet.unsupportedEffects, ...(comboResult?.unsupportedEffects ?? []), ...long.unsupportedEffects]) {
+  for (const entry of [
+    ...attacker.sheet.unsupportedEffects, ...(comboResult?.unsupportedEffects ?? []),
+    ...long.unsupportedEffects, ...order.unsupportedEffects,
+  ]) {
     unmodelled.set(entry.id, entry)
   }
   return {
@@ -176,6 +198,7 @@ function buildReport(
     issues: summary.issues,
     stats: Object.fromEntries(SHOWN_STATS.map((stat) => [stat, attacker.sheet.total[stat] ?? 0])),
     rows: abilityRows(champion, attacker, target),
+    buildOrder,
     combo: comboResult === null ? null : {
       damage: total(comboResult), killed: comboResult.killed,
       ...(comboResult.timeToKill !== undefined && { timeToKill: comboResult.timeToKill }),
@@ -183,7 +206,7 @@ function buildReport(
     ...(long.killed && long.timeToKill !== undefined && long.timeToKill <= MAX_TTK_SECONDS && { timeToKill: long.timeToKill }),
     dps: sustainedDps(attacker, target, state.durationSeconds, priority),
     unmodelled: [...unmodelled.values()],
-    dataWarnings: [...new Set([...attacker.sheet.dataWarnings, ...(comboResult?.dataWarnings ?? [])])],
+    dataWarnings: [...new Set([...attacker.sheet.dataWarnings, ...(comboResult?.dataWarnings ?? []), ...order.dataWarnings])],
   }
 }
 

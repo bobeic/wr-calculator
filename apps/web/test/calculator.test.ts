@@ -108,6 +108,24 @@ describe('runCalculator', () => {
   it('reports an unknown champion as an error', () => {
     expect(runCalculator(state({ championId: 'nobody' }), dataset, false).a).toEqual({ ok: false, error: "unknown champion 'nobody'" })
   })
+
+  it('builds the order one item at a time, each pricier and stronger than the last', () => {
+    const report = runCalculator(
+      state({ buildA: { ...emptyBuild(), items: ['bf-sword', 'bf-sword'] } }), dataset, false,
+    )
+    if (!report.a.ok) throw new Error('should run')
+    const { buildOrder } = report.a.value
+    expect(buildOrder.map((step) => step.itemName)).toEqual(['B. F. Sword', 'B. F. Sword'])
+    expect(buildOrder[1].breakpoint.gold).toBe(2 * dataset.catalog.items.get('bf-sword')!.cost.total)
+    expect(buildOrder[1].breakpoint.gold).toBeGreaterThan(buildOrder[0].breakpoint.gold)
+    expect(buildOrder[1].breakpoint.burst).toBeGreaterThan(buildOrder[0].breakpoint.burst)
+  })
+
+  it('has no build order without items or without a combo to burst with', () => {
+    expect(runCalculator(state(), dataset, false).a).toMatchObject({ ok: true, value: { buildOrder: [] } })
+    const broken = runCalculator(state({ buildA: { ...emptyBuild(), items: ['bf-sword'] }, combo: 'bogus' }), dataset, false)
+    expect(broken.a.ok && broken.a.value.buildOrder).toEqual([])
+  })
 })
 
 describe('isEmptyBuild', () => {

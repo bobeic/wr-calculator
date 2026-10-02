@@ -141,6 +141,22 @@ function breakpointsForSide(
   return breakpoints
 }
 
+/** The gold/burst/dps/ttk/ehp series at every item breakpoint for one build, in build-order (one build vs compareBuilds' two). */
+export function buildBreakpoints(
+  side: CompareBuildsSide, target: Combatant, scenario: CompareBuildsScenario
+): { breakpoints: BuildBreakpoint[] } & Pick<CompareBuildsResult, 'unsupportedEffects' | 'dataWarnings' | 'unverifiedRules'> {
+  const envelope: Envelope = {
+    unsupportedByEffectId: new Map(), dataWarnings: [], unverifiedRuleIds: new Set(),
+  }
+  const breakpoints = breakpointsForSide(side, target, scenario, envelope, new Map())
+  return {
+    breakpoints,
+    unsupportedEffects: [...envelope.unsupportedByEffectId.values()],
+    dataWarnings: [...new Set(envelope.dataWarnings)],
+    unverifiedRules: [...envelope.unverifiedRuleIds],
+  }
+}
+
 /** Computes a gold/burst/dps/ttk/ehp series at every item breakpoint for two builds, for crossover charts. */
 export function compareBuilds(
   a: CompareBuildsSide, b: CompareBuildsSide, target: Combatant, scenario: CompareBuildsScenario

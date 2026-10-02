@@ -157,8 +157,39 @@ export function Results({ report, comboText }: ResultsProps) {
         </div>
       </details>
 
+      <BuildOrder label="Build A" report={a} />
+      {comparing && <BuildOrder label="Build B" report={b} />}
+
       <Unmodelled reports={[a, b].filter((value): value is BuildReport => value !== undefined)} />
     </div>
+  )
+}
+
+/** Gold, burst, DPS and time to kill after each item, in the order the build adds them. */
+function BuildOrder({ label, report }: { label: string; report: BuildReport | undefined }) {
+  if (report === undefined || report.buildOrder.length === 0) return null
+  return (
+    <details className="stats-details">
+      <summary>{label}: build order ({report.buildOrder.length} items)</summary>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th className="num">Gold</th><th className="num">Burst</th><th className="num">DPS</th><th className="num">TTK</th></tr>
+          </thead>
+          <tbody>
+            {report.buildOrder.map((step) => (
+              <tr key={step.itemId}>
+                <td>{step.itemName}</td>
+                <td className="num">{whole(step.breakpoint.gold)}</td>
+                <td className="num">{whole(step.breakpoint.burst)}</td>
+                <td className="num">{whole(step.breakpoint.dps)}</td>
+                <td className="num">{step.breakpoint.ttk === undefined ? <span className="muted">doesn&apos;t kill</span> : seconds(step.breakpoint.ttk)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
   )
 }
 
