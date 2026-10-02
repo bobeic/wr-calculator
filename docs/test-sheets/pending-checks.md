@@ -151,6 +151,14 @@ Patch 7.3a is live.
   - Ziggs: Short Fuse assumed ready on every Bouncing Bomb.
   - Ezreal: Mystic Shot's on-hit effects and cooldown refunds aren't modelled; Essence Flux detonates at once.
   - Pyke: Death from Below is only its 50% damage (no execute, no Armor Penetration part).
+- Batch 12 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Urgot: Echoing Flames has one 15s cooldown for all six legs (procs far too rarely); Purge fires 3 shots a second
+    (League of Legends' rate); Fear Beyond Death's execute isn't modelled.
+  - Vi: Denting Blows' Armor reduction and attack speed aren't modelled; Vault Breaker always fully charged;
+    Relentless Force's charges aren't modelled.
+  - Ekko: Z-Drive's 3-hit window taken as 4s; "Low Health" for Parallel Convergence taken as below 30%.
+  - Kalista: Rend's spear count is an input, and each extra spear uses rank 4's 42 (+57% AD) at every rank.
+  - Zyra: one Thorn Spitter per ability hit, attacking once a second for 6s.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

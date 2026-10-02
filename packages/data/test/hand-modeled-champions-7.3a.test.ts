@@ -36,6 +36,7 @@ describe('7.3a hand-modelled champions', () => {
         'volibear', 'jarvan-iv', 'morgana', 'kaisa', 'yuumi',
         'ksante', 'kayn', 'ahri', 'ashe', 'lulu',
         'teemo', 'pantheon', 'ziggs', 'ezreal', 'pyke',
+        'urgot', 'vi', 'ekko', 'kalista', 'zyra',
       ])
   })
 
@@ -823,5 +824,53 @@ describe('Pyke', () => {
     const withBelt = build(['giants-belt'])
     expect(withBelt.total.hp).toBeCloseTo(bare.total.hp!, 6)
     expect(withBelt.total.ad! - bare.total.ad!).toBeCloseTo(dataset.catalog.items.get('giants-belt')!.stats.hp! / 14, 6)
+  })
+})
+
+describe('Urgot', () => {
+  it('Purge fires 12 shots over 4 seconds', () => {
+    const result = run('urgot', ['W', 'wait:4'])
+    expect(result.instances.filter((i) => i.source.id === 'urgot-w').length + bySource(result, 'urgot-w-purge').length).toBe(12)
+  })
+
+  it('Echoing Flames adds 105% AD + 3% max Health at level 15, once per 15 seconds', () => {
+    const ad = attacker('urgot').sheet.total.ad!
+    const procs = bySource(run('urgot', ['AA', 'AA']), 'urgot-passive-echoing-flames').map((i) => i.raw)
+    expect(procs).toHaveLength(1)
+    expect(procs[0]).toBeCloseTo(1.05 * ad + 0.03 * 10000, 6)
+  })
+})
+
+describe('Vi', () => {
+  it('Denting Blows lands on the 3rd attack for 4.8% max Health', () => {
+    expect(bySource(run('vi', ['AA', 'AA', 'AA']), 'vi-passive-denting-blows').map((i) => i.raw)).toEqual([480])
+  })
+})
+
+describe('Ekko', () => {
+  it('Z-Drive Resonance procs on the third hit', () => {
+    expect(bySource(run('ekko', ['Q', 'AA', 'AA']), 'ekko-passive-z-drive').map((i) => i.raw)).toEqual([30])
+  })
+
+  it('Parallel Convergence adds 3% missing Health only below 30% Health', () => {
+    const at = (fraction: number) => bySource(
+      simulateCombo(attacker('ekko'), { ...dummy(), startHpFraction: fraction }, ['AA'], { critMode: 'never' }), 'ekko-w-passive',
+    )
+    expect(at(1)).toHaveLength(0)
+    expect(at(0.2)).toHaveLength(1)
+  })
+})
+
+describe('Kalista', () => {
+  it('Rend adds 42 (+57% AD) per extra spear', () => {
+    const ad = attacker('kalista').sheet.total.ad!
+    const rend = (spears: number) => run('kalista', ['E'], { 'kalista-rend-spears': spears }).instances[0].raw
+    expect(rend(4) - rend(0)).toBeCloseTo(4 * (42 + 0.57 * ad), 6)
+  })
+})
+
+describe('Zyra', () => {
+  it('each damaging ability sprouts its own Thorn Spitter', () => {
+    expect(bySource(run('zyra', ['Q', 'E', 'wait:6']), 'zyra-thorn-spitter')).toHaveLength(12)
   })
 })
