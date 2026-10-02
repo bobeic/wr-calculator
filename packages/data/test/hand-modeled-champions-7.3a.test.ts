@@ -48,6 +48,7 @@ describe('7.3a hand-modelled champions', () => {
         'rumble', 'skarner', 'ryze', 'zeri', 'rakan',
         'camille', 'evelynn', 'fizz', 'sona',
         'kennen', 'olaf', 'lissandra', 'milio',
+        'irelia', 'talon', 'vladimir', 'janna',
       ])
   })
 
@@ -1259,5 +1260,33 @@ describe('Lissandra', () => {
 describe('Milio', () => {
   it('Ultra Mega Fire Kick deals 320 at rank 4', () => {
     expect(run('milio', ['Q']).instances.map((i) => i.raw)).toEqual([320])
+  })
+})
+
+describe('Irelia', () => {
+  it('Ionian Fervor at max stacks adds attack speed and an on-hit', () => {
+    const off = attacker('irelia')
+    const on = attacker('irelia', { 'irelia-ionian-fervor-max': true })
+    expect(on.sheet.total.attackSpeed!).toBeGreaterThan(off.sheet.total.attackSpeed!)
+    expect(bySource(run('irelia', ['AA']), 'irelia-passive-on-hit')).toHaveLength(0)
+    expect(bySource(run('irelia', ['AA'], { 'irelia-ionian-fervor-max': true }), 'irelia-passive-on-hit')).toHaveLength(1)
+  })
+})
+
+describe('Talon', () => {
+  it("Blade's End bleeds after three ability hits", () => {
+    expect(bySource(run('talon', ['Q', 'W', 'R', 'wait:2']), 'talon-passive-bleed')).toHaveLength(4)
+  })
+})
+
+describe('Vladimir', () => {
+  it('Crimson Pact turns AP into Health; Sanguine Pool ticks 4 times', () => {
+    expect(bySource(run('vladimir', ['W', 'wait:2']), 'vladimir-w-pool')).toHaveLength(4)
+  })
+})
+
+describe('Janna', () => {
+  it('Howling Gale deals 170 at rank 4', () => {
+    expect(run('janna', ['Q']).instances.map((i) => i.raw)).toEqual([170])
   })
 })
