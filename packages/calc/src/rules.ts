@@ -126,6 +126,8 @@ export const UNIQUE_EFFECT_RESOLUTION: 'strongest' | 'first' = 'strongest'
 export const ITEM_SLOTS = 5
 export const HAS_SEPARATE_BOOTS_SLOT = true
 export const HAS_SEPARATE_ENCHANT_SLOT = false
+// Every Wild Rift champion takes two summoner spells.
+export const SUMMONER_SPELL_SLOTS = 2
 
 // TODO-VERIFY(damageAmpTiming): confirm damageAmp effects multiply raw damage before resist
 // mitigation (not after) — compare a known damageAmp source's effect on a hit against a

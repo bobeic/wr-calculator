@@ -17,6 +17,10 @@ describe('parseCombo', () => {
     expect(parseCombo('ITEM:Some-Id WAIT:2')).toEqual({ ok: true, actions: ['item:Some-Id', 'wait:2'] })
   })
 
+  it('parses spell: tokens', () => {
+    expect(parseCombo('spell:ignite Q')).toEqual({ ok: true, actions: ['spell:ignite', 'Q'] })
+  })
+
   it('returns no actions for empty or blank text', () => {
     expect(parseCombo('')).toEqual({ ok: true, actions: [] })
     expect(parseCombo('   ')).toEqual({ ok: true, actions: [] })

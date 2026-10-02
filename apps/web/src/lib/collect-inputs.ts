@@ -7,6 +7,7 @@ function buildEffects(build: DebugBuild, catalog: StatCatalog): Effect[] {
   return [
     ...itemIds.flatMap((id) => catalog.items.get(id)?.effects ?? []),
     ...build.runes.flatMap((id) => catalog.runes.get(id)?.effects ?? []),
+    ...(build.spells ?? []).flatMap((id) => catalog.spells?.get(id)?.effects ?? []),
   ]
 }
 

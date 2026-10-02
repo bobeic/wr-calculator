@@ -22,6 +22,17 @@ export const activeHandler: EffectHandler<ActiveEffect> = {
     }
 
     const source = { kind: 'item' as const, id: effect.id, name: effect.name }
+    if (effect.overTime) {
+      const { durationSeconds, tickIntervalSeconds } = effect.overTime
+      const ticks = Math.round(durationSeconds / tickIntervalSeconds)
+      const damageType = effect.damageType
+      for (let tick = 1; tick <= ticks; tick++) {
+        ctx.scheduleEvent?.(ctx.time + tick * tickIntervalSeconds, (later) => {
+          later.dealDamage({ type: damageType, amount: amount / ticks, source })
+        }, `active:${effect.id}`)
+      }
+      return
+    }
     ctx.dealDamage({ type: effect.damageType, amount, source })
     const extraHits = effect.extraHits ?? { count: 0, fraction: 0 }
     for (let hit = 0; hit < extraHits.count; hit++) {

@@ -1,4 +1,4 @@
-import type { Champion, Build, Item, Rune, Effect, StatKey, NullableScalar, Condition } from '@wr-calc/schema'
+import type { Champion, Build, Item, Rune, SummonerSpell, Effect, StatKey, NullableScalar, Condition } from '@wr-calc/schema'
 import { STAT_KEYS } from '@wr-calc/schema'
 import {
   MAX_CHAMPION_LEVEL, ATTACK_SPEED_CAP, STAT_RESOLUTION_ORDER, statAtLevel, attackSpeedAtLevel,
@@ -53,6 +53,8 @@ function statTimeConditionMet(condition: Condition | undefined, inputs: Record<s
 export interface StatCatalog {
   items: Map<string, Item>
   runes: Map<string, Rune>
+  /** Summoner spells; optional so catalogs built before spells existed still work. */
+  spells?: Map<string, SummonerSpell>
 }
 
 /** Resolves a champion's base/bonus/total stats for a level and build, with a full breakdown. */

@@ -36,6 +36,14 @@ describe('encodeState / decodeState', () => {
     expect(decode(encodeState(FULL_STATE))).toEqual({ state: FULL_STATE, issues: [] })
   })
 
+  it('round-trips summoner spells on 7.3a and drops unknown ones', () => {
+    const live = datasetFor('7.3a')
+    const state: DebugState = { ...FULL_STATE, buildA: { ...FULL_STATE.buildA, spells: ['ignite', 'flash'] } }
+    expect(decodeState(new URLSearchParams(encodeState(state)), live)).toEqual({ state, issues: [] })
+    const bad = { ...FULL_STATE, buildA: { ...FULL_STATE.buildA, spells: ['nope'] } }
+    expect(decodeState(new URLSearchParams(encodeState(bad)), live).issues).toEqual(["build A: unknown spell 'nope' dropped"])
+  })
+
   it.each<DebugTarget>([
     { kind: 'preset', presetId: 'tank' },
     { kind: 'dummy', hp: 2500, armor: 90, mr: 60 },

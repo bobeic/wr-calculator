@@ -12,6 +12,7 @@ const BuildParamSchema = z.object({
   items: z.array(z.string()),
   boots: z.string().optional(),
   runes: z.array(z.string()),
+  spells: z.array(z.string()).optional(),
   inputs: z.record(z.string(), z.union([z.number(), z.boolean()])),
 }).strict()
 
@@ -76,9 +77,9 @@ function decodeNumber(
 function sanitizeBuild(
   build: DebugBuild, label: string, dataset: DebugDataset, issues: string[],
 ): DebugBuild {
-  const known = (id: string, kind: 'item' | 'boots' | 'rune'): boolean => {
-    const catalog = kind === 'rune' ? dataset.catalog.runes : dataset.catalog.items
-    if (catalog.has(id)) return true
+  const known = (id: string, kind: 'item' | 'boots' | 'rune' | 'spell'): boolean => {
+    const catalog = kind === 'rune' ? dataset.catalog.runes : kind === 'spell' ? dataset.catalog.spells : dataset.catalog.items
+    if (catalog?.has(id)) return true
     issues.push(`${label}: unknown ${kind} '${id}' dropped`)
     return false
   }
@@ -86,6 +87,8 @@ function sanitizeBuild(
   const sanitized: DebugBuild = { items, runes: [], inputs: build.inputs }
   if (build.boots !== undefined && known(build.boots, 'boots')) sanitized.boots = build.boots
   sanitized.runes = build.runes.filter((id) => known(id, 'rune'))
+  const spells = (build.spells ?? []).filter((id) => known(id, 'spell'))
+  if (spells.length > 0) sanitized.spells = spells
   return sanitized
 }
 

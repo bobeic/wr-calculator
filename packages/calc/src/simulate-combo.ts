@@ -22,7 +22,7 @@ import { resolveScalar, scalarWarning } from './resolve-scalar'
 const MAX_DAMAGE_CHAIN_DEPTH = 64
 
 export type ComboAction =
-  'AA' | 'Q' | 'W' | 'E' | 'R' | 'dash' | `item:${string}` | `wait:${number}`
+  'AA' | 'Q' | 'W' | 'E' | 'R' | 'dash' | `item:${string}` | `spell:${string}` | `wait:${number}`
 
 export interface SimulateComboOptions {
   critMode?: 'expected' | 'always' | 'never'
@@ -636,11 +636,14 @@ export function simulateCombo(
       }
       dispatchOnDash(dashStartedAt)
       if (attackerRuntime.lastAbilityCast) attackerRuntime.lastAbilityCast.feintUsed = true
-    } else if (action.startsWith('item:')) {
-      const itemId = action.slice(5)
-      const item = attacker.items.find((candidate) => candidate.id === itemId)
-      const activeEffect = item?.effects.find((effect) => effect.kind === 'active')
-      if (!item || !activeEffect) continue
+    } else if (action.startsWith('item:') || action.startsWith('spell:')) {
+      const isSpell = action.startsWith('spell:')
+      const id = action.slice(isSpell ? 6 : 5)
+      const owner = isSpell
+        ? attacker.spells?.find((candidate) => candidate.id === id)
+        : attacker.items.find((candidate) => candidate.id === id)
+      const activeEffect = owner?.effects.find((effect) => effect.kind === 'active')
+      if (!owner || !activeEffect) continue
 
       const cooldownKey = `active:${activeEffect.id}`
       const availableAt = attackerRuntime.cooldowns[cooldownKey] ?? 0

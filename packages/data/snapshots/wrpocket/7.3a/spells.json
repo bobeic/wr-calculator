@@ -1,0 +1,92 @@
+[
+  {
+    "description": {
+      "en": "Gain a shield that absorbs 120 (120–560 ) damage for 2.5 seconds."
+    },
+    "id": "barrier",
+    "name": {
+      "en": "Barrier"
+    },
+    "source_id": "81050101"
+  },
+  {
+    "description": {
+      "en": "Removes disables (including spell debuffs) affecting your champion and grants immunity to disables for 0.25 seconds."
+    },
+    "id": "cleanse",
+    "name": {
+      "en": "Cleanse"
+    },
+    "source_id": "81070101"
+  },
+  {
+    "description": {
+      "en": "Exhausts target enemy champion, reducing their Movement Speed by 35% and their damage dealt by 40% for 2.5 seconds."
+    },
+    "id": "exhaust",
+    "name": {
+      "en": "Exhaust"
+    },
+    "source_id": "81060101"
+  },
+  {
+    "description": {
+      "en": "Teleport a short distance forward or towards the aimed direction."
+    },
+    "id": "flash",
+    "name": {
+      "en": "Flash"
+    },
+    "source_id": "81090101"
+  },
+  {
+    "description": {
+      "en": "Gain a large burst of movement speed, that decays to 25% bonus movement speed for 8 seconds. With each takedown, Ghost's duration is extended by 6 seconds, refreshing its effects, up to the original amount."
+    },
+    "id": "ghost",
+    "name": {
+      "en": "Ghost"
+    },
+    "source_id": "81010101"
+  },
+  {
+    "description": {
+      "en": "Restore 110 Health (110–400 ) to you and the most wounded nearby ally champion, and grants both of you 30% bonus Movement Speed for 2 second(s). Healing is halved for champions recently affected by Heal."
+    },
+    "id": "heal",
+    "name": {
+      "en": "Heal"
+    },
+    "source_id": "81030101"
+  },
+  {
+    "description": {
+      "en": "Ignites target enemy champion, dealing 72 true damage (72–380 ) over 5 and applying 60% Grievous Wounds for the duration. Grievous Wound reduces the effectiveness of Healing and Regeneration effects."
+    },
+    "id": "ignite",
+    "name": {
+      "en": "Ignite"
+    },
+    "source_id": "81100101"
+  },
+  {
+    "description": {
+      "en": "Jungle Knowledge:\nOn cast, Smite deals 600 true damage to minions and monsters. Basic attacks against monsters deal 22 (based on level) true damage per second to nearby enemies for 2 seconds.\nThis damage is increased by 10% bonus Attack Damage, 12% bonus Ability Power, 25% bonus Armor, 25% bonus Magic Resistance, and 4% bonus Health.\nDeals 10% increased damage to monsters.\nHunter's Funds:\n- Hunter's Funds stacks increase over time.\n- Clearing a monster camp consumes 1 stack and grants 40 bonus gold.\n- Basic attacking monsters restores 5 - 35 Health per second (based on level). The healing increases based on missing Health.\n- While holding Smite, take only 50% damage from non-epic monsters.\nSmite Upgrade:\n- Consuming 8 stacks and 20 stacks upgrades Smite, increasing its damage to 1,000 and 1,400 respectively.\n- Once Smite is fully upgraded, gain Movement Speed while in the jungle or river (10% out of combat, 5% in combat).\n- Upgraded Smite can be used on champions, dealing 40 true damage and stealing 25% of the target's Movement Speed for 2 seconds.\nGain 1 charge every 45 seconds. Up to 2 charges."
+    },
+    "id": "smite",
+    "name": {
+      "en": "Smite"
+    },
+    "source_id": "81110101"
+  },
+  {
+    "description": {
+      "en": "After channeling for 3.5 seconds, teleport your champion to an allied champion, structure, or ward (excludes areas in range of enemy inhibitors). You can only teleport to structures during the first 6 minutes of the game."
+    },
+    "id": "teleport",
+    "name": {
+      "en": "Teleport"
+    },
+    "source_id": "81210101"
+  }
+]

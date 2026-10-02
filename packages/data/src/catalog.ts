@@ -1,11 +1,12 @@
-import type { Item, Rune } from '@wr-calc/schema'
+import type { Item, Rune, SummonerSpell } from '@wr-calc/schema'
 import type { StatCatalog } from '@wr-calc/calc'
 
-/** Builds a StatCatalog (item/rune id -> object maps) from flat arrays. */
-export function buildCatalog(items: Item[], runes: Rune[] = []): StatCatalog {
+/** Builds a StatCatalog (item/rune/spell id -> object maps) from flat arrays. */
+export function buildCatalog(items: Item[], runes: Rune[] = [], spells: SummonerSpell[] = []): StatCatalog {
   return {
     items: new Map(items.map((item) => [item.id, item])),
     runes: new Map(runes.map((rune) => [rune.id, rune])),
+    spells: new Map(spells.map((spell) => [spell.id, spell])),
   }
 }
 

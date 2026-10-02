@@ -1,9 +1,9 @@
 import type { Build, Item, Rune } from '@wr-calc/schema'
-import { HAS_SEPARATE_BOOTS_SLOT, HAS_SEPARATE_ENCHANT_SLOT, ITEM_SLOTS } from './rules'
+import { HAS_SEPARATE_BOOTS_SLOT, HAS_SEPARATE_ENCHANT_SLOT, ITEM_SLOTS, SUMMONER_SPELL_SLOTS } from './rules'
 
 export type BuildIssueCode =
   | 'unknown-item' | 'too-many-items' | 'duplicate-item' | 'boots-in-items' | 'not-boots' | 'exclusive-group'
-  | 'shared-passive' | 'too-many-keystones'
+  | 'shared-passive' | 'too-many-keystones' | 'too-many-spells' | 'duplicate-spell'
 
 export interface BuildIssue {
   code: BuildIssueCode
@@ -80,6 +80,13 @@ export function validateBuild(build: Build, items: ReadonlyMap<string, Item>, ru
     } else {
       holderByGroup.set(item.exclusiveGroup, item.id)
     }
+  }
+  const spells = build.spells ?? []
+  if (spells.length > SUMMONER_SPELL_SLOTS) {
+    issues.push({ code: 'too-many-spells', message: `the build has ${spells.length} summoner spells; the limit is ${SUMMONER_SPELL_SLOTS}` })
+  }
+  if (new Set(spells).size !== spells.length) {
+    issues.push({ code: 'duplicate-spell', message: 'the same summoner spell is in the build twice' })
   }
   // A rune page has one keystone (rune slot 'keystone'). Unknown rune ids are resolveStats' error, not a shop rule.
   const keystones = build.runes.filter((id) => runes?.get(id)?.slot === 'keystone')

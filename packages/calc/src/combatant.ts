@@ -1,4 +1,4 @@
-import type { Champion, Build, Item, Effect, Target } from '@wr-calc/schema'
+import type { Champion, Build, Item, Effect, SummonerSpell, Target } from '@wr-calc/schema'
 import { abilityRankFor, championKitEffects } from './kit-effects'
 import { resolveStats } from './resolve-stats'
 import type { StatCatalog, StatSheet } from './resolve-stats'
@@ -12,6 +12,8 @@ export interface Combatant {
   sheet: StatSheet
   items: Item[]
   runeEffects: Effect[]
+  /** Summoner spells, cast with `spell:<id>` combo actions. */
+  spells?: SummonerSpell[]
   /** Effects carried by the champion's own abilities, rank values already bound. */
   kitEffects?: Effect[]
   inputs: Record<string, number | boolean>
@@ -45,8 +47,13 @@ export function combatantFromChampion(
   // resolveStats above already throws on any unknown item/rune id, so every lookup here is safe.
   const items = itemIds.map((id) => catalog.items.get(id)!)
   const runeEffects = build.runes.flatMap((id) => catalog.runes.get(id)!.effects)
+  const spells = (build.spells ?? []).map((id) => {
+    const spell = catalog.spells?.get(id)
+    if (!spell) throw new Error(`combatantFromChampion: unknown summoner spell id '${id}'`)
+    return spell
+  })
   return {
-    id: champion.id, name: champion.name, kind: 'champion', level, sheet, items, runeEffects,
+    id: champion.id, name: champion.name, kind: 'champion', level, sheet, items, runeEffects, spells,
     kitEffects: championKitEffects(champion, build.abilityRanks), inputs: build.inputs, startHpFraction: 1,
     abilities: champion.abilities, abilityRanks,
   }

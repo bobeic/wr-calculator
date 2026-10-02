@@ -11,6 +11,8 @@ export const ActiveEffectSchema = EffectBaseSchema.extend({
   ratios: z.array(StatRatioSchema).optional(),
   /** Added to the damage: the target's max HP times this (e.g. Redemption's 10%). */
   targetMaxHpRatio: NullableScalarSchema.optional(),
+  /** Deal the damage as a burn split into ticks over `durationSeconds` instead of at once (e.g. Ignite). */
+  overTime: z.object({ durationSeconds: z.number().positive(), tickIntervalSeconds: z.number().positive() }).strict().optional(),
   /** Further hits on the same target, each dealing `fraction` of the first (e.g. Rocketbelt's bolts). */
   extraHits: z.object({
     count: z.number().int().nonnegative(), fraction: z.number().nonnegative(),

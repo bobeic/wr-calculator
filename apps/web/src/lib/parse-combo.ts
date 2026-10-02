@@ -12,7 +12,7 @@ function tokenize(text: string): string[] {
   return text.trim().split(/\s+/).filter((token) => token !== '')
 }
 
-/** Parses combo text like "Q AA dash item:trinity-force wait:0.5 R" into simulateCombo actions. */
+/** Parses combo text like "Q AA dash item:trinity-force spell:ignite wait:0.5 R" into simulateCombo actions. */
 export function parseCombo(text: string): ComboParse {
   const actions: ComboAction[] = []
   for (const [tokenIndex, token] of tokenize(text).entries()) {
@@ -30,6 +30,10 @@ export function parseCombo(text: string): ComboParse {
     const rest = colon === -1 ? '' : token.slice(colon + 1)
     if (prefix === 'item' && rest !== '') {
       actions.push(`item:${rest}`)
+      continue
+    }
+    if (prefix === 'spell' && rest !== '') {
+      actions.push(`spell:${rest}`)
       continue
     }
     if (prefix === 'wait') {

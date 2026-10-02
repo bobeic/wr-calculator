@@ -32,6 +32,8 @@ Patch 7.3a is live.
   - Grasp of Undying: the engine has it ready on the first attack, then every 4 seconds.
   - Electrocute and Dark Harvest damage type: adaptive by bonus AD vs AP (rules.ts `adaptiveDamageType`).
 
+- Ignite: what is its cooldown in Wild Rift (the engine uses League's 90s), and is 72–380 linear with level?
+
 ## 2. Open engine rules (TODO-VERIFY in `packages/calc/src/rules.ts`)
 
 Each `TODO-VERIFY` comment there says how to check it. The ones most likely to move numbers:

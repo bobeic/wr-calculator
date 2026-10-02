@@ -5,6 +5,8 @@ export const BuildSchema = z.object({
   boots: z.string().optional(),
   enchant: z.string().optional(),
   runes: z.array(z.string()),
+  /** Summoner spell ids (two per build in game). */
+  spells: z.array(z.string()).optional(),
   /** Rank of each basic and ultimate ability, 1..maxRank; an ability left out is at its max rank. */
   abilityRanks: z.object({
     q: z.number().int().min(1).optional(),

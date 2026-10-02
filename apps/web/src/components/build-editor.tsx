@@ -18,6 +18,7 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
   const boots = allItems.filter((item) => item.tier === 'boots')
   const nonBoots = allItems.filter((item) => item.tier !== 'boots')
   const runes = [...catalog.runes.values()]
+  const spells = [...(catalog.spells?.values() ?? [])]
   const inputs = collectInputs(build, catalog)
   const summary = summarizeBuild(build, catalog)
   const efficiency = (index: number): string => {
@@ -33,6 +34,7 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
   }
   const setBoots = (id: string) => {
     const next: DebugBuild = { items: build.items, runes: build.runes, inputs: build.inputs }
+    if (build.spells !== undefined) next.spells = build.spells
     if (id !== '') next.boots = id
     onChange(next)
   }
@@ -40,6 +42,12 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
     ...build,
     runes: build.runes.includes(id) ? build.runes.filter((rune) => rune !== id) : [...build.runes, id],
   })
+  const toggleSpell = (id: string) => {
+    const current = build.spells ?? []
+    const spells = current.includes(id) ? current.filter((spell) => spell !== id) : [...current, id]
+    const { spells: _dropped, ...rest } = build
+    onChange(spells.length > 0 ? { ...rest, spells } : rest)
+  }
   const setInput = (id: string, value: number | boolean) => onChange({
     ...build, inputs: { ...build.inputs, [id]: value },
   })
@@ -88,6 +96,17 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
             <label key={rune.id}>
               <input type="checkbox" checked={build.runes.includes(rune.id)} onChange={() => toggleRune(rune.id)} />
               {rune.name}{' '}
+            </label>
+          ))}
+        </p>
+      )}
+      {spells.length > 0 && (
+        <p>
+          Summoner spells (cast with spell:id in the combo):{' '}
+          {spells.map((spell) => (
+            <label key={spell.id}>
+              <input type="checkbox" checked={(build.spells ?? []).includes(spell.id)} onChange={() => toggleSpell(spell.id)} />
+              {spell.name}{' '}
             </label>
           ))}
         </p>

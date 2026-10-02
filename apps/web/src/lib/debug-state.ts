@@ -7,6 +7,8 @@ export interface DebugBuild {
   items: string[]
   boots?: string
   runes: string[]
+  /** Summoner spell ids; left out when none are picked. */
+  spells?: string[]
   inputs: Record<string, number | boolean>
 }
 

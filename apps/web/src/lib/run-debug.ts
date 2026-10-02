@@ -52,6 +52,7 @@ export function toBuild(build: DebugBuild, dataset: DebugDataset, abilityRanks: 
     items: build.items, runes: build.runes, inputs: resolveInputs(build, dataset.catalog),
   }
   if (build.boots !== undefined) result.boots = build.boots
+  if (build.spells !== undefined && build.spells.length > 0) result.spells = build.spells
   if (Object.keys(abilityRanks).length > 0) result.abilityRanks = abilityRanks
   return result
 }
