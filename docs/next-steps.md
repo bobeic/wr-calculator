@@ -63,8 +63,10 @@ Steps once a name is chosen:
    keep them current. `https://wrpocket.app/site_data/champions/<slug>.json` already carries full tooltip text and
    per-rank tables (used for the batch 3 kits below) — the champion page itself only renders descriptions for some
    abilities client-side, so fetch this JSON directly rather than the page HTML.
-3. **Calculator polish:** done — ability ranks in the UI, and a per-build item order (gold/burst/DPS/TTK at each
-   item, via the new `buildBreakpoints`). Still open: picking a champion target's runes.
+3. **Calculator polish:** done — ability ranks in the UI, a per-build item order (gold/burst/DPS/TTK at each item,
+   via the new `buildBreakpoints`), and picking a champion target's runes (turned out already wired: `TargetPicker`
+   already reuses the same `BuildPanel` as the attacker's build, runes included — just checked it actually changes
+   the target's resolved stats).
 4. **"Best first item" view:** time to kill for every legendary on a given champion, built on the build comparison.
 5. **Patch preview:** Tencent's CN data runs ahead of global servers, so it can show changes before they arrive.
 6. **Design pass** once the design answers are in.
