@@ -213,6 +213,13 @@ Patch 7.3a is live.
   - Vel'Koz: Deconstruction's "20 + 8 (based on level)" read as 20 + 8 per level; the ray all magic, all at once.
   - Kog'Maw: no Caustic Spittle shred; Living Artillery without the missing-Health amp or the below-40% doubling.
   - Rell: Full Tilt's empowered attack waits 3 seconds; no resist steal.
+- Batch 21 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Rumble: no Heat (no Danger Zone, no Overheat); Flamespitter's 3 seconds at once; no Electro Harpoon shred or charges.
+  - Skarner: Shattered Earth's third-attack 11% spread over all three; boulder lasts 6 seconds; Seismic Bastion
+    stacks Quaking here; Ixtal's Impact always hits a wall.
+  - Ryze: no bonus Mana ratios and no Flux bonus, so his damage is well under the game's.
+  - Zeri: her attacks are plain attacks (no 6-round burst, no Attack Speed cap or conversion).
+  - Rakan: nothing beyond the listed damage.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

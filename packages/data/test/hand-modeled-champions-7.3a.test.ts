@@ -45,6 +45,7 @@ describe('7.3a hand-modelled champions', () => {
         'gwen', 'rengar', 'viktor', 'xayah', 'karma',
         'jayce', 'warwick', 'orianna', 'sivir', 'nami',
         'riven', 'lillia', 'velkoz', 'kogmaw', 'rell',
+        'rumble', 'skarner', 'ryze', 'zeri', 'rakan',
       ])
   })
 
@@ -1166,5 +1167,39 @@ describe('Rell', () => {
     const hits = bySource(run('rell', ['E', 'AA', 'AA']), 'rell-e-full-tilt')
     expect(hits).toHaveLength(1)
     expect(hits[0].raw).toBeCloseTo(700, 6)
+  })
+})
+
+describe('Rumble', () => {
+  it('Flamespitter adds 10% max Health; The Equalizer burns 5 times', () => {
+    expect(run('rumble', ['Q']).instances[0].raw).toBeCloseTo(220 + 1000, 6)
+    expect(bySource(run('rumble', ['R', 'wait:5']), 'rumble-r-equalizer').map((i) => i.raw)).toEqual([280, 280, 280, 280, 280])
+  })
+})
+
+describe('Skarner', () => {
+  it('Shattered Earth empowers 3 attacks and Quaking procs on the third hit', () => {
+    const result = run('skarner', ['Q', 'AA', 'AA', 'AA', 'AA', 'wait:4'])
+    expect(partFrom(result, 'skarner-q-shattered-earth')).toHaveLength(3)
+    expect(bySource(result, 'skarner-passive-quaking')).toHaveLength(4)
+    for (const tick of bySource(result, 'skarner-passive-quaking')) expect(tick.raw).toBeCloseTo(250, 6)
+  })
+})
+
+describe('Ryze', () => {
+  it('Overload deals 145 at rank 4', () => {
+    expect(run('ryze', ['Q']).instances.map((i) => i.raw)).toEqual([145])
+  })
+})
+
+describe('Zeri', () => {
+  it('Spark Surge empowers 3 attacks', () => {
+    expect(bySource(run('zeri', ['E', 'AA', 'AA', 'AA', 'AA']), 'zeri-e-spark-surge')).toHaveLength(3)
+  })
+})
+
+describe('Rakan', () => {
+  it('The Quickness deals 300 at rank 3', () => {
+    expect(run('rakan', ['R']).instances.map((i) => i.raw)).toEqual([300])
   })
 })
