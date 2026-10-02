@@ -129,6 +129,14 @@ Patch 7.3a is live.
     up here); the 4th shot is +60% AD without its 11% missing Health; Curtain Call is 5x one shot at once, with the
     missing-Health increase on the base only.
   - Malphite: Thunderclap's cone damage assumed to hit the target on every attack for 6s.
+- Batch 9 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Volibear: The Relentless Storm's lightning at 5 stacks and its +4% AP attack speed aren't modelled; Frenzied
+    Maul is always the un-Frenzied cast.
+  - Jarvan IV: Dragon Strike's % Armor reduction isn't modelled; Martial Cadence reads Health after the attack lands.
+  - Morgana: Tormented Shadow's up-to-170% missing-Health increase isn't modelled; Soul Shackles always lands both hits.
+  - Kai'Sa: Caustic Wounds is 5 at every level and ignores Plasma stacks; "+5% AP" on the detonation read as per
+    100 AP; Void Seeker's 2 Plasma stacks aren't applied.
+  - Yuumi: unattached numbers only; Final Chapter's later waves read as 20/30/40 (+5% AP) each.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

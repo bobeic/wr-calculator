@@ -55,6 +55,8 @@ Batch 8 adds two more:
 - `abilityHitProc.pctTargetMaxHp`: a % of the target's max Health on the proc (Aatrox's Deathbringer Stance).
 - The `armor` damage ratio stat: the owner's total Armor (Malphite's Thunderclap and Ground Slam).
 
+Batch 9 adds `abilityHitProc.pctTargetCurrentHp` (Jarvan IV's Martial Cadence, 8% current Health).
+
 ## Consequences
 
 - `docs/test-sheets/pending-checks.md` lists the guesses most likely to be off (Darius's Noxian Might at level 15,

@@ -33,6 +33,7 @@ describe('7.3a hand-modelled champions', () => {
         'dr-mundo', 'tryndamere', 'mel', 'jinx', 'seraphine',
         'nasus', 'khazix', 'akali', 'draven', 'blitzcrank',
         'aatrox', 'nocturne', 'yone', 'jhin', 'malphite',
+        'volibear', 'jarvan-iv', 'morgana', 'kaisa', 'yuumi',
       ])
   })
 
@@ -698,5 +699,51 @@ describe('Malphite', () => {
     expect(run('malphite', ['E']).instances[0].raw).toBeCloseTo(210 + 0.4 * armor, 6)
     expect(partFrom(run('malphite', ['W', 'AA', 'AA']), 'malphite-w-first-attack')).toHaveLength(1)
     expect(partFrom(run('malphite', ['W', 'AA', 'AA']), 'malphite-w-cone')).toHaveLength(2)
+  })
+})
+
+describe('Volibear', () => {
+  it('Sky Splitter adds 11% max Health; Thundering Smash empowers one attack', () => {
+    expect(run('volibear', ['E']).instances[0].raw).toBeCloseTo(170 + 0.11 * 10000, 6)
+    expect(partFrom(run('volibear', ['Q', 'AA', 'AA']), 'volibear-q-thundering-smash')).toHaveLength(1)
+  })
+})
+
+describe('Jarvan IV', () => {
+  it('Martial Cadence adds 8% current Health to the first attack, then waits 5 seconds', () => {
+    const procs = bySource(run('jarvan-iv', ['AA', 'AA']), 'jarvan-iv-passive-martial-cadence')
+    expect(procs).toHaveLength(1)
+    const attack = run('jarvan-iv', ['AA']).instances.find((i) => i.source.id === 'AA')!
+    expect(procs[0].raw).toBeCloseTo(0.08 * attack.targetHpAfter, 6)
+  })
+})
+
+describe('Morgana', () => {
+  it('Tormented Shadow ticks 10 times over 5 seconds; Soul Shackles hits twice', () => {
+    const result = run('morgana', ['W', 'wait:5'])
+    expect(result.instances.filter((i) => i.source.id === 'morgana-w')).toHaveLength(1)
+    expect(bySource(result, 'morgana-w-tormented-shadow')).toHaveLength(9)
+    expect(run('morgana', ['R']).instances[0].raw).toBe(600)
+  })
+})
+
+describe("Kai'Sa", () => {
+  it('Plasma detonates on the 5th attack for 15% missing Health', () => {
+    const result = run('kaisa', ['AA', 'AA', 'AA', 'AA', 'AA'])
+    const procs = bySource(result, 'kaisa-passive-plasma')
+    expect(procs).toHaveLength(1)
+    const before = result.instances[result.instances.indexOf(procs[0]) - 1]
+    expect(procs[0].raw).toBeCloseTo(0.15 * (10000 - before.targetHpAfter), 6)
+  })
+
+  it('Icathian Rain lands all 6 missiles (no bonus AD or AP without items)', () => {
+    expect(run('kaisa', ['Q']).instances.map((i) => i.raw)).toEqual([100, 125])
+  })
+})
+
+describe('Yuumi', () => {
+  it('Prowling Projectile has 5 ranks; Final Chapter lands 7 waves', () => {
+    expect(run('yuumi', ['Q']).instances[0].raw).toBe(220)
+    expect(run('yuumi', ['R']).instances.map((i) => i.raw)).toEqual([120, 240])
   })
 })

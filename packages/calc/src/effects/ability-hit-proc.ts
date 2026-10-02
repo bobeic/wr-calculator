@@ -40,12 +40,15 @@ function tryProc(effect: AbilityHitProcEffect, ctx: HookContext): void {
     amount += (typeof stacks === 'number' ? stacks : 0) * effect.damagePerStack.amount
   }
   amount += sumStatRatios(effect.ratios, ctx.selfSheet, ctx.level, effect.name, ctx.addDataWarning)
-  if (effect.pctTargetMaxHp != null) {
-    const pctResolved = resolveScalar(effect.pctTargetMaxHp, ctx.level)
-    const pctWarning = scalarWarning(effect.name, 'pctTargetMaxHp', pctResolved)
-    if (pctWarning) ctx.addDataWarning(pctWarning)
-    amount += pctResolved.value * (ctx.opponentSheet.total.hp ?? 0)
+  const targetPct = (scalar: AbilityHitProcEffect['pctTargetMaxHp'], field: string, hp: number): void => {
+    if (scalar == null) return
+    const resolved = resolveScalar(scalar, ctx.level)
+    const warning = scalarWarning(effect.name, field, resolved)
+    if (warning) ctx.addDataWarning(warning)
+    amount += resolved.value * hp
   }
+  targetPct(effect.pctTargetMaxHp, 'pctTargetMaxHp', ctx.opponentSheet.total.hp ?? 0)
+  targetPct(effect.pctTargetCurrentHp, 'pctTargetCurrentHp', ctx.opponent.currentHp)
 
   ctx.dealDamage({
     type: effectDamageType(effect.damageType, ctx), amount,
