@@ -42,6 +42,7 @@ describe('7.3a hand-modelled champions', () => {
         'fiora', 'wukong', 'twisted-fate', 'smolder', 'soraka',
         'gnar', 'rammus', 'zed', 'varus', 'alistar',
         'jax', 'nidalee', 'aurora', 'lucian', 'maokai',
+        'gwen', 'rengar', 'viktor', 'xayah', 'karma',
       ])
   })
 
@@ -1056,5 +1057,42 @@ describe('Lucian', () => {
 describe('Maokai', () => {
   it('Bramble Smash adds 4% max Health at rank 4', () => {
     expect(run('maokai', ['Q']).instances[0].raw).toBe(225 + 400)
+  })
+})
+
+describe('Gwen', () => {
+  it('Thousand Cuts adds 1% max Health to every attack; Needlework fires 9 needles', () => {
+    expect(bySource(run('gwen', ['AA', 'AA']), 'gwen-passive-thousand-cuts').map((i) => i.raw)).toEqual([100, 100])
+    expect(run('gwen', ['R']).instances[0].raw).toBe(9 * 65)
+  })
+})
+
+describe('Rengar', () => {
+  it('Savagery empowers one attack with 160 (+20% AD) at rank 4', () => {
+    const ad = attacker('rengar').sheet.total.ad!
+    expect(partFrom(run('rengar', ['Q', 'AA', 'AA']), 'rengar-q-savagery').map((p) => p.amount)).toEqual([160 + 0.2 * ad])
+  })
+})
+
+describe('Viktor', () => {
+  it('Arcane Storm hits once and then 5 more times', () => {
+    const result = run('viktor', ['R', 'wait:5'])
+    expect(result.instances.filter((i) => i.source.id === 'viktor-r').map((i) => i.raw)).toEqual([250])
+    expect(bySource(result, 'viktor-r-storm').map((i) => i.raw)).toEqual([130, 130, 130, 130, 130])
+  })
+})
+
+describe('Xayah', () => {
+  it('Deadly Plumage adds 25% AD to attacks for 4 seconds', () => {
+    const ad = attacker('xayah').sheet.total.ad!
+    const parts = partFrom(run('xayah', ['W', 'AA', 'AA']), 'xayah-w-damage')
+    expect(parts).toHaveLength(2)
+    for (const part of parts) expect(part.amount).toBeCloseTo(0.25 * ad, 6)
+  })
+})
+
+describe('Karma', () => {
+  it('Focused Resolve deals the tether and the root', () => {
+    expect(run('karma', ['W']).instances.map((i) => i.raw)).toEqual([110, 130])
   })
 })

@@ -193,6 +193,12 @@ Patch 7.3a is live.
   - Aurora: Spirit Abjuration's 3-hit window taken as 4s; Twofold Hex's recast missing-Health bonus on its base only.
   - Lucian: Lightslinger's second shot folded into the attack (no separate on-hit or crit), 40% at every level.
   - Maokai: one sapling outside brush, landing at once.
+- Batch 18 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Gwen: Snip Snip! always at 4 stacks (6 snips), no true damage at the centre; Needlework's 9 needles at once.
+  - Rengar: no Ferocity (no empowered abilities); Savagery's crit isn't modelled.
+  - Viktor: no Hexcore upgrades; Arcane Storm's target stays in the storm for all 5.5 seconds.
+  - Xayah: Bladecaller assumes 3 Feathers through the target; Deadly Plumage's +25% read as +25% AD per attack.
+  - Karma: no Mantra (empowered Inner Flame is her biggest burst); Focused Resolve's root always lands.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
