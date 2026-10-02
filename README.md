@@ -71,6 +71,13 @@ A `--from-cache` run uses the cached page or the committed notes snapshot, and f
 `<patch>-<YYYYMMDDhhmmss>` instead of the network; it was used to bootstrap 7.3. When that patch's
 generated files already exist, it checks that regenerating reproduces them.
 
+## Hosting
+
+The site is a static export published to GitHub Pages by `.github/workflows/deploy-site.yml` on every push to
+`main`: https://bobeic.github.io/wr-calculator/. One-time setup: repository Settings → Pages → Source: "GitHub
+Actions". Without a custom domain the site lives under `/wr-calculator/`, so the workflow builds with that base path
+(`NEXT_BASE_PATH`); after adding a custom domain in the same settings page it builds without one.
+
 ## Environment Variables
 
-None required at this stage.
+- `NEXT_BASE_PATH` (optional, build only): the path the site is served under, e.g. `/wr-calculator`. Empty by default.

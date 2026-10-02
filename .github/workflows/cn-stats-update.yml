@@ -1,12 +1,12 @@
 name: CN stats update
 
 # Fetches the CN server's win, pick and ban rates and opens a pull request when they changed. Tencent publishes
-# them daily. Manual for now: uncomment `schedule` to run it every day. Needs the same "Allow GitHub Actions to
-# create and approve pull requests" setting as the patch update.
+# them daily. Runs every day (and by hand). Needs the "Allow GitHub Actions to create and approve pull requests"
+# setting, which is on (user, 2026-10-03).
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '23 4 * * *'
+  schedule:
+    - cron: '23 4 * * *'
 
 permissions:
   contents: write
