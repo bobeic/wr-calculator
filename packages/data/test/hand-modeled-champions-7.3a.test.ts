@@ -38,6 +38,7 @@ describe('7.3a hand-modelled champions', () => {
         'teemo', 'pantheon', 'ziggs', 'ezreal', 'pyke',
         'urgot', 'vi', 'ekko', 'kalista', 'zyra',
         'renekton', 'shyvana', 'syndra', 'twitch', 'swain',
+        'kayle', 'kindred', 'aurelion-sol', 'vayne', 'braum',
       ])
   })
 
@@ -908,5 +909,40 @@ describe('Twitch', () => {
 describe('Swain', () => {
   it("Death's Hand lands all 5 bolts", () => {
     expect(run('swain', ['Q']).instances.map((i) => i.raw)).toEqual([160, 160])
+  })
+})
+
+describe('Kayle', () => {
+  it('Starfire Spellblade adds 17 magic on every attack at rank 4', () => {
+    expect(bySource(run('kayle', ['AA', 'AA']), 'kayle-e-passive').map((i) => i.raw)).toEqual([17, 17])
+  })
+})
+
+describe('Kindred', () => {
+  it("Mark stacks raise Wolf's Frenzy's current-Health damage by 1% each", () => {
+    const w = (marks: number) => run('kindred', ['W'], { 'kindred-mark-stacks': marks }).instances[0].raw
+    expect(w(4) - w(0)).toBeCloseTo(0.04 * 10000, 6)
+  })
+})
+
+describe('Aurelion Sol', () => {
+  it('Breath of Light burns for 3 seconds in all', () => {
+    const result = run('aurelion-sol', ['Q', 'wait:3'])
+    expect(result.instances.filter((i) => i.source.id === 'aurelion-sol-q').map((i) => i.raw)).toEqual([103, 100])
+    expect(bySource(result, 'aurelion-sol-q-breath').map((i) => i.raw)).toEqual([203, 203])
+  })
+})
+
+describe('Vayne', () => {
+  it('Silver Bolts deals 9% max Health true damage on every third hit', () => {
+    const procs = bySource(run('vayne', ['AA', 'AA', 'AA', 'AA', 'AA', 'AA']), 'vayne-w-silver-bolts')
+    expect(procs.map((i) => `${i.type} ${i.raw}`)).toEqual(['true 900', 'true 900'])
+  })
+})
+
+describe('Braum', () => {
+  it("Concussive Blows stuns on the 4th stack; Winter's Bite scales with his max Health", () => {
+    expect(bySource(run('braum', ['AA', 'AA', 'AA', 'AA']), 'braum-passive-concussive-blows').map((i) => i.raw)).toEqual([45])
+    expect(run('braum', ['Q']).instances[0].raw).toBeCloseTo(240 + 0.03 * attacker('braum').sheet.total.hp!, 6)
   })
 })

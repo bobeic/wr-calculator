@@ -167,6 +167,13 @@ Patch 7.3a is live.
     nothing.
   - Swain: Death's Hand lands 5 bolts (count not in the text) and ignores "up to 95"; Demonic Ascension's aura lasts
     6 seconds, with the recast's burst at once.
+- Batch 14 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Kayle: Radiant Blast's resist reduction and the level 9/13 passive upgrades aren't modelled.
+  - Kindred: Mark stacks are an input; Mounting Dread's pounce lands on the cast (not the 3rd attack), and Wolf's
+    Frenzy is one maul.
+  - Aurelion Sol: Breath of Light uses the table's per-rank numbers (the text adds per-level parts) and no Stardust.
+  - Vayne: Silver Bolts' "consecutive" taken as within 3.5s, without its minimum; Final Hour lasts 8s at every rank.
+  - Braum: Concussive Blows stacks from any ability hit, 45 at every level.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
