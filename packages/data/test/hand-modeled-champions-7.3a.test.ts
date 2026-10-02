@@ -43,6 +43,7 @@ describe('7.3a hand-modelled champions', () => {
         'gnar', 'rammus', 'zed', 'varus', 'alistar',
         'jax', 'nidalee', 'aurora', 'lucian', 'maokai',
         'gwen', 'rengar', 'viktor', 'xayah', 'karma',
+        'jayce', 'warwick', 'orianna', 'sivir', 'nami',
       ])
   })
 
@@ -1094,5 +1095,38 @@ describe('Xayah', () => {
 describe('Karma', () => {
   it('Focused Resolve deals the tether and the root', () => {
     expect(run('karma', ['W']).instances.map((i) => i.raw)).toEqual([110, 130])
+  })
+})
+
+describe('Jayce', () => {
+  it('Thundering Blow deals 20% max Health at rank 5; Lightning Field ticks 4 times', () => {
+    const bonusAd = attacker('jayce').sheet.bonus.ad ?? 0
+    expect(run('jayce', ['E']).instances[0].raw).toBeCloseTo(2000 + bonusAd, 6)
+    expect(bySource(run('jayce', ['W', 'wait:4']), 'jayce-w-lightning-field').map((i) => i.raw)).toEqual([110, 110, 110, 110])
+  })
+})
+
+describe('Warwick', () => {
+  it('Eternal Hunger adds 12 (+15% bonus AD) magic damage to attacks', () => {
+    expect(bySource(run('warwick', ['AA']), 'warwick-passive-eternal-hunger').map((i) => i.raw)).toEqual([12])
+  })
+})
+
+describe('Orianna', () => {
+  it('Command: Shockwave deals 450 at rank 3', () => {
+    expect(run('orianna', ['R']).instances.map((i) => i.raw)).toEqual([450])
+  })
+})
+
+describe('Sivir', () => {
+  it('Boomerang Blade hits twice', () => {
+    const bonusAd = attacker('sivir').sheet.bonus.ad ?? 0
+    expect(run('sivir', ['Q']).instances[0].raw).toBeCloseTo(2 * (160 + 0.7 * bonusAd), 6)
+  })
+})
+
+describe('Nami', () => {
+  it("Tidecaller's Blessing empowers 3 attacks", () => {
+    expect(bySource(run('nami', ['E', 'AA', 'AA', 'AA', 'AA']), 'nami-e-blessing').map((i) => i.raw)).toEqual([85, 85, 85])
   })
 })

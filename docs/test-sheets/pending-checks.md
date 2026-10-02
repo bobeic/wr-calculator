@@ -199,6 +199,13 @@ Patch 7.3a is live.
   - Viktor: no Hexcore upgrades; Arcane Storm's target stays in the storm for all 5.5 seconds.
   - Xayah: Bladecaller assumes 3 Feathers through the target; Deadly Plumage's +25% read as +25% AD per attack.
   - Karma: no Mantra (empowered Inner Flame is her biggest burst); Focused Resolve's root always lands.
+- Batch 19 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Jayce: Mercury Hammer stance only (no Cannon, no stance bonuses); Lightning Field as 4 one-second ticks.
+  - Warwick: Jaws of the Beast doesn't apply Eternal Hunger (abilities applying on-hit isn't in the calculator);
+    Infinite Duress's 4 on-hits aren't modelled; no Blood Hunt attack speed.
+  - Orianna: Clockwork Windup a flat 13 at every level, without its same-target stacks.
+  - Sivir: Boomerang Blade hits the target twice (out and back), no crit scaling; no Morale from On the Hunt.
+  - Nami: Tidecaller's Blessing cast on herself.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
