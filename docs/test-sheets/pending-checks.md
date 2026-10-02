@@ -90,6 +90,16 @@ Patch 7.3a is live.
   - Tristana: Explosive Charge's 4s fuse, its stacking +25% per hit (up to 2x), and its on-kill explosion are all
     skipped — only the base bomb damage is modelled.
   - Leona: how long Shield of Daybreak's empower lasts unused before expiring (engine: 10s, not stated).
+- Batch 5 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Sett: Knuckle Down read as 1% max Health + 0.01-0.025% per AD (by rank). Haymaker's Grit portion and The Show
+    Stopper's % of the grabbed enemy's bonus Health are left out, so both are well under real damage; the right
+    punch's 8x faster wind-up isn't modelled either.
+  - Graves: attacks read as all 4 bullets hitting (144% AD) at every level ("based on level" isn't given); reloading
+    isn't modelled, so his sustained DPS is overstated.
+  - Galio: Colossal Smash's cooldown isn't stated (League's 5s used); Winds of War's tornado read as 8% max Health
+    +2% per 100 AP.
+  - Samira: the melee-range passive damage isn't modelled; Flair and Inferno Trigger don't crit.
+  - Lux: Illumination detonates on every second ability hit only (not on attacks), with no level scaling.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

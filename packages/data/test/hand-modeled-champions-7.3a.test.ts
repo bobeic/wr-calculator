@@ -29,6 +29,7 @@ describe('7.3a hand-modelled champions', () => {
       .toEqual([
         'ambessa', 'darius', 'lee-sin', 'hwei', 'caitlyn', 'senna', 'chogath', 'master-yi', 'yasuo', 'miss-fortune', 'nautilus',
         'garen', 'xin-zhao', 'brand', 'yunara', 'thresh', 'mordekaiser', 'viego', 'veigar', 'tristana', 'leona',
+        'sett', 'graves', 'galio', 'samira', 'lux',
       ])
   })
 
@@ -488,5 +489,64 @@ describe('Leona', () => {
     expect(run('leona', ['W']).instances[0].raw).toBe(185)
     expect(run('leona', ['E']).instances[0].raw).toBe(225)
     expect(run('leona', ['R']).instances[0].raw).toBe(300)
+  })
+})
+
+describe('Sett', () => {
+  it('every second attack is a right punch with 9 bonus damage (no bonus AD without items)', () => {
+    expect(partFrom(run('sett', ['AA', 'AA', 'AA', 'AA']), 'sett-passive-right-punch').map((part) => part.amount)).toEqual([9, 9])
+  })
+
+  it('Knuckle Down empowers two attacks with base + (1% + 0.025% per AD) max Health', () => {
+    const ad = attacker('sett').sheet.total.ad!
+    const bonus = partFrom(run('sett', ['Q', 'AA', 'AA', 'AA']), 'sett-q-knuckle-down')
+    expect(bonus).toHaveLength(2)
+    for (const part of bonus) expect(part.amount).toBeCloseTo(50 + (0.01 + 0.00025 * ad) * 10000, 6)
+  })
+
+  it('Haymaker deals its base as true damage', () => {
+    expect(run('sett', ['W']).instances[0]).toMatchObject({ raw: 155, type: 'true' })
+  })
+})
+
+describe('Graves', () => {
+  it('attacks deal an extra 44% AD (all four bullets)', () => {
+    const ad = attacker('graves').sheet.total.ad!
+    expect(bySource(run('graves', ['AA']), 'graves-passive-buckshot').map((i) => i.raw)[0]).toBeCloseTo(0.44 * ad, 6)
+  })
+
+  it('End of the Line hits twice (no bonus AD without items)', () => {
+    expect(run('graves', ['Q']).instances.map((i) => i.raw)).toEqual([130, 230])
+  })
+})
+
+describe('Galio', () => {
+  it('Colossal Smash procs on the first attack, then waits 5 seconds', () => {
+    expect(bySource(run('galio', ['AA', 'AA', 'AA']), 'galio-passive-colossal-smash')).toHaveLength(1)
+  })
+
+  it("Winds of War's tornado deals 8% max Health (no AP without items)", () => {
+    expect(run('galio', ['Q']).instances.map((i) => i.raw)).toEqual([205, 800])
+  })
+})
+
+describe('Samira', () => {
+  it('Inferno Trigger fires 10 shots of 60 (+50% AD)', () => {
+    const ad = attacker('samira').sheet.total.ad!
+    expect(run('samira', ['R']).instances[0].raw).toBeCloseTo(10 * (60 + 0.5 * ad), 6)
+  })
+
+  it('Wild Rush speeds up attacks', () => {
+    const gap = (combo: ComboAction[]) => {
+      const times = run('samira', combo).instances.filter((i) => i.source.id === 'AA').map((i) => i.time)
+      return times[1] - times[0]
+    }
+    expect(gap(['E', 'AA', 'AA'])).toBeLessThan(gap(['AA', 'AA']))
+  })
+})
+
+describe('Lux', () => {
+  it('Illumination detonates on every second ability hit', () => {
+    expect(bySource(run('lux', ['Q', 'E', 'R']), 'lux-passive-illumination').map((i) => i.raw)).toEqual([25.5])
   })
 })

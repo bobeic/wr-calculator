@@ -15,8 +15,8 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
 - Pages: home, CN tier list, champions, items, runes, patches, the calculator (two-build comparison, damage per ability,
   time to kill) and `/debug`.
 - Hand-modelled champion kits: Ambessa; Darius, Lee Sin, Hwei (all nine spells), Caitlyn, Senna; Cho'Gath, Master Yi,
-  Yasuo, Miss Fortune, Nautilus; Garen, Xin Zhao, Brand, Yunara, Thresh; Mordekaiser, Viego, Veigar, Tristana, Leona.
-  The other 121 champions use auto-imported ability numbers ("rough kit" on the site).
+  Yasuo, Miss Fortune, Nautilus; Garen, Xin Zhao, Brand, Yunara, Thresh; Mordekaiser, Viego, Veigar, Tristana, Leona;
+  Sett, Graves, Galio, Samira, Lux. The other 116 champions use auto-imported ability numbers ("rough kit" on the site).
 - Every item and rune that changes a damage number is modelled. Most values are unchecked in game; the open questions
   are in `docs/test-sheets/pending-checks.md`.
 
@@ -61,7 +61,7 @@ Steps once a name is chosen:
 
 ## Development, roughly in order
 
-1. **More champion kits.** Continue down the CN pick rates (fifth most-picked per lane next).
+1. **More champion kits.** Continue down the CN pick rates (sixth most-picked per lane next).
 2. **Runes and spells in the patch pipeline.** They're hand-copied now; importing them from wrpocket each patch would
    keep them current. `https://wrpocket.app/site_data/champions/<slug>.json` already carries full tooltip text and
    per-rank tables (used for the batch 3 kits below) — the champion page itself only renders descriptions for some
