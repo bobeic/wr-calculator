@@ -1,0 +1,63 @@
+/*
+ * Structural placeholder styling. The visual design is still open (see docs/review/2026-10-03-overnight.md):
+ * every colour, font and spacing value is a token here, so a design pass changes this block, not the pages.
+ */
+:root {
+  --bg: #fbfbf9;
+  --surface: #ffffff;
+  --text: #1c1c1a;
+  --muted: #6b6b66;
+  --line: #e4e3de;
+  --accent: #1f5f8b;
+  --good: #2b7a3d;
+  --bad: #a63a2b;
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --gap: 16px;
+  --radius: 4px;
+  --max: 1080px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151514;
+    --surface: #1c1c1b;
+    --text: #e9e8e3;
+    --muted: #9a9993;
+    --line: #2e2e2c;
+    --accent: #7fb6dd;
+    --good: #7cc48a;
+    --bad: #e38b7c;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--font); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 1.6rem; margin: 0 0 var(--gap); }
+h2 { font-size: 1.15rem; margin: calc(var(--gap) * 1.5) 0 calc(var(--gap) / 2); }
+.page { max-width: var(--max); margin: 0 auto; padding: var(--gap); }
+.site-header { border-bottom: 1px solid var(--line); background: var(--surface); }
+.site-header nav { max-width: var(--max); margin: 0 auto; padding: 10px var(--gap); display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; }
+.site-header .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+.site-footer { max-width: var(--max); margin: 48px auto 0; padding: var(--gap); color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+.muted { color: var(--muted); }
+.note { color: var(--muted); font-size: 13px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-weight: 600; color: var(--muted); font-size: 13px; }
+td.num, th.num { text-align: right; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: var(--gap); }
+.filters button { font: inherit; padding: 4px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
+.filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 4px 16px; }
+.tag { display: inline-block; font-size: 12px; padding: 0 6px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--muted); }
+.change-before { color: var(--bad); }
+.change-after { color: var(--good); }
+dl.stats { display: grid; grid-template-columns: max-content 1fr; gap: 2px 16px; margin: 0; }
+dl.stats dt { color: var(--muted); }
+dl.stats dd { margin: 0; }
+pre.text { white-space: pre-wrap; font: inherit; margin: 0; }
+@media (max-width: 600px) {
+  .site-header nav { gap: 12px; }
+}

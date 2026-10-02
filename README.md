@@ -1,14 +1,14 @@
 # wr-calc
 
-A pnpm/TypeScript monorepo for a Wild Rift build damage calculator: a pure calculation engine,
-real patch data, and a bare debug page for exercising the engine end to end.
+A pnpm/TypeScript monorepo for a Wild Rift site: CN-server win rates, patch changes and a build damage
+calculator. It has a pure calculation engine, real patch data, and a statically exported Next.js site.
 
 ## Project Structure
 
 - `packages/schema`: Zod schemas defining the data contract (champions, items, runes, effects, builds, targets)
 - `packages/calc`: the calculation engine: `resolveStats`, `simulateCombo`, `compareBuilds`, sustained DPS, effective HP, and game rules in `rules.ts`
-- `packages/data`: per-patch data (7.3, 7.3a; champions and items generated from wrpocket.app via `pnpm --filter @wr-calc/data patch:update`, plus hand-modeled starter items; everything unverified until checked in-game), `buildCatalog`, and the golden test runner (Node-only loader at `@wr-calc/data/golden-loader`)
-- `apps/web`: Next.js debug page (static export) that runs the engine in the browser
+- `packages/data`: per-patch data (7.3, 7.3a; champions and items generated from wrpocket.app via `pnpm --filter @wr-calc/data patch:update`, plus hand-modelled items and champions; unverified until checked in-game), CN-server win rates (`CN_STATS`, refreshed with `pnpm --filter @wr-calc/data cn-stats:update`), `buildCatalog`, the golden test runner (Node-only loader at `@wr-calc/data/golden-loader`) and a Node-only loader for the site's build-time files (`@wr-calc/data/site-loader`)
+- `apps/web`: the Next.js site (static export): home, CN tier list, champion, item and patch pages, the calculator (currently the engine's debug view) and `/debug`
 
 ## Getting Started
 
@@ -29,8 +29,9 @@ pnpm install
 - **Type check**: `pnpm typecheck`
 - **Run tests**: `pnpm test`
 - **Test a single package**: `pnpm --filter @wr-calc/schema test`
-- **Run the debug page**: `pnpm --filter @wr-calc/web dev`, then open http://localhost:3000. All state lives in the URL, so a link reproduces the exact setup.
-- **Build the debug page**: `pnpm --filter @wr-calc/web build` (static export to `apps/web/out/`)
+- **Run the site**: `pnpm --filter @wr-calc/web dev`, then open http://localhost:3000. The calculator's state lives in the URL, so a link reproduces the exact setup.
+- **Build the site**: `pnpm --filter @wr-calc/web build` (static export to `apps/web/out/`, one folder per page)
+- **Refresh CN win rates**: `pnpm --filter @wr-calc/data cn-stats:update` (also a manual GitHub workflow)
 
 No environment variables are required.
 
