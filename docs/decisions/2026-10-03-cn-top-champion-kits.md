@@ -50,6 +50,11 @@ Batches 3-7 (2026-10-02) reuse the existing pieces, plus one addition in batch 7
 - `DamageComponent.basePerInput`: adds `value` × one of the owner's number inputs to the base (Nasus's Siphoning
   Strike: +1 damage per stack). The flat counterpart of `DamageRatio.perInput`.
 
+Batch 8 adds two more:
+
+- `abilityHitProc.pctTargetMaxHp`: a % of the target's max Health on the proc (Aatrox's Deathbringer Stance).
+- The `armor` damage ratio stat: the owner's total Armor (Malphite's Thunderclap and Ground Slam).
+
 ## Consequences
 
 - `docs/test-sheets/pending-checks.md` lists the guesses most likely to be off (Darius's Noxian Might at level 15,

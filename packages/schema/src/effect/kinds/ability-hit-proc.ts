@@ -19,6 +19,8 @@ export const AbilityHitProcEffectSchema = EffectBaseSchema.extend({
   startOnCooldownInputId: z.string().optional(),
   /** `empoweredAttack` is a basic attack that spent an empowered-attack charge. Defaults to ['ability']. */
   triggeredBy: z.array(z.enum(['ability', 'basicAttack', 'empoweredAttack'])).min(1).optional(),
+  /** Added to the damage: the target's max Health times this (Aatrox's Deathbringer Stance: 4%). */
+  pctTargetMaxHp: NullableScalarSchema.optional(),
   /** Adds `amount` per stack of a stackCount input (e.g. Dark Harvest: 11 per soul). */
   damagePerStack: z.object({ inputId: z.string(), amount: z.number() }).strict().optional(),
   /** Procs at most once per combo (e.g. Dead Man's Plate's Momentum is spent by the first attack). */

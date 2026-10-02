@@ -32,6 +32,7 @@ describe('7.3a hand-modelled champions', () => {
         'sett', 'graves', 'galio', 'samira', 'lux',
         'dr-mundo', 'tryndamere', 'mel', 'jinx', 'seraphine',
         'nasus', 'khazix', 'akali', 'draven', 'blitzcrank',
+        'aatrox', 'nocturne', 'yone', 'jhin', 'malphite',
       ])
   })
 
@@ -645,5 +646,57 @@ describe('Blitzcrank', () => {
   it('Power Fist adds 140% AD to one attack', () => {
     const ad = attacker('blitzcrank').sheet.total.ad!
     expect(partFrom(run('blitzcrank', ['E', 'AA', 'AA']), 'blitzcrank-e-power-fist').map((part) => part.amount)).toEqual([1.4 * ad])
+  })
+})
+
+describe('Aatrox', () => {
+  it('Deathbringer Stance adds 4% max Health to one attack per 24 seconds', () => {
+    expect(bySource(run('aatrox', ['AA', 'AA']), 'aatrox-passive-deathbringer-stance').map((i) => i.raw)).toEqual([400])
+  })
+
+  it('The Darkin Blade deals its three casts at 1x, 1.25x and 1.5x', () => {
+    const ad = attacker('aatrox').sheet.total.ad!
+    expect(run('aatrox', ['Q']).instances.map((i) => i.raw).reduce((a, b) => a + b, 0)).toBeCloseTo(3.75 * (100 + 0.9 * ad), 6)
+  })
+
+  it('World Ender multiplies AD by 1.5 at rank 3 when toggled on', () => {
+    const off = attacker('aatrox').sheet.total.ad!
+    expect(attacker('aatrox', { 'aatrox-world-ender-active': true }).sheet.total.ad!).toBeCloseTo(1.5 * off, 6)
+  })
+})
+
+describe('Nocturne', () => {
+  it('Umbra Blades adds 20% AD to every 4th attack', () => {
+    const ad = attacker('nocturne').sheet.total.ad!
+    expect(partFrom(run('nocturne', ['AA', 'AA', 'AA', 'AA']), 'nocturne-passive-umbra-blades').map((p) => p.amount)).toEqual([0.2 * ad])
+  })
+})
+
+describe('Yone', () => {
+  it('Spirit Cleave deals half physical, half magic', () => {
+    const types = run('yone', ['W']).instances.map((i) => `${i.type} ${i.raw}`)
+    expect(types).toEqual(['physical 632.5', 'magic 632.5'])
+  })
+})
+
+describe('Jhin', () => {
+  it('every 4th shot adds 60% AD', () => {
+    const ad = attacker('jhin').sheet.total.ad!
+    expect(partFrom(run('jhin', ['AA', 'AA', 'AA', 'AA']), 'jhin-passive-fourth-shot').map((p) => p.amount)).toEqual([0.6 * ad])
+  })
+})
+
+describe('Malphite', () => {
+  it('Ground Slam scales with Armor (40% more at rank 4 of Thunderclap); Thunderclap empowers attacks', () => {
+    const armor = attacker('malphite').sheet.total.armor!
+    const malphite = champion('malphite')
+    const withoutW = combatantFromChampion(
+      { ...malphite, abilities: { ...malphite.abilities, w: { ...malphite.abilities.w, effects: [] } } },
+      15, { items: [], runes: [], inputs: {} }, dataset.catalog,
+    ).sheet.total.armor!
+    expect(armor).toBeCloseTo(1.4 * withoutW, 6)
+    expect(run('malphite', ['E']).instances[0].raw).toBeCloseTo(210 + 0.4 * armor, 6)
+    expect(partFrom(run('malphite', ['W', 'AA', 'AA']), 'malphite-w-first-attack')).toHaveLength(1)
+    expect(partFrom(run('malphite', ['W', 'AA', 'AA']), 'malphite-w-cone')).toHaveLength(2)
   })
 })

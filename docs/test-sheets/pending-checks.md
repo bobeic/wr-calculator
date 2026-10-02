@@ -119,6 +119,16 @@ Patch 7.3a is live.
   - Draven: one empowered attack per Spinning Axe cast (no juggling); Whirling Death hits twice (out and back).
   - Blitzcrank: Power Fist read as +80-140% AD rather than a crit; Static Field's mark procs on every attack, even
     while the ultimate is on cooldown.
+- Batch 8 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Aatrox: Deathbringer Stance on a flat 24s cooldown (the 3s refund per hit isn't modelled, so it procs too
+    rarely); The Darkin Blade's three casts at once, never on the sweetspot; World Ender is a toggle.
+  - Nocturne: Umbra Blades read as +20% AD on every 4th attack; Dusk Trail's AD for the full 5s.
+  - Yone: Steel and Spirit (every other attack half magic) and Soul Unbound's true-damage echo aren't modelled;
+    Spirit Cleave and Fate Sealed read as half physical, half magic.
+  - Jhin: the fixed attack rate, reload and attack-speed-to-AD conversion aren't modelled (attack speed speeds him
+    up here); the 4th shot is +60% AD without its 11% missing Health; Curtain Call is 5x one shot at once, with the
+    missing-Health increase on the base only.
+  - Malphite: Thunderclap's cone damage assumed to hit the target on every attack for 6s.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
