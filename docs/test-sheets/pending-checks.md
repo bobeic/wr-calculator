@@ -257,6 +257,14 @@ Patch 7.3a is live.
   - Nunu & Willump: the largest snowball, a full Snowball Barrage and a full Absolute Zero channel; no Call of the
     Freljord attack speed.
   - Annie: Tibbers' attacks aren't modelled.
+- Batch 28 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Hecarim: Rampage always fully charged and critting (x1.2); no Warpath.
+  - Diana: Moonsilver Blade's 30% attack speed at every level; all 3 Pale Cascade spheres hit; Moonfall fully charged;
+    no Lunar Rush reset.
+  - Taliyah: all 5 Threaded Volley rocks hit; no Worked Ground boulder or Unraveled Earth detonations.
+  - Norra: Memory Surge fully charged; all 4 Portalpalooza! bolts hit; no Trinkets.
+  - Katarina: no dagger pick-ups (her main damage in game), so she reads far low; every Death Lotus dagger hits.
+  - Kassadin: Riftwalk unstacked and without its Mana ratio; Force Pulse un-enhanced.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

@@ -52,6 +52,7 @@ describe('7.3a hand-modelled champions', () => {
         'sion', 'amumu', 'vex', 'ornn',
         'shen', 'fiddlesticks', 'heimerdinger', 'zilean',
         'poppy', 'nunu-willump', 'annie',
+        'hecarim', 'diana', 'taliyah', 'norra', 'katarina', 'kassadin',
       ])
   })
 
@@ -1365,5 +1366,42 @@ describe('Nunu & Willump', () => {
 describe('Annie', () => {
   it('Summon: Tibbers deals the summon and the pounce', () => {
     expect(run('annie', ['R']).instances.map((i) => i.raw)).toEqual([330, 190])
+  })
+})
+
+describe('Hecarim', () => {
+  it('Spirit of Dread ticks 8 times', () => {
+    expect(bySource(run('hecarim', ['W', 'wait:4']), 'hecarim-w-spirit-of-dread')).toHaveLength(8)
+  })
+})
+
+describe('Diana', () => {
+  it('Moonsilver Blade procs on the third attack', () => {
+    expect(bySource(run('diana', ['AA', 'AA', 'AA']), 'diana-passive-moonsilver-blade').map((i) => i.raw)).toEqual([35])
+  })
+})
+
+describe('Taliyah', () => {
+  it('Threaded Volley: the first rock in full, 4 more at 40%', () => {
+    expect(run('taliyah', ['Q']).instances.map((i) => i.raw)).toEqual([100, 160])
+  })
+})
+
+describe('Norra', () => {
+  it('Portalpalooza! fires 4 bolts, the last 40% stronger', () => {
+    expect(run('norra', ['R']).instances.map((i) => i.raw)).toEqual([540, 252])
+  })
+})
+
+describe('Katarina', () => {
+  it('Death Lotus throws 20 daggers', () => {
+    const ticks = bySource(run('katarina', ['R', 'wait:3']), 'katarina-r-death-lotus')
+    expect(ticks).toHaveLength(20)
+  })
+})
+
+describe('Kassadin', () => {
+  it('Nether Blade empowers one attack', () => {
+    expect(bySource(run('kassadin', ['W', 'AA', 'AA']), 'kassadin-w-nether-blade').map((i) => i.raw)).toEqual([140])
   })
 })
