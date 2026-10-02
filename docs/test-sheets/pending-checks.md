@@ -174,6 +174,13 @@ Patch 7.3a is live.
   - Aurelion Sol: Breath of Light uses the table's per-rank numbers (the text adds per-level parts) and no Stardust.
   - Vayne: Silver Bolts' "consecutive" taken as within 3.5s, without its minimum; Final Hour lasts 8s at every rank.
   - Braum: Concussive Blows stacks from any ability hit, 45 at every level.
+- Batch 15 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Fiora: she strikes a Vital every 2 seconds (as soon as one appears) - likely generous; Bladework's crit is split
+    over both attacks; Grand Challenge always hits all 4 Vitals.
+  - Wukong: the clone and Golden Staff's periodic +50% aren't modelled; Cyclone always spins twice.
+  - Twisted Fate: Pick a Card is always the Blue Card.
+  - Smolder: Dragon Practice stacks are an input; the 25/100/175-stack effects and crit scaling aren't modelled.
+  - Soraka: Equinox's two hits land at once; empowered Starcall isn't modelled.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

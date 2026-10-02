@@ -39,6 +39,7 @@ describe('7.3a hand-modelled champions', () => {
         'urgot', 'vi', 'ekko', 'kalista', 'zyra',
         'renekton', 'shyvana', 'syndra', 'twitch', 'swain',
         'kayle', 'kindred', 'aurelion-sol', 'vayne', 'braum',
+        'fiora', 'wukong', 'twisted-fate', 'smolder', 'soraka',
       ])
   })
 
@@ -944,5 +945,44 @@ describe('Braum', () => {
   it("Concussive Blows stuns on the 4th stack; Winter's Bite scales with his max Health", () => {
     expect(bySource(run('braum', ['AA', 'AA', 'AA', 'AA']), 'braum-passive-concussive-blows').map((i) => i.raw)).toEqual([45])
     expect(run('braum', ['Q']).instances[0].raw).toBeCloseTo(240 + 0.03 * attacker('braum').sheet.total.hp!, 6)
+  })
+})
+
+describe('Fiora', () => {
+  it('a Vital deals 4% max Health true damage at most every 2 seconds', () => {
+    const vitals = bySource(run('fiora', ['AA', 'AA']), 'fiora-passive-vital')
+    expect(vitals.map((i) => `${i.type} ${i.raw}`)).toEqual(['true 400'])
+  })
+
+  it('Bladework adds 50% AD to each of the next two attacks at rank 4', () => {
+    const ad = attacker('fiora').sheet.total.ad!
+    expect(partFrom(run('fiora', ['E', 'AA', 'AA', 'AA']), 'fiora-e-bladework').map((p) => p.amount)).toEqual([0.5 * ad, 0.5 * ad])
+  })
+})
+
+describe('Wukong', () => {
+  it('Cyclone spins twice for 220% AD + 18% max Health', () => {
+    const ad = attacker('wukong').sheet.total.ad!
+    expect(run('wukong', ['R']).instances[0].raw).toBeCloseTo(2 * (2.2 * ad + 1800), 6)
+  })
+})
+
+describe('Twisted Fate', () => {
+  it('Stacked Deck adds 140 magic to every 4th attack at rank 4', () => {
+    expect(bySource(run('twisted-fate', ['AA', 'AA', 'AA', 'AA']), 'twisted-fate-e-fourth-attack').map((i) => i.raw)).toEqual([140])
+  })
+})
+
+describe('Smolder', () => {
+  it("Super Scorcher Breath's Passive damage is 30% of his Dragon Practice stacks", () => {
+    const magicPart = (stacks: number) => run('smolder', ['Q'], { 'smolder-dragon-practice-stacks': stacks })
+      .instances.filter((i) => i.type === 'magic').reduce((sum, i) => sum + i.raw, 0)
+    expect(magicPart(200)).toBeCloseTo(60, 6)
+  })
+})
+
+describe('Soraka', () => {
+  it('Equinox hits twice', () => {
+    expect(run('soraka', ['E']).instances[0].raw).toBe(440)
   })
 })
