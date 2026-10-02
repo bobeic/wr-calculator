@@ -34,6 +34,16 @@ Patch 7.3a is live.
 
 - Ignite: what is its cooldown in Wild Rift (the engine uses League's 90s), and is 72–380 linear with level?
 
+- Champion kits for Darius, Lee Sin, Hwei, Caitlyn and Senna (2026-10-03, from wrpocket's 7.3a text; all unchecked).
+  The guesses most likely to be off:
+  - Darius: Noxian Might's AD. The text says "32 (based on level)"; the engine gives 32 at every level. What is it at
+    level 15? Also: does Hemorrhage tick once a second, and does R's damage go up by 20% per stack (5 stacks = double)?
+  - Caitlyn: is the Headshot the 6th attack or the 7th? The text reads "every 6 attacks, the next attack", so the
+    engine fires it on the 7th.
+  - Hwei: does Signature of the Visionary go off on every second ability hit? How long do Stirring Lights last (the
+    engine says 6s)?
+  - Senna: Mist's crit is modelled as 0.5% per stack instead of 10% per 20.
+
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
   engine uses one value per combo (listed in the file).

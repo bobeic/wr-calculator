@@ -13,7 +13,7 @@ function liveCharges(effect: EmpoweredAttackEffect, ctx: HookContext): number {
 
 function grantCharge(effect: EmpoweredAttackEffect, ctx: HookContext): void {
   ctx.self.buffs[buffKey(effect)] = {
-    stacks: Math.min(liveCharges(effect, ctx) + 1, effect.maxCharges),
+    stacks: Math.min(liveCharges(effect, ctx) + (effect.grant.charges ?? 1), effect.maxCharges),
     expiresAt: ctx.time + effect.durationSeconds,
   }
 }

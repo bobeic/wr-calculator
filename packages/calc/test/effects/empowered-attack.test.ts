@@ -67,6 +67,15 @@ describe('empoweredAttackHandler', () => {
     expect(self.buffs['empowered:step']?.stacks).toBe(1)
   })
 
+  it('adds grant.charges per grant, still capped', () => {
+    const ironWill: EmpoweredAttackEffect = { ...feint, grant: { on: 'abilityCast', slots: ['w'], charges: 2 }, maxCharges: 3 }
+    const self = runtime()
+    empoweredAttackHandler.hooks!.onAbilityCast!(ironWill, ctx({ self }), 'w')
+    expect(self.buffs['empowered:step']?.stacks).toBe(2)
+    empoweredAttackHandler.hooks!.onAbilityCast!(ironWill, ctx({ self }), 'w')
+    expect(self.buffs['empowered:step']?.stacks).toBe(3)
+  })
+
   it('spends one charge per basic attack: a passive bonus on the attack and swing attack speed', () => {
     const self = runtime({ buffs: { 'empowered:step': { stacks: 2, expiresAt: 4 } } })
     const modifier = empoweredAttackHandler.hooks!.beforeBasicAttack!(feint, ctx({ self, time: 1 }))

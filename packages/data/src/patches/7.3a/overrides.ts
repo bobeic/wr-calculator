@@ -2,6 +2,7 @@ import type { Champion, Item, Provenance } from '@wr-calc/schema'
 import { STARTER_ITEMS } from '../7.3/items'
 import { WRPOCKET_7_3A_PROVENANCE } from './provenance'
 import { BATCH6_ITEMS } from './items-batch6'
+import { HAND_MODELED_CHAMPIONS_7_3A } from './champions'
 
 /** Values read in the 7.3a practice tool. */
 const IN_GAME_7_3A: Provenance = { source: 'in-game', patch: '7.3a', verifiedInGame: true, verifiedAt: '2026-10-01' }
@@ -50,4 +51,5 @@ export const OVERRIDE_ITEMS: Item[] = [
   // Items first modelled on 7.3a (batch 6).
   ...BATCH6_ITEMS,
 ]
-export const OVERRIDE_CHAMPIONS: Champion[] = []
+// Champions first hand-modelled on 7.3a (champions.ts).
+export const OVERRIDE_CHAMPIONS: Champion[] = [...HAND_MODELED_CHAMPIONS_7_3A]

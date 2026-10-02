@@ -1,6 +1,7 @@
 import type { DamageAmpEffect } from '@wr-calc/schema'
 import type { EffectHandler } from './types'
 import { resolveScalar, scalarWarning } from '../resolve-scalar'
+import { targetDotStacks } from './dot'
 
 export const damageAmpHandler: EffectHandler<DamageAmpEffect> = {
   kind: 'damageAmp',
@@ -15,6 +16,7 @@ export const damageAmpHandler: EffectHandler<DamageAmpEffect> = {
     if (effect.scaleWithTargetBonusHp) {
       amount *= Math.min(1, Math.max(0, ctx.opponentSheet.bonus.hp ?? 0) / effect.scaleWithTargetBonusHp.fullAt)
     }
+    if (effect.perTargetDotStack) amount *= targetDotStacks(effect.perTargetDotStack.effectId, ctx)
     return 1 + amount
   },
 }

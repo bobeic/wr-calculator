@@ -10,6 +10,14 @@ export const DotEffectSchema = EffectBaseSchema.extend({
   tickIntervalSeconds: z.number().positive(),
   durationSeconds: NullableScalarSchema,
   refresh: z.enum(['refresh', 'stack', 'ignore']),
+  /**
+   * With refresh 'stack': the stack cap. Each application then adds a stack (up to the cap) and restarts the whole
+   * dot at the new stack count, so every stack shares one timer (e.g. Darius's Hemorrhage, 5 stacks). Without it,
+   * each application runs as its own independent dot.
+   */
+  maxStacks: z.number().int().positive().optional(),
+  /** What applies the dot: basic attacks and/or hits of the listed ability slots. Omitted means any ability hit. */
+  appliedBy: z.array(z.enum(['basicAttack', 'q', 'w', 'e', 'r'])).min(1).optional(),
   /** Added to each tick: the attacker's stat times the ratio, read when the dot is applied. */
   ratios: z.array(StatRatioSchema)
     .default([]),

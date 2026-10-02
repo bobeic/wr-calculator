@@ -128,3 +128,56 @@ describe('dotHandler.modifyResist', () => {
     expect(dotHandler.modifyResist!(effect, ctx({ opponent }), 'magic')).toEqual({})
   })
 })
+
+describe('dot appliedBy and maxStacks', () => {
+  const bleed = {
+    ...effect, id: 'bleed', damageType: 'physical' as const, tickAmount: 4, tickIntervalSeconds: 1,
+    durationSeconds: 5, refresh: 'stack' as const, maxStacks: 3, appliedBy: ['basicAttack' as const, 'q' as const],
+  }
+
+  it('applies on a basic attack only when appliedBy lists it', () => {
+    const opponent = runtime()
+    dotHandler.hooks!.onBasicAttack!(effect, ctx({ opponent, scheduleEvent: () => {} }))
+    expect(opponent.buffs['dot:e1']).toBeUndefined()
+    dotHandler.hooks!.onBasicAttack!(bleed, ctx({ opponent, scheduleEvent: () => {} }))
+    expect(opponent.buffs['dot:bleed']).toEqual({ expiresAt: 5, stacks: 1 })
+  })
+
+  it('applies on an ability hit only for the listed slots', () => {
+    const opponent = runtime()
+    dotHandler.hooks!.onAbilityHit!(bleed, ctx({ opponent, scheduleEvent: () => {} }), 'e', [])
+    expect(opponent.buffs['dot:bleed']).toBeUndefined()
+    dotHandler.hooks!.onAbilityHit!(bleed, ctx({ opponent, scheduleEvent: () => {} }), 'q', [])
+    expect(opponent.buffs['dot:bleed']?.stacks).toBe(1)
+  })
+
+  it('restarts the whole dot at the new stack count, capped, cancelling the old ticks', () => {
+    const opponent = runtime()
+    const ticks: Array<{ at: number; amount: number }> = []
+    const cancelled: string[] = []
+    const apply = (time: number) => dotHandler.hooks!.onBasicAttack!(bleed, ctx({
+      time, opponent,
+      cancelScheduled: (key) => {
+        cancelled.push(key)
+        for (let i = ticks.length - 1; i >= 0; i--) if (ticks[i].at > time) ticks.splice(i, 1)
+      },
+      scheduleEvent: (at, run) => run(ctx({
+        dealDamage: (input) => {
+          ticks.push({ at, amount: input.amount })
+          return { time: at, source: input.source, type: input.type, raw: input.amount, mitigated: input.amount, targetHpAfter: 0 }
+        },
+      })),
+    }))
+    for (const time of [0, 1, 2, 3]) apply(time)
+    expect(opponent.buffs['dot:bleed']).toEqual({ expiresAt: 8, stacks: 3 })
+    expect(cancelled).toEqual(['dot:bleed', 'dot:bleed', 'dot:bleed'])
+    // The last application's five ticks, each at the 3-stack cap.
+    expect(ticks.filter((tick) => tick.at > 3)).toEqual([4, 5, 6, 7, 8].map((at) => ({ at, amount: 12 })))
+  })
+
+  it('starts over at one stack once the dot has expired', () => {
+    const opponent = runtime({ buffs: { 'dot:bleed': { expiresAt: 5, stacks: 3 } } })
+    dotHandler.hooks!.onBasicAttack!(bleed, ctx({ time: 6, opponent, scheduleEvent: () => {}, cancelScheduled: () => {} }))
+    expect(opponent.buffs['dot:bleed']).toEqual({ expiresAt: 11, stacks: 1 })
+  })
+})

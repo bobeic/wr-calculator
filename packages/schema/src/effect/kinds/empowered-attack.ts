@@ -14,6 +14,8 @@ export const EmpoweredAttackEffectSchema = EffectBaseSchema.extend({
     on: z.enum(['abilityCast', 'dashAfterAbility']),
     slots: z.array(z.enum(['q', 'w', 'e', 'r'])).optional(),
     withinSeconds: z.number().nonnegative().optional(),
+    /** Charges one grant adds (default 1), e.g. Lee Sin's Iron Will empowers the next two attacks. */
+    charges: z.number().int().positive().optional(),
   }).strict(),
   maxCharges: z.number().int().positive(),
   durationSeconds: z.number().positive(),

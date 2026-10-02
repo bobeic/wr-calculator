@@ -52,3 +52,18 @@ describe('damageAmpHandler.damageMultiplier', () => {
     expect(result).toBe(1)
   })
 })
+
+describe('damageAmp perTargetDotStack', () => {
+  const perStack = { ...effect, amount: 0.2, perTargetDotStack: { effectId: 'bleed' } }
+
+  it('multiplies amount by the live stacks of that dot on the target', () => {
+    const opponent = runtime({ buffs: { 'dot:bleed': { expiresAt: 5, stacks: 4 } } })
+    expect(damageAmpHandler.damageMultiplier!(perStack, ctx({ time: 2, opponent }), input)).toBeCloseTo(1.8, 10)
+  })
+
+  it('adds nothing with no stacks or an expired dot', () => {
+    expect(damageAmpHandler.damageMultiplier!(perStack, ctx(), input)).toBe(1)
+    const opponent = runtime({ buffs: { 'dot:bleed': { expiresAt: 5, stacks: 4 } } })
+    expect(damageAmpHandler.damageMultiplier!(perStack, ctx({ time: 6, opponent }), input)).toBe(1)
+  })
+})
