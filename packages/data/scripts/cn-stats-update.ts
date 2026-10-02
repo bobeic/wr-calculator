@@ -3,6 +3,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { normalizeId } from '../src/wrpocket-ids'
 import { HERO_LIST_URL, RANK_LIST_URL, RawHeroListSchema, RawRankListSchema, mapCnStats } from './cn-stats/map'
 
 const DATA_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -28,7 +29,7 @@ async function fetchJson(url: string): Promise<unknown> {
 async function knownChampionIds(): Promise<Set<string>> {
   const { CURRENT_PATCH } = await import('../src/patches/registry')
   const raw = JSON.parse(await readFile(join(CHAMPIONS_SNAPSHOT_ROOT, CURRENT_PATCH, 'champions.json'), 'utf-8')) as Array<{ id: string }>
-  return new Set(raw.map((champion) => champion.id))
+  return new Set(raw.map((champion) => normalizeId(champion.id)))
 }
 
 const rankList = RawRankListSchema.parse(await fetchJson(RANK_LIST_URL))

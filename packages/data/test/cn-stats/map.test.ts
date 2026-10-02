@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { championIdFromPoster, mapCnStats } from '../../scripts/cn-stats/map'
 import type { RawHeroList, RawRankList } from '../../scripts/cn-stats/map'
 import { CN_STATS } from '../../src/cn-stats'
+import { CURRENT_PATCH, getPatchDataset } from '../../src/patches/registry'
 
 const row = (heroId: string, position: string, strength: string, win = '0.5') => ({
   hero_id: heroId, position, strength, appear_rate: '0.1', forbid_rate: '0.2', win_rate: win, dtstatdate: '20260930',
@@ -19,7 +20,7 @@ describe('championIdFromPoster', () => {
   it('turns poster names into our ids, with overrides', () => {
     expect(championIdFromPoster('https://x/Posters/AurelionSol_0.jpg')).toBe('aurelion-sol')
     expect(championIdFromPoster('https://x/Posters/MonkeyKing_0.jpg')).toBe('wukong')
-    expect(championIdFromPoster('https://x/Posters/Nunu_0.jpg')).toBe('nunu-and-willump')
+    expect(championIdFromPoster('https://x/Posters/Nunu_0.jpg')).toBe('nunu-willump')
   })
 })
 
@@ -50,5 +51,11 @@ describe('CN_STATS (committed snapshot)', () => {
   it('maps every hero and has rows in every lane of the all-ranks bracket', () => {
     expect(CN_STATS.unmapped).toEqual([])
     for (const rows of Object.values(CN_STATS.ranks.all)) expect(rows.length).toBeGreaterThan(10)
+  })
+
+  it('names only champions in the current dataset', () => {
+    const ids = new Set(getPatchDataset(CURRENT_PATCH).champions.map((champion) => champion.id))
+    const rows = Object.values(CN_STATS.ranks).flatMap((lanes) => Object.values(lanes).flat())
+    expect(rows.filter((row) => !ids.has(row.championId)).map((row) => row.championId)).toEqual([])
   })
 })

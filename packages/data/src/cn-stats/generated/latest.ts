@@ -5,7 +5,7 @@ import type { CnStatsSnapshot } from '../types'
 export const CN_STATS: CnStatsSnapshot = {
  "source": "https://mlol.qt.qq.com/go/lgame_battle_info/hero_rank_list_v2",
  "statDate": "2026-09-30",
- "fetchedAt": "2026-10-02T00:44:03.852Z",
+ "fetchedAt": "2026-10-02T00:45:42.512Z",
  "cnVersion": "7.3",
  "ranks": {
   "all": {
@@ -653,7 +653,7 @@ export const CN_STATS: CnStatsSnapshot = {
      "strengthRank": 39
     },
     {
-     "championId": "nunu-and-willump",
+     "championId": "nunu-willump",
      "heroId": "10008",
      "winRate": 0.506151,
      "pickRate": 0.014148,
@@ -2065,7 +2065,7 @@ export const CN_STATS: CnStatsSnapshot = {
      "strengthRank": 36
     },
     {
-     "championId": "nunu-and-willump",
+     "championId": "nunu-willump",
      "heroId": "10008",
      "winRate": 0.527338,
      "pickRate": 0.018346,
@@ -3485,7 +3485,7 @@ export const CN_STATS: CnStatsSnapshot = {
      "strengthRank": 32
     },
     {
-     "championId": "nunu-and-willump",
+     "championId": "nunu-willump",
      "heroId": "10008",
      "winRate": 0.537893,
      "pickRate": 0.023304,
@@ -4633,7 +4633,7 @@ export const CN_STATS: CnStatsSnapshot = {
      "strengthRank": 4
     },
     {
-     "championId": "nunu-and-willump",
+     "championId": "nunu-willump",
      "heroId": "10008",
      "winRate": 0.703704,
      "pickRate": 0.069588,

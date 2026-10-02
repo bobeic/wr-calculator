@@ -26,7 +26,7 @@ const RANK_KEYS: Record<string, CnRank> = { 0: 'all', 1: 'diamond', 2: 'master',
 const LANE_KEYS: Record<string, Lane> = { 1: 'mid', 2: 'top', 3: 'adc', 4: 'support', 5: 'jungle' }
 
 // Poster names that don't turn into our ids.
-const POSTER_OVERRIDES: Record<string, string> = { Nunu: 'nunu-and-willump', MonkeyKing: 'wukong' }
+const POSTER_OVERRIDES: Record<string, string> = { Nunu: 'nunu-willump', MonkeyKing: 'wukong' }
 
 /** Our champion id from a Tencent poster URL: '.../Posters/AurelionSol_0.jpg' -> 'aurelion-sol'. */
 export function championIdFromPoster(poster: string): string {
