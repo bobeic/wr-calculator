@@ -741,6 +741,7 @@
         "ambessa-l15-no-items-q-then-slam.json",
         "ambessa-l15-no-items-q.json",
         "ambessa-l15-no-items-w.json",
+        "ambessa-l15-seryldas-grudge-aa.json",
         "ambessa-l15-spear-of-shojin-aa.json",
         "ambessa-l15-spear-of-shojin-e.json",
         "ambessa-l15-spear-of-shojin-q-then-slam.json",
@@ -19020,7 +19021,9 @@
           "wordDiff": "~~\\*\\*~~Icy~~\\*\\*~~: Damaging active abilities and empowered attacks slow enemies below 60% ~~current~~ Health by 30% ~~Movement Speed~~ for 1 second."
         }
       ],
-      "goldens": [],
+      "goldens": [
+        "ambessa-l15-seryldas-grudge-aa.json"
+      ],
       "id": "seryldas-grudge",
       "kind": "item",
       "name": "Serylda’s Grudge"

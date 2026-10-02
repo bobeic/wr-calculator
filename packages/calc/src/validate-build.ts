@@ -10,7 +10,7 @@ export interface BuildIssue {
 }
 
 // Tiers a build may hold only one copy of. Components (basic, epic) can be bought twice; finished items can't.
-// TODO-VERIFY(itemSlots) covers the slot count; uniqueness of finished items follows League's shop rule.
+// The slot count is verified (5 + boots); uniqueness of finished items follows League's shop rule.
 const UNIQUE_TIERS: ReadonlySet<Item['tier']> = new Set(['legendary', 'boots', 'enchant', 'support'])
 
 /**

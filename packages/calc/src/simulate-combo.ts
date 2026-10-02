@@ -295,6 +295,7 @@ export function simulateCombo(
         : input.type === 'magic' ? target.sheet.total.mr ?? 0 : 0
       const modifiers: ResistModifiers = { ...ZERO_RESIST_MODIFIERS }
       const attackerTotal = attackerCtx.selfSheet.total
+      // Percent pen sources add (verified 2026-10-01: Ambessa's 30% R passive + Serylda's 35% gave 65%, an attack of 127).
       if (input.type === 'physical') {
         modifiers.flatPen += attackerTotal.flatArmorPen ?? 0
         modifiers.pctPen += attackerTotal.pctArmorPen ?? 0

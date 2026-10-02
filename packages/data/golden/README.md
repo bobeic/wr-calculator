@@ -70,7 +70,7 @@ Item batch 5, the rest (7.3a practice tool, 2026-10-01): the same Ambessa setup 
 attack), Spear of Shojin (`q-w-e-q`: 591 + 117 + 116 + 677 as Focused Will stacks), Sundered Sky (`aa-aa`: the first
 attack crits for 152, the second doesn't), Sterak's Gage, Death's Dance, Guardian Angel (45 AD) and Maw of
 Malmortius. Readings within one point of the engine were recorded as read. Serylda's Grudge has no Frostbite burn
-in game; its other hits aren't recorded yet.
+in game. Its `aa` (127) shows percent armor pen sources add: R's 30% plus Serylda's 35% is 65%, not 54.5%.
 
 The practice tool appears to round damage up rather than to the nearest whole number, so a
 recorded value can be up to 1 above the engine's exact figure (e.g. 577.14 shows as 578). The 1%

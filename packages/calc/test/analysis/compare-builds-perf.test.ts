@@ -1,3 +1,4 @@
+import { ITEM_SLOTS } from '../../src/rules'
 import { describe, it, expect } from 'vitest'
 import { compareBuilds } from '../../src/analysis/compare-builds'
 import type { CompareBuildsScenario } from '../../src/analysis/compare-builds'
@@ -33,11 +34,11 @@ function adItem(id: string, ad: number, cost: number): Item {
 }
 
 describe('compareBuilds performance', () => {
-  it('computes two 6-item builds in under 5ms', () => {
+  it('computes two full (5-item) builds in under 5ms', () => {
     const items = new Map<string, Item>()
     const buildAItems: string[] = []
     const buildBItems: string[] = []
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= ITEM_SLOTS; i++) {
       items.set(`item-a${i}`, adItem(`item-a${i}`, 10 * i, 1000 * i))
       items.set(`item-b${i}`, adItem(`item-b${i}`, 5 * i, 800 * i))
       buildAItems.push(`item-a${i}`)
@@ -70,8 +71,8 @@ describe('compareBuilds performance', () => {
     }
     const median = [...timings].sort((x, y) => x - y)[Math.floor(timings.length / 2)]
 
-    expect(result.a).toHaveLength(6)
-    expect(result.b).toHaveLength(6)
+    expect(result.a).toHaveLength(ITEM_SLOTS)
+    expect(result.b).toHaveLength(ITEM_SLOTS)
     expect(median).toBeLessThan(5)
   })
 })

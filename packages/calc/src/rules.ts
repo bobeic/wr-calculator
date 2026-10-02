@@ -120,11 +120,10 @@ export const RESIST_MODIFICATION_ORDER = [
 // passive is shown as active.
 export const UNIQUE_EFFECT_RESOLUTION: 'strongest' | 'first' = 'strongest'
 
-// TODO-VERIFY(itemSlots): confirm the inventory holds 6 item slots plus a separate boots slot,
-// in a custom game.
+// Verified 2026-10-01 (user, in-game): the inventory holds 5 items plus a separate boots slot.
 // Confirmed 2026-09-17 (user, in-game): Wild Rift removed the boot-enchant mechanic — enchants
 // are standalone items now, not a separate attach-to-boots slot.
-export const ITEM_SLOTS = 6
+export const ITEM_SLOTS = 5
 export const HAS_SEPARATE_BOOTS_SLOT = true
 export const HAS_SEPARATE_ENCHANT_SLOT = false
 
@@ -139,7 +138,6 @@ export const UNVERIFIED_RULE_IDS = [
   'adaptiveDamageType',
   'resistModificationOrder',
   'uniqueEffectResolution',
-  'itemSlots',
   'attackSpeedRatioGrowth',
   'statResolutionOrder',
   'attackSpeedStacking',

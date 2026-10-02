@@ -81,7 +81,9 @@ correctness bugs, and are not listed here.
    item mechanic (on-hit damage capped against monsters) and should be picked up alongside whatever
    step first models jungle monsters as targets.
 
-8. **Percent armor/magic penetration and percent resist reduction from multiple sources stack
+8. **Percent armor pen: RESOLVED (2026-10-01, in game: Ambessa's 30% R passive plus Serylda's 35% gave 65%, an attack of
+   127 on the 100-armor dummy, so the additive rule is right). Magic pen and resist reduction are still unchecked.**
+   **Percent armor/magic penetration and percent resist reduction from multiple sources stack
    additively**, not multiplicatively — two 40% penetration sources currently sum to 80% rather
    than compounding to `1 - 0.6*0.6 = 64%`. `RESIST_MODIFICATION_ORDER`'s *order* is already
    TODO-VERIFY-tagged (`resistModificationOrder` in `packages/calc/src/rules.ts`), but the
@@ -137,4 +139,4 @@ correctness bugs, and are not listed here.
 - one item per exclusive group.
 
 `resolveStats` throws with every issue listed, which the debug page shows as a stage error. The slot
-count is still TODO-VERIFY(itemSlots).
+count is verified in game: 5 items plus a separate boots slot (2026-10-01).

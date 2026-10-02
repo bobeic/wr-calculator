@@ -24,7 +24,7 @@ const datasetWithNulls: DebugDataset = {
 }
 const LEGENDARIES = [
   'rabadons-deathcap', 'blade-of-the-ruined-king', 'trinity-force',
-  'liandrys-torment', 'void-staff', 'black-cleaver',
+  'liandrys-torment', 'void-staff',
 ]
 
 function state(overrides: Partial<DebugState> = {}): DebugState {
@@ -49,7 +49,7 @@ function error(stage: Stage<unknown>): string {
 }
 
 describe('runDebug with the real 7.3 dataset', () => {
-  it('runs a full champion + 6-item build end to end through every stage', () => {
+  it('runs a full champion + 5-item build end to end through every stage', () => {
     const result = runDebug(state(), dataset)
     expect(ok(result.sheetA).total.hp).toBeGreaterThan(0)
     expect(ok(result.sheetB).total.ad).toBeGreaterThan(0)
@@ -57,7 +57,7 @@ describe('runDebug with the real 7.3 dataset', () => {
     expect(ok(result.comboA).totalsBySource.AA).toBeGreaterThan(0)
     expect(ok(result.comboB).instances.length).toBeGreaterThan(0)
     const compare = ok(result.compare)
-    expect(compare.a).toHaveLength(6)
+    expect(compare.a).toHaveLength(5)
     expect(compare.b).toHaveLength(1)
   })
 
