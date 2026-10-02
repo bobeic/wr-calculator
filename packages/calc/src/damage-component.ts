@@ -18,6 +18,8 @@ function resolveRatioStat(
     case 'maxHp': return attacker.sheet.total.hp ?? 0
     case 'bonusHp': return attacker.sheet.bonus.hp ?? 0
     case 'armor': return attacker.sheet.total.armor ?? 0
+    case 'bonusArmor': return attacker.sheet.bonus.armor ?? 0
+    case 'bonusMr': return attacker.sheet.bonus.mr ?? 0
     case 'targetMaxHp': return target.sheet.total.hp ?? 0
     case 'targetCurrentHp': return targetCurrentHp
     case 'targetMissingHp': return Math.max(0, (target.sheet.total.hp ?? 0) - targetCurrentHp)

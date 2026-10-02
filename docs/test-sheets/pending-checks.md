@@ -137,6 +137,13 @@ Patch 7.3a is live.
   - Kai'Sa: Caustic Wounds is 5 at every level and ignores Plasma stacks; "+5% AP" on the detonation read as per
     100 AP; Void Seeker's 2 Plasma stacks aren't applied.
   - Yuumi: unattached numbers only; Final Chapter's later waves read as 20/30/40 (+5% AP) each.
+- Batch 10 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - K'Sante: All Out isn't modelled at all (the upgraded abilities, attack speed, lost resists), nor Demolishing
+    Strike; Dauntless Instinct acts as a spellblade at 1-2% max Health in a straight line by level.
+  - Kayn: base form only (neither Shadow Assassin nor Darkin Slayer).
+  - Ahri: all 3 fox-fires and all 3 Spirit Rush casts land on the target, at once.
+  - Ashe: Frost Shot's crit rework isn't modelled; Ranger's Focus is castable without its 4 Focus stacks.
+  - Lulu: Pix's 12 is flat at every level; only one Glitterlance bolt hits.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

@@ -34,6 +34,7 @@ describe('7.3a hand-modelled champions', () => {
         'nasus', 'khazix', 'akali', 'draven', 'blitzcrank',
         'aatrox', 'nocturne', 'yone', 'jhin', 'malphite',
         'volibear', 'jarvan-iv', 'morgana', 'kaisa', 'yuumi',
+        'ksante', 'kayn', 'ahri', 'ashe', 'lulu',
       ])
   })
 
@@ -745,5 +746,42 @@ describe('Yuumi', () => {
   it('Prowling Projectile has 5 ranks; Final Chapter lands 7 waves', () => {
     expect(run('yuumi', ['Q']).instances[0].raw).toBe(220)
     expect(run('yuumi', ['R']).instances.map((i) => i.raw)).toEqual([120, 240])
+  })
+})
+
+describe("K'Sante", () => {
+  it('Dauntless Instinct adds 12 + 2% max Health at level 15 to the attack after an ability', () => {
+    expect(partFrom(run('ksante', ['Q', 'AA', 'AA']), 'ksante-passive-dauntless-instinct').map((p) => p.amount)).toEqual([212])
+  })
+
+  it('Ntofo Strikes scales with bonus resists (none without items)', () => {
+    expect(run('ksante', ['Q']).instances[0].raw).toBe(200)
+  })
+})
+
+describe('Kayn', () => {
+  it('Reaping Slash hits twice', () => {
+    expect(run('kayn', ['Q']).instances[0].raw).toBe(320)
+  })
+})
+
+describe('Ahri', () => {
+  it('Orb of Deception deals magic out and true back', () => {
+    expect(run('ahri', ['Q']).instances.map((i) => `${i.type} ${i.raw}`)).toEqual(['magic 145', 'true 145'])
+  })
+})
+
+describe('Ashe', () => {
+  it("Ranger's Focus adds 30% AD to every attack for 6 seconds", () => {
+    const ad = attacker('ashe').sheet.total.ad!
+    const flurry = partFrom(run('ashe', ['Q', 'AA', 'AA', 'AA']), 'ashe-q-flurry')
+    expect(flurry).toHaveLength(3)
+    for (const part of flurry) expect(part.amount).toBeCloseTo(0.3 * ad, 6)
+  })
+})
+
+describe('Lulu', () => {
+  it('Pix adds 12 magic damage to every attack', () => {
+    expect(bySource(run('lulu', ['AA', 'AA']), 'lulu-passive-pix').map((i) => i.raw)).toEqual([12, 12])
   })
 })

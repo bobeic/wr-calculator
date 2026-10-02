@@ -153,3 +153,14 @@ describe('resolveDamageComponent basePerInput', () => {
     expect(resolveDamageComponent(component, combatant(), target, 1000, 15, 'Q').amount).toBe(20)
   })
 })
+
+describe('resolveDamageComponent owner resist ratios', () => {
+  it('reads total Armor, bonus Armor and bonus Magic Resist from the attacker', () => {
+    const attacker = combatant({ sheet: sheet({ total: { armor: 150, mr: 90 }, bonus: { armor: 100, mr: 50 } }) })
+    const component: DamageComponent = {
+      type: 'physical', base: 0, tags: [],
+      ratios: [{ stat: 'armor', value: 1 }, { stat: 'bonusArmor', value: 0.1 }, { stat: 'bonusMr', value: 0.01 }],
+    }
+    expect(resolveDamageComponent(component, attacker, combatant(), 1000, 15, 'X').amount).toBeCloseTo(150 + 10 + 0.5, 6)
+  })
+})
