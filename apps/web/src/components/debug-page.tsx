@@ -91,8 +91,8 @@ export function DebugPage() {
             </label>
           ))}
         </span>
-        <BuildEditor label="Build A" build={state.buildA} catalog={dataset.catalog} onChange={(buildA) => update({ buildA })} />
-        <BuildEditor label="Build B" build={state.buildB} catalog={dataset.catalog} onChange={(buildB) => update({ buildB })} />
+        <BuildEditor label="Build A" build={state.buildA} catalog={dataset.catalog} champion={dataset.champions.get(state.championId)} onChange={(buildA) => update({ buildA })} />
+        <BuildEditor label="Build B" build={state.buildB} catalog={dataset.catalog} champion={dataset.champions.get(state.championId)} onChange={(buildB) => update({ buildB })} />
         <TargetEditor target={state.target} dataset={dataset} onChange={(target) => update({ target })} />
         <p>
           <label>Combo <input value={state.combo} onChange={(event) => update({ combo: event.target.value })} /></label>

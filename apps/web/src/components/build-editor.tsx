@@ -1,25 +1,29 @@
 'use client'
 
+import type { Champion } from '@wr-calc/schema'
 import type { StatCatalog } from '@wr-calc/calc'
 import type { DebugBuild } from '../lib/debug-state'
-import { collectInputs, inputValue } from '../lib/collect-inputs'
+import { collectInputs } from '../lib/collect-inputs'
+import { EffectInputs } from './effect-inputs'
 import { summarizeBuild } from '../lib/build-summary'
 
 interface BuildEditorProps {
   label: string
   build: DebugBuild
   catalog: StatCatalog
+  /** The champion using the build; its kit's inputs are listed with the build's. */
+  champion?: Champion
   onChange: (build: DebugBuild) => void
 }
 
 /** Edits one build: ordered items, boots, runes, and the effect inputs its items declare. */
-export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProps) {
+export function BuildEditor({ label, build, catalog, champion, onChange }: BuildEditorProps) {
   const allItems = [...catalog.items.values()]
   const boots = allItems.filter((item) => item.tier === 'boots')
   const nonBoots = allItems.filter((item) => item.tier !== 'boots')
   const runes = [...catalog.runes.values()]
   const spells = [...(catalog.spells?.values() ?? [])]
-  const inputs = collectInputs(build, catalog)
+  const inputs = collectInputs(build, catalog, champion)
   const summary = summarizeBuild(build, catalog)
   const efficiency = (index: number): string => {
     const value = summary.items[index]?.efficiency
@@ -114,27 +118,7 @@ export function BuildEditor({ label, build, catalog, onChange }: BuildEditorProp
       {inputs.length > 0 && (
         <p>
           Effect inputs:{' '}
-          {inputs.map((input) => {
-            const value = inputValue(input, build.inputs)
-            return input.type === 'stackCount' ? (
-              <label key={input.id}>
-                {input.label}{' '}
-                <input
-                  type="number" min={input.min} max={input.max}
-                  value={typeof value === 'number' ? value : input.default}
-                  onChange={(event) => {
-                    const stacks = Number(event.target.value)
-                    if (Number.isFinite(stacks)) setInput(input.id, Math.min(input.max, Math.max(input.min, stacks)))
-                  }}
-                />{' '}
-              </label>
-            ) : (
-              <label key={input.id}>
-                <input type="checkbox" checked={value === true} onChange={(event) => setInput(input.id, event.target.checked)} />
-                {input.label}{' '}
-              </label>
-            )
-          })}
+          <EffectInputs inputs={inputs} values={build.inputs} onChange={setInput} />
         </p>
       )}
     </fieldset>

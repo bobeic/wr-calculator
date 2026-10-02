@@ -46,10 +46,15 @@ function mapStage<T, U>(stage: Stage<T>, fn: (value: T) => U): Stage<U> {
   return stage.ok ? { ok: true, value: fn(stage.value) } : stage
 }
 
-/** Converts a debug-page build into an engine Build, filling declared input defaults and the attacker's ability ranks. */
-export function toBuild(build: DebugBuild, dataset: DebugDataset, abilityRanks: AbilityRanks = {}): Build {
+/**
+ * Converts a debug-page build into an engine Build, filling declared input defaults (the champion's kit inputs too,
+ * when given) and the attacker's ability ranks.
+ */
+export function toBuild(
+  build: DebugBuild, dataset: DebugDataset, abilityRanks: AbilityRanks = {}, champion?: Champion,
+): Build {
   const result: Build = {
-    items: build.items, runes: build.runes, inputs: resolveInputs(build, dataset.catalog),
+    items: build.items, runes: build.runes, inputs: resolveInputs(build, dataset.catalog, champion),
   }
   if (build.boots !== undefined) result.boots = build.boots
   if (build.spells !== undefined && build.spells.length > 0) result.spells = build.spells
@@ -63,7 +68,8 @@ function requireChampion(dataset: DebugDataset, id: string): Champion {
   return champion
 }
 
-function targetCombatant(target: DebugTarget, dataset: DebugDataset): Combatant {
+/** The combat target: a preset or custom dummy, or a champion with its own build. */
+export function targetCombatant(target: DebugTarget, dataset: DebugDataset): Combatant {
   switch (target.kind) {
     case 'preset': {
       const preset = dataset.targets.find((candidate) => candidate.id === target.presetId)
@@ -72,11 +78,10 @@ function targetCombatant(target: DebugTarget, dataset: DebugDataset): Combatant 
     }
     case 'dummy':
       return combatantFromDummy({ kind: 'dummy', hp: target.hp, armor: target.armor, mr: target.mr })
-    case 'champion':
-      return combatantFromChampion(
-        requireChampion(dataset, target.championId), target.level,
-        toBuild(target.build, dataset), dataset.catalog,
-      )
+    case 'champion': {
+      const champion = requireChampion(dataset, target.championId)
+      return combatantFromChampion(champion, target.level, toBuild(target.build, dataset, {}, champion), dataset.catalog)
+    }
   }
 }
 
@@ -128,10 +133,10 @@ function nullSources(state: DebugState, dataset: DebugDataset): NullSource[] {
 export function runDebug(state: DebugState, dataset: DebugDataset): DebugResult {
   const champion = attempt(() => requireChampion(dataset, state.championId))
   const attackerA = attempt(() => combatantFromChampion(
-    need('champion', champion), state.level, toBuild(state.buildA, dataset, state.abilityRanks), dataset.catalog,
+    need('champion', champion), state.level, toBuild(state.buildA, dataset, state.abilityRanks, need('champion', champion)), dataset.catalog,
   ))
   const attackerB = attempt(() => combatantFromChampion(
-    need('champion', champion), state.level, toBuild(state.buildB, dataset, state.abilityRanks), dataset.catalog,
+    need('champion', champion), state.level, toBuild(state.buildB, dataset, state.abilityRanks, need('champion', champion)), dataset.catalog,
   ))
   const target = attempt(() => targetCombatant(state.target, dataset))
 
@@ -154,7 +159,7 @@ export function runDebug(state: DebugState, dataset: DebugDataset): DebugResult 
     need('build B', attackerB)
     const side = (build: DebugBuild) => ({
       champion: need('champion', champion), level: state.level,
-      build: toBuild(build, dataset, state.abilityRanks), catalog: dataset.catalog,
+      build: toBuild(build, dataset, state.abilityRanks, need('champion', champion)), catalog: dataset.catalog,
     })
     return compareBuilds(side(state.buildA), side(state.buildB), need('target', target), {
       durationSeconds: state.durationSeconds,

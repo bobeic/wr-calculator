@@ -1,18 +1,16 @@
 import { Suspense } from 'react'
-import { DebugPage } from '../../components/debug-page'
+import { CURRENT_PATCH, getPatchDataset } from '@wr-calc/data'
+import { CalculatorPage } from '../../components/calculator/calculator-page'
 
 export const metadata = { title: 'Calculator · wr-calc' }
 
-/**
- * The build calculator. For now it is the engine's debug view; the user-facing calculator design is still open
- * (docs/review/2026-10-03-overnight.md). useSearchParams inside DebugPage needs the Suspense boundary.
- */
-export default function CalculatorPage() {
+/** The build calculator; the engine's debug view stays at /debug. useSearchParams inside needs the Suspense boundary. */
+export default function CalculatorRoute() {
+  const modelledIds = getPatchDataset(CURRENT_PATCH).handModelled.champions.map((champion) => champion.id)
   return (
     <main>
-      <p className="note">Early version: this is the engine&apos;s debug view. A friendlier calculator is next.</p>
       <Suspense fallback={<p>Loading…</p>}>
-        <DebugPage />
+        <CalculatorPage modelledIds={modelledIds} />
       </Suspense>
     </main>
   )

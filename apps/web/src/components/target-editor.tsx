@@ -77,6 +77,7 @@ export function TargetEditor({ target, dataset, onChange }: TargetEditorProps) {
           })}
           <BuildEditor
             label="Target build" build={target.build} catalog={dataset.catalog}
+            champion={dataset.champions.get(target.championId)}
             onChange={(build) => onChange({ ...target, build })}
           />
         </>
