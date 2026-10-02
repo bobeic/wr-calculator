@@ -144,3 +144,12 @@ describe('resolveDamageComponent perInput', () => {
     expect(without.amount).toBeCloseTo(60, 6)
   })
 })
+
+describe('resolveDamageComponent basePerInput', () => {
+  it("adds basePerInput.value × the attacker's number input to the base", () => {
+    const component: DamageComponent = { type: 'physical', base: 20, ratios: [], basePerInput: { inputId: 'stacks', value: 1 }, tags: [] }
+    const target = combatant()
+    expect(resolveDamageComponent(component, combatant({ inputs: { stacks: 150 } }), target, 1000, 15, 'Q').amount).toBe(170)
+    expect(resolveDamageComponent(component, combatant(), target, 1000, 15, 'Q').amount).toBe(20)
+  })
+})

@@ -38,6 +38,10 @@ export function resolveDamageComponent(
   if (baseWarning) dataWarnings.push(baseWarning)
 
   let amount = baseResolved.value
+  if (component.basePerInput) {
+    const stacks = attacker.inputs[component.basePerInput.inputId]
+    amount += component.basePerInput.value * (typeof stacks === 'number' ? stacks : 0)
+  }
   for (const ratio of component.ratios) {
     const statValue = resolveRatioStat(ratio.stat, attacker, target, targetCurrentHp)
     const ratioResolved = resolveScalar(ratio.value, level, rank)

@@ -45,6 +45,11 @@ Miss Fortune and Nautilus (`7.3a/champions-batch2.ts`). Two more engine pieces:
 Effects that last for a window rather than a number of attacks (Wuju Style, Titan's Wrath) are empowered attacks with
 99 charges, so every attack in the window is empowered.
 
+Batches 3-7 (2026-10-02) reuse the existing pieces, plus one addition in batch 7:
+
+- `DamageComponent.basePerInput`: adds `value` × one of the owner's number inputs to the base (Nasus's Siphoning
+  Strike: +1 damage per stack). The flat counterpart of `DamageRatio.perInput`.
+
 ## Consequences
 
 - `docs/test-sheets/pending-checks.md` lists the guesses most likely to be off (Darius's Noxian Might at level 15,

@@ -30,6 +30,8 @@ export const DamageComponentSchema = z.object({
   base: NullableScalarSchema,
   ratios: z.array(DamageRatioSchema),
   hits: z.number().optional(),
+  /** Adds `value` × one of the owner's number inputs to `base`, e.g. Nasus's Siphoning Strike: +1 damage per stack. */
+  basePerInput: z.object({ inputId: z.string(), value: z.number() }).strict().optional(),
   tags: z.array(z.string()),
 }).strict()
 export type DamageComponent = z.infer<typeof DamageComponentSchema>

@@ -110,6 +110,15 @@ Patch 7.3a is live.
     real. Projectile Burst is 3 projectiles once per ability (no stacking to 9).
   - Jinx: always on Pow-Pow (minigun); Fishbones isn't modelled. Death Rocket at full (travelled) damage.
   - Seraphine: one Note per cast; Echo and Notes from allies aren't modelled; High Note's missing-Health increase isn't.
+- Batch 7 kits (2026-10-02, same source; all unchecked). The guesses most likely to be off:
+  - Nasus: Spirit Fire's zone ticks once a second for 5s and its % Armor reduction isn't modelled; Fury of the Sands'
+    later ticks drop the AP part and the 240/s cap.
+  - Kha'Zix: Taste Their Fear always isolated (x2.1); Unseen Threat once per combo; evolutions not modelled.
+  - Akali: Assassin's Mark taken as a spellblade with a flat 37 at every level; Perfect Execution's second dash scales
+    in a straight line to 100% missing Health (text: max below 35% Health) and drops its extra AP.
+  - Draven: one empowered attack per Spinning Axe cast (no juggling); Whirling Death hits twice (out and back).
+  - Blitzcrank: Power Fist read as +80-140% AD rather than a crit; Static Field's mark procs on every attack, even
+    while the ultimate is on cooldown.
 
 - Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
   or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the

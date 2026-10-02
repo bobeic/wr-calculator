@@ -31,6 +31,7 @@ describe('7.3a hand-modelled champions', () => {
         'garen', 'xin-zhao', 'brand', 'yunara', 'thresh', 'mordekaiser', 'viego', 'veigar', 'tristana', 'leona',
         'sett', 'graves', 'galio', 'samira', 'lux',
         'dr-mundo', 'tryndamere', 'mel', 'jinx', 'seraphine',
+        'nasus', 'khazix', 'akali', 'draven', 'blitzcrank',
       ])
   })
 
@@ -596,5 +597,53 @@ describe('Jinx', () => {
 describe('Seraphine', () => {
   it('each cast gives the next attack a Note of 4 bonus magic damage', () => {
     expect(bySource(run('seraphine', ['Q', 'AA', 'AA']), 'seraphine-passive-harmony').map((i) => i.raw)).toEqual([4])
+  })
+})
+
+describe('Nasus', () => {
+  it('Siphoning Strike adds 1 damage per stack', () => {
+    const bonus = (stacks: number) => partFrom(run('nasus', ['Q', 'AA'], { 'nasus-siphoning-strike-stacks': stacks }), 'nasus-q-siphoning-strike')[0].amount
+    expect(bonus(0)).toBe(110)
+    expect(bonus(300)).toBe(410)
+  })
+
+  it('Fury of the Sands deals 5% max Health now and every second for 11 more', () => {
+    const result = run('nasus', ['R', 'wait:12'])
+    expect(result.instances[0].raw).toBeCloseTo(500, 6)
+    const ticks = bySource(result, 'nasus-r-storm')
+    expect(ticks).toHaveLength(11)
+    for (const tick of ticks) expect(tick.raw).toBeCloseTo(500, 6)
+  })
+})
+
+describe("Kha'Zix", () => {
+  it('Taste Their Fear deals the isolated (+110%) damage; Unseen Threat procs once', () => {
+    expect(run('khazix', ['Q']).instances[0].raw).toBeCloseTo(180 * 2.1, 6)
+    expect(bySource(run('khazix', ['AA', 'AA']), 'khazix-passive-unseen-threat')).toHaveLength(1)
+  })
+})
+
+describe('Akali', () => {
+  it("Assassin's Mark empowers the attack after an ability", () => {
+    expect(bySource(run('akali', ['Q', 'AA', 'AA']), 'akali-passive-assassins-mark')).toHaveLength(1)
+  })
+
+  it("Perfect Execution's second dash grows with missing Health", () => {
+    const at = (fraction: number) => simulateCombo(attacker('akali'), { ...dummy(), startHpFraction: fraction }, ['R'], { critMode: 'never' })
+      .instances.filter((i) => i.source.id === 'akali-r').reduce((sum, i) => sum + i.raw, 0)
+    expect(at(0.5) - at(1)).toBeCloseTo(0.5 * 420, 6)
+  })
+})
+
+describe('Draven', () => {
+  it('Spinning Axe empowers one attack per cast', () => {
+    expect(partFrom(run('draven', ['Q', 'AA', 'AA']), 'draven-q-spinning-axe')).toHaveLength(1)
+  })
+})
+
+describe('Blitzcrank', () => {
+  it('Power Fist adds 140% AD to one attack', () => {
+    const ad = attacker('blitzcrank').sheet.total.ad!
+    expect(partFrom(run('blitzcrank', ['E', 'AA', 'AA']), 'blitzcrank-e-power-fist').map((part) => part.amount)).toEqual([1.4 * ad])
   })
 })
