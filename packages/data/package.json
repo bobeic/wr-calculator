@@ -9,6 +9,7 @@
     "patch:impact": "tsx scripts/build-impact.ts",
     "cn-stats:update": "tsx scripts/cn-stats-update.ts",
     "cn-builds:update": "tsx scripts/cn-builds-update.ts",
+    "cn-preview:update": "tsx scripts/cn-preview-update.ts",
     "test-sheet": "tsx scripts/test-sheet.ts"
   },
   "main": "./src/index.ts",

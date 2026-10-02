@@ -22,6 +22,7 @@ export default function PatchesPage() {
           )
         })}
       </ul>
+      <p><Link href="/patches/cn-preview/">CN preview</Link><span className="note"> · what Tencent&apos;s Chinese server has changed, and where it differs from live</span></p>
     </main>
   )
 }

@@ -5,6 +5,7 @@ import { assignTiers } from '../src/lib/site/tiers'
 import { championLanes } from '../src/lib/site/champion-lanes'
 import { calculatorHref, changeLabel, pct } from '../src/lib/site/format'
 import { CURRENT_DATASET } from '../src/lib/dataset'
+import { cnEntryHref, cnFieldLabel } from '../src/lib/site/cn-preview'
 import { decodeState } from '../src/lib/url-state'
 
 const row = (championId: string, strengthRank: number): CnChampionStat => ({
@@ -59,5 +60,15 @@ describe('CN build calculator links', () => {
         }
       }
     }
+  })
+})
+
+describe('CN preview labels', () => {
+  it('names ability rows in English where known and links only global entries', () => {
+    expect(cnFieldLabel('q.基础伤害')).toBe('Q base damage')
+    expect(cnFieldLabel('r.未知')).toBe('R 未知')
+    expect(cnFieldLabel('price')).toBe('price')
+    expect(cnEntryHref('champion:aatrox')).toBe('/champions/aatrox/')
+    expect(cnEntryHref('item:cn-2119')).toBeNull()
   })
 })

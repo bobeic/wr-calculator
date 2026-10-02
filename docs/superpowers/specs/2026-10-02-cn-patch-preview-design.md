@@ -54,3 +54,10 @@ v1 shows the feed actually runs ahead often enough to matter.
 - Trim and diff: fixtures for an item price change, a stat change, a spell row change, an added and a removed entry.
 - "Live here yet?": a change matching the snapshot, one not matching, one unmappable.
 - The site: the page renders with an empty log (the first run has no baseline).
+
+## 5. Built (2026-10-02)
+
+v1 as above. First run: 328 entries; "differs today" is ~340 fields, almost all champion ability rows, not the one
+item value §1 expected. wrpocket's champion numbers are not a straight copy of Tencent's (e.g. Aatrox Q 10/40/70/100
+on wrpocket, 15/45/75/105 on Tencent), so §3's leak risk applies mainly to items. Champion base stats, ability costs
+and cooldowns are logged but never compared ("?").
