@@ -54,6 +54,9 @@ Steps once a name is chosen:
   block in `apps/web/src/app/globals.css`, so a redesign doesn't touch the pages.
 - **Tier letters.** The S+/S/A/B/C cut (top 8% / 17% / 25% / 25% / 25% of Tencent's strength order) is a placeholder.
   Keep it, change the cut, or tier by win rate?
+- **CN leaking into live data (FYI, decide when convenient).** wrpocket copies Tencent's CN feed to the second, so
+  when CN patches before global, `patch:update` may import CN numbers as global. Once the CN preview log exists it
+  shows this ("already live" before the global notes). Gate the import on it, or just watch?
 - **In-game checks**, in `docs/test-sheets/pending-checks.md`. The most useful: Caitlyn's Headshot (6th or 7th
   attack?), Nautilus's passive and Miss Fortune's Love Tap at level 15, Master Yi's Wuju passive, Yasuo's crit damage,
   a few rows of `docs/test-sheets/predictions-7.3a.md`, and skimming the ranged list in
@@ -72,6 +75,8 @@ Steps once a name is chosen:
    the target's resolved stats).
 4. **"Best first item" view:** done — a "Best first item" panel in the calculator ranks every legendary item bought
    alone by time to kill, computed lazily (only once opened) so it doesn't slow down every edit.
-5. **Patch preview:** Tencent's CN data runs ahead of global servers, so it can show changes before they arrive.
+5. **Patch preview:** designed in `docs/superpowers/specs/2026-10-02-cn-patch-preview-design.md`. wrpocket
+   mirrors Tencent's CN feed, so the preview tracks **CN changing** (a dated change log from daily Tencent snapshots,
+   each change marked "already live" or "CN only") rather than CN differing, which today is one value. Build v1 next.
 6. **Design pass** once the design answers are in.
 7. **Housekeeping:** done — workflow actions bumped off Node 20.
