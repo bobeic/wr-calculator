@@ -15,17 +15,25 @@ const numericStats = (item: Item): Array<[StatKey, number]> =>
 
 /**
  * Prices each stat from the shop's components (League's usual gold-efficiency method). First, basic items with a
- * single stat (Long Sword: 500g / 12 AD) price their stat. Then any basic or epic item with no effects and exactly
- * one stat still unpriced prices it from what's left of its cost (Vampiric Scepter: 1200g minus 20 AD → lifesteal).
- * Among several candidates, a basic item beats an epic one, then the lower cost, then the id, so it's deterministic.
+ * single stat (Long Sword: 500g / 12 AD) price their stat. Then any basic or epic item with exactly one stat still
+ * unpriced prices it from what's left of its cost (Vampiric Scepter: 1200g minus 20 AD → lifesteal). Pure-stat
+ * components (no effects, no named passive) go first; a component with a passive only prices a stat nothing else
+ * can (Tear of the Goddess is the only mana anchor). Among several candidates, a basic item beats an epic one, then
+ * the lower cost, then the id, so it's deterministic.
  */
 export function statGoldValues(items: Iterable<Item>): StatGoldValues {
-  const candidates = [...items]
-    // Only pure-stat components set prices: no modelled effects and no named passive (Tear's Mana Charge, Recurve Bow's on-hit).
-    .filter((item) => (item.tier === 'basic' || item.tier === 'epic') && item.effects.length === 0
-      && (item.uniquePassives ?? []).length === 0 && numericStats(item).length > 0)
+  const components = [...items]
+    .filter((item) => (item.tier === 'basic' || item.tier === 'epic') && numericStats(item).length > 0)
     .sort((a, b) => (a.tier === b.tier ? 0 : a.tier === 'basic' ? -1 : 1) || a.cost.total - b.cost.total || a.id.localeCompare(b.id))
+  const pure = components.filter((item) => item.effects.length === 0 && (item.uniquePassives ?? []).length === 0)
   const values: StatGoldValues = {}
+  priceFrom(pure, values)
+  priceFrom(components, values)
+  return values
+}
+
+/** Prices every stat it can from the candidates, keeping prices already set. */
+function priceFrom(candidates: readonly Item[], values: StatGoldValues): void {
   let progressed = true
   while (progressed) {
     progressed = false
@@ -43,7 +51,6 @@ export function statGoldValues(items: Iterable<Item>): StatGoldValues {
       progressed = true
     }
   }
-  return values
 }
 
 export interface GoldEfficiency {
