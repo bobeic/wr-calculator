@@ -12,7 +12,7 @@ attack speed. A mismatch goes on `pending-checks.md`.
 | Item | Ambessa + Ardent Censer | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 13 magic, 13 magic, 13 magic, 13 magic, 13 magic, 13 magic, 13 magic |
 | Item | Ambessa + Bami's Cinder | 100% | AA wait:4.5 | 10 magic, 10 magic, 10 magic |
 | Item | Annie + Blackfire Torch | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic, 5.4 magic |
-| Item | Ambessa + Blade of the Ruined King | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 329 physical, 310 physical, 279 physical, 265 physical, 253 physical, 241 physical, 229 physical |
+| Item | Ambessa + Blade of the Ruined King | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 438 physical, 408 physical, 360 physical, 339 physical, 318 physical, 299 physical, 280 physical |
 | Item | Ambessa + Dawnshroud | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 23 magic, 23 magic |
 | Item | Ambessa + Dead Man's Plate | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 50 magic |
 | Item | Ambessa + Divine Sunderer | 100% | Q AA W AA R AA AA AA AA AA wait:3 | 674 (attack incl. 1000 raw), 674 (attack incl. 1000 raw) |

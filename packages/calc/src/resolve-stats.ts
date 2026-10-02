@@ -11,6 +11,7 @@ import { contributeStats, stageOf } from './effects/registry'
 import type { StatContribution, StatContext, StatLayer, StatSource } from './effects/types'
 import type { UnsupportedEffectEntry } from './result-envelope'
 import { validateBuild } from './validate-build'
+import { effectsForAttackType } from './attack-type'
 
 export interface StatSheet {
   base: Partial<Record<StatKey, number>>
@@ -142,8 +143,8 @@ export function resolveStats(
 
   const effects: Effect[] = [
     ...championKitEffects(champion, build.abilityRanks),
-    ...items.flatMap((item) => item.effects),
-    ...runes.flatMap((rune) => rune.effects),
+    ...effectsForAttackType(items.flatMap((item) => item.effects), champion.attackType ?? 'melee'),
+    ...effectsForAttackType(runes.flatMap((rune) => rune.effects), champion.attackType ?? 'melee'),
   ]
   const ctx: StatContext = { level: clampedLevel, inputs: build.inputs, statSoFar }
   const combatContributions: CombatContribution[] = []

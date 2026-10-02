@@ -3,6 +3,7 @@ import type { StatCatalog } from '@wr-calc/calc'
 import { buildCatalog, mergeById, withExclusiveGroups } from '../catalog'
 import type { TargetPreset } from './7.3/targets'
 import { syncChampion, syncItem } from './source-sync'
+import { attackTypeOf } from '../attack-types'
 
 /** Ids of every source record that changed or disappeared since the previous patch. */
 export interface ChangedIds {
@@ -199,7 +200,8 @@ export function buildPatchDataset(layer: PatchLayer, previous: PatchDataset | nu
   return {
     id: layer.id,
     items,
-    champions: mergeById(layer.generatedChampions, markStale(syncedChampions, stale.champions)),
+    champions: mergeById(layer.generatedChampions, markStale(syncedChampions, stale.champions))
+      .map((champion) => ({ ...champion, attackType: attackTypeOf(champion.id) })),
     catalog: buildCatalog(items, runes, spells),
     runes,
     spells,

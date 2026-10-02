@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { CN_RANKS, CN_RANK_LABELS, CN_STATS, CURRENT_PATCH, LANE_LABELS, getPatchDataset } from '@wr-calc/data'
+import { CN_RANKS, CN_RANK_LABELS, CN_STATS, CURRENT_PATCH, FORM_DEPENDENT_CHAMPIONS, LANE_LABELS, getPatchDataset } from '@wr-calc/data'
 import { loadChampionText } from '@wr-calc/data/site-loader'
 import { StatTable } from '../../../components/site/stat-table'
 import { championLanes } from '../../../lib/site/champion-lanes'
@@ -31,6 +31,10 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
   return (
     <main>
       <h1>{champion.name}</h1>
+      <p className="muted">
+        {champion.attackType === 'ranged' ? 'Ranged' : 'Melee'}
+        {(FORM_DEPENDENT_CHAMPIONS as readonly string[]).includes(id) && ' (changes with form; the calculator uses this one)'}
+      </p>
       <p><Link href={`/calculator/?champ=${id}`}>Open in the calculator</Link></p>
 
       <h2>CN win rates</h2>

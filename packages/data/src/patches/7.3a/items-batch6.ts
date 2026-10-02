@@ -177,17 +177,19 @@ export const BATCH6_ITEMS: Item[] = [
     kind: 'procEveryN', id: 'kraken-slayer-bring-it-down', name: 'Bring It Down',
     description: 'Every third attack deals 150–210 bonus physical damage (120–168 for ranged champions). For every 1% '
       + 'Health the target is missing, this damage increases by 0.75%, capped at 75%.',
-    support: 'partial', supportNotes: 'Melee values (ranged: 120–168). 150–210 is taken as linear over levels 1–15.',
+    support: 'partial', supportNotes: '150–210 (ranged 120–168) is taken as linear over levels 1–15.',
     n: 3, countsFrom: 'basicAttack', damageType: 'physical', damage: { levelRange: { min: 150, max: 210 } },
+    ranged: { damage: { levelRange: { min: 120, max: 168 } } },
     targetMissingHpAmp: { perMissingPct: 0.0075, max: 0.75 }, resetsOnMiss: false,
   }]),
   modelled('hullbreaker', [{
     kind: 'procEveryN', id: 'hullbreaker-skipper', name: 'Skipper',
     description: 'Every 4th attack against champions and epic monsters deals bonus physical damage equal to 160% base '
       + 'Attack Damage + 5% max Health (ranged champions deal 40% of the damage).',
-    support: 'partial', supportNotes: 'Melee values. The structure bonus and Boarding Party are not modelled.',
+    support: 'partial', supportNotes: 'The structure bonus and Boarding Party are not modelled.',
     n: 4, countsFrom: 'basicAttack', damageType: 'physical', damage: 0, resetsOnMiss: false,
     ratios: [{ stat: 'ad', layer: 'base', value: 1.6 }, { stat: 'hp', value: 0.05 }],
+    ranged: { ratios: [{ stat: 'ad', layer: 'base', value: 0.64 }, { stat: 'hp', value: 0.02 }] },
   }]),
   ...([
     ['rapid-firecannon', 'Sharpshooter', 80, ENERGIZED_ATTACKS, 'The Energized attack gains 35% Attack Range, capped at 150, and adds 80 magic damage.'],
@@ -214,10 +216,10 @@ export const BATCH6_ITEMS: Item[] = [
       kind: 'stacking', id: 'yun-tal-wildarrows-practice', name: 'Practice Makes Perfect',
       description: 'Each basic attack permanently adds 0.4% Critical Strike Chance for melee champions or 0.2% for '
         + 'ranged champions, capped at 25%.',
-      support: 'partial', supportNotes: 'Ranged value; stacks gained before the combo are an input (125 = 25%). '
-        + 'Attacks in the combo don\'t add stacks.',
-      stat: 'critChance', perStack: 0.002, maxStacks: 125, stackInputId: 'yun-tal-wildarrows-stacks',
-      inputs: stacks('yun-tal-wildarrows-stacks', 'Yun Tal Wildarrows permanent stacks', 125),
+      support: 'partial', supportNotes: 'The crit gained before the combo is an input, in percent (0-25), so it '
+        + 'works for melee and ranged alike. Attacks in the combo don\'t add more.',
+      stat: 'critChance', perStack: 0.01, maxStacks: 25, stackInputId: 'yun-tal-wildarrows-crit',
+      inputs: stacks('yun-tal-wildarrows-crit', 'Yun Tal Wildarrows bonus crit chance gained (%)', 25),
     },
     {
       kind: 'attackStack', id: 'yun-tal-wildarrows-flurry', name: 'Flurry',
@@ -255,8 +257,9 @@ export const BATCH6_ITEMS: Item[] = [
     kind: 'spellblade', id: 'divine-sunderer-spellblade', name: 'Spellblade',
     description: "After using an ability, your next attack within 10 seconds will deal 10% of the target's maximum "
       + 'Health as bonus physical damage (7% if the attack is ranged). (1.5 second Cooldown)',
-    support: 'partial', supportNotes: 'Melee value (ranged: 7%). The heal is not modelled.',
+    support: 'partial', supportNotes: 'The heal is not modelled.',
     damageType: 'physical', bonusDamage: 0, ratios: [], pctTargetMaxHp: 0.1, internalCooldownSeconds: 1.5,
+    ranged: { pctTargetMaxHp: 0.07 },
   }]),
   modelled('iceborn-gauntlet', [{
     kind: 'spellblade', id: 'iceborn-gauntlet-spellblade', name: 'Spellblade',
@@ -278,8 +281,9 @@ export const BATCH6_ITEMS: Item[] = [
     kind: 'abilityHitProc', id: 'titanic-hydra-cleave', name: 'Cleave',
     description: 'Every 1.75 seconds, your next attack deals bonus physical damage equal to 25 + 3% bonus Health, '
       + 'creating a shockwave behind the target. Ranged champions deal 75% of the damage.',
-    support: 'partial', supportNotes: 'Melee value. The shockwave only hits enemies behind the target, so it is left out.',
+    support: 'partial', supportNotes: 'The shockwave only hits enemies behind the target, so it is left out.',
     damageType: 'physical', damage: 25, ratios: [{ stat: 'hp', layer: 'bonus', value: 0.03 }], cooldownSeconds: 1.75,
+    ranged: { damage: 18.75, ratios: [{ stat: 'hp', layer: 'bonus', value: 0.0225 }] },
     triggeredBy: ['basicAttack'],
   }]),
   modelled('dominiks-regards', [{
@@ -489,8 +493,9 @@ export const BATCH6_ITEMS: Item[] = [
     kind: 'stat', id: 'yordle-trap-catcher', name: 'Catcher',
     description: 'Slowing or immobilizing an enemy champion inspires you for 8 seconds: gain 20 Movement Speed and 30% '
       + 'bonus Attack Speed (20% for ranged champions).',
-    support: 'partial', supportNotes: 'Melee value. A toggle says whether you are Inspired for the whole combo.',
+    support: 'partial', supportNotes: 'A toggle says whether you are Inspired for the whole combo.',
     stat: 'attackSpeed', amount: 0.3, condition: { type: 'toggle', inputId: 'yordle-trap-inspired' },
+    ranged: { amount: 0.2 },
     inputs: toggle('yordle-trap-inspired', 'Inspired (Yordle Trap)'),
   }]),
   modelled('spectral-sickle', [{

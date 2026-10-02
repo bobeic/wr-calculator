@@ -6,6 +6,7 @@ import { GENERATED_CHAMPIONS } from './generated/champions'
 import { GENERATED_ITEMS } from './generated/items'
 import { STARTER_ITEMS } from './items'
 import { syncItem } from '../source-sync'
+import { attackTypeOf } from '../../attack-types'
 
 export * from './provenance'
 export * from './targets'
@@ -17,4 +18,5 @@ export const PATCH_7_3_ITEMS: Item[] = withExclusiveGroups(
   EXCLUSIVE_GROUPS,
 )
 export const PATCH_7_3_CHAMPIONS: Champion[] = mergeById(GENERATED_CHAMPIONS, HAND_MODELED_CHAMPIONS)
+  .map((champion) => ({ ...champion, attackType: attackTypeOf(champion.id) }))
 export const PATCH_7_3_CATALOG = buildCatalog(PATCH_7_3_ITEMS, [])

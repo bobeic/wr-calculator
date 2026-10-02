@@ -37,4 +37,9 @@ export const EffectBaseSchema = z.object({
   supportNotes: z.string().optional(),
   inputs: z.array(EffectInputSchema).optional(),
   condition: ConditionSchema.optional(),
+  /**
+   * Field values that replace this effect's own when its owner is a ranged champion (e.g. Eclipse:
+   * `{ damage: ... 3.5% ... }`). The effect's own values are the melee ones. Checked after merging (see the data tests).
+   */
+  ranged: z.record(z.string(), z.unknown()).optional(),
 }).strict()

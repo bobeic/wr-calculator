@@ -39,8 +39,8 @@ export const OVERRIDE_ITEMS: Item[] = [
   withEffect('blade-of-the-ruined-king', 'botrk-mists-edge', {
     description: "Basic attacks deal bonus physical damage equal to 6% of the target's current Health "
       + '(8% for melee), minimum 15, maximum 100 against monsters.',
-    supportNotes: 'Uses the ranged value (6%); melee champions get 8%. The Drain slow is not modeled.',
-    pctTargetCurrentHp: 0.06,
+    supportNotes: 'The Drain slow is not modeled.',
+    pctTargetCurrentHp: 0.08, ranged: { pctTargetCurrentHp: 0.06 },
   }),
   // Practice tool, 2026-10-01 (Ambessa, 10,000 HP / 100 armor dummy, 30% armor pen): the proc dealt 412 after
   // armor, i.e. 700 = 7% max HP, as the (corrected) 7.3 model already says. Marks it verified in game.

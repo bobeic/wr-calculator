@@ -71,3 +71,10 @@ clean after every commit.
   existing data relied on the old behaviour (all golden cases unchanged).
 - Our id for Nunu is `nunu-willump` (wrpocket says `nunu-and-willump`). The id alias map moved into
   `packages/data/src/wrpocket-ids.ts` so the site and the scripts share it.
+
+## Follow-up (2026-10-03, after your reply)
+
+- Merged into `main`.
+- Melee/ranged values are in: champions carry an attack type from `packages/data/src/attack-types.ts` (please skim
+  the ranged list), and ranged champions get the ranged numbers of BotRK, Eclipse, Kraken, Hullbreaker, Titanic
+  Hydra, Divine Sunderer, Yordle Trap, Lethal Tempo, Grasp and Empowered Attack.

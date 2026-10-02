@@ -29,6 +29,7 @@ export const ChampionAbilitiesSchema: z.ZodObject<{
 }).strict()
 
 const ChampionResourceSchema = z.enum(['mana', 'energy', 'none', 'other'])
+const ChampionAttackTypeSchema = z.enum(['melee', 'ranged'])
 const ChampionAttackSpeedSchema = z.object({ base: z.number(), ratio: z.number().optional() }).strict()
 
 // Annotated with named references for the same TS7056 reason as ChampionAbilitiesSchema.
@@ -39,6 +40,7 @@ export const ChampionSchema: z.ZodObject<{
   baseStats: typeof ChampionBaseStatsSchema
   attackSpeed: typeof ChampionAttackSpeedSchema
   abilities: typeof ChampionAbilitiesSchema
+  attackType: z.ZodOptional<typeof ChampionAttackTypeSchema>
   sourcePins: z.ZodOptional<z.ZodArray<z.ZodString>>
   provenance: typeof ProvenanceSchema
 }, 'strict'> = z.object({
@@ -48,6 +50,8 @@ export const ChampionSchema: z.ZodObject<{
   baseStats: ChampionBaseStatsSchema,
   attackSpeed: ChampionAttackSpeedSchema,
   abilities: ChampionAbilitiesSchema,
+  /** Melee or ranged; picks an effect's `ranged` values. Set from the data package's list; melee when left out. */
+  attackType: ChampionAttackTypeSchema.optional(),
   /** Hand-modelled champions only: fields kept as written instead of synced from the patch data, e.g. 'baseStats.ad'. */
   sourcePins: z.array(z.string()).optional(),
   provenance: ProvenanceSchema,

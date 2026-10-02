@@ -34,6 +34,10 @@ Patch 7.3a is live.
 
 - Ignite: what is its cooldown in Wild Rift (the engine uses League's 90s), and is 72–380 linear with level?
 
+- Ranged list (2026-10-03): skim `packages/data/src/attack-types.ts`. It's from League's attack types; anyone missing
+  or wrong there gets the wrong melee/ranged item values. Gnar, Nidalee, Jayce and Kayle change with form; the
+  engine uses one value per combo (listed in the file).
+
 ## 2. Open engine rules (TODO-VERIFY in `packages/calc/src/rules.ts`)
 
 Each `TODO-VERIFY` comment there says how to check it. The ones most likely to move numbers:

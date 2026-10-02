@@ -3,7 +3,7 @@ import type { Effect, Rune } from '@wr-calc/schema'
 // Runes, first modelled 2026-10-02 from wrpocket's 7.3a text (snapshots/wrpocket/7.3a/runes.json; the patch pipeline
 // doesn't import runes yet). Every rune is listed so a build can name it; only effects that move a 1v1 damage number
 // are modelled, and nothing here has been checked in game. Assumptions are in each effect's supportNotes and in
-// docs/test-sheets/pending-checks.md. Melee values unless a note says otherwise.
+// docs/test-sheets/pending-checks.md. Values that differ for ranged champions are in each effect's `ranged`.
 
 const toggle = (id: string, label: string, defaultOn = false) => [{ type: 'boolean' as const, id, label, default: defaultOn }]
 const stacks = (id: string, label: string, max: number) => [{ type: 'stackCount' as const, id, label, min: 0, max, default: 0 }]
@@ -55,8 +55,8 @@ const KEYSTONES: Rune[] = [
     kind: 'attackStack', id: 'lethal-tempo-attack-speed', name: 'Lethal Tempo',
     description: 'Hitting enemy champions with basic attacks grants stacking Attack Speed, up to 6 stacks. Each stack '
       + 'grants 8% (melee) or 6.4% (ranged) Attack Speed for 6 seconds.',
-    support: 'partial', supportNotes: 'Melee value. The bolt at max stacks (9-30 adaptive) is not modelled.',
-    stat: 'attackSpeed', amountPerStack: 0.08, maxStacks: 6, durationSeconds: 6,
+    support: 'partial', supportNotes: 'The bolt at max stacks (9-30 adaptive) is not modelled.',
+    stat: 'attackSpeed', amountPerStack: 0.08, maxStacks: 6, durationSeconds: 6, ranged: { amountPerStack: 0.064 },
   }]),
   rune('fleet-footwork', 'Fleet Footwork', 'Keystone', 'keystone', []),
   rune('conqueror', 'Conqueror', 'Keystone', 'keystone', [{
@@ -74,13 +74,14 @@ const KEYSTONES: Rune[] = [
       kind: 'abilityHitProc', id: 'grasp-of-undying-attack', name: 'Grasp of the Undying',
       description: 'After 4 stacks (one per second in combat), your next basic attack against an enemy champion deals '
         + '3.3% of your maximum health in bonus magic damage. On ranged champions, all effects are reduced by 60%.',
-      support: 'partial', supportNotes: 'Melee value. Taken as ready on the first attack and every 4 seconds after.',
+      support: 'partial', supportNotes: 'Taken as ready on the first attack and every 4 seconds after.',
       damageType: 'magic', damage: 0, ratios: [{ stat: 'hp', value: 0.033 }], cooldownSeconds: 4, triggeredBy: ['basicAttack'],
+      ranged: { ratios: [{ stat: 'hp', value: 0.0132 }] },
     },
     {
       kind: 'stacking', id: 'grasp-of-undying-health', name: 'Grasp of the Undying (Health)',
-      description: 'Each proc permanently grants 10 bonus health.', support: 'full',
-      stat: 'hp', perStack: 10, maxStacks: 100, stackInputId: 'grasp-of-undying-stacks',
+      description: 'Each proc permanently grants 10 bonus health (4 for ranged champions).', support: 'full',
+      stat: 'hp', perStack: 10, ranged: { perStack: 4 }, maxStacks: 100, stackInputId: 'grasp-of-undying-stacks',
       inputs: stacks('grasp-of-undying-stacks', 'Grasp of the Undying procs so far', 100),
     },
   ]),
@@ -145,8 +146,9 @@ const DOMINATION: Rune[] = [
     kind: 'abilityHitProc', id: 'empowered-attack-damage', name: 'Empowered Attack',
     description: 'Every 8 seconds, the next attack will be empowered, dealing 20 - 60 bonus adaptive damage. Ranged '
       + 'champions deal 80% damage.',
-    support: 'partial', supportNotes: 'Melee value.',
+    support: 'full',
     damageType: 'adaptive', damage: level(20, 60), ratios: [], cooldownSeconds: 8, triggeredBy: ['basicAttack'],
+    ranged: { damage: level(16, 48) },
   }]),
   rune('chain-assault', 'Chain Assault', 'Domination', '1', [{
     kind: 'abilityHitProc', id: 'chain-assault-damage', name: 'Chain Assault',

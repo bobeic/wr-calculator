@@ -3,6 +3,7 @@ import { abilityRankFor, championKitEffects } from './kit-effects'
 import { resolveStats } from './resolve-stats'
 import type { StatCatalog, StatSheet } from './resolve-stats'
 import { MAX_CHAMPION_LEVEL } from './rules'
+import { effectsForAttackType } from './attack-type'
 
 export interface Combatant {
   id: string
@@ -45,12 +46,15 @@ export function combatantFromChampion(
     ...(build.enchant ? [build.enchant] : []),
   ]
   // resolveStats above already throws on any unknown item/rune id, so every lookup here is safe.
+  // Items, runes and spells as this champion uses them: ranged champions take each effect's ranged values.
+  const attackType = champion.attackType ?? 'melee'
   const items = itemIds.map((id) => catalog.items.get(id)!)
-  const runeEffects = build.runes.flatMap((id) => catalog.runes.get(id)!.effects)
+    .map((item) => ({ ...item, effects: effectsForAttackType(item.effects, attackType) }))
+  const runeEffects = effectsForAttackType(build.runes.flatMap((id) => catalog.runes.get(id)!.effects), attackType)
   const spells = (build.spells ?? []).map((id) => {
     const spell = catalog.spells?.get(id)
     if (!spell) throw new Error(`combatantFromChampion: unknown summoner spell id '${id}'`)
-    return spell
+    return { ...spell, effects: effectsForAttackType(spell.effects, attackType) }
   })
   return {
     id: champion.id, name: champion.name, kind: 'champion', level, sheet, items, runeEffects, spells,

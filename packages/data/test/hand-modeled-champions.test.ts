@@ -8,7 +8,8 @@ import { buildCatalog } from '../src/catalog'
 describe('HAND_MODELED_CHAMPIONS', () => {
   it('replaces the generated entry for each hand-modelled champion', () => {
     for (const champion of HAND_MODELED_CHAMPIONS) {
-      expect(PATCH_7_3_CHAMPIONS.find((entry) => entry.id === champion.id), champion.id).toBe(champion)
+      // The dataset copies each champion to add its attack type.
+      expect(PATCH_7_3_CHAMPIONS.find((entry) => entry.id === champion.id), champion.id).toEqual({ ...champion, attackType: 'melee' })
     }
     expect(PATCH_7_3_CHAMPIONS).toHaveLength(GENERATED_CHAMPIONS.length)
   })

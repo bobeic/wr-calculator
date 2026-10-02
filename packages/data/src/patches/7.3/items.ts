@@ -42,8 +42,9 @@ export const STARTER_ITEMS: Item[] = [
       description: "Basic attacks deal bonus physical damage equal to 7% of the target's current Health "
         + '(8.5% for melee), minimum 15, maximum 100 against monsters.',
       support: 'partial',
-      supportNotes: 'Uses the ranged value (7%); melee champions get 8.5%. The Drain slow is not modeled.',
-      damageType: 'physical', pctTargetCurrentHp: 0.07, minDamage: 15, monsterCap: 100,
+      supportNotes: 'The Drain slow is not modeled.',
+      damageType: 'physical', pctTargetCurrentHp: 0.085, minDamage: 15, monsterCap: 100,
+      ranged: { pctTargetCurrentHp: 0.07 },
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,
   },
@@ -539,12 +540,13 @@ export const STARTER_ITEMS: Item[] = [
       support: 'partial',
       // 7% per wrpocket's 7.3 text, confirmed in game on 7.3a (2026-10-01); the WR wiki's 6% was out of date.
       // Procs on Q2 in a Q then Q2 sequence, and shows merged into the triggering hit's number (user, 2026-10-02).
-      supportNotes: 'Melee values (3.5% for ranged is not modeled). The shield is not modeled; item effects, '
+      supportNotes: 'The shield is not modeled; item effects, '
         + 'crowd control and damage over time don\'t add stacks here. In game the proc shows as one number with '
         + 'the hit that triggers it.',
       stacksToProc: 2, stackWindowSeconds: 1.8, cooldownSeconds: 6,
       stacksFrom: ['basicAttack', 'ability'],
       damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.07 }], tags: [] },
+      ranged: { damage: { type: 'physical', base: 0, ratios: [{ stat: 'targetMaxHp', value: 0.035 }], tags: [] } },
       delivery: { kind: 'instant' },
     }],
     provenance: WRPOCKET_7_3_PROVENANCE,

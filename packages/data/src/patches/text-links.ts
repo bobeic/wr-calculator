@@ -41,11 +41,13 @@ export const ITEM_TEXT_LINKS: Record<string, ItemTextLinks> = {
   },
   'blade-of-the-ruined-king': {
     links: [
-      { effectId: 'botrk-mists-edge', path: 'pctTargetCurrentHp', capture: [/equal to ([\d.]+)% of the target's current Health/], value: pct },
+      // The first number is the ranged value; the melee one is in brackets.
+      { effectId: 'botrk-mists-edge', path: 'ranged.pctTargetCurrentHp', capture: [/equal to ([\d.]+)% of the target's current Health/], value: pct },
+      { effectId: 'botrk-mists-edge', path: 'pctTargetCurrentHp', capture: [/\(([\d.]+)% for melee\)/], value: pct },
       { effectId: 'botrk-mists-edge', path: 'minDamage', capture: [/minimum of (\d+)/] },
       { effectId: 'botrk-mists-edge', path: 'monsterCap', capture: [/maximum of (\d+) against monsters/] },
     ],
-    ignore: [/\([\d.]+% for melee\)/, /Drain:[^\n]*/],
+    ignore: [/Drain:[^\n]*/],
   },
   'trinity-force': {
     links: [
@@ -194,8 +196,9 @@ export const ITEM_TEXT_LINKS: Record<string, ItemTextLinks> = {
       { effectId: 'eclipse-ever-rising-moon', path: 'stackWindowSeconds', capture: [/within ([\d.]+) seconds/] },
       { effectId: 'eclipse-ever-rising-moon', path: 'cooldownSeconds', capture: [COOLDOWN] },
       { effectId: 'eclipse-ever-rising-moon', path: 'damage.ratios[0].value', capture: [/equal to ([\d.]+)% of the target's Max Health/], value: pct },
+      { effectId: 'eclipse-ever-rising-moon', path: 'ranged.damage.ratios[0].value', capture: [/\(([\d.]+)% for ranged champions\)/], value: pct },
     ],
-    ignore: [/\([\d.]+% for ranged champions\)/, /absorbs damage equal to [^)]*\)/, /for \d+ seconds \(/],
+    ignore: [/absorbs damage equal to [^)]*\)/, /for \d+ seconds \(/],
   },
   // Icy is a slow, which isn't modelled (there is no Frostbite burn: in-game check, 2026-10-01).
   'seryldas-grudge': { links: [], ignore: [/Icy:[^\n]*/] },
