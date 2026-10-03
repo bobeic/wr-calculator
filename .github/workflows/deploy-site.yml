@@ -33,6 +33,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - id: pages
         uses: actions/configure-pages@v6
+      # Game art is downloaded at build time (art:update only fetches files it doesn't have); keep it between runs.
+      - uses: actions/cache@v5
+        with:
+          path: apps/web/public/art
+          key: art-v1-${{ github.run_id }}
+          restore-keys: art-v1-
       - name: Build the static site
         run: pnpm --filter @wr-calc/web build
         env:

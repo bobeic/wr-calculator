@@ -10,7 +10,8 @@
     "cn-stats:update": "tsx scripts/cn-stats-update.ts",
     "cn-builds:update": "tsx scripts/cn-builds-update.ts",
     "cn-preview:update": "tsx scripts/cn-preview-update.ts",
-    "test-sheet": "tsx scripts/test-sheet.ts"
+    "test-sheet": "tsx scripts/test-sheet.ts",
+    "art:update": "tsx scripts/art-update.ts"
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
+    "sharp": "^0.35.4",
     "tsx": "^4.23.15"
   }
 }

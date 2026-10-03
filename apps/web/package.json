@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm run art && next build",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "art": "pnpm --filter @wr-calc/data art:update"
   },
   "dependencies": {
     "@wr-calc/calc": "workspace:*",

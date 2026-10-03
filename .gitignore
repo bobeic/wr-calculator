@@ -7,3 +7,5 @@ dist/
 .cache/
 next-env.d.ts
 out/
+apps/web/public/art/
+apps/web/.impeccable/review/
