@@ -10,6 +10,8 @@ import type { CnRank } from '@wr-calc/data'
 import { championArt, itemIcon, runeIcon } from '../../../lib/site/art'
 import { assignTiers } from '../../../lib/site/tiers'
 import { calculatorHref, itemHref, pct } from '../../../lib/site/format'
+import { gemLead } from '../../../lib/site/builds'
+import { DamageText } from '../../../components/site/damage-text'
 
 export const dynamicParams = false
 
@@ -100,12 +102,30 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
                               ))}
                             </ol>
                             <span className="build-rates">
-                              <span className={row.winRate >= 0.5 ? 'up' : 'down'}>{pct(row.winRate)}</span> win
-                              <span className="muted"> · {pct(row.pickRate)} pick</span>
+                              <span>
+                                <span className={row.winRate >= 0.5 ? 'up' : 'down'}>{pct(row.winRate)}</span> win
+                                <span className="muted"> · {pct(row.pickRate)} pick</span>
+                              </span>
+                              {gemLead(row, core[0]) !== null && (
+                                <span className="gem-badge" title="Wins at least 3 points more than the most-picked core, in at least 5% of games">
+                                  +{((gemLead(row, core[0]) ?? 0) * 100).toFixed(1)} pts vs most picked
+                                </span>
+                              )}
                             </span>
-                            <Link className="build-try" href={calculatorHref(id, row.ids, runes[0]?.ids ?? [])} aria-label={`Try build ${index + 1} in the calculator`}>
-                              Try <ArrowIcon />
-                            </Link>
+                            {index === 0
+                              ? (
+                                <Link className="build-try" href={calculatorHref(id, row.ids, runes[0]?.ids ?? [])} aria-label="Try the most-picked build in the calculator">
+                                  Try <ArrowIcon />
+                                </Link>
+                              )
+                              : (
+                                <Link
+                                  className="build-try" href={calculatorHref(id, core[0].ids, runes[0]?.ids ?? [], { items: row.ids, runes: runes[0]?.ids ?? [] })}
+                                  aria-label={`Compare build ${index + 1} with the most-picked build in the calculator`}
+                                >
+                                  Compare <ArrowIcon />
+                                </Link>
+                              )}
                           </li>
                         ))}
                       </ol>
@@ -126,8 +146,10 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
                               ))}
                             </ul>
                             <span className="build-rates">
-                              <span className={row.winRate >= 0.5 ? 'up' : 'down'}>{pct(row.winRate)}</span> win
-                              <span className="muted"> · {pct(row.pickRate)} pick</span>
+                              <span>
+                                <span className={row.winRate >= 0.5 ? 'up' : 'down'}>{pct(row.winRate)}</span> win
+                                <span className="muted"> · {pct(row.pickRate)} pick</span>
+                              </span>
                             </span>
                           </li>
                         ))}
@@ -151,7 +173,7 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div>
                   <h3>{ability.name}</h3>
-                  {ability.description.split('\n').filter((line) => line.trim() !== '').map((line, index) => <p key={index}>{line}</p>)}
+                  {ability.description.split('\n').filter((line) => line.trim() !== '').map((line, index) => <p key={index}><DamageText text={line} /></p>)}
                 </div>
               </li>
             ))}

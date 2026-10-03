@@ -19,3 +19,7 @@ const LANE_PATHS: Record<Lane, string> = {
 export function LaneIcon({ lane }: { lane: Lane }) {
   return <svg className="lane-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={LANE_PATHS[lane]} {...stroke} /></svg>
 }
+
+export function SearchIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" {...stroke} /><path d="m16 16 4.5 4.5" {...stroke} /></svg>
+}

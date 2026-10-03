@@ -7,13 +7,15 @@ import { assignTiers, TIERS } from '../../lib/site/tiers'
 import type { TieredStat } from '../../lib/site/tiers'
 import { championHref, pct } from '../../lib/site/format'
 import { LaneIcon } from './icons'
+import { MetaMap } from './meta-map'
+import { WinBar } from './lane-board'
 
 export interface TierListProps {
   ranks: CnStatsSnapshot['ranks']
   rankLabels: Record<CnRank, string>
   laneLabels: Record<Lane, string>
   names: Record<string, string>
-  art: Record<string, { icon?: string; splash?: string }>
+  art: Record<string, { icon?: string }>
 }
 
 /** Win rate against an even 50%: above reads as rising, below as falling. */
@@ -24,6 +26,7 @@ export function TierList({ ranks, rankLabels, laneLabels, names, art }: TierList
   const rankOptions = (Object.keys(rankLabels) as CnRank[]).filter((rank) => Object.values(ranks[rank]).some((rows) => rows.length > 0))
   const [rank, setRank] = useState<CnRank>(rankOptions[0] ?? 'all')
   const [lane, setLane] = useState<Lane>('top')
+  const [view, setView] = useState<'tiers' | 'map'>('tiers')
   const rows = assignTiers(ranks[rank][lane])
   const name = (row: TieredStat) => names[row.championId] ?? row.championId
 
@@ -42,24 +45,34 @@ export function TierList({ ranks, rankLabels, laneLabels, names, art }: TierList
             <button key={option} type="button" aria-pressed={option === rank} onClick={() => setRank(option)}>{rankLabels[option]}</button>
           ))}
         </div>
+        <div className="segmented" role="group" aria-label="View">
+          <button type="button" aria-pressed={view === 'tiers'} onClick={() => setView('tiers')}>Tiers</button>
+          <button type="button" aria-pressed={view === 'map'} onClick={() => setView('map')}>Meta map</button>
+        </div>
       </div>
 
-      <div className="tier-board" key={`${rank}-${lane}`}>
+      {view === 'map' && (
+        <MetaMap
+          key={`${rank}-${lane}`} rows={rows} names={names}
+          icons={Object.fromEntries(rows.map((row) => [row.championId, art[row.championId]?.icon]))}
+        />
+      )}
+
+      {view === 'tiers' && <div className="tier-board" key={`${rank}-${lane}`}>
         {TIERS.map((tier) => {
           const tierRows = rows.filter((row) => row.tier === tier)
           if (tierRows.length === 0) return null
-          const featured = tier === 'S+'
           return (
             <section key={tier} className="tier-row" data-tier={tier} aria-label={`${tier} tier, ${tierRows.length} champion${tierRows.length === 1 ? '' : 's'}`}>
               <div className="tier-letter tier-badge" data-tier={tier} aria-hidden="true">{tier}</div>
-              <ol className={featured ? 'tier-cards' : 'tier-tiles'}>
+              <ol className="tier-tiles">
                 {tierRows.map((row) => {
-                  const image = featured ? art[row.championId]?.splash : art[row.championId]?.icon
+                  const image = art[row.championId]?.icon
                   return (
                     <li key={row.championId}>
-                      <Link href={championHref(row.championId)} className={featured ? 'tier-card' : 'tier-tile'}>
+                      <Link href={championHref(row.championId)} className="tier-tile">
                         {image
-                          ? <img src={image} alt="" className={featured ? 'tier-card-art' : 'icon-img'} width={featured ? undefined : 52} height={featured ? undefined : 52} loading="lazy" />
+                          ? <img src={image} alt="" className="icon-img" width={52} height={52} loading="lazy" />
                           : <span className="icon-img" />}
                         <span className="tier-name">{name(row)}</span>
                         <span className="tier-stats">
@@ -68,6 +81,7 @@ export function TierList({ ranks, rankLabels, laneLabels, names, art }: TierList
                           <span>{pct(row.banRate)} ban</span>
                         </span>
                         <span className="tier-rank">#{row.strengthRank}</span>
+                        <WinBar rate={row.winRate} />
                       </Link>
                     </li>
                   )
@@ -76,11 +90,11 @@ export function TierList({ ranks, rankLabels, laneLabels, names, art }: TierList
             </section>
           )
         })}
-      </div>
-      <p className="note">
+      </div>}
+      {view === 'tiers' && <p className="note">
         Win rate in cyan is above 50%, in red below. #N is Tencent&apos;s strength order in the lane. {rankLabels[rank]},{' '}
         {laneLabels[lane]}.
-      </p>
+      </p>}
     </>
   )
 }

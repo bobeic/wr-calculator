@@ -55,12 +55,14 @@ Steps once a name is chosen:
 
 ## Needs the owner
 
-- **Tier letters.** The S+/S/A/B/C cut (top 8% / 17% / 25% / 25% / 25% of Tencent's strength order) is a placeholder.
-  Keep it, change the cut, or tier by win rate?
-- **CN leaking into live data (FYI, decide when convenient).** wrpocket's items copy Tencent's CN feed (timestamps
-  match to the second), so when CN patches before global, `patch:update` may import CN item numbers as global. Its
-  champion numbers differ from Tencent's in ~300 ability rows, so champions look sourced separately. The CN preview
-  log shows a leak as "already live" before the global notes. Gate the import on it, or just watch?
+- **Tier letters (decided 2026-10-03: keep for now).** The tier list keeps Tencent's strength order with our S+/S/A/B/C
+  cut (top 8% / 17% / 25% / 25% / 25%). Later the owner may want our own order with win rate weighted very highly;
+  if so, pull low-pick win rates toward 50% before ranking so 0.3%-pick flukes don't land in S+.
+- **CN vs global (decided 2026-10-03).** CN win/pick/ban rates, builds and the tier list stay CN-sourced and labelled
+  as such; every calculator number is global (wrpocket). `patch:update` now puts a "Possible CN data in this import"
+  table at the top of `PATCH_DIFF.md` (and a warning in the PR body) when an item value moved onto exactly Tencent's
+  CN number, saying "don't merge" when no official global notes were found. Champion numbers aren't checked that way
+  (wrpocket's differ from Tencent's in ~300 rows, so they look sourced separately).
 - **In-game checks**, in `docs/test-sheets/pending-checks.md`. The most useful: Caitlyn's Headshot (6th or 7th
   attack?), Nautilus's passive and Miss Fortune's Love Tap at level 15, Master Yi's Wuju passive, Yasuo's crit damage,
   a few rows of `docs/test-sheets/predictions-7.3a.md`, and skimming the ranged list in
@@ -88,15 +90,16 @@ Steps once a name is chosen:
    ability rows (e.g. Aatrox Q 10/40/70/100 live vs 15/45/75/105 CN): wrpocket's champion numbers are *not* a straight
    copy of Tencent's, unlike its items. A few rows look like Tencent glitches (Ahri E shows one value). Later: the
    calculated preview (brainstorm §4.2), if the log shows CN changes worth simulating.
-6. **Design pass:** first pass done on branch `design-pass` (2026-10-03), not merged yet. Reference: wildriftalpha.com.
-   Dark, splash-led look: shell, home, tier list and champion page redesigned; the other pages (items, runes, patches,
-   calculator) only pick up the new tokens and still need their own pass. Game art comes from Tencent's Wild Rift feeds
-   (Riot Data Dragon for a few ability icons), downloaded by `pnpm --filter @wr-calc/data art:update` into
-   `apps/web/public/art/` (gitignored; the web build runs it, the deploy workflow caches it). The design system is in
-   `apps/web/DESIGN.md`; product facts in `apps/web/PRODUCT.md`; screenshots in `docs/design/2026-10-03/`; how it was made and how to edit it: `docs/design/README.md`. Design skills
-   (`impeccable`, `design-taste-frontend`, `redesign-existing-projects`) are vendored in `.claude/skills/`. Open ideas
-   from the review: art on the tier list beyond the S+ row, more framing on detail sections, tier tiles revealing pick
-   and ban on hover.
+6. **Design pass:** first pass (2026-10-03, merged): dark, splash-led shell, home, tier list and champion page. The
+   owner liked it but it read too close to wildriftalpha.com, so a second pass is on branch `design-pass-2`
+   (not merged; screenshots in `docs/design/2026-10-03b/`): the home page is a lane board (highest win rates per lane
+   with their most-picked core, over the leader's splash) plus a champion search, and "Builds beating the meta" (cores
+   out-winning the most-picked one by 3+ points in 5%+ of games, rule in `apps/web/src/lib/site/builds.ts`) with
+   "Compare" links that open both builds in the calculator; champion pages badge those builds and get a compact hero;
+   damage-type colours (physical orange, magic blue, true white) colour ability text and split each calculator row;
+   the tier list has a "Meta map" view (win rate against pick rate). Items, runes, patches and the calculator still
+   need their own pass; a logo waits for the name. The design system is in `apps/web/DESIGN.md`; how to edit it:
+   `docs/design/README.md`.
 8. **Later: light mode and other languages.** Both are likely wanted. Keep every colour a token in `globals.css` (no
    hard-coded colours in pages) so a light theme is a second token block, and keep UI strings easy to pull into
    per-language files (wildriftalpha does EN, TR, RU, ES, FR, PL). Champion and item names would need Riot's or

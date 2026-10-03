@@ -28,6 +28,20 @@ function Delta({ a, b, higherIsBetter = true, format = whole }: {
   return <span className={better ? 'better' : 'worse'}>{b > a ? '+' : '−'}{format(Math.abs(b - a))}</span>
 }
 
+const DAMAGE_TYPES = ['physical', 'magic', 'true'] as const
+
+/** A thin bar of the row's physical / magic / true split, in the damage-type colours. */
+function DamageMix({ byType }: { byType: AbilityRow['byType'] }) {
+  const sum = byType.physical + byType.magic + byType.true
+  if (sum <= 0) return null
+  const label = DAMAGE_TYPES.filter((type) => byType[type] > 0).map((type) => `${Math.round((byType[type] / sum) * 100)}% ${type}`).join(', ')
+  return (
+    <span className="dmg-mix" role="img" aria-label={label} title={label}>
+      {DAMAGE_TYPES.map((type) => byType[type] > 0 && <span key={type} data-type={type} style={{ flexGrow: byType[type] }} />)}
+    </span>
+  )
+}
+
 function Sources({ row, hp }: { row: AbilityRow; hp: number }) {
   if (row.kind === 'none') return <span className="muted">no damage</span>
   return (
@@ -35,6 +49,7 @@ function Sources({ row, hp }: { row: AbilityRow; hp: number }) {
       <span className="big">{whole(row.damage)}</span>
       <span className="muted"> {hp > 0 ? `${Math.round((row.damage / hp) * 100)}%` : ''}</span>
       {row.kind === 'empowers' && <span className="muted"> next attack</span>}
+      <DamageMix byType={row.byType} />
       {row.sources.length > 1 && (
         <span className="sources">{row.sources.map((source) => `${displayName(source.name)} ${whole(source.damage)}`).join(' · ')}</span>
       )}
@@ -133,6 +148,10 @@ export function Results({ report, comboText }: ResultsProps) {
           </tbody>
         </table>
       </div>
+      <p className="note dmg-legend">
+        Bars split each row by damage type: <span className="dmg" data-type="physical">physical</span>,{' '}
+        <span className="dmg" data-type="magic">magic</span>, <span className="dmg" data-type="true">true</span>.
+      </p>
 
       <details className="stats-details">
         <summary>Stats</summary>

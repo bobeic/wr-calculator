@@ -7,6 +7,7 @@ import { calculatorHref, changeLabel, pct } from '../src/lib/site/format'
 import { CURRENT_DATASET } from '../src/lib/dataset'
 import { cnEntryHref, cnFieldLabel } from '../src/lib/site/cn-preview'
 import { decodeState } from '../src/lib/url-state'
+import { byWinRate, gemLead, hiddenGems } from '../src/lib/site/builds'
 
 const row = (championId: string, strengthRank: number): CnChampionStat => ({
   championId, heroId: '1', winRate: 0.5, pickRate: 0.1, banRate: 0, strengthRank,
@@ -70,5 +71,36 @@ describe('CN preview labels', () => {
     expect(cnFieldLabel('price')).toBe('price')
     expect(cnEntryHref('champion:aatrox')).toBe('/champions/aatrox/')
     expect(cnEntryHref('item:cn-2119')).toBeNull()
+  })
+})
+
+describe('hidden gems', () => {
+  const set = (winRate: number, pickRate: number) => ({ ids: [`i${winRate}`], winRate, pickRate })
+  it('flags a core that out-wins the most-picked one by 3+ points in 5%+ of games', () => {
+    const top = set(0.5, 0.3)
+    expect(gemLead(set(0.535, 0.06), top)).toBeCloseTo(0.035)
+    expect(gemLead(set(0.52, 0.06), top)).toBeNull()
+    expect(gemLead(set(0.6, 0.04), top)).toBeNull()
+    expect(gemLead(top, top)).toBeNull()
+  })
+
+  it('finds gems in the real builds, biggest lead first, each linking to a valid comparison', () => {
+    const gems = hiddenGems(CN_BUILDS)
+    expect(gems.length).toBeGreaterThan(0)
+    expect(gems.map((gem) => gem.lead)).toEqual([...gems.map((gem) => gem.lead)].sort((a, b) => b - a))
+    const gem = gems[0]
+    const href = calculatorHref(gem.championId, gem.mostPicked.ids, gem.runes, { items: gem.build.ids, runes: gem.runes })
+    const { state, issues } = decodeState(new URLSearchParams(href.split('?')[1]), CURRENT_DATASET)
+    expect(issues).toEqual([])
+    expect(state.buildB.items).toEqual(gem.build.ids)
+  })
+})
+
+describe('byWinRate', () => {
+  it('sorts by win rate and drops champions picked under 1%', () => {
+    const rows = [
+      { ...row('a', 1), winRate: 0.51 }, { ...row('b', 2), winRate: 0.6, pickRate: 0.005 }, { ...row('c', 3), winRate: 0.55 },
+    ]
+    expect(byWinRate(rows, 5).map((entry) => entry.championId)).toEqual(['c', 'a'])
   })
 })

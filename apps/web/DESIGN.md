@@ -20,6 +20,10 @@ colors:
   tier-a: "#5ed6c8"
   tier-b: "#8fa3c7"
   tier-c: "#6f7c95"
+  good-wash: "rgb(94 214 200 / 0.1)"
+  dmg-physical: "#ff9a52"
+  dmg-magic: "#8fa9ff"
+  dmg-true: "#f4f1ea"
   hairline: "rgb(214 178 106 / 0.14)"
   hairline-strong: "rgb(214 178 106 / 0.34)"
 typography:
@@ -97,8 +101,11 @@ their own page). Splash art is never boxed; it is masked into the blue-black gro
 side. Everything else is a quiet, gold-hairlined frame around numbers. Dark only for now; a light theme is a second
 token block (see Colors).
 
-Surfaces: home is Persuade (lead with who's winning, one gold action); tier list and champion pages are Operate (scan,
-compare, click through), so their brand lives in details: tier colours, icons, hairlines.
+Surfaces: home is a scoreboard (2026-10-03, second pass): a glass lane board of the highest win rates per lane, each
+with its most-picked core, over the lane leader's splash, beside a champion search and one gold action; then "Builds
+beating the meta". Tier list and champion pages are Operate (scan, compare, click through), so their brand lives in
+details: tier colours, icons, hairlines, 50%-centred win bars. The owner wants the content familiar but the look
+unmistakably ours: no slogan hero, no browse-link grid, no splash-banner tier rows (those read as wildriftalpha.com).
 
 ## Colors
 
@@ -129,7 +136,7 @@ Display tops out at 6rem (champion title); home headline `clamp(2.6rem, 6.2vw, 5
   the copy and fades downward.
 - Sections separate by 56px above headings, tighter below.
 - Grids are content-driven: tier tiles `auto-fill, minmax(236px, 1fr)`; S+ banners `auto-fit, minmax(260px, 1fr)`;
-  the home lane strip is 5 columns on desktop and a snap-scrolling row on phones.
+  the home is a 5fr / 7fr split (copy, lane board) that stacks under 960px.
 - Breakpoints: 960px (two-column layouts collapse), 760px (mobile header, art above copy, single-column lists).
 
 ## Elevation & Depth
@@ -149,10 +156,23 @@ are authored on a 24px grid with a 1.6 stroke.
 - **Quiet link** (`.quiet-link`): text plus arrow, for secondary actions beside a primary button.
 - **Segmented toggle** (`.segmented`): lane/bracket filters; active option gets surface-2 and a gold underline; scrolls
   sideways on phones instead of wrapping.
-- **Lane card / tier card**: art fills the card under a bottom scrim; name in condensed 800, stats under it. Hover
-  lifts 3–4px and scales the art 5%.
-- **Tier row**: tier letter in its tier colour beside a grid; S+ uses splash banners, other tiers icon tiles (52px icon,
-  name, rank, win/pick/ban as separate unbroken spans).
+- **Lane board** (`LaneBoard`, home): a glass panel (`--glass`, 14px blur) of lane tabs and five rows, each one link:
+  place, 52px icon, name (condensed 800), tier letter, pick/ban, win % with a win bar, three core item icons, arrow.
+  Switching lanes re-deals it: rows slide in with a 40ms stagger and the leader's splash blurs in behind. On phones the
+  core icons drop to a third row and the lane icons hide so all five tabs fit.
+- **Win bar** (`WinBar`): 4px track centred on a 50% mark spanning 44-60%; the fill runs from the mark, cyan right,
+  red left. Used on the lane board and every tier tile.
+- **Tier row**: tier letter in its tier colour beside a grid of icon tiles (52px icon, name, rank, win/pick/ban as
+  separate unbroken spans, win bar). Every tier, S+ included, uses tiles; S+ only gets the gold-washed row.
+- **Gem row** ("Builds beating the meta", home): champion, then the winning core at full size over the most-picked
+  core dimmed and smaller ("Most picked"), the lead as a big cyan "+N pts", and a "Compare" link that opens both in
+  the calculator. A core qualifies at 3+ points over the most-picked core in 5%+ of games
+  (`lib/site/builds.ts`). **Gem badge**: the same rule as a cyan outlined pill on champion-page build rows.
+- **Meta map** (tier list "Meta map" view): win rate (up, gridlines every 2 points, dashed 50%) against pick rate
+  (right, square-root scale from the lane's lowest pick rate) with 36px icon points ringed in tier colour (S+ a double
+  ring), a name label on hover/focus, corner labels "Overlooked winners" / "Popular winners", and a tier key.
+- **Damage mix bar** (calculator rows): a 96px, 4px bar split by mitigated physical / magic / true damage, with a
+  legend under the table.
 - **Item path** (`.item-path`): icons joined by short hairline connectors, names under them on champion pages.
 - **Ability row**: 56px icon with a gold key badge (Q/W/E/R/Passive), name, paragraphs; rows separated by hairlines in
   one panel.
@@ -163,7 +183,10 @@ are authored on a 24px grid with a 1.6 stroke.
 - Do let real art carry the page; use Tencent's Wild Rift art from `public/art` (downloaded by `art:update`), never a
   gradient standing in for missing art.
 - Do show the source and date with every rate, under the heading it belongs to, not as a label above it.
-- Do keep gold as the single accent; cyan/red mean "above/below 50%" and nothing else.
+- Do keep gold as the single accent; cyan/red mean "above/below 50%" (or "better/worse") and nothing else.
+- Do use the damage-type colours (`--dmg-physical` orange, `--dmg-magic` blue, `--dmg-true` white) only where a
+  number or word is a damage type: ability text ("magic damage") and the calculator's split bars. Never for status or
+  decoration, and never on tier UI (magic blue sits close to the tier-B ring).
 - Don't put eyebrow/kicker labels above headings.
 - Don't hard-code colours in components; add a token.
 - Don't box splash art in a frame; mask it into the ground.

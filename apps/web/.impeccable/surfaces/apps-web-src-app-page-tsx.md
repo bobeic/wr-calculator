@@ -7,33 +7,31 @@ related_targets: ["apps/web/src/app/tier-list/page.tsx","apps/web/src/app/champi
 
 # Home, tier list, champion page
 
-Scope: site shell, home (Persuade), tier list and champion page (Operate). Audience: ranked Wild Rift players checking
-what to pick and build, on laptop or phone. Pinned by owner: wildriftalpha.com's layout and gaming-site feel, dark,
-splash art and icons. Constraints: static export, art from public/art (Tencent's WR art), English now but strings and
-colours stay swappable for later languages and a light theme.
+Scope: site shell, home (now Operate-leaning: find a pick and its build fast), tier list and champion page (Operate).
+Audience: ranked Wild Rift players checking what to pick and build, on laptop or phone; the owner (a streamer) also
+theorycrafts off-meta builds. Owner, 2026-10-03: content may resemble other sites, but the design must not look like a
+copy of wildriftalpha.com (the original reference). Dark, splash art and icons stay. Constraints: static export, art
+from public/art, strings and colours swappable for later languages and a light theme.
 
 ## Direction contract
 
-THESIS: the site is Wild Rift's own loading screen turned into a scoreboard: the art is the data (the hero shows
-whoever is winning right now), refusing the category default of a generic hero headline over a stock gradient.
+THESIS: the scoreboard, not the guide page: every first view answers "who wins, and with what" as a ranked readout,
+refusing the reference site's slogan hero, browse-link grid and splash-card tier rows as the main structure.
 
-OWN-WORLD: blue-black hextech ground (#070b14 to #111a2b), Wild Rift gold as the one primary accent, a cold cyan for
-rising numbers, red for falling. Saira (variable width): condensed heavy caps-free display, normal-width body. Hairline
-gold-tinted borders, square-ish 6px corners, splash art masked into the ground with a long fade, never boxed.
+OWN-WORLD: blue-black ground, gold as the one accent, cyan/red only for above/below 50%, plus damage-type colours
+(physical orange, magic blue, true white) wherever damage is shown. Saira condensed heavy numbers, tabular. Win-rate
+bars centred on 50%; glass board panels over masked splash art.
 
-STORY: the visitor sees which champion is on top in CN ranked today, sees the top pick in every lane, and goes to the
-tier list or a champion's build in one click; the calculator is offered as the deeper tool.
+STORY: pick a lane, see the five highest win rates with their most-picked core, open a champion for builds; spot
+"builds beating the meta" (cores out-winning the most-picked one) and compare them in the calculator.
 
-FIRST VIEWPORT: full-bleed splash of the #1 CN champion filling the right two thirds, fading into the ground at left;
-left column holds a display headline (up to 3 lines) naming the champion and the claim, its win rate large with the
-source and date under it, its most-picked Diamond+ core as item icons with a link that runs it in the calculator
-(the differentiator, proven on real data), then the gold primary "Full tier list" button and a quiet "Build
-calculator" link. Bottom edge: a row of five lane
-cards (portrait card art, lane, champion, win %), overlapping the splash.
+FIRST VIEWPORT: home: left column headline, champion search, CN source line, one gold "Full tier list" button; right,
+a glass lane board (lane tabs, five rows: place, icon, name, tier, pick/ban, win % with a 50%-centred bar, three core
+item icons) over the lane leader's splash, which cross-fades when the lane changes. Champion page: a compact splash
+hero so the builds panel starts in the first viewport on desktop.
 
-FORM: pinned brief, no concept roll: the owner pinned the direction in their own words ("i quite like wildriftalpha
-the layout is nice and ... it has an appropriate style for a gaming site"; "we want both splash art and icons";
-"start with dark"), and a pinned direction beats the roll; code-led, no image generation available.
-Signature interaction: lane cards lift and brighten their art on hover/focus; tier tiles reveal pick and ban on hover.
+FORM: owner-directed refinement of the 2026-10-03 pass (no concept roll), code-led, no image generation available.
+Signature interaction: switching lanes re-deals the board (rows slide in staggered, splash blurs in). Tier list adds
+a "Meta map" view (win rate against pick rate, icon points ringed in tier colour).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

@@ -1,4 +1,4 @@
-import type { AbilityVariant, Champion, StatKey } from '@wr-calc/schema'
+import type { AbilityVariant, Champion, DamageType, StatKey } from '@wr-calc/schema'
 import type {
   AbilityKey, BuildBreakpoint, BuildIssue, ComboAction, ComboResult, Combatant, UnsupportedEffectEntry,
 } from '@wr-calc/calc'
@@ -34,6 +34,8 @@ export interface AbilityRow {
   kind: 'hit' | 'empowers' | 'none'
   damage: number
   sources: SourceDamage[]
+  /** The same damage split by type (after mitigation). */
+  byType: Record<DamageType, number>
 }
 
 export const SHOWN_STATS: readonly StatKey[] = [
@@ -88,6 +90,16 @@ function total(result: ComboResult): number {
   return result.instances.reduce((sum, instance) => sum + instance.mitigated, 0)
 }
 
+const NO_DAMAGE: Record<DamageType, number> = { physical: 0, magic: 0, true: 0 }
+
+/** Mitigated damage per type; `minus` takes a baseline away (what an empowered attack adds over a plain one). */
+function byType(result: ComboResult, minus?: ComboResult): Record<DamageType, number> {
+  const totals = { ...NO_DAMAGE }
+  for (const instance of result.instances) totals[instance.type] += instance.mitigated
+  for (const instance of minus?.instances ?? []) totals[instance.type] -= instance.mitigated
+  return { physical: Math.max(0, totals.physical), magic: Math.max(0, totals.magic), true: Math.max(0, totals.true) }
+}
+
 /** Damage per source in the order the sources first hit; a merged hit is split by its parts' raw shares. */
 function bySource(result: ComboResult): SourceDamage[] {
   const totals = new Map<string, SourceDamage>()
@@ -126,7 +138,7 @@ export function castActions(champion: Champion, key: AbilityKey, variant?: Abili
 export function abilityRows(champion: Champion, attacker: Combatant, target: Combatant): AbilityRow[] {
   const simulate = (actions: ComboAction[]) => simulateCombo(attacker, target, actions, { critMode: 'expected', ignoreCooldowns: true })
   const attack = simulate(['AA', `wait:${SETTLE_SECONDS}`])
-  const rows: AbilityRow[] = [{ key: 'aa', label: 'AA', name: 'Basic attack', kind: 'hit', damage: total(attack), sources: bySource(attack) }]
+  const rows: AbilityRow[] = [{ key: 'aa', label: 'AA', name: 'Basic attack', kind: 'hit', damage: total(attack), sources: bySource(attack), byType: byType(attack) }]
   for (const key of ['q', 'w', 'e', 'r'] as const) {
     const ability = champion.abilities[key]
     const casts = ability.variants === undefined
@@ -138,14 +150,14 @@ export function abilityRows(champion: Champion, attacker: Combatant, target: Com
     for (const { rowKey, label, name, variant } of casts) {
       const cast = simulate(castActions(champion, key, variant))
       if (total(cast) > 0) {
-        rows.push({ key: rowKey, label, name, kind: 'hit', damage: total(cast), sources: bySource(cast) })
+        rows.push({ key: rowKey, label, name, kind: 'hit', damage: total(cast), sources: bySource(cast), byType: byType(cast) })
         continue
       }
       const empowered = simulate([castAction(key, variant), 'AA', `wait:${SETTLE_SECONDS}`])
       const extra = total(empowered) - total(attack)
       rows.push(extra > 0.05
-        ? { key: rowKey, label, name, kind: 'empowers', damage: extra, sources: bySource(empowered) }
-        : { key: rowKey, label, name, kind: 'none', damage: 0, sources: [] })
+        ? { key: rowKey, label, name, kind: 'empowers', damage: extra, sources: bySource(empowered), byType: byType(empowered, attack) }
+        : { key: rowKey, label, name, kind: 'none', damage: 0, sources: [], byType: { ...NO_DAMAGE } })
     }
   }
   return rows

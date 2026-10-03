@@ -1,28 +1,94 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-03T10:00:00Z",
+  "generatedAt": "2026-10-03T18:00:00Z",
   "title": "Design System: wr-calc",
   "extensions": {
     "colorMeta": {
-      "gold": { "role": "primary", "displayName": "Wild Rift Gold", "canonical": "#e4b65c", "tonalRamp": ["#f2cb7c", "#e4b65c", "#c8963f"] },
-      "ground": { "role": "neutral", "displayName": "Hextech Night", "canonical": "#070b14", "tonalRamp": ["#070b14", "#0b1220", "#0f1829", "#15213a"] },
-      "rising-cyan": { "role": "tertiary", "displayName": "Rising (≥50% win)", "canonical": "#5ed6c8" },
-      "falling-red": { "role": "tertiary", "displayName": "Falling (<50% win)", "canonical": "#f08473" }
+      "gold": {
+        "role": "primary",
+        "displayName": "Wild Rift Gold",
+        "canonical": "#e4b65c",
+        "tonalRamp": [
+          "#f2cb7c",
+          "#e4b65c",
+          "#c8963f"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Hextech Night",
+        "canonical": "#070b14",
+        "tonalRamp": [
+          "#070b14",
+          "#0b1220",
+          "#0f1829",
+          "#15213a"
+        ]
+      },
+      "rising-cyan": {
+        "role": "tertiary",
+        "displayName": "Rising (≥50% win)",
+        "canonical": "#5ed6c8"
+      },
+      "falling-red": {
+        "role": "tertiary",
+        "displayName": "Falling (<50% win)",
+        "canonical": "#f08473"
+      },
+      "dmg-physical": {
+        "role": "tertiary",
+        "displayName": "Physical damage",
+        "canonical": "#ff9a52"
+      },
+      "dmg-magic": {
+        "role": "tertiary",
+        "displayName": "Magic damage",
+        "canonical": "#8fa9ff"
+      },
+      "dmg-true": {
+        "role": "tertiary",
+        "displayName": "True damage",
+        "canonical": "#f4f1ea"
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Hero headline and champion name; Saira condensed 800." },
-      "body": { "displayName": "Body", "purpose": "Reading text and data; Saira at 92% width, tabular numerals." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline and champion name; Saira condensed 800."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text and data; Saira at 92% width, tabular numerals."
+      }
     },
     "shadows": [
-      { "name": "card", "value": "0 18px 40px -18px rgb(0 0 0 / 0.7)", "purpose": "Floating art cards (home lane strip)." },
-      { "name": "button-glow", "value": "0 10px 30px -12px rgb(228 182 92 / 0.6)", "purpose": "Under the gold primary button only." }
+      {
+        "name": "card",
+        "value": "0 18px 40px -18px rgb(0 0 0 / 0.7)",
+        "purpose": "Floating panels: the home lane board."
+      },
+      {
+        "name": "button-glow",
+        "value": "0 10px 30px -12px rgb(228 182 92 / 0.6)",
+        "purpose": "Under the gold primary button only."
+      }
     ],
     "motion": [
-      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "All transitions: card lift, art zoom, link arrow nudge, tier board fade-in." }
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "All transitions: lane board re-deal, splash blur-in, link arrow nudge, tier board fade-in."
+      }
     ],
     "breakpoints": [
-      { "name": "md", "value": "960px" },
-      { "name": "sm", "value": "760px" }
+      {
+        "name": "md",
+        "value": "960px"
+      },
+      {
+        "name": "sm",
+        "value": "760px"
+      }
     ]
   },
   "components": [
@@ -41,6 +107,13 @@
       "description": "Lane and bracket filters.",
       "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">Baron</button><button>Jungle</button></div>",
       "css": ".ds-seg { display:inline-flex; gap:4px; padding:4px; border:1px solid rgb(214 178 106 / 0.14); border-radius:10px; background:#0b1220; } .ds-seg button { min-height:40px; padding:0 14px; border:0; border-radius:6px; background:transparent; color:#98a4bb; font-weight:600; } .ds-seg button[aria-pressed=true] { background:#15213a; color:#e8ecf4; box-shadow:inset 0 -2px 0 #e4b65c; }"
+    },
+    {
+      "name": "Win Bar",
+      "kind": "other",
+      "description": "Win rate against an even 50%: the fill runs from the centre mark, cyan right, red left.",
+      "html": "<span class=\"ds-win\"><span class=\"ds-even\"></span><span class=\"ds-fill\"></span></span>",
+      "css": ".ds-win { position:relative; display:block; width:120px; height:4px; border-radius:2px; background:#15213a; } .ds-even { position:absolute; left:37.5%; top:-3px; bottom:-3px; width:1px; background:#98a4bb; } .ds-fill { position:absolute; left:37.5%; width:30%; top:0; bottom:0; border-radius:2px; background:#5ed6c8; }"
     }
   ]
 }

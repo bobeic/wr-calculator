@@ -8,8 +8,7 @@ export default function TierListPage() {
   const champions = getPatchDataset(CURRENT_PATCH).champions
   const names = Object.fromEntries(champions.map((champion) => [champion.id, champion.name]))
   const art = Object.fromEntries(champions.map((champion) => {
-    const { icon, splash } = championArt(champion.id)
-    return [champion.id, { icon, splash }]
+    return [champion.id, { icon: championArt(champion.id).icon }]
   }))
   return (
     <main>
