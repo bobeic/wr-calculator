@@ -102,6 +102,18 @@ Steps once a name is chosen:
    the tier list has a "Meta map" view (win rate against pick rate). Items, runes, patches and the calculator still
    need their own pass; a logo waits for the name. The design system is in `apps/web/DESIGN.md`; how to edit it:
    `docs/design/README.md`.
+9. **Learning features** (branch `learn`, on top of `design-pass-2`, not merged; owner wants the site educational):
+   - Done: toughest matchups per lane on champion pages (wrchina's Diamond+ counter data, fetched by
+     `cn-builds:update`); power spikes (combo damage after each item) on every popular core; champion guides from
+     `content/guides/<id>.md` (template and writing rules in `content/guides/`), shown under the builds. No guides
+     are written yet: they come from the owner.
+   - Next patch: "what this patch did to your build" (each champion's most-picked core run on the old and new patch).
+     Not done for 7.3 → 7.3a because kits and most items were only modelled in 7.3a, so the comparison would show
+     modelling, not game changes; from the next patch both sides carry the same models.
+   - Later: item decision guides (e.g. armour pen vs lethality by target armour, from the calculator).
+   - AI coach: a chat on the site that knows the guides and data and can run the calculator as a tool. Needs a small
+     server (e.g. a Cloudflare Worker) holding an Anthropic API key, with per-visitor rate limits. Waiting on the
+     owner: accounts, a monthly budget, and some guides for it to know.
 8. **Later: light mode and other languages.** Both are likely wanted. Keep every colour a token in `globals.css` (no
    hard-coded colours in pages) so a light theme is a second token block, and keep UI strings easy to pull into
    per-language files (wildriftalpha does EN, TR, RU, ES, FR, PL). Champion and item names would need Riot's or

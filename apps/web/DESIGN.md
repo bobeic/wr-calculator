@@ -182,6 +182,12 @@ are authored on a 24px grid with a 1.6 stroke.
   verdict, and a gold "Open this comparison" button that opens the same setup.
 - **Overlooked winners** (under the meta map): up to five 50%+ win rates picked under the lane median, as small
   bordered rows with icon, name, tier, win/pick and a win bar; the readable version of the map's crowded corner.
+- **Power spikes** (champion page core rows): three 14px gold bars on a hairline baseline, the combo's damage after
+  each item (level 15, bruiser target), one scale per lane, each value labelled under its bar.
+- **Matchup chip** (champion page, "Toughest matchups"): icon, "vs Name", and the champion's own win rate against
+  that opponent (100% minus wrchina's), cyan/red by 50%, so red always means a losing matchup.
+- **Guide** (champion page, from `content/guides/<id>.md`): raised panels per section in an auto-fit grid, muted text
+  with bold in the text colour; matchup notes span the full width with the opponent's icon.
 - **Damage mix bar** (calculator rows): a 96px, 4px bar split by mitigated physical / magic / true damage, with a
   legend under the table.
 - **Item path** (`.item-path`): icons joined by short hairline connectors, names under them on champion pages.

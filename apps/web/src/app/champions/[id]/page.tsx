@@ -14,6 +14,8 @@ import { gemLead } from '../../../lib/site/builds'
 import { powerSpikes, SPIKE_TARGET } from '../../../lib/site/power-spikes'
 import { DamageText } from '../../../components/site/damage-text'
 import { DEFAULT_COMBO } from '../../../lib/calculator'
+import { loadGuide } from '../../../lib/site/guides'
+import { GuideView } from '../../../components/site/guide'
 
 export const dynamicParams = false
 
@@ -47,6 +49,7 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
   const lanes = championLanes(CN_STATS, id)
   const tierIn = (lane: LaneStat['lane']) => assignTiers(CN_STATS.ranks.all[lane]).find((row) => row.championId === id)?.tier
   const main = lanes[0]
+  const guide = loadGuide(id)
 
   return (
     <main className="bleed">
@@ -203,6 +206,13 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
             })}
           </>}
         </section>
+
+        {guide && (
+          <section aria-labelledby="guide-title">
+            <h2 id="guide-title">Guide</h2>
+            <GuideView guide={guide} champions={dataset.champions.map((entry) => ({ id: entry.id, name: entry.name, icon: championIcon(entry.id) }))} />
+          </section>
+        )}
 
         <section aria-labelledby="abilities-title">
           <h2 id="abilities-title">Abilities</h2>

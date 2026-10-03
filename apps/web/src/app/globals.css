@@ -507,3 +507,20 @@ details > summary { cursor: pointer; color: var(--accent); }
 .matchup:hover { text-decoration: none; border-color: var(--line-strong); }
 .matchup .icon-img { width: 36px; height: 36px; }
 .matchup .up, .matchup .down { font-weight: 800; font-stretch: 80%; font-size: 1.05rem; }
+
+/* Champion page: guide from content/guides/<id>.md */
+.guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.guide-section { padding: 20px 22px; border: 1px solid var(--line); border-radius: calc(var(--radius) + 4px); background: var(--bg-raised); }
+.guide-section h3 { margin: 0 0 10px; }
+.guide-section p, .guide-section li { color: var(--muted); }
+.guide-section p { margin: 0 0 10px; }
+.guide-section ul { margin: 0; padding-left: 20px; }
+.guide-section li + li { margin-top: 6px; }
+.guide-section strong { color: var(--text); }
+.guide-matchups { grid-column: 1 / -1; }
+.guide-matchups ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 24px; }
+.guide-matchups li { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: 12px; align-items: start; }
+.guide-matchups li + li { margin-top: 0; }
+.guide-opponent { display: contents; color: var(--text); font-weight: 700; }
+.guide-opponent .icon-img { grid-row: span 2; }
+.guide-matchups p { grid-column: 2; margin: 2px 0 0; }

@@ -10,6 +10,7 @@ import { decodeState } from '../src/lib/url-state'
 import { byWinRate, gemLead, hiddenGems } from '../src/lib/site/builds'
 import { workedExample } from '../src/lib/site/worked-example'
 import { overlookedWinners } from '../src/components/site/meta-map'
+import { loadGuide, parseGuide } from '../src/lib/site/guides'
 
 const row = (championId: string, strengthRank: number): CnChampionStat => ({
   championId, heroId: '1', winRate: 0.5, pickRate: 0.1, banRate: 0, strengthRank,
@@ -135,5 +136,37 @@ describe('workedExample link', () => {
     expect(issues).toEqual([])
     expect(state.target).toEqual({ kind: 'preset', presetId: 'bruiser' })
     expect(example.mostPicked.timeToKill).toBeGreaterThan(0)
+  })
+})
+
+describe('parseGuide', () => {
+  it('reads sections, paragraphs, bullets, bold and matchup notes, and drops the template placeholders', () => {
+    const guide = parseGuide([
+      'Title line, not shown',
+      '## In short',
+      'Wins by **dashing** in',
+      'after level 6.',
+      '',
+      '## Combos',
+      '- E then Q',
+      '- R to finish',
+      '',
+      '## Matchups',
+      '- Darius: stay out of **Q** range.',
+      '- Dr. Mundo: farm safely.',
+      '',
+      '## Common mistakes',
+      '-',
+    ].join('\n'))
+    expect(guide.sections).toEqual([
+      { title: 'In short', blocks: [{ kind: 'p', text: [{ text: 'Wins by ', bold: false }, { text: 'dashing', bold: true }, { text: ' in after level 6.', bold: false }] }] },
+      { title: 'Combos', blocks: [{ kind: 'ul', items: [[{ text: 'E then Q', bold: false }], [{ text: 'R to finish', bold: false }]] }] },
+    ])
+    expect(guide.matchups.map((note) => note.name)).toEqual(['Darius', 'Dr. Mundo'])
+    expect(guide.matchups[0].text[1]).toEqual({ text: 'Q', bold: true })
+  })
+
+  it('has no guide for a champion without a file', () => {
+    expect(loadGuide('no-such-champion')).toBeNull()
   })
 })
