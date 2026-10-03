@@ -55,9 +55,6 @@ Steps once a name is chosen:
 
 ## Needs the owner
 
-- **Site design.** Sites you like and dislike; dark first, light first or both; whether to show champion and item
-  icons (Tencent's CDN has them, but using them raises licensing and reliability questions). The styling is one token
-  block in `apps/web/src/app/globals.css`, so a redesign doesn't touch the pages.
 - **Tier letters.** The S+/S/A/B/C cut (top 8% / 17% / 25% / 25% / 25% of Tencent's strength order) is a placeholder.
   Keep it, change the cut, or tier by win rate?
 - **CN leaking into live data (FYI, decide when convenient).** wrpocket's items copy Tencent's CN feed (timestamps
@@ -91,5 +88,12 @@ Steps once a name is chosen:
    ability rows (e.g. Aatrox Q 10/40/70/100 live vs 15/45/75/105 CN): wrpocket's champion numbers are *not* a straight
    copy of Tencent's, unlike its items. A few rows look like Tencent glitches (Ahri E shows one value). Later: the
    calculated preview (brainstorm §4.2), if the log shows CN changes worth simulating.
-6. **Design pass** once the design answers are in.
+6. **Design pass:** answers in (2026-10-03), work on branch `design-pass`. Reference: wildriftalpha.com (layout and
+   gaming-site feel). Splash art and champion/item icons both wanted; download them at build time and serve them from
+   the site rather than hotlinking Riot's or Tencent's CDN. Dark theme only for now. The design skills
+   (`impeccable`, `design-taste-frontend`, `redesign-existing-projects`) are vendored in `.claude/skills/`.
+8. **Later: light mode and other languages.** Both are likely wanted. Keep every colour a token in `globals.css` (no
+   hard-coded colours in pages) so a light theme is a second token block, and keep UI strings easy to pull into
+   per-language files (wildriftalpha does EN, TR, RU, ES, FR, PL). Champion and item names would need Riot's or
+   Tencent's localized data.
 7. **Housekeeping:** done — workflow actions bumped off Node 20.
