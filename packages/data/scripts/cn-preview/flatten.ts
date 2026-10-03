@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import type { CnChange, LiveStatus } from '../../src/cn-preview/types'
+import { normalizeId } from '../../src/wrpocket-ids'
+import type { Snapshot, SnapshotItem } from '../patch/snapshot'
 
 /** One entry's fields as strings, so a diff is a plain key comparison. */
 export type Flat = Record<string, Record<string, string>>
@@ -103,4 +105,34 @@ export function differsNow(current: Flat, lookup: LiveLookup): CnChange[] {
     }
   }
   return changes
+}
+
+/** A wrpocket item's value for one of Tencent's item fields, as flatten writes it; null when it can't be compared. */
+export function itemField(item: SnapshotItem, field: string): string | null {
+  if (field === 'price') return item.price
+  if (field === 'from') return item.components.map(normalizeId).sort().join(',')
+  const stat = ITEM_STATS[field.replace(/^stat\./, '')]
+  return field.startsWith('stat.') && stat !== undefined ? String(item.numeric_stats[stat[0]] ?? 0) : null
+}
+
+/**
+ * Item fields that wrpocket changed between two snapshots onto exactly CN's current value (`before` = old global,
+ * `after` = new global = CN). wrpocket copies Tencent's item feed, so when CN patches first these may be CN numbers
+ * imported as global.
+ */
+export function cnLeaks(before: Snapshot, after: Snapshot, cn: Flat): CnChange[] {
+  const old = new Map(before.items.map((item) => [normalizeId(item.id), item]))
+  const leaks: CnChange[] = []
+  for (const item of after.items) {
+    const id = normalizeId(item.id)
+    const previous = old.get(id)
+    const fields = cn[`item:${id}`]
+    if (previous === undefined || fields === undefined) continue
+    for (const [field, cnValue] of Object.entries(fields)) {
+      const was = itemField(previous, field)
+      const now = itemField(item, field)
+      if (was !== null && now !== was && now === cnValue) leaks.push({ entry: `item:${id}`, name: item.name.en, field, before: was, after: now, live: 'live' })
+    }
+  }
+  return leaks
 }

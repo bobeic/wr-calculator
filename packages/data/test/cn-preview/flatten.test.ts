@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { diffFlat, differsNow, flatten } from '../../scripts/cn-preview/flatten'
+import { cnLeaks, diffFlat, differsNow, flatten } from '../../scripts/cn-preview/flatten'
 import type { LiveLookup, RawEquip, RawHero } from '../../scripts/cn-preview/flatten'
+import type { Snapshot } from '../../scripts/patch/snapshot'
 
 const equip = (price: string, ad: string): RawEquip => ({
   version: '7.3', fileTime: 't',
@@ -46,5 +47,24 @@ describe('diffFlat and differsNow', () => {
     expect(differsNow(flat, live)).toEqual([
       { entry: 'item:statikk-shiv', name: '电刃', field: 'price', before: '3100', after: '3000', live: 'cn-only' },
     ])
+  })
+})
+
+describe('cnLeaks', () => {
+  const snapshot = (price: string, ad: number): Snapshot => ({
+    meta: { patch: '7.3', updated: 't' }, champions: [],
+    items: [{ id: 'statikk-shiv', name: { en: 'Statikk Shiv' }, description: { en: '' }, price, tier: '3', category: { en: 'physical' }, components: [], numeric_stats: { attackDamage: ad } }],
+  })
+  const cn = { 'item:statikk-shiv': { name: '电刃', price: '3100', 'stat.ad': '45' } }
+
+  it('flags a value that moved onto exactly CN\'s number', () => {
+    expect(cnLeaks(snapshot('3000', 45), snapshot('3100', 45), cn)).toEqual([
+      { entry: 'item:statikk-shiv', name: 'Statikk Shiv', field: 'price', before: '3000', after: '3100', live: 'live' },
+    ])
+  })
+
+  it('ignores unchanged values and changes CN doesn\'t share', () => {
+    expect(cnLeaks(snapshot('3000', 45), snapshot('3000', 45), cn)).toEqual([])
+    expect(cnLeaks(snapshot('3000', 45), snapshot('2900', 40), cn)).toEqual([])
   })
 })

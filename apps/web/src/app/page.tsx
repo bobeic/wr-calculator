@@ -53,7 +53,7 @@ export default function HomePage() {
                 <span className="home-stat-big up">{pct(lead.stat.winRate)}</span>
                 <span className="muted">win rate · {pct(lead.stat.pickRate)} picked · {pct(lead.stat.banRate)} banned</span>
               </p>
-              <p className="dateline">CN ranked, all ranks, <strong>{CN_STATS.statDate}</strong> · patch {CURRENT_PATCH}</p>
+              <p className="dateline">CN ranked, all ranks, <strong>{CN_STATS.statDate}</strong> · CN patch {CN_STATS.cnVersion}</p>
               {leadCore && (
                 <div className="home-build">
                   <span className="note">Most-picked Diamond+ core</span>

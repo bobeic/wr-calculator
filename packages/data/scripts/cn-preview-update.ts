@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import type { CnPreview } from '../src/cn-preview/types'
 import { normalizeId } from '../src/wrpocket-ids'
 import { fetchJson, sourceIdMap } from './cn-fetch'
-import { ITEM_STATS, RawEquipSchema, RawHeroSchema, diffFlat, differsNow, flatten } from './cn-preview/flatten'
+import { RawEquipSchema, RawHeroSchema, diffFlat, differsNow, flatten, itemField } from './cn-preview/flatten'
 import type { Flat, LiveLookup, RawHero } from './cn-preview/flatten'
 import { HERO_LIST_URL, RawHeroListSchema, championIdFromPoster } from './cn-stats/map'
 import { readSnapshot } from './patch/snapshot-io'
@@ -30,11 +30,7 @@ const lookup: LiveLookup = (entry, field) => {
   const [kind, id] = entry.split(':')
   if (kind === 'item') {
     const item = liveItems.get(id)
-    if (item === undefined) return null
-    if (field === 'price') return item.price
-    if (field === 'from') return item.components.map(normalizeId).sort().join(',')
-    const stat = ITEM_STATS[field.replace(/^stat\./, '')]
-    return field.startsWith('stat.') && stat !== undefined ? String(item.numeric_stats[stat[0]] ?? 0) : null
+    return item === undefined ? null : itemField(item, field)
   }
   const [slot, type] = field.split('.')
   const ability = liveChampions.get(id)?.abilities[WRPOCKET_SLOTS[slot] ?? '']

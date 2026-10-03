@@ -7,6 +7,8 @@ import type { Provenance } from '@wr-calc/schema'
 import { loadGoldenCases } from '../src/golden-loader'
 import { getPatchDataset } from '../src/patches/registry'
 import type { ReviewedEntry } from '../src/patches/overlay'
+import { cnLeaks } from './cn-preview/flatten'
+import type { Flat } from './cn-preview/flatten'
 import { loadNotes } from './official-notes/fetch'
 import { renderNotesReview } from './official-notes/render'
 import type { OfficialNotes } from './official-notes/types'
@@ -37,6 +39,8 @@ const REQUEST_DELAY_MS = 150
 const DATA_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SNAPSHOT_ROOT = join(DATA_ROOT, 'snapshots', 'wrpocket')
 const NOTES_SNAPSHOT_ROOT = join(DATA_ROOT, 'snapshots', 'official-notes')
+// Tencent's CN item feed, kept by cn-preview:update: what a CN leak would look like.
+const TENCENT_SNAPSHOT = join(DATA_ROOT, 'snapshots', 'tencent', 'latest.json')
 const PATCHES_DIR = join(DATA_ROOT, 'src', 'patches')
 const GOLDEN_DIR = join(DATA_ROOT, 'golden')
 // Inside the package so the final renames stay on one filesystem.
@@ -243,7 +247,24 @@ async function run(options: Options): Promise<void> {
     await writeFile(join(staged.reports, 'patch-diff.json'), stableStringify(diff))
     const runeSpellChanges = diffRunesAndSpells(before, committed)
     runeSpellSummary = `Runes and spells: ${runeSpellChanges.length} changed, added or removed (see PATCH_DIFF.md)`
-    await writeFile(join(staged.reports, 'PATCH_DIFF.md'), `${renderPatchDiff(diff)}\n${renderRuneSpellChanges(runeSpellChanges)}`)
+    // The site's numbers are global; flag any item value that just moved onto exactly CN's number.
+    const cn: Flat = existsSync(TENCENT_SNAPSHOT) ? JSON.parse(await readFile(TENCENT_SNAPSHOT, 'utf-8')).entries : {}
+    const leaks = cnLeaks(before, committed, cn)
+    const notesFound = notes !== null
+    const leakSection = leaks.length === 0 ? '' : [
+      '## Possible CN data in this import',
+      '',
+      `${leaks.length} item values changed to exactly what Tencent's CN server shows. ${notesFound
+        ? 'Check each against the official notes before merging.'
+        : '**No official global notes were found**, so these are likely CN numbers that global hasn\'t got yet: don\'t merge until global patches.'}`,
+      '',
+      '| Item | Field | Was | Now (= CN) |',
+      '|---|---|---|---|',
+      ...leaks.map((leak) => `| ${leak.name} | ${leak.field} | ${leak.before} | ${leak.after} |`),
+      '',
+    ].join('\n')
+    if (leaks.length > 0) console.log(`WARNING: ${leaks.length} item values moved to exactly CN's numbers${notesFound ? '' : ' and no official notes were found'}; see "Possible CN data" in PATCH_DIFF.md.`)
+    await writeFile(join(staged.reports, 'PATCH_DIFF.md'), `${leakSection}${renderPatchDiff(diff)}\n${renderRuneSpellChanges(runeSpellChanges)}`)
     await writeFile(join(staged.generated, 'notes-review.ts'), renderNotesReview(diff.officialNotes, plan.patch))
     await writeFile(join(staged.generated, 'text-sync.ts'), renderTextSync(diff.textSync, plan.patch, diff.championSync))
     if (notes !== null) await writeFile(join(staged.reports, 'official-notes.json'), stableStringify(notes))
