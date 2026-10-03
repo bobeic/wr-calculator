@@ -93,7 +93,7 @@ Steps once a name is chosen:
    calculator) only pick up the new tokens and still need their own pass. Game art comes from Tencent's Wild Rift feeds
    (Riot Data Dragon for a few ability icons), downloaded by `pnpm --filter @wr-calc/data art:update` into
    `apps/web/public/art/` (gitignored; the web build runs it, the deploy workflow caches it). The design system is in
-   `apps/web/DESIGN.md`; product facts in `apps/web/PRODUCT.md`; screenshots in `docs/design/2026-10-03/`. Design skills
+   `apps/web/DESIGN.md`; product facts in `apps/web/PRODUCT.md`; screenshots in `docs/design/2026-10-03/`; how it was made and how to edit it: `docs/design/README.md`. Design skills
    (`impeccable`, `design-taste-frontend`, `redesign-existing-projects`) are vendored in `.claude/skills/`. Open ideas
    from the review: art on the tier list beyond the S+ row, more framing on detail sections, tier tiles revealing pick
    and ban on hover.
