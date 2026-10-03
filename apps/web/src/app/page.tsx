@@ -7,10 +7,20 @@ import { LaneBoard } from '../components/site/lane-board'
 import type { BoardRow } from '../components/site/lane-board'
 import { championArt, championIcon, itemIcon } from '../lib/site/art'
 import { byWinRate, hiddenGems } from '../lib/site/builds'
+import { workedExample } from '../lib/site/worked-example'
+import { DEFAULT_COMBO } from '../lib/calculator'
 import { assignTiers } from '../lib/site/tiers'
 import { calculatorHref, championHref, itemHref, patchHref, pct } from '../lib/site/format'
 
 const BOARD_SIZE = 5
+
+/** What the combo numbers say about why a build wins: more damage, or an edge the calculator doesn't measure. */
+function damageVerdict(mostPicked: number, winner: number): string {
+  const change = (winner - mostPicked) / mostPicked
+  if (change > 0.03) return `It also hits ${Math.round(change * 100)}% harder.`
+  if (change < -0.03) return `It deals ${Math.round(-change * 100)}% less, so its edge is elsewhere: durability, utility or timing.`
+  return 'Their damage is close, so its edge is elsewhere: durability, utility or timing.'
+}
 const GEMS_SHOWN = 6
 
 /** Home: who wins in each lane and what they build, then the builds beating the meta, then the deeper tools. */
@@ -36,7 +46,9 @@ export default function HomePage() {
 
   // One per champion here: the same three items in another order would otherwise fill the list.
   const gemChampions = new Set<string>()
-  const gems = hiddenGems(CN_BUILDS).filter((gem) => !gemChampions.has(gem.championId) && gemChampions.add(gem.championId)).slice(0, GEMS_SHOWN)
+  const allGems = hiddenGems(CN_BUILDS)
+  const example = allGems[0] === undefined ? null : workedExample(allGems[0])
+  const gems = allGems.filter((gem) => !gemChampions.has(gem.championId) && gemChampions.add(gem.championId)).slice(0, GEMS_SHOWN)
   const notes = loadOfficialNotes(CURRENT_PATCH)
   const changedValues = notes?.entries.filter((entry) => !entry.excluded)
     .reduce((sum, entry) => sum + entry.lines.filter((line) => line.before !== null && line.after !== null).length, 0) ?? 0
@@ -106,26 +118,63 @@ export default function HomePage() {
           </section>
         )}
 
-        <section className="home-tools" aria-labelledby="calc-title">
-          <div className="home-calc">
+      </div>
+
+      <section className="theory" aria-labelledby="calc-title">
+        {example && championArt(example.gem.championId).splash && (
+          <img className="theory-art" src={championArt(example.gem.championId).splash} alt="" loading="lazy" />
+        )}
+        <div className="theory-inner">
+          <div className="theory-copy">
             <h2 id="calc-title">Theorycraft any build</h2>
             <p>
-              Pick a champion, a level and two builds, and see each ability&apos;s damage, the full combo and the time to
-              kill, side by side. Every kit, item and rune is modelled from the live patch; most numbers aren&apos;t
-              checked in game yet.
+              Win rates tell you what works; the calculator shows why. Pick a champion, a level and two builds, and see
+              each ability&apos;s damage, the full combo and the time to kill, side by side. Every kit, item and rune is
+              modelled from the live patch; most numbers aren&apos;t checked in game yet.
             </p>
-            <Link className="quiet-link" href="/calculator/">Open the calculator <ArrowIcon /></Link>
+            <Link className="quiet-link" href="/calculator/">Open an empty calculator <ArrowIcon /></Link>
           </div>
-          <ul className="home-links">
-            {notes && (
-              <li><Link href={patchHref(CURRENT_PATCH)}>Patch {CURRENT_PATCH} <ArrowIcon /></Link><span>{changedValues} values changed on the live servers</span></li>
-            )}
-            <li><Link href="/patches/cn-preview/">CN preview <ArrowIcon /></Link><span>What changed on the China server before it reaches you</span></li>
-            <li><Link href="/items/">Items <ArrowIcon /></Link><span>{dataset.items.length} items, with every number</span></li>
-            <li><Link href="/runes/">Runes <ArrowIcon /></Link><span>{dataset.runes.length} runes</span></li>
-          </ul>
-        </section>
-      </div>
+          {example && (
+            <div className="theory-example">
+              <h3>
+                {name(example.gem.championId)} {LANE_LABELS[example.gem.lane]}: the most-picked core against one that wins{' '}
+                <span className="up">{(example.gem.lead * 100).toFixed(1)}</span> points more
+              </h3>
+              <table className="theory-table">
+                <thead>
+                  <tr><th>Core</th><th className="num">Win</th><th className="num">Combo</th><th className="num">Time to kill</th></tr>
+                </thead>
+                <tbody>
+                  {[{ label: 'Most picked', side: example.mostPicked }, { label: 'Wins more', side: example.winner }].map(({ label, side }) => (
+                    <tr key={label}>
+                      <td><span className="theory-label">{label}</span>{itemRow(side.items, 36)}</td>
+                      <td className="num"><span className={side.winRate >= 0.5 ? 'up' : 'down'}>{pct(side.winRate)}</span></td>
+                      <td className="num">{Math.round(side.comboDamage).toLocaleString('en')}</td>
+                      <td className="num">{side.timeToKill === undefined ? '—' : `${side.timeToKill.toFixed(1)}s`}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="note">
+                Level 15, combo {DEFAULT_COMBO}, against {example.target.name} ({example.target.hp.toLocaleString('en')} HP).{' '}
+                {damageVerdict(example.mostPicked.comboDamage, example.winner.comboDamage)}
+              </p>
+              <Link className="button" href={example.href}>Open this comparison <ArrowIcon /></Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <nav className="home-links" aria-label="More">
+        <ul>
+          {notes && (
+            <li><Link href={patchHref(CURRENT_PATCH)}>Patch {CURRENT_PATCH} <ArrowIcon /></Link><span>{changedValues} values changed on the live servers</span></li>
+          )}
+          <li><Link href="/patches/cn-preview/">CN preview <ArrowIcon /></Link><span>What changed on the China server before it reaches you</span></li>
+          <li><Link href="/items/">Items <ArrowIcon /></Link><span>{dataset.items.length} items, with every number</span></li>
+          <li><Link href="/runes/">Runes <ArrowIcon /></Link><span>{dataset.runes.length} runes</span></li>
+        </ul>
+      </nav>
     </main>
   )
 }

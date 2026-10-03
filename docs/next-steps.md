@@ -51,7 +51,9 @@ Steps once a name is chosen:
 4. **Optional:** verify the domain under your GitHub account's Settings → Pages, so no one else can point a site at it.
 5. **Re-run the "Deploy site" workflow.** With a custom domain the build drops the `/wr-calculator/` sub-path
    automatically.
-6. **Rename the site** from "wr-calc" to the chosen name (header, page titles, footer, README).
+6. **Rename the site** if the name changes: `SITE_NAME` in `apps/web/src/lib/site/brand.ts` (header, titles, footer)
+   and the README. Working name since 2026-10-03: **Wild Rift Builds** (owner: go with "Wild Rift something" like
+   other fan sites, change the domain later if it ever becomes a problem).
 
 ## Needs the owner
 

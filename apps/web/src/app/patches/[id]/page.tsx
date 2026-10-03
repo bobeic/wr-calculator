@@ -12,7 +12,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  return { title: `Patch ${(await params).id} · wr-calc` }
+  return { title: `Patch ${(await params).id}` }
 }
 
 type NotesEntry = OfficialNotesFile['entries'][number]

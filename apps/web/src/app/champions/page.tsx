@@ -3,7 +3,7 @@ import { CN_STATS, CURRENT_PATCH, LANE_LABELS, getPatchDataset } from '@wr-calc/
 import { championLanes } from '../../lib/site/champion-lanes'
 import { championHref } from '../../lib/site/format'
 
-export const metadata = { title: 'Champions · wr-calc' }
+export const metadata = { title: 'Champions' }
 
 export default function ChampionsPage() {
   const champions = [...getPatchDataset(CURRENT_PATCH).champions].sort((a, b) => a.name.localeCompare(b.name))

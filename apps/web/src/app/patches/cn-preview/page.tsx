@@ -4,7 +4,7 @@ import type { CnChange } from '@wr-calc/data'
 import { StatTable } from '../../../components/site/stat-table'
 import { cnEntryHref, cnFieldLabel } from '../../../lib/site/cn-preview'
 
-export const metadata = { title: 'CN preview · wr-calc' }
+export const metadata = { title: 'CN preview' }
 
 const LIVE_LABELS = { live: 'already live', 'cn-only': 'CN only', unknown: '?' } as const
 

@@ -5,7 +5,7 @@ import { StatTable } from '../../components/site/stat-table'
 import { itemHref } from '../../lib/site/format'
 import { TIER_LABELS, TIER_ORDER, modelStatus } from '../../lib/site/stats'
 
-export const metadata = { title: 'Items · wr-calc' }
+export const metadata = { title: 'Items' }
 
 export default function ItemsPage() {
   const items = getPatchDataset(CURRENT_PATCH).items

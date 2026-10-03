@@ -14,7 +14,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  return { title: `${getPatchDataset(CURRENT_PATCH).items.find((item) => item.id === id)?.name ?? id} · wr-calc` }
+  return { title: `${getPatchDataset(CURRENT_PATCH).items.find((item) => item.id === id)?.name ?? id}` }
 }
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {

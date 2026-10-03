@@ -1,5 +1,5 @@
 ---
-name: wr-calc
+name: Wild Rift Builds
 description: Wild Rift's loading screen turned into a scoreboard — splash art as data on a blue-black hextech ground.
 colors:
   ground: "#070b14"
@@ -91,7 +91,7 @@ components:
     height: "36px"
 ---
 
-# Design System: wr-calc
+# Design System: Wild Rift Builds
 
 ## Overview
 
@@ -158,6 +158,7 @@ are authored on a 24px grid with a 1.6 stroke.
   sideways on phones instead of wrapping.
 - **Lane board** (`LaneBoard`, home): a glass panel (`--glass`, 14px blur) of lane tabs and five rows, each one link:
   place, 52px icon, name (condensed 800), tier letter, pick/ban, win % with a win bar, three core item icons, arrow.
+  On desktop it starts lower than the copy (top margin up to 180px) so the leader's splash shows above it.
   Switching lanes re-deals it: rows slide in with a 40ms stagger and the leader's splash blurs in behind. On phones the
   core icons drop to a third row and the lane icons hide so all five tabs fit.
 - **Win bar** (`WinBar`): 4px track centred on a 50% mark spanning 44-60%; the fill runs from the mark, cyan right,
@@ -171,6 +172,16 @@ are authored on a 24px grid with a 1.6 stroke.
 - **Meta map** (tier list "Meta map" view): win rate (up, gridlines every 2 points, dashed 50%) against pick rate
   (right, square-root scale from the lane's lowest pick rate) with 36px icon points ringed in tier colour (S+ a double
   ring), a name label on hover/focus, corner labels "Overlooked winners" / "Popular winners", and a tier key.
+- **Logo** (`components/site/logo.tsx`, favicon `app/icon.svg`): three item slots climbing a step each, two outlined
+  and the last filled gold: a build path that goes up. Gold mark, wordmark in condensed 800 text colour, one colour
+  (never a second accent colour on part of the name). The name lives only in `lib/site/brand.ts` (`SITE_NAME`); page
+  titles use the layout's `%s · SITE_NAME` template.
+- **Theorycraft band** (home): full-bleed raised band, the worked example's champion splash faded in from the right
+  (55% opacity), copy left and a glass example panel right: the biggest "beating the meta" gap run through the
+  calculator at build time (level 15, default combo, bruiser target), win / combo / time to kill per core, a one-line
+  verdict, and a gold "Open this comparison" button that opens the same setup.
+- **Overlooked winners** (under the meta map): up to five 50%+ win rates picked under the lane median, as small
+  bordered rows with icon, name, tier, win/pick and a win bar; the readable version of the map's crowded corner.
 - **Damage mix bar** (calculator rows): a 96px, 4px bar split by mitigated physical / magic / true damage, with a
   legend under the table.
 - **Item path** (`.item-path`): icons joined by short hairline connectors, names under them on champion pages.

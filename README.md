@@ -1,6 +1,6 @@
-# wr-calc
+# Wild Rift Builds
 
-A pnpm/TypeScript monorepo for a Wild Rift site: CN-server win rates, patch changes and a build damage
+A pnpm/TypeScript monorepo (packages `@wr-calc/*`) for a Wild Rift site: CN-server win rates, patch changes and a build damage
 calculator. It has a pure calculation engine, real patch data, and a statically exported Next.js site.
 
 ## Project Structure

@@ -10,6 +10,8 @@ import { summarizeBuild } from './build-summary'
 
 /** How long the per-ability rows wait after a cast so burns and bleeds finish ticking. */
 const SETTLE_SECONDS = 6
+/** The combo the calculator starts with when the link doesn't set one. */
+export const DEFAULT_COMBO = 'Q W E R AA'
 /** The longest rotation the time-to-kill search simulates. */
 export const MAX_TTK_SECONDS = 60
 

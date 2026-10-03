@@ -8,7 +8,7 @@ import { CURRENT_DATASET } from '../../lib/dataset'
 import { MAX_DURATION_SECONDS, RANK_SLOTS, emptyBuild } from '../../lib/debug-state'
 import type { DebugBuild, DebugState } from '../../lib/debug-state'
 import { decodeState, encodeState } from '../../lib/url-state'
-import { isEmptyBuild, runCalculator } from '../../lib/calculator'
+import { DEFAULT_COMBO, isEmptyBuild, runCalculator } from '../../lib/calculator'
 import { ChampionPicker } from './champion-picker'
 import { BuildPanel } from './build-panel'
 import { TargetPicker } from './target-picker'
@@ -20,7 +20,6 @@ const champions = [...dataset.champions.values()].sort((left, right) => left.nam
 
 /** What a link without these parameters opens: a champion with a full kit and a combo of every ability. */
 const DEFAULT_CHAMPION = 'ambessa'
-const DEFAULT_COMBO = 'Q W E R AA'
 
 interface CalculatorPageProps {
   /** Champions with a hand-written kit. */

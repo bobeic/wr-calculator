@@ -2,7 +2,7 @@ import { CN_RANK_LABELS, CN_STATS, CURRENT_PATCH, LANE_LABELS, getPatchDataset }
 import { TierList } from '../../components/site/tier-list'
 import { championArt } from '../../lib/site/art'
 
-export const metadata = { title: 'Tier list · wr-calc' }
+export const metadata = { title: 'Tier list' }
 
 export default function TierListPage() {
   const champions = getPatchDataset(CURRENT_PATCH).champions

@@ -22,7 +22,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const champion = getPatchDataset(CURRENT_PATCH).champions.find((entry) => entry.id === id)
-  return { title: `${champion?.name ?? id} · wr-calc` }
+  return { title: `${champion?.name ?? id}` }
 }
 
 const SLOT_LABELS = { passive: 'Passive', q: 'Q', w: 'W', e: 'E', r: 'R' } as const

@@ -8,6 +8,8 @@ import { CURRENT_DATASET } from '../src/lib/dataset'
 import { cnEntryHref, cnFieldLabel } from '../src/lib/site/cn-preview'
 import { decodeState } from '../src/lib/url-state'
 import { byWinRate, gemLead, hiddenGems } from '../src/lib/site/builds'
+import { workedExample } from '../src/lib/site/worked-example'
+import { overlookedWinners } from '../src/components/site/meta-map'
 
 const row = (championId: string, strengthRank: number): CnChampionStat => ({
   championId, heroId: '1', winRate: 0.5, pickRate: 0.1, banRate: 0, strengthRank,
@@ -102,5 +104,36 @@ describe('byWinRate', () => {
       { ...row('a', 1), winRate: 0.51 }, { ...row('b', 2), winRate: 0.6, pickRate: 0.005 }, { ...row('c', 3), winRate: 0.55 },
     ]
     expect(byWinRate(rows, 5).map((entry) => entry.championId)).toEqual(['c', 'a'])
+  })
+})
+
+describe('workedExample', () => {
+  it('runs the calculator on the biggest off-meta winner against its most-picked core', () => {
+    const example = workedExample(hiddenGems(CN_BUILDS)[0])
+    expect(example).not.toBeNull()
+    expect(example!.mostPicked.comboDamage).toBeGreaterThan(0)
+    expect(example!.winner.comboDamage).toBeGreaterThan(0)
+    expect(example!.target.hp).toBeGreaterThan(0)
+  })
+})
+
+describe('overlookedWinners', () => {
+  it('keeps 50%+ win rates picked under the lane median, best first', () => {
+    const rows = assignTiers([
+      { ...row('a', 1), winRate: 0.53, pickRate: 0.006 }, { ...row('b', 2), winRate: 0.55, pickRate: 0.007 },
+      { ...row('c', 3), winRate: 0.6, pickRate: 0.2 }, { ...row('d', 4), winRate: 0.48, pickRate: 0.05 },
+      { ...row('e', 5), winRate: 0.51, pickRate: 0.1 },
+    ])
+    expect(overlookedWinners(rows).map((entry) => entry.championId)).toEqual(['b', 'a'])
+  })
+})
+
+describe('workedExample link', () => {
+  it('opens the calculator on the same target the example used', () => {
+    const example = workedExample(hiddenGems(CN_BUILDS)[0])!
+    const { state, issues } = decodeState(new URLSearchParams(example.href.split('?')[1]), CURRENT_DATASET)
+    expect(issues).toEqual([])
+    expect(state.target).toEqual({ kind: 'preset', presetId: 'bruiser' })
+    expect(example.mostPicked.timeToKill).toBeGreaterThan(0)
   })
 })

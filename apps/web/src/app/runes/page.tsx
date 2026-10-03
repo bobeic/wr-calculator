@@ -2,7 +2,7 @@ import { CURRENT_PATCH, getPatchDataset } from '@wr-calc/data'
 import { loadRuneText } from '@wr-calc/data/site-loader'
 import type { Rune } from '@wr-calc/schema'
 
-export const metadata = { title: 'Runes · wr-calc' }
+export const metadata = { title: 'Runes' }
 
 const PATHS = ['Keystone', 'Domination', 'Precision', 'Resolve', 'Sorcery']
 
