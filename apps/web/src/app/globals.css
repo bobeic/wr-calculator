@@ -277,12 +277,14 @@ input[type="range"] { accent-color: var(--accent); }
 .champ-body { max-width: var(--max); margin: 0 auto; padding: 8px var(--gutter) 0; }
 .build-lane { padding: 20px; margin: 0 0 14px; border: 1px solid var(--line); border-radius: calc(var(--radius) + 4px); background: var(--bg-raised); }
 .build-lane > h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; }
-.build-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px 32px; }
+.build-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px 32px; }
 .build-sub { font-size: 0.85rem; font-weight: 600; font-stretch: 100%; color: var(--muted); margin: 0 0 8px; letter-spacing: 0; }
 .build-list { list-style: none; margin: 0; padding: 0; }
 .build-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 0; border-top: 1px solid var(--line); }
 .build-row:first-child { border-top: 0; padding-top: 0; }
 .build-row .item-path { flex: 1 1 auto; }
+.core-list .build-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto 112px; column-gap: 18px; }
+.core-list .build-row .build-try { justify-self: end; }
 .item-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; width: 72px; text-align: center; color: var(--muted); font-size: 0.75rem; line-height: 1.2; }
 .item-chip:hover { color: var(--text); text-decoration: none; }
 .build-row .item-path > li + li::before { margin-bottom: 22px; }
@@ -337,6 +339,11 @@ input[type="range"] { accent-color: var(--accent); }
   .theory-table .item-path .icon-img { width: 26px; height: 26px; }
   .theory-table .item-path > li + li::before { width: 5px; }
   .board-lanes .lane-icon { display: none; }
+  .core-list .build-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; }
+  .core-list .build-row .item-path { grid-column: 1 / -1; }
+  .core-list .build-row .spikes { grid-row: 2; }
+  .core-list .build-row .build-try { grid-row: 2; grid-column: 2; align-self: start; }
+  .core-list .build-row .build-rates { grid-column: 1 / -1; grid-row: 3; align-items: flex-start; }
   .board .board-lanes button { flex: 1 1 0; min-width: 0; padding: 0 4px; justify-content: center; }
   .tier-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px; }
   .tier-letter { padding-top: 0; justify-self: start; font-size: 2rem; }
@@ -488,3 +495,15 @@ details > summary { cursor: pointer; color: var(--accent); }
 .overlooked-name .tier-badge { min-width: 0; }
 .overlooked-win { color: var(--muted); font-size: 0.85rem; }
 .overlooked-row .win-bar { margin-top: 5px; }
+
+/* Champion page: power spikes (combo damage after each item) and toughest matchups */
+.spikes { display: inline-flex; gap: 6px; margin-bottom: 16px; }
+.spike { position: relative; display: flex; align-items: flex-end; justify-content: center; width: 40px; height: 34px; border-bottom: 1px solid var(--line-strong); }
+.spike-bar { width: 14px; min-height: 2px; border-radius: 3px 3px 0 0; background: var(--accent); }
+.spike-value { position: absolute; top: calc(100% + 3px); color: var(--muted); font-size: 0.72rem; white-space: nowrap; }
+.matchups { grid-column: 1 / -1; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.matchups ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.matchup { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 12px 4px 4px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text); font-size: 0.9rem; }
+.matchup:hover { text-decoration: none; border-color: var(--line-strong); }
+.matchup .icon-img { width: 36px; height: 36px; }
+.matchup .up, .matchup .down { font-weight: 800; font-stretch: 80%; font-size: 1.05rem; }

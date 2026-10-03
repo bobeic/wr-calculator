@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mapCnBuilds } from '../../scripts/cn-builds/map'
-import type { RawBuild } from '../../scripts/cn-builds/map'
+import type { RawBuild, RawCounter } from '../../scripts/cn-builds/map'
 
 const core = (ids: string[], win: number, pick: number) => ({ items: ids.map((id) => ({ id })), win, pick })
 const page = (ids: string[], win: number, pick: number) => ({ runes: ids.map((id) => ({ id })), win, pick })
@@ -41,5 +41,25 @@ describe('mapCnBuilds', () => {
   it('rejects an unknown lane key instead of guessing', () => {
     expect(() => mapCnBuilds([raw('10123', [{ pos: '9', pos_label: '?', core: [], runes: [] }])], heroes, items, runes, 'now'))
       .toThrow(/unknown pos '9'/)
+  })
+
+  it('attaches Diamond+ matchups to their lane, opponent ids mapped, and adds lanes with no builds', () => {
+    const counter: RawCounter = {
+      hero_id: '10123',
+      blocks: {
+        1: [
+          { pos: '3', pos_label: 'Bot (ADC)', counters: [{ id: '10001', win: 55.9, pick: 4.23 }, { id: '10999', win: 60, pick: 2 }] },
+          { pos: '5', pos_label: 'Supporto', counters: [{ id: '10001', win: 52, pick: 1.5 }] },
+        ],
+        2: [{ pos: '3', pos_label: 'Bot (ADC)', counters: [{ id: '10001', win: 99, pick: 99 }] }],
+      },
+    }
+    const snapshot = mapCnBuilds([raw('10123', [{ pos: '3', pos_label: 'Bot (ADC)', core: [], runes: [] }])],
+      new Map([['10123', 'senna'], ['10001', 'garen']]), items, runes, 'now', [counter])
+    expect(snapshot.champions.senna).toEqual([
+      { lane: 'adc', core: [], runes: [], matchups: [{ championId: 'garen', winRate: 0.559, pickRate: 0.0423 }] },
+      { lane: 'support', core: [], runes: [], matchups: [{ championId: 'garen', winRate: 0.52, pickRate: 0.015 }] },
+    ])
+    expect(snapshot.unmapped.heroes).toEqual(['10999'])
   })
 })

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { CnBuildsSnapshot, CnLaneBuilds, CnRatedSet } from '../../src/cn-builds/types'
+import type { CnBuildsSnapshot, CnLaneBuilds, CnMatchup, CnRatedSet } from '../../src/cn-builds/types'
 import type { Lane } from '../../src/cn-stats/types'
 
 export const BUILD_URL = (heroId: string): string => `https://wrchina.gg/api/build/${heroId}_1.json`
@@ -15,6 +15,18 @@ export const RawBuildSchema = z.object({
   }).passthrough()),
 }).passthrough()
 export type RawBuild = z.infer<typeof RawBuildSchema>
+
+export const COUNTER_URL = (heroId: string): string => `https://wrchina.gg/api/counter/${heroId}.json`
+
+// Block "1" is Diamond+ (wrchina's default; its app.js picks it first). `win` is the listed opponent's win rate.
+export const RawCounterSchema = z.object({
+  hero_id: z.string(),
+  blocks: z.record(z.string(), z.array(z.object({
+    pos: z.union([z.string(), z.number()]).transform(String), pos_label: z.string(),
+    counters: z.array(z.object({ id: z.string(), win: z.number(), pick: z.number() }).passthrough()),
+  }).passthrough())),
+}).passthrough()
+export type RawCounter = z.infer<typeof RawCounterSchema>
 
 // wrchina's own lane keys, not Tencent's rank-list ones (checked 2026-10-02: Rengar 2 Top / 4 Giungla / 1 Mid,
 // Senna 3 Bot).
@@ -36,6 +48,7 @@ const fraction = (percent: number): number => Number((percent / 100).toFixed(6))
 export function mapCnBuilds(
   raws: readonly RawBuild[], championIdByHero: ReadonlyMap<string, string>,
   itemIds: ReadonlyMap<string, string>, runeIds: ReadonlyMap<string, string>, fetchedAt: string,
+  counters: readonly RawCounter[] = [],
 ): CnBuildsSnapshot {
   const unmapped = { heroes: new Set<string>(), items: new Set<string>(), runes: new Set<string>() }
   const champions: CnBuildsSnapshot['champions'] = {}
@@ -64,6 +77,26 @@ export function mapCnBuilds(
         runes: sets(position.runes.map((set) => ({ ...set, ids: set.runes })), 'runes'), }]
     })
     if (lanes.length > 0) champions[championId] = lanes
+  }
+  for (const counter of counters) {
+    const championId = championIdByHero.get(counter.hero_id)
+    if (championId === undefined) continue
+    for (const position of counter.blocks['1'] ?? []) {
+      const lane = POS_KEYS[position.pos]
+      if (lane === undefined) throw new Error(`hero ${counter.hero_id}: unknown counter pos '${position.pos}' (${position.pos_label})`)
+      const matchups = position.counters.flatMap((opponent): CnMatchup[] => {
+        const id = championIdByHero.get(opponent.id)
+        if (id === undefined) {
+          unmapped.heroes.add(opponent.id)
+          return []
+        }
+        return [{ championId: id, winRate: fraction(opponent.win), pickRate: fraction(opponent.pick) }]
+      })
+      const lanes = champions[championId] ??= []
+      const entry = lanes.find((existing) => existing.lane === lane)
+      if (entry) entry.matchups = matchups
+      else lanes.push({ lane, core: [], runes: [], matchups })
+    }
   }
   const sorted = (set: Set<string>): string[] => [...set].sort()
   return {

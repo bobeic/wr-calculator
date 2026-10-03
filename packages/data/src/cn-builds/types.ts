@@ -13,12 +13,26 @@ export interface CnRatedSet {
   pickRate: number
 }
 
+/** One opponent in a lane matchup. */
+export interface CnMatchup {
+  championId: string
+  /** The opponent's win rate against this champion, as a fraction. */
+  winRate: number
+  /** How often the matchup happens, as a fraction (low = few games, noisy rate). */
+  pickRate: number
+}
+
 export interface CnLaneBuilds {
   lane: Lane
   /** Three-item cores, most picked first. */
   core: CnRatedSet[]
   /** Rune pages (keystone first), most picked first. */
   runes: CnRatedSet[]
+  /**
+   * The toughest opponents in this lane, Diamond+, from wrchina.gg/api/counter/<heroId>.json (block "1", wrchina's
+   * default bracket; its other blocks are higher brackets with fewer games). Their order. Absent before 2026-10-03.
+   */
+  matchups?: CnMatchup[]
 }
 
 export interface CnBuildsSnapshot {
