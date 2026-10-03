@@ -6,6 +6,7 @@ import { StatTable } from '../../../components/site/stat-table'
 import { ArrowIcon, LaneIcon } from '../../../components/site/icons'
 import { championLanes } from '../../../lib/site/champion-lanes'
 import type { LaneStat } from '../../../lib/site/champion-lanes'
+import type { CnRank } from '@wr-calc/data'
 import { championArt, itemIcon, runeIcon } from '../../../lib/site/art'
 import { assignTiers } from '../../../lib/site/tiers'
 import { calculatorHref, itemHref, pct } from '../../../lib/site/format'
@@ -44,10 +45,6 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
       <section className="champ-hero" aria-labelledby="champ-title">
         {art.splash && <img className="champ-hero-art" src={art.splash} alt="" fetchPriority="high" />}
         <div className="champ-hero-inner">
-          <p className="dateline">
-            <Link href="/champions/">Champions</Link> · {champion.attackType === 'ranged' ? 'Ranged' : 'Melee'}
-            {(FORM_DEPENDENT_CHAMPIONS as readonly string[]).includes(id) && ' (changes with form; the calculator uses this one)'}
-          </p>
           <h1 id="champ-title" className="champ-title">{champion.name}</h1>
           {lanes.length > 0 && (
             <ul className="lane-chips" aria-label="Lanes in CN ranked">
@@ -68,7 +65,11 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
               <div><dt>Strength in {LANE_LABELS[main.lane]}</dt><dd>#{main.strengthRank}<span className="muted"> of {main.laneSize}</span></dd></div>
             </dl>
           )}
-          <p className="note">{main ? `CN ranked, all ranks, ${CN_STATS.statDate}.` : 'Not in Tencent’s ranked list.'}</p>
+          <p className="note">
+            {champion.attackType === 'ranged' ? 'Ranged' : 'Melee'}
+            {(FORM_DEPENDENT_CHAMPIONS as readonly string[]).includes(id) && ' (changes with form; the calculator uses this one)'}
+            {' · '}{main ? `CN ranked, all ranks, ${CN_STATS.statDate}.` : 'Not in Tencent’s ranked list.'}
+          </p>
           <Link className="button" href={`/calculator/?champ=${id}`}>Open in the calculator <ArrowIcon /></Link>
         </div>
       </section>
@@ -150,7 +151,7 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div>
                   <h3>{ability.name}</h3>
-                  <pre className="text">{ability.description}</pre>
+                  {ability.description.split('\n').filter((line) => line.trim() !== '').map((line, index) => <p key={index}>{line}</p>)}
                 </div>
               </li>
             ))}
@@ -160,24 +161,18 @@ export default async function ChampionPage({ params }: { params: Promise<{ id: s
         <section aria-labelledby="rates-title">
           <h2 id="rates-title">Win rates by rank</h2>
           {brackets.length === 0 ? <p className="muted">Not in Tencent&apos;s ranked list.</p> : (
-            <div className="bracket-grid">
-              {brackets.map(({ rank, lanes: rows }) => (
-                <section key={rank}>
-                  <h3 className="build-sub">{CN_RANK_LABELS[rank]}</h3>
-                  <StatTable<LaneStat>
-                    rows={rows}
-                    rowKey={(row) => row.lane}
-                    columns={[
-                      { key: 'lane', label: 'Lane', render: (row) => LANE_LABELS[row.lane] },
-                      { key: 'strength', label: 'Strength', numeric: true, render: (row) => `${row.strengthRank} / ${row.laneSize}` },
-                      { key: 'win', label: 'Win', numeric: true, render: (row) => pct(row.winRate) },
-                      { key: 'pick', label: 'Pick', numeric: true, render: (row) => pct(row.pickRate) },
-                      { key: 'ban', label: 'Ban', numeric: true, render: (row) => pct(row.banRate) },
-                    ]}
-                  />
-                </section>
-              ))}
-            </div>
+            <StatTable<LaneStat & { rank: CnRank }>
+              rows={brackets.flatMap(({ rank, lanes: rows }) => rows.map((row) => ({ ...row, rank })))}
+              rowKey={(row) => `${row.rank}-${row.lane}`}
+              columns={[
+                { key: 'rank', label: 'Rank', render: (row) => CN_RANK_LABELS[row.rank] },
+                { key: 'lane', label: 'Lane', render: (row) => LANE_LABELS[row.lane] },
+                { key: 'strength', label: 'Strength', numeric: true, render: (row) => `${row.strengthRank} / ${row.laneSize}` },
+                { key: 'win', label: 'Win', numeric: true, render: (row) => pct(row.winRate) },
+                { key: 'pick', label: 'Pick', numeric: true, render: (row) => pct(row.pickRate) },
+                { key: 'ban', label: 'Ban', numeric: true, render: (row) => pct(row.banRate) },
+              ]}
+            />
           )}
         </section>
       </div>

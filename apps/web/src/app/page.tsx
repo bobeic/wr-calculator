@@ -46,7 +46,6 @@ export default function HomePage() {
           {leadArt?.splash && <img className="home-hero-art" src={leadArt.splash} alt="" fetchPriority="high" />}
           <div className="home-hero-inner">
             <div className="home-hero-copy">
-              <p className="dateline">CN ranked, all ranks · <strong>{CN_STATS.statDate}</strong> · patch {CURRENT_PATCH}</p>
               <h1 id="home-title" className="home-title">
                 {name(lead.stat.championId)} is the strongest {LANE_LABELS[lead.lane]} pick right now
               </h1>
@@ -54,6 +53,7 @@ export default function HomePage() {
                 <span className="home-stat-big up">{pct(lead.stat.winRate)}</span>
                 <span className="muted">win rate · {pct(lead.stat.pickRate)} picked · {pct(lead.stat.banRate)} banned</span>
               </p>
+              <p className="dateline">CN ranked, all ranks, <strong>{CN_STATS.statDate}</strong> · patch {CURRENT_PATCH}</p>
               {leadCore && (
                 <div className="home-build">
                   <span className="note">Most-picked Diamond+ core</span>
@@ -73,7 +73,7 @@ export default function HomePage() {
               )}
               <div className="home-actions">
                 <Link className="button" href="/tier-list/">Full tier list <ArrowIcon /></Link>
-                <Link className="quiet-link" href={championHref(lead.stat.championId)}>{name(lead.stat.championId)} builds <ArrowIcon /></Link>
+                <Link className="quiet-link" href="/calculator/">Build calculator <ArrowIcon /></Link>
               </div>
             </div>
           </div>

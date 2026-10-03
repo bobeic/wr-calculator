@@ -13,7 +13,7 @@ export interface TierListProps {
   rankLabels: Record<CnRank, string>
   laneLabels: Record<Lane, string>
   names: Record<string, string>
-  art: Record<string, { icon?: string; card?: string }>
+  art: Record<string, { icon?: string; splash?: string }>
 }
 
 /** Win rate against an even 50%: above reads as rising, below as falling. */
@@ -54,7 +54,7 @@ export function TierList({ ranks, rankLabels, laneLabels, names, art }: TierList
               <div className="tier-letter tier-badge" data-tier={tier} aria-hidden="true">{tier}</div>
               <ol className={featured ? 'tier-cards' : 'tier-tiles'}>
                 {tierRows.map((row) => {
-                  const image = featured ? art[row.championId]?.card : art[row.championId]?.icon
+                  const image = featured ? art[row.championId]?.splash : art[row.championId]?.icon
                   return (
                     <li key={row.championId}>
                       <Link href={championHref(row.championId)} className={featured ? 'tier-card' : 'tier-tile'}>
@@ -63,8 +63,9 @@ export function TierList({ ranks, rankLabels, laneLabels, names, art }: TierList
                           : <span className="icon-img" />}
                         <span className="tier-name">{name(row)}</span>
                         <span className="tier-stats">
-                          <span className={trend(row.winRate)}>{pct(row.winRate)}</span>
-                          <span className="tier-more"> · {pct(row.pickRate)} pick · {pct(row.banRate)} ban</span>
+                          <span><span className={trend(row.winRate)}>{pct(row.winRate)}</span> win</span>
+                          <span>{pct(row.pickRate)} pick</span>
+                          <span>{pct(row.banRate)} ban</span>
                         </span>
                         <span className="tier-rank">#{row.strengthRank}</span>
                       </Link>

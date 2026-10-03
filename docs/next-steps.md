@@ -88,10 +88,15 @@ Steps once a name is chosen:
    ability rows (e.g. Aatrox Q 10/40/70/100 live vs 15/45/75/105 CN): wrpocket's champion numbers are *not* a straight
    copy of Tencent's, unlike its items. A few rows look like Tencent glitches (Ahri E shows one value). Later: the
    calculated preview (brainstorm §4.2), if the log shows CN changes worth simulating.
-6. **Design pass:** answers in (2026-10-03), work on branch `design-pass`. Reference: wildriftalpha.com (layout and
-   gaming-site feel). Splash art and champion/item icons both wanted; download them at build time and serve them from
-   the site rather than hotlinking Riot's or Tencent's CDN. Dark theme only for now. The design skills
-   (`impeccable`, `design-taste-frontend`, `redesign-existing-projects`) are vendored in `.claude/skills/`.
+6. **Design pass:** first pass done on branch `design-pass` (2026-10-03), not merged yet. Reference: wildriftalpha.com.
+   Dark, splash-led look: shell, home, tier list and champion page redesigned; the other pages (items, runes, patches,
+   calculator) only pick up the new tokens and still need their own pass. Game art comes from Tencent's Wild Rift feeds
+   (Riot Data Dragon for a few ability icons), downloaded by `pnpm --filter @wr-calc/data art:update` into
+   `apps/web/public/art/` (gitignored; the web build runs it, the deploy workflow caches it). The design system is in
+   `apps/web/DESIGN.md`; product facts in `apps/web/PRODUCT.md`; screenshots in `docs/design/2026-10-03/`. Design skills
+   (`impeccable`, `design-taste-frontend`, `redesign-existing-projects`) are vendored in `.claude/skills/`. Open ideas
+   from the review: art on the tier list beyond the S+ row, more framing on detail sections, tier tiles revealing pick
+   and ban on hover.
 8. **Later: light mode and other languages.** Both are likely wanted. Keep every colour a token in `globals.css` (no
    hard-coded colours in pages) so a light theme is a second token block, and keep UI strings easy to pull into
    per-language files (wildriftalpha does EN, TR, RU, ES, FR, PL). Champion and item names would need Riot's or
