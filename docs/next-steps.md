@@ -6,7 +6,16 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
 
 - The site is live at https://bobeic.github.io/wr-calculator/ and redeploys on every push to `main`
   (`.github/workflows/deploy-site.yml`).
-- The daily CN win-rate and patch-check workflows run on schedules and open pull requests when something changes.
+- The daily CN win-rate and patch-check workflows run on schedules and open pull requests when something changes. The
+  CN one merges its own PR once the full typecheck and tests pass, then starts a deploy (2026-10-04); patch-check PRs
+  stay manual.
+- Launch basics (2026-10-04): `sitemap.xml`, `robots.txt` (blocks `/debug/`, only read by crawlers once the site has
+  its own domain), a link-preview image (`apps/web/src/app/opengraph-image.png`; re-render it if the name changes), a
+  404 page, and `/debug` is a 404 in production builds (`next dev` only). The site URL comes from GitHub Pages in the
+  deploy workflow, so all of this follows a custom domain without code changes.
+- Analytics: Cloudflare Web Analytics is wired up but off until `CF_ANALYTICS_TOKEN` in
+  `apps/web/src/lib/site/brand.ts` is filled in (owner: create a free Cloudflare account → Web Analytics → add site →
+  copy the token).
 - Champion pages show CN Diamond+ builds (top 3-item cores and rune pages per lane, each with a "Try" link into the
   calculator), from `https://wrchina.gg/api/build/<heroId>_1.json`, refreshed by the same daily workflow. Upgraded
   support items and transformed items (Muramana, Seraph's, Fimbulwinter) show as their base item; Diadem of Songs
@@ -93,8 +102,7 @@ Steps once a name is chosen:
    copy of Tencent's, unlike its items. A few rows look like Tencent glitches (Ahri E shows one value). Later: the
    calculated preview (brainstorm §4.2), if the log shows CN changes worth simulating.
 6. **Design pass:** first pass (2026-10-03, merged): dark, splash-led shell, home, tier list and champion page. The
-   owner liked it but it read too close to wildriftalpha.com, so a second pass is on branch `design-pass-2`
-   (not merged; screenshots in `docs/design/2026-10-03b/`): the home page is a lane board (highest win rates per lane
+   owner liked it but it read too close to wildriftalpha.com, so a second pass followed (merged to `main`; screenshots in `docs/design/2026-10-03b/`): the home page is a lane board (highest win rates per lane
    with their most-picked core, over the leader's splash) plus a champion search, and "Builds beating the meta" (cores
    out-winning the most-picked one by 3+ points in 5%+ of games, rule in `apps/web/src/lib/site/builds.ts`) with
    "Compare" links that open both builds in the calculator; champion pages badge those builds and get a compact hero;
@@ -102,7 +110,7 @@ Steps once a name is chosen:
    the tier list has a "Meta map" view (win rate against pick rate). Items, runes, patches and the calculator still
    need their own pass; a logo waits for the name. The design system is in `apps/web/DESIGN.md`; how to edit it:
    `docs/design/README.md`.
-9. **Learning features** (branch `learn`, on top of `design-pass-2`, not merged; owner wants the site educational):
+9. **Learning features** (merged to `main`; owner wants the site educational):
    - Done: toughest matchups per lane on champion pages (wrchina's Diamond+ counter data, fetched by
      `cn-builds:update`); power spikes (combo damage after each item) on every popular core; champion guides from
      `content/guides/<id>.md` (template and writing rules in `content/guides/`), shown under the builds. No guides

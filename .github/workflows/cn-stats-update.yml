@@ -1,8 +1,8 @@
 name: CN stats update
 
 # Fetches the CN server's win, pick and ban rates (Tencent) Diamond+ builds (wrchina.gg) and CN feed changes (preview) and opens a pull request when they changed. Tencent publishes
-# them daily. Runs every day (and by hand). Needs the "Allow GitHub Actions to create and approve pull requests"
-# setting, which is on (user, 2026-10-03).
+# them daily. Runs every day (and by hand), and merges its own pull request once the full typecheck and tests pass.
+# Needs the "Allow GitHub Actions to create and approve pull requests" setting, which is on (user, 2026-10-03).
 on:
   workflow_dispatch:
   schedule:
@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   update:
@@ -31,9 +32,11 @@ jobs:
         run: pnpm --filter @wr-calc/data cn-builds:update | tee -a cn-stats.log
       - name: Check the CN feed for changes
         run: pnpm --filter @wr-calc/data cn-preview:update | tee -a cn-stats.log
+      # The whole suite, not just the CN tests: the PR merges itself, and CI doesn't run on PRs opened by this token.
       - name: Check the result
-        run: pnpm --filter @wr-calc/data test -- test/cn-stats test/cn-builds test/cn-preview
+        run: pnpm typecheck && pnpm test
       - name: Open a pull request
+        id: pr
         uses: peter-evans/create-pull-request@v8
         with:
           branch: cn-stats-update/auto
@@ -46,3 +49,14 @@ jobs:
             packages/data/src/cn-preview/generated
             packages/data/snapshots/tencent
           delete-branch: true
+      - name: Merge it
+        if: steps.pr.outputs.pull-request-number && steps.pr.outputs.pull-request-operation != 'closed'
+        run: gh pr merge ${{ steps.pr.outputs.pull-request-number }} --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+      # A merge made with this token doesn't trigger the push-to-main deploy, so start it by hand.
+      - name: Redeploy the site
+        if: steps.pr.outputs.pull-request-number && steps.pr.outputs.pull-request-operation != 'closed'
+        run: gh workflow run deploy-site.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

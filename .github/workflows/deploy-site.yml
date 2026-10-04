@@ -43,6 +43,7 @@ jobs:
         run: pnpm --filter @wr-calc/web build
         env:
           NEXT_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_SITE_URL: ${{ steps.pages.outputs.base_url }}
       - uses: actions/upload-pages-artifact@v5
         with:
           path: apps/web/out
