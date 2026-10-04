@@ -1,5 +1,5 @@
 ---
-name: Wild Rift Builds
+name: Wild Rift Coach
 description: Wild Rift's loading screen turned into a scoreboard — splash art as data on a blue-black hextech ground.
 colors:
   ground: "#070b14"
@@ -91,7 +91,7 @@ components:
     height: "36px"
 ---
 
-# Design System: Wild Rift Builds
+# Design System: Wild Rift Coach
 
 ## Overview
 

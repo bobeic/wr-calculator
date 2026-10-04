@@ -8,14 +8,16 @@ web
 
 ## Users
 
-Wild Rift ranked players who want to know what to pick and build this patch: which champions are strong, what the
+Wild Rift ranked players who want to get better: how to play their role and champion, plus what to pick and build this patch: which champions are strong, what the
 best players build, and what changed. They check it before or between games, on whatever device is at hand (often a
 laptop or desktop rather than the phone they play on, but phones too). A smaller group of theorycrafters uses the
 damage calculator to dig into build maths.
 
 ## Product Purpose
 
-A Wild Rift reference site: CN-server tier list and win rates, champion pages with CN Diamond+ builds, items, runes,
+A coaching site first (owner's direction, 2026-10-04): in-depth guides written from the owner's own knowledge, starting
+with jungle (gank timing, objectives), and later an AI coach that answers only from those guides and the site's data.
+Around that, the reference pages: CN-server tier list and win rates, champion pages with CN Diamond+ builds, items, runes,
 patch notes with every changed value, and a build damage calculator. Success is a ranked player getting a confident
 pick-and-build answer in seconds, and coming back each patch.
 
@@ -24,8 +26,9 @@ pick-and-build answer in seconds, and coming back each patch.
 Data straight from the China server (Tencent's ranked stats, wrchina.gg Diamond+ builds, a daily log of CN-only
 changes before they reach global) plus a real calculation engine: combo damage, time to kill, two-build comparison and
 "best first item", none of which listing sites offer. The calculator is the depth layer and differentiator, not the
-headline; the browse pages are the main draw. More theory content may come later. (Owner delegated this framing,
-2026-10-03.)
+headline. The knowledge base is what separates the site from generic AI advice: every guide comes from the owner
+(drafted from stream transcripts where useful, then checked by them), and nothing unverified is shown as advice.
+(2026-10-04; earlier framing delegated by the owner on 2026-10-03.)
 
 ## Operating Context
 
@@ -43,7 +46,7 @@ headline; the browse pages are the main draw. More theory content may come later
 - English only for now; other languages and a light theme are likely later, so UI strings and colours must stay easy
   to swap.
 - Must look good on phones, tablets and desktops alike.
-- Name undecided: working name "wildriftbuilds"; the site currently says "wr-calc".
+- Name: Wild Rift Coach (2026-10-04, was Wild Rift Builds). Domain not bought yet.
 
 ## Brand Commitments
 

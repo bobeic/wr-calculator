@@ -14,7 +14,7 @@ export const metadata = {
   // Origin only: Next adds the base path to image URLs itself.
   metadataBase: new URL('/', SITE_URL),
   title: { default: SITE_NAME, template: `%s · ${SITE_NAME}` },
-  description: 'Wild Rift win rates, builds, patch changes and a damage calculator, to help you pick, build and improve.',
+  description: 'Get better at Wild Rift: win rates, builds, matchups, patch changes and a damage calculator.',
   openGraph: { siteName: SITE_NAME, type: 'website' },
   twitter: { card: 'summary_large_image' },
 }

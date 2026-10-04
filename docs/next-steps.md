@@ -37,10 +37,11 @@ Where the project stands (2026-10-03) and what comes next. Update this file as i
 
 ## Domain (not bought yet)
 
-The working name is **wildriftbuilds**. When checked on 2026-10-03, `wildriftbuilds.com`, `wildriftbuilds.app` and
-`wildriftbuild.com` were unregistered; `.gg` couldn't be checked. Other free options were `riftmath.com` / `.app`,
-`riftcalc.com` / `.app`, `riftsheet.com` and `wrtheory.com`. "Wild Rift" is Riot's trademark: fan sites commonly use it
-and the footer already says the site is unaffiliated, but a name without it (e.g. riftmath) avoids the question.
+The name is **Wild Rift Coach** (owner, 2026-10-04: the site's focus is helping people get better; owner isn't worried
+about the trademark). Checked against the registries on 2026-10-04: `wildriftcoach.com` is taken (registered
+2025-03, no website), and so are `wrcoach.com`, `riftcoach.com`, `riftcoach.app`, `riftcoach.gg` and
+`wildriftcoaching.com` (a coaching business's site). Free: `wildriftcoach.gg`, `.app`, `.io`, `.net`, `.org`,
+`wildrift.coach`, `wrcoach.gg`, `wrcoach.app`, `thewildriftcoach.com`.
 
 Steps once a name is chosen:
 
@@ -60,9 +61,8 @@ Steps once a name is chosen:
 4. **Optional:** verify the domain under your GitHub account's Settings → Pages, so no one else can point a site at it.
 5. **Re-run the "Deploy site" workflow.** With a custom domain the build drops the `/wr-calculator/` sub-path
    automatically.
-6. **Rename the site** if the name changes: `SITE_NAME` in `apps/web/src/lib/site/brand.ts` (header, titles, footer)
-   and the README. Working name since 2026-10-03: **Wild Rift Builds** (owner: go with "Wild Rift something" like
-   other fan sites, change the domain later if it ever becomes a problem).
+6. **Rename the site** if the name changes: `SITE_NAME` in `apps/web/src/lib/site/brand.ts` (header, titles, footer),
+   the README, and re-render `apps/web/src/app/opengraph-image.png` (the link preview has the name in it).
 
 ## Needs the owner
 
@@ -111,6 +111,11 @@ Steps once a name is chosen:
    need their own pass; a logo waits for the name. The design system is in `apps/web/DESIGN.md`; how to edit it:
    `docs/design/README.md`.
 9. **Learning features** (merged to `main`; owner wants the site educational):
+   - Direction (2026-10-04): the site is now **Wild Rift Coach**; guides and the AI coach are the focus, the data pages
+     support them. First guides: **jungle** (when to gank, objectives), the owner's strongest area. These are role
+     guides, not champion guides, so they need a topic-guide page (not built yet; `content/guides/` is per champion).
+   - Stream transcripts: the owner has many long streams; draft guide notes from their transcripts, which the owner
+     checks before anything is published. Waiting on: where the VODs live (Twitch/YouTube) and a first one to try.
    - Done: toughest matchups per lane on champion pages (wrchina's Diamond+ counter data, fetched by
      `cn-builds:update`); power spikes (combo damage after each item) on every popular core; champion guides from
      `content/guides/<id>.md` (template and writing rules in `content/guides/`), shown under the builds. No guides

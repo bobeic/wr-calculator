@@ -1,5 +1,5 @@
 // The site's name in one place: the working name until a domain is bought (see docs/next-steps.md).
-export const SITE_NAME = 'Wild Rift Builds'
+export const SITE_NAME = 'Wild Rift Coach'
 
 // The site's public address, for the sitemap and link previews. The deploy workflow sets it from GitHub Pages, so it
 // follows a custom domain automatically.
