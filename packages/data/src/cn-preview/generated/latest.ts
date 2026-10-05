@@ -3,7 +3,7 @@
 import type { CnPreview } from '../types'
 
 export const CN_PREVIEW: CnPreview = {
- "checkedAt": "2026-10-04T12:13:53.728Z",
+ "checkedAt": "2026-10-05T11:42:34.730Z",
  "version": "7.3",
  "fileTime": "2026-09-29 16:09:42",
  "log": [],
