@@ -583,7 +583,7 @@
       "base.armorperlevel": "4.5",
       "base.attack": "60",
       "base.attackspeed": "0.2",
-      "base.attackspeedperlevel": "0.04",
+      "base.attackspeedperlevel": "0.025",
       "base.crit": "2",
       "base.hp": "600",
       "base.hpperlevel": "128",
@@ -1485,8 +1485,8 @@
       "q.cd": "9/8/7/6",
       "q.cost": "80",
       "q.攒聚雷丨基础伤害": "80/110/140/170",
-      "q.攒聚雷丨基础额外伤害": "200/330/490/680",
-      "q.没骨火丨基础伤害": "50/90/130/170",
+      "q.攒聚雷丨基础额外伤害": "160/275/420/595",
+      "q.没骨火丨基础伤害": "50/85/120/155",
       "q.没骨火丨最大生命值伤害": "4%/5%/6%/7%",
       "q.连皴山丨持续伤害": "20/40/60/80",
       "q.连皴山丨爆炸伤害": "20/35/50/65",
@@ -1497,10 +1497,10 @@
       "w.MP": "90/95/100/105",
       "w.cd": "17/16/16/15",
       "w.cost": "90",
-      "w.宿墨丨基础伤害": "30/40/50/60",
+      "w.宿墨丨基础伤害": "20/30/40/50",
       "w.宿墨丨法力回复": "45/50/55/60",
-      "w.渲浓丨基础护盾": "60/80/100/120",
-      "w.渲浓丨最大基础护盾": "108/128/148/168",
+      "w.渲浓丨基础护盾": "50/70/90/110",
+      "w.渲浓丨最大基础护盾": "98/118/138/158",
       "w.飞染丨持续时间": "4/4.5/5/5.5",
       "w.飞染丨移速加成": "30%/32%/35%/37%"
     },
@@ -2563,7 +2563,7 @@
       "q.基础伤害": "70/130/190/250",
       "q.移速降低": "15%/20%/25%/30%",
       "r.MP": "100/100/100",
-      "r.cd": "75/70/65",
+      "r.cd": "85/80/75",
       "r.cost": "100",
       "r.基础伤害": "200/300/400",
       "w.MP": "25/25/25/25",
@@ -3057,7 +3057,7 @@
       "base.attackspeedperlevel": "0.024",
       "base.crit": "2",
       "base.hp": "660",
-      "base.hpperlevel": "134",
+      "base.hpperlevel": "128",
       "base.hpregen": "10",
       "base.hpregenperlevel": "0.8",
       "base.magic": "0",
@@ -3081,7 +3081,7 @@
       "q.移速加成": "20%/25%/30%/35%",
       "q.额外攻击力": "20/30/40/50",
       "r.MP": "100/100/100",
-      "r.cd": "110/90/70",
+      "r.cd": "120/100/80",
       "r.cost": "100",
       "r.基础伤害": "150/275/400",
       "w.MP": "50/50/50/50",
@@ -3447,7 +3447,7 @@
       "w.基础伤害": "70/135/200/265"
     },
     "champion:rammus": {
-      "base.armor": "45",
+      "base.armor": "40",
       "base.armorperlevel": "4.7",
       "base.attack": "54",
       "base.attackspeed": "0.28",
@@ -3705,13 +3705,13 @@
     },
     "champion:samira": {
       "base.armor": "35",
-      "base.armorperlevel": "5",
+      "base.armorperlevel": "5.5",
       "base.attack": "60",
       "base.attackspeed": "0.14",
       "base.attackspeedperlevel": "0.03",
       "base.crit": "2",
       "base.hp": "630",
-      "base.hpperlevel": "128",
+      "base.hpperlevel": "136",
       "base.hpregen": "7.5",
       "base.hpregenperlevel": "0.68",
       "base.magic": "0",
@@ -3721,7 +3721,7 @@
       "base.mpregen": "15",
       "base.mpregenperlevel": "0.5",
       "base.spellblock": "30",
-      "base.spellblockperlevel": "1.4",
+      "base.spellblockperlevel": "2",
       "e.MP": "40/40/40/40",
       "e.cd": "20/17/14/11",
       "e.cost": "40",
@@ -3745,8 +3745,8 @@
       "base.armor": "35",
       "base.armorperlevel": "4.5",
       "base.attack": "50",
-      "base.attackspeed": "0.6",
-      "base.attackspeedperlevel": "0.05",
+      "base.attackspeed": "1.1",
+      "base.attackspeedperlevel": "0.025",
       "base.crit": "2",
       "base.hp": "570",
       "base.hpperlevel": "120",
@@ -4481,7 +4481,7 @@
       "r.cost": "100",
       "r.基础伤害": "350/450/550",
       "w.MP": "60/60/60/60",
-      "w.cd": "22/20/18/16",
+      "w.cd": "20/18/16/14",
       "w.cost": "60",
       "w.基础伤害": "85/155/225/295",
       "w.移速降低时间": "1.5/2/2.5/3"
@@ -5286,7 +5286,7 @@
       "q.攻速加成": "25%",
       "q.被动附带伤害": "5",
       "r.MP": "100/100/100",
-      "r.cd": "70/60/50",
+      "r.cd": "70/65/60",
       "r.cost": "100",
       "w.MP": "60/60/60/60",
       "w.cd": "10/10/10/10",
@@ -5914,7 +5914,7 @@
     "item:deaths-dance": {
       "from": "caulfields-warhammer,chain-vest,pickaxe",
       "name": "死亡之舞",
-      "price": "3200",
+      "price": "3300",
       "stat.ad": "50",
       "stat.armor": "45"
     },
@@ -6289,9 +6289,9 @@
     "item:locket-of-the-iron-solari": {
       "from": "cloth-armor,kindlegem,null-magic-mantle",
       "name": "钢铁烈阳之匣",
-      "price": "2600",
+      "price": "2500",
       "stat.armor": "30",
-      "stat.hp": "200",
+      "stat.hp": "300",
       "stat.magicBlock": "30"
     },
     "item:long-sword": {
@@ -6650,7 +6650,7 @@
     "item:statikk-shiv": {
       "from": "aether-wisp,kircheis-shard,pickaxe",
       "name": "斯塔缇克电刃",
-      "price": "3000",
+      "price": "2900",
       "stat.ad": "40",
       "stat.attackSpeed": "30",
       "stat.magicAttack": "40",
@@ -6725,7 +6725,7 @@
     "item:thornmail": {
       "from": "bramble-vest,chain-vest",
       "name": "荆棘之甲",
-      "price": "2700",
+      "price": "2850",
       "stat.armor": "75",
       "stat.hp": "200"
     },
@@ -6833,7 +6833,7 @@
     "item:youmuus-ghostblade": {
       "from": "caulfields-warhammer,serrated-dirk",
       "name": "幽梦之魂",
-      "price": "3000",
+      "price": "2900",
       "stat.ad": "55",
       "stat.armorPene": "15",
       "stat.moveRate": "4"
@@ -6841,9 +6841,9 @@
     "item:yun-tal-wildarrows": {
       "from": "bf-sword,kircheis-shard",
       "name": "育恩塔尔荒野箭",
-      "price": "3100",
+      "price": "3000",
       "stat.ad": "50",
-      "stat.attackSpeed": "25"
+      "stat.attackSpeed": "35"
     },
     "item:zeal": {
       "from": "brawlers-gloves,dagger",
@@ -6869,6 +6869,6 @@
       "stat.magicAttack": "110"
     }
   },
-  "fileTime": "2026-09-29 16:09:42",
+  "fileTime": "2026-10-28 14:32:31",
   "version": "7.3"
 }
